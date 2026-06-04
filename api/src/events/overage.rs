@@ -97,7 +97,7 @@ pub async fn track_daily_event(
                         match provider.ingest_overage_event(&ext_id, 1).await {
                             Ok(()) => break,
                             Err(e) => {
-                                tracing::warn!("⚠️ Polar overage event attempt {}/3 failed for {}: {}", attempt + 1, ext_id, e);
+ tracing::warn!(" Polar overage event attempt {}/3 failed for {}: {}", attempt + 1, ext_id, e);
                                 if attempt < 2 {
                                     tokio::time::sleep(tokio::time::Duration::from_secs(2u64.pow(attempt + 1))).await;
                                 }
@@ -135,7 +135,7 @@ async fn send_limit_notification(
     let (subject, body) = if is_en {
         match status {
             "approaching" => (
-                "⚠️ HookSniff: You've reached 80% of your event limit".to_string(),
+ " HookSniff: You've reached 80% of your event limit".to_string(),
                 format!(
                     "Hello,\n\nYou've reached 80% of your daily event limit.\n\
                      Current usage: {}/{}\n\n\
@@ -145,7 +145,7 @@ async fn send_limit_notification(
                 ),
             ),
             "at_limit" => (
-                "🔴 HookSniff: You've reached your daily event limit".to_string(),
+ " HookSniff: You've reached your daily event limit".to_string(),
                 format!(
                     "Hello,\n\nYou've reached your daily event limit.\n\
                      Current usage: {}/{}\n\n\
@@ -155,7 +155,7 @@ async fn send_limit_notification(
                 ),
             ),
             "exceeded" => (
-                "💰 HookSniff: Event limit exceeded — overage charges apply".to_string(),
+ " HookSniff: Event limit exceeded — overage charges apply".to_string(),
                 format!(
                     "Hello,\n\nYou've exceeded your daily event limit.\n\
                      Current usage: {}/{}\n\n\
@@ -169,7 +169,7 @@ async fn send_limit_notification(
     } else {
         match status {
             "approaching" => (
-                "⚠️ HookSniff: Event limitinizin %80'ine ulaştınız".to_string(),
+ " HookSniff: Event limitinizin %80'ine ulaştınız".to_string(),
                 format!(
                     "Merhaba,\n\nGünlük event limitinizin %80'ine ulaştınız.\n\
                      Mevcut kullanım: {}/{}\n\n\
@@ -179,7 +179,7 @@ async fn send_limit_notification(
                 ),
             ),
             "at_limit" => (
-                "🔴 HookSniff: Günlük event limitinize ulaştınız".to_string(),
+ " HookSniff: Günlük event limitinize ulaştınız".to_string(),
                 format!(
                     "Merhaba,\n\nGünlük event limitinize ulaştınız.\n\
                      Mevcut kullanım: {}/{}\n\n\
@@ -189,7 +189,7 @@ async fn send_limit_notification(
                 ),
             ),
             "exceeded" => (
-                "💰 HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor".to_string(),
+ " HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor".to_string(),
                 format!(
                     "Merhaba,\n\nGünlük event limitinizi aştınız.\n\
                      Mevcut kullanım: {}/{}\n\n\
@@ -207,20 +207,20 @@ async fn send_limit_notification(
         match client.send_contact_email(&customer.email, &subject, &body).await {
             Ok(()) => {
                 tracing::info!(
-                    "📧 Overage notification sent to {}: {} ({}, {}/{})",
+ " Overage notification sent to {}: {} ({}, {}/{})",
                     customer.email, subject, status, current, limit
                 );
             }
             Err(e) => {
                 tracing::warn!(
-                    "⚠️ Failed to send overage notification to {}: {:?}",
+ " Failed to send overage notification to {}: {:?}",
                     customer.email, e
                 );
             }
         }
     } else {
         tracing::info!(
-            "📧 Overage notification (no email provider): {} — {} ({}, {}/{})",
+ " Overage notification (no email provider): {} — {} ({}, {}/{})",
             customer.email, subject, status, current, limit
         );
     }

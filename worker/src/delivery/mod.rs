@@ -444,10 +444,10 @@ async fn deliver_email(
             let success = (200..300).contains(&status_code);
 
             if success {
-                info!("✅ Email delivered to {} for {}", to, webhook.delivery_id);
+ info!(" Email delivered to {} for {}", to, webhook.delivery_id);
             } else {
                 warn!(
-                    "⚠️ Email delivery got status {}: {}",
+ " Email delivery got status {}: {}",
                     status_code, resp_body
                 );
             }
@@ -467,7 +467,7 @@ async fn deliver_email(
         }
         Err(e) => {
             warn!(
-                "❌ Email delivery failed for {}: {:?}",
+ " Email delivery failed for {}: {:?}",
                 webhook.delivery_id, e
             );
             Ok(DeliveryResult {

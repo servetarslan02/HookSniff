@@ -86,7 +86,7 @@ impl SchemaRegistry {
         .context("Failed to register schema")?;
 
         info!(
-            "📝 Registered schema '{}' v{} for customer {}",
+ " Registered schema '{}' v{} for customer {}",
             request.name, version, customer_id
         );
 
@@ -194,7 +194,7 @@ impl SchemaRegistry {
             .await
             .context("Failed to update schema from event")?;
 
-        info!("📝 Auto-detected schema for {}", schema_id);
+ info!(" Auto-detected schema for {}", schema_id);
 
         let schema = self
             .get(schema_id)

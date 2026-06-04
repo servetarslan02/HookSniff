@@ -50,7 +50,7 @@ async fn main() -> Result<()> {
         async {
             match db::create_health_pool(&db_url).await {
                 Ok(p) => {
-                    tracing::info!("✅ Health check pool created (5 connections)");
+ tracing::info!(" Health check pool created (5 connections)");
                     db::HealthPool(p)
                 }
                 Err(e) => {
@@ -97,28 +97,28 @@ async fn main() -> Result<()> {
         if let Some(ref url) = redis_url {
             match tokio::time::timeout(redis_startup, queue::RedisQueue::new(url)).await {
                 Ok(Ok(q)) => {
-                    tracing::info!("✅ Redis Streams webhook queue active (USE_REDIS_QUEUE=true)");
+ tracing::info!(" Redis Streams webhook queue active (USE_REDIS_QUEUE=true)");
                     redis_queue = Some(q);
                 }
                 Ok(Err(e)) => {
-                    tracing::warn!("⚠️ Redis Streams queue unavailable ({}), using PG fallback", e);
+ tracing::warn!(" Redis Streams queue unavailable ({}), using PG fallback", e);
                 }
                 Err(_) => {
-                    tracing::warn!("⚠️ Redis Streams queue timed out, using PG fallback");
+ tracing::warn!(" Redis Streams queue timed out, using PG fallback");
                 }
             }
         } else {
-            tracing::warn!("⚠️ USE_REDIS_QUEUE=true but REDIS_URL not set, using PG queue");
+ tracing::warn!(" USE_REDIS_QUEUE=true but REDIS_URL not set, using PG queue");
         }
     } else {
-        tracing::info!("ℹ️ Redis queue disabled (USE_REDIS_QUEUE=false), using PG queue");
+ tracing::info!("ℹ Redis queue disabled (USE_REDIS_QUEUE=false), using PG queue");
     }
 
     // Initialize global REDIS_QUEUE for handler access
     if let Some(q) = redis_queue.take() {
         let mut global = crate::db::REDIS_QUEUE.lock().expect("REDIS_QUEUE lock");
         *global = Some(q);
-        tracing::info!("✅ Global REDIS_QUEUE initialized");
+ tracing::info!(" Global REDIS_QUEUE initialized");
     }
 
     // ── Warm-up (background) ────────────────────────────────────
@@ -169,9 +169,9 @@ async fn main() -> Result<()> {
                 }
             };
             if publisher.has_redis() {
-                tracing::info!("✅ Event publisher initialized (Redis Streams)");
+ tracing::info!(" Event publisher initialized (Redis Streams)");
             } else {
-                tracing::info!("✅ Event publisher initialized (local broadcast only — no Redis)");
+ tracing::info!(" Event publisher initialized (local broadcast only — no Redis)");
             }
             Some(publisher)
         },
@@ -214,17 +214,17 @@ async fn main() -> Result<()> {
             publisher.clone(),
             ws_gateway.clone(),
         );
-        tracing::info!("✅ Event bridge started (EventPublisher → WsGateway)");
+ tracing::info!(" Event bridge started (EventPublisher → WsGateway)");
     }
 
     let qstash_client = hooksniff_api::qstash::QStashClient::from_env();
     if qstash_client.is_some() {
-        tracing::info!("✅ QStash client initialized");
+ tracing::info!(" QStash client initialized");
     }
 
     let r2_client = hooksniff_api::r2::R2Client::from_env();
     if r2_client.is_some() {
-        tracing::info!("✅ R2 storage client initialized");
+ tracing::info!(" R2 storage client initialized");
     }
 
     let email_provider = email::EmailProvider::from_config(&cfg);
@@ -249,7 +249,7 @@ async fn main() -> Result<()> {
     let startup_duration = startup_start.elapsed();
     tracing::info!(
         startup_ms = startup_duration.as_millis() as u64,
-        "✅ API started"
+ " API started"
     );
 
     let app = Router::new()
@@ -320,7 +320,7 @@ async fn main() -> Result<()> {
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
     let addr = format!("0.0.0.0:{}", cfg.port);
-    tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
+ tracing::info!(" HookSniff API running on port {}", cfg.port);
 
     // Bind the TCP listener immediately — Render needs to see the port open within seconds
     let listener = tokio::net::TcpListener::bind(&addr).await?;
@@ -336,7 +336,7 @@ async fn main() -> Result<()> {
         .with_graceful_shutdown(shutdown_signal())
         .await?;
 
-    tracing::info!("👋 HookSniff API shut down gracefully");
+ tracing::info!(" HookSniff API shut down gracefully");
     Ok(())
 }
 
@@ -347,19 +347,19 @@ fn validate_encryption_key(cfg: &config::Config) -> Result<()> {
     if std::env::var("ENCRYPTION_KEY").is_err() {
         if cfg.is_production() {
             anyhow::bail!(
-                "🚫 ENCRYPTION_KEY must be set in production — required for SSO secrets, API keys, etc. \
+ " ENCRYPTION_KEY must be set in production — required for SSO secrets, API keys, etc. \
                  Generate one with: openssl rand -hex 32"
             );
         }
         tracing::warn!(
-            "⚠️ ENCRYPTION_KEY not set — encrypted fields will be unavailable. \
+ " ENCRYPTION_KEY not set — encrypted fields will be unavailable. \
              Generate one with: openssl rand -hex 32"
         );
     } else {
         let key_hex = std::env::var("ENCRYPTION_KEY").expect("already validated as present");
         if hex::decode(&key_hex).map(|b| b.len() != 32).unwrap_or(true) {
             anyhow::bail!(
-                "🚫 ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). \
+ " ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). \
                  Generate one with: openssl rand -hex 32"
             );
         }
@@ -378,18 +378,18 @@ fn validate_jwt_config() -> Result<()> {
 
     match (has_private_key, has_public_key) {
         (true, true) => {
-            tracing::info!("✅ JWT RS256 active — tokens signed with RSA asymmetric keys");
+ tracing::info!(" JWT RS256 active — tokens signed with RSA asymmetric keys");
         }
         (true, false) | (false, true) => {
             tracing::warn!(
-                "⚠️ JWT key pair incomplete — falling back to HS256. \
+ " JWT key pair incomplete — falling back to HS256. \
                  Set both JWT_PRIVATE_KEY + JWT_PUBLIC_KEY to enable RS256."
             );
         }
         (false, false) => {
             if std::env::var("JWT_SECRET").is_err() {
                 anyhow::bail!(
-                    "🚫 Neither JWT_PRIVATE_KEY/JWT_PUBLIC_KEY nor JWT_SECRET is set."
+ " Neither JWT_PRIVATE_KEY/JWT_PUBLIC_KEY nor JWT_SECRET is set."
                 );
             }
             tracing::info!("JWT HS256 active");
@@ -409,7 +409,7 @@ async fn build_sso_store() -> routes::sso::SsoStateStore {
                 redis::aio::ConnectionManager::new(client)
             ).await {
                 Ok(Ok(conn)) => {
-                    tracing::info!("✅ SSO state store using Redis");
+ tracing::info!(" SSO state store using Redis");
                     sso_store = sso_store.with_redis(conn);
                 }
                 Ok(Err(e)) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),

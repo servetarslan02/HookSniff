@@ -124,7 +124,7 @@ pub async fn create_platform_alert(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("🔔 Admin created alert rule: {}", req.name);
+ tracing::info!(" Admin created alert rule: {}", req.name);
 
     Ok(Json(AdminAlertRule {
         id: alert.0,

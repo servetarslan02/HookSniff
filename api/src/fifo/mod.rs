@@ -628,7 +628,7 @@ pub async fn run_fifo_migration(pool: &PgPool) -> Result<()> {
         .execute(pool)
         .await
         .context("Failed to run FIFO migration")?;
-    tracing::info!("✅ FIFO migration completed");
+ tracing::info!(" FIFO migration completed");
     Ok(())
 }
 

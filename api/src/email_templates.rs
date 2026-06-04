@@ -52,7 +52,7 @@ pub fn tpl_welcome(display_name: &str, lang: Language) -> (&'static str, String)
         Language::Tr => (
             "HookSniff'e Hoş Geldiniz!",
             email_html(&format!(
-                r#"  <h1 style="color: #6d28d9;">HookSniff'e Hoş Geldiniz, {display_name}! 🎉</h1>
+ r#" <h1 style="color: #6d28d9;">HookSniff'e Hoş Geldiniz, {display_name}! </h1>
   <p>Hesabınız başarıyla oluşturuldu.</p>
   <p>Artık uç noktalar oluşturabilir, webhook'lar kurabilir ve teslimatlarınızı izlemeye başlayabilirsiniz.</p>"#
             )),
@@ -60,7 +60,7 @@ pub fn tpl_welcome(display_name: &str, lang: Language) -> (&'static str, String)
         Language::En => (
             "Welcome to HookSniff!",
             email_html(&format!(
-                r#"  <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! 🎉</h1>
+ r#" <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! </h1>
   <p>Your account has been created successfully.</p>
   <p>You can now create endpoints, set up webhooks, and start monitoring your deliveries.</p>"#
             )),
@@ -151,12 +151,12 @@ pub fn tpl_delivery_failed(
 ) -> (String, String) {
     match lang {
         Language::Tr => (
-            format!("⚠️ Teslimat başarısız: {}", endpoint_name),
+ format!(" Teslimat başarısız: {}", endpoint_name),
             format!(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #dc2626;">Webhook Teslimatı Başarısız ⚠️</h1>
+ <h1 style="color: #dc2626;">Webhook Teslimatı Başarısız </h1>
   <p><strong>{endpoint_name}</strong> adresine yapılan webhook teslimatı başarısız oldu.</p>
   <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
               padding:16px;margin:16px 0;">
@@ -169,12 +169,12 @@ pub fn tpl_delivery_failed(
             ),
         ),
         Language::En => (
-            format!("⚠️ Delivery failed: {}", endpoint_name),
+ format!(" Delivery failed: {}", endpoint_name),
             format!(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #dc2626;">Webhook Delivery Failed ⚠️</h1>
+ <h1 style="color: #dc2626;">Webhook Delivery Failed </h1>
   <p>A webhook delivery to <strong>{endpoint_name}</strong> has failed.</p>
   <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
               padding:16px;margin:16px 0;">
@@ -229,7 +229,7 @@ pub fn tpl_invoice(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Fatura / Makbuz 🧾</h1>
+ <h1 style="color: #6d28d9;">Fatura / Makbuz </h1>
   <p>HookSniff aboneliğiniz için faturanız hazır.</p>
   <table style="width:100%;border-collapse:collapse;margin:16px 0;">
     <tr>
@@ -261,7 +261,7 @@ pub fn tpl_invoice(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Invoice / Receipt 🧾</h1>
+ <h1 style="color: #6d28d9;">Invoice / Receipt </h1>
   <p>Your invoice for the HookSniff subscription is ready.</p>
   <table style="width:100%;border-collapse:collapse;margin:16px 0;">
     <tr>
@@ -293,12 +293,12 @@ pub fn tpl_invoice(
 pub fn tpl_webhook_success(endpoint_name: &str, lang: Language) -> (&'static str, String) {
     match lang {
         Language::Tr => (
-            "✅ Webhook başarıyla teslim edildi",
+ " Webhook başarıyla teslim edildi",
             format!(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #059669;">Webhook Başarıyla Teslim Edildi ✅</h1>
+ <h1 style="color: #059669;">Webhook Başarıyla Teslim Edildi </h1>
   <p><strong>{endpoint_name}</strong> adresine yapılan webhook teslimatı başarıyla tamamlandı.</p>
   <p>HookSniff kontrol panelinizden teslimat ayrıntılarını görüntüleyebilirsiniz.</p>
   <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
@@ -307,12 +307,12 @@ pub fn tpl_webhook_success(endpoint_name: &str, lang: Language) -> (&'static str
             ),
         ),
         Language::En => (
-            "✅ Webhook delivered successfully",
+ " Webhook delivered successfully",
             format!(
                 r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #059669;">Webhook Delivered Successfully ✅</h1>
+ <h1 style="color: #059669;">Webhook Delivered Successfully </h1>
   <p>The webhook delivery to <strong>{endpoint_name}</strong> completed successfully.</p>
   <p>You can view the delivery details in your HookSniff dashboard.</p>
   <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>

@@ -455,7 +455,7 @@ mod tests {
 
     #[test]
     fn test_password_unicode() {
-        let pass = "şifre_土耳其_🔐";
+ let pass = "şifre_土耳其_";
         let hash = hash_password(pass).unwrap();
         assert!(verify_password(pass, &hash).unwrap());
     }

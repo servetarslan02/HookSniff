@@ -81,7 +81,7 @@ pub async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
 
         if del_count > 0 || att_count > 0 {
             tracing::info!(
-                "🧹 Retention cleanup [{}]: deleted {} deliveries, {} attempts ({} days)",
+ " Retention cleanup [{}]: deleted {} deliveries, {} attempts ({} days)",
                 plan,
                 del_count,
                 att_count,
@@ -101,7 +101,7 @@ pub async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
         .await?;
     let dead_count = dead_result.rows_affected();
     if dead_count > 0 {
-        tracing::info!("🧹 Retention cleanup: deleted {} old dead_letters", dead_count);
+ tracing::info!(" Retention cleanup: deleted {} old dead_letters", dead_count);
     }
 
     // Clean audit_log older than 365 days
@@ -113,7 +113,7 @@ pub async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
     let audit_count = audit_result.rows_affected();
     if audit_count > 0 {
         tracing::info!(
-            "🧹 Retention cleanup: deleted {} old audit_log entries",
+ " Retention cleanup: deleted {} old audit_log entries",
             audit_count
         );
     }

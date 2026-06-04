@@ -14,7 +14,7 @@ use crate::resend_email::ResendEmailClient;
 /// Run the weekly digest email job.
 /// Called every Monday at 09:00 UTC by the main loop.
 pub async fn run_weekly_digest(pool: &PgPool, email_client: &ResendEmailClient) -> Result<u64> {
-    tracing::info!("📊 Running weekly digest job...");
+ tracing::info!(" Running weekly digest job...");
 
     let mut emails_sent = 0u64;
 
@@ -35,7 +35,7 @@ pub async fn run_weekly_digest(pool: &PgPool, email_client: &ResendEmailClient) 
             Ok(sent) => {
                 if sent {
                     emails_sent += 1;
-                    tracing::debug!("📧 Weekly digest sent to {}", email);
+ tracing::debug!(" Weekly digest sent to {}", email);
                 }
             }
             Err(e) => {
@@ -44,7 +44,7 @@ pub async fn run_weekly_digest(pool: &PgPool, email_client: &ResendEmailClient) 
         }
     }
 
-    tracing::info!("✅ Weekly digest complete: {} emails sent", emails_sent);
+ tracing::info!(" Weekly digest complete: {} emails sent", emails_sent);
     Ok(emails_sent)
 }
 
@@ -143,10 +143,10 @@ fn build_tr_digest(
     endpoints: i64,
     failing: &[(String, i64)],
 ) -> (String, String) {
-    let subject = format!("📊 HookSniff Haftalık Özet — %{:.1} Başarı Oranı", success_rate);
+ let subject = format!(" HookSniff Haftalık Özet — %{:.1} Başarı Oranı", success_rate);
 
     let failing_html = if failing.is_empty() {
-        "<p style='color:#22c55e;'>✅ Hata yok — tüm endpoint'ler sağlıklı!</p>".to_string()
+ "<p style='color:#22c55e;'> Hata yok — tüm endpoint'ler sağlıklı!</p>".to_string()
     } else {
         let rows: String = failing.iter().map(|(url, count)| {
             format!("<tr><td style='padding:6px 8px;border:1px solid #e5e7eb;font-size:13px;'>{}</td><td style='padding:6px 8px;border:1px solid #e5e7eb;color:#dc2626;text-align:center;'>{}</td></tr>", url, count)
@@ -162,7 +162,7 @@ fn build_tr_digest(
     let html = format!(
         r#"<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#fff;">
         <div style="text-align:center;margin-bottom:24px;">
-            <h1 style="font-size:20px;margin:0;">📊 Haftalık Özet</h1>
+ <h1 style="font-size:20px;margin:0;"> Haftalık Özet</h1>
             <p style="color:#6b7280;font-size:13px;margin:4px 0 0;">{} planı • Son 7 gün</p>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
@@ -184,7 +184,7 @@ fn build_tr_digest(
             </div>
         </div>
         <div style="margin-bottom:16px;">
-            <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">✅ Başarılı: {} &nbsp;|&nbsp; ❌ Başarısız: {}</div>
+ <div style="font-size:13px;color:#6b7280;margin-bottom:4px;"> Başarılı: {} &nbsp;|&nbsp; Başarısız: {}</div>
         </div>
         {}
         <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;">
@@ -208,10 +208,10 @@ fn build_en_digest(
     endpoints: i64,
     failing: &[(String, i64)],
 ) -> (String, String) {
-    let subject = format!("📊 HookSniff Weekly Digest — {:.1}% Success Rate", success_rate);
+ let subject = format!(" HookSniff Weekly Digest — {:.1}% Success Rate", success_rate);
 
     let failing_html = if failing.is_empty() {
-        "<p style='color:#22c55e;'>✅ No failures — all endpoints healthy!</p>".to_string()
+ "<p style='color:#22c55e;'> No failures — all endpoints healthy!</p>".to_string()
     } else {
         let rows: String = failing.iter().map(|(url, count)| {
             format!("<tr><td style='padding:6px 8px;border:1px solid #e5e7eb;font-size:13px;'>{}</td><td style='padding:6px 8px;border:1px solid #e5e7eb;color:#dc2626;text-align:center;'>{}</td></tr>", url, count)
@@ -227,7 +227,7 @@ fn build_en_digest(
     let html = format!(
         r#"<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#fff;">
         <div style="text-align:center;margin-bottom:24px;">
-            <h1 style="font-size:20px;margin:0;">📊 Weekly Digest</h1>
+ <h1 style="font-size:20px;margin:0;"> Weekly Digest</h1>
             <p style="color:#6b7280;font-size:13px;margin:4px 0 0;">{} plan • Last 7 days</p>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
@@ -249,7 +249,7 @@ fn build_en_digest(
             </div>
         </div>
         <div style="margin-bottom:16px;">
-            <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">✅ Success: {} &nbsp;|&nbsp; ❌ Failed: {}</div>
+ <div style="font-size:13px;color:#6b7280;margin-bottom:4px;"> Success: {} &nbsp;|&nbsp; Failed: {}</div>
         </div>
         {}
         <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;">

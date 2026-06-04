@@ -203,12 +203,12 @@ async fn add_domain(
     // Add domain to Vercel project for automatic SSL
     let vercel_result = add_domain_to_vercel(&domain).await;
     match &vercel_result {
-        Ok(_) => tracing::info!("✅ Domain added to Vercel: {}", domain),
-        Err(e) => tracing::warn!("⚠️ Failed to add domain to Vercel (non-fatal): {}", e),
+ Ok(_) => tracing::info!(" Domain added to Vercel: {}", domain),
+ Err(e) => tracing::warn!(" Failed to add domain to Vercel (non-fatal): {}", e),
     }
 
     tracing::info!(
-        "🌐 Custom domain added: {} for customer {}",
+ " Custom domain added: {} for customer {}",
         domain,
         customer.id
     );
@@ -305,7 +305,7 @@ async fn verify_domain(
         .execute(&pool)
         .await?;
 
-        tracing::info!("✅ Domain verified: {}", domain_name);
+ tracing::info!(" Domain verified: {}", domain_name);
 
         Ok(Json(serde_json::json!({
             "verified": true,

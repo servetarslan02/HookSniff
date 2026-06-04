@@ -450,7 +450,7 @@ pub async fn run_retry_policy_migration(pool: &PgPool) -> Result<()> {
         .execute(pool)
         .await
         .context("Failed to run retry policy migration")?;
-    tracing::info!("✅ Retry policy migration completed");
+ tracing::info!(" Retry policy migration completed");
     Ok(())
 }
 

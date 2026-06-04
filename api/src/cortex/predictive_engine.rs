@@ -92,7 +92,7 @@ pub async fn run_predictions(pool: &sqlx::PgPool, config: &CortexConfig) -> Resu
         .await?;
 
         if failure_prob > config.predictive_failure_threshold {
-            tracing::warn!("⚠️ Predictive: endpoint {} has {:.0}% failure probability", endpoint_id, failure_prob * 100.0);
+ tracing::warn!(" Predictive: endpoint {} has {:.0}% failure probability", endpoint_id, failure_prob * 100.0);
         }
         count += 1;
     }

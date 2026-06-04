@@ -33,14 +33,14 @@ pub async fn ddos_middleware(
     // Layer 1: IP rate limit
     let ip_result = ddos.check_ip(&ip).await;
     if !ip_result.allowed {
-        tracing::warn!(ip = %ip, "🚫 DDoS: IP rate limit exceeded");
+ tracing::warn!(ip = %ip, " DDoS: IP rate limit exceeded");
         return Err(AppError::Forbidden);
     }
 
     // Layer 3: Global rate limit
     let global_result = ddos.check_global().await;
     if !global_result.allowed {
-        tracing::warn!("🚫 DDoS: Global rate limit exceeded");
+ tracing::warn!(" DDoS: Global rate limit exceeded");
         return Err(AppError::Forbidden);
     }
 

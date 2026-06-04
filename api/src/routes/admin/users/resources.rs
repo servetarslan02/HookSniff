@@ -401,7 +401,7 @@ pub async fn admin_user_replay_delivery(
     .await?;
 
     tracing::info!(
-        "🔁 Admin replayed delivery {} for user {} → new delivery {}",
+ " Admin replayed delivery {} for user {} → new delivery {}",
         orig_id,
         user_id,
         new_delivery.0

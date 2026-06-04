@@ -62,7 +62,7 @@ pub async fn run_healing(
         // BLOCK auto_disable unless circuit breaker threshold met
         let effective_action = if action_type == "auto_disable" && consecutive_high.0 < AUTO_DISABLE_MIN_CONSECUTIVE as i64 {
             tracing::info!(
-                "🔧 Circuit breaker: endpoint {} has {}/{} consecutive high scores — downgrade auto_disable → circuit_tighten",
+ " Circuit breaker: endpoint {} has {}/{} consecutive high scores — downgrade auto_disable → circuit_tighten",
                 endpoint_id, consecutive_high.0, AUTO_DISABLE_MIN_CONSECUTIVE
             );
             "circuit_tighten".to_string()
@@ -115,11 +115,11 @@ pub async fn run_healing(
             }
             "retry_slowdown" => {
                 // Signal to retry policy to slow down (stored in healing_actions, read by worker)
-                tracing::info!("🔧 Cortex: Retry slowdown for endpoint {} (score {})", endpoint_id, score);
+ tracing::info!(" Cortex: Retry slowdown for endpoint {} (score {})", endpoint_id, score);
             }
             "circuit_tighten" => {
                 // Signal to circuit breaker to lower threshold
-                tracing::info!("🔧 Cortex: Circuit tightened for endpoint {} (score {})", endpoint_id, score);
+ tracing::info!(" Cortex: Circuit tightened for endpoint {} (score {})", endpoint_id, score);
             }
             "rate_limit_reduce" => {
                 // Reduce the endpoint's rate limit by 25%
@@ -131,7 +131,7 @@ pub async fn run_healing(
                     sqlx::query(
                         "UPDATE endpoints SET webhook_limit = $1 WHERE id = $2"
                     ).bind(new_limit.max(10)).bind(endpoint_id).execute(pool).await?;
-                    tracing::info!("🔧 Cortex: Rate limit reduced {} → {} for endpoint {} (score {})", limit, new_limit.max(10), endpoint_id, score);
+ tracing::info!(" Cortex: Rate limit reduced {} → {} for endpoint {} (score {})", limit, new_limit.max(10), endpoint_id, score);
                 }
             }
             "fallback_url_switch" => {
@@ -141,7 +141,7 @@ pub async fn run_healing(
                         sqlx::query(
                             "UPDATE endpoints SET active_url = $1 WHERE id = $2"
                         ).bind(url).bind(endpoint_id).execute(pool).await.ok();
-                        tracing::info!("🔧 Cortex: Switched endpoint {} to fallback URL {} (score {})", endpoint_id, url, score);
+ tracing::info!(" Cortex: Switched endpoint {} to fallback URL {} (score {})", endpoint_id, url, score);
                     }
                 }
             }
@@ -155,7 +155,7 @@ pub async fn run_healing(
                     sqlx::query(
                         "UPDATE endpoints SET max_retries = $1 WHERE id = $2"
                     ).bind(new_retries).bind(endpoint_id).execute(pool).await?;
-                    tracing::info!("🔧 Cortex: Max retries {} → {} for endpoint {} (score {})", retries, new_retries, endpoint_id, score);
+ tracing::info!(" Cortex: Max retries {} → {} for endpoint {} (score {})", retries, new_retries, endpoint_id, score);
                 }
             }
             "timeout_adjust" => {
@@ -168,7 +168,7 @@ pub async fn run_healing(
                     sqlx::query(
                         "UPDATE endpoints SET timeout_ms = $1 WHERE id = $2"
                     ).bind(new_timeout.min(30000)).bind(endpoint_id).execute(pool).await?;
-                    tracing::info!("🔧 Cortex: Timeout {}ms → {}ms for endpoint {} (score {})", timeout_val, new_timeout.min(30000), endpoint_id, score);
+ tracing::info!(" Cortex: Timeout {}ms → {}ms for endpoint {} (score {})", timeout_val, new_timeout.min(30000), endpoint_id, score);
                 }
             }
             _ => {}
@@ -205,7 +205,7 @@ pub async fn run_healing(
     .await?;
 
     for (customer_id, sick, total) in cascades {
-        tracing::warn!("🚨 CASCADE DETECTED: customer {} has {}/{} endpoints sick", customer_id, sick, total);
+ tracing::warn!(" CASCADE DETECTED: customer {} has {}/{} endpoints sick", customer_id, sick, total);
         super::CORTEX_METRICS.cascade_detections.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
         // Record cascade in healing_actions
@@ -273,7 +273,7 @@ async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Resul
 
                 super::action_memory::record_outcome(pool, endpoint_id, "success", Some(serde_json::json!({ "recovery_sr": sr }))).await?;
 
-                tracing::info!("✅ Cortex: Recovered endpoint {} (SR {:.1}%)", endpoint_id, sr);
+ tracing::info!(" Cortex: Recovered endpoint {} (SR {:.1}%)", endpoint_id, sr);
             }
         }
     }

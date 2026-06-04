@@ -91,7 +91,7 @@ async fn create_api_key(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("🔑 New API key created for customer {}", customer.id);
+ tracing::info!(" New API key created for customer {}", customer.id);
 
     // Audit log — API_KEY_CREATE
     {
@@ -199,7 +199,7 @@ async fn rotate_api_key(
         c.invalidate("apikey", &old_prefix).await;
     }
 
-    tracing::info!("🔑 API key rotated for customer {}", customer.id);
+ tracing::info!(" API key rotated for customer {}", customer.id);
 
     Ok(Json(CreateApiKeyResponse {
         id,
