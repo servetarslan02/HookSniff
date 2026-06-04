@@ -94,7 +94,7 @@ pub async fn ip_blocklist_middleware(
 
     if let Some(ip) = &ip {
         if cache.is_blocked(ip, &pool).await {
-            tracing::warn!(ip = %ip, path = %path, "🚫 Blocked IP attempted access");
+ tracing::warn!(ip = %ip, path = %path, " Blocked IP attempted access");
             crate::security_monitor::log_security_event(
                 &pool,
                 "blocked_ip_access",

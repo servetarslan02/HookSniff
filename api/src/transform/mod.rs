@@ -487,7 +487,7 @@ pub async fn run_transform_migration(pool: &PgPool) -> Result<()> {
         .execute(pool)
         .await
         .context("Failed to run transform migration")?;
-    tracing::info!("✅ Transform migration completed");
+ tracing::info!(" Transform migration completed");
     Ok(())
 }
 

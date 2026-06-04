@@ -41,7 +41,7 @@ pub async fn create_team(
 
     tx.commit().await?;
 
-    tracing::info!("✅ Team '{}' created by {}", req.name, customer.id);
+ tracing::info!(" Team '{}' created by {}", req.name, customer.id);
     Ok(Json(team))
 }
 
@@ -169,7 +169,7 @@ pub async fn update_team(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("✅ Team '{}' ({}) updated by {}", new_name, id, customer.id);
+ tracing::info!(" Team '{}' ({}) updated by {}", new_name, id, customer.id);
 
     let _ = crate::audit::log_action(&pool, customer.id, "TEAM_UPDATE", "team", Some(&id.to_string()),
         Some(serde_json::json!({"name": new_name})), None, None).await;
@@ -216,7 +216,7 @@ pub async fn delete_team(
         .execute(&pool)
         .await?;
 
-    tracing::info!("✅ Team '{}' ({}) deleted by {}", team.name, id, customer.id);
+ tracing::info!(" Team '{}' ({}) deleted by {}", team.name, id, customer.id);
 
     let _ = crate::audit::log_action(&pool, customer.id, "TEAM_DELETE", "team", Some(&id.to_string()),
         Some(serde_json::json!({"team_name": &team.name})), None, None).await;
@@ -257,7 +257,7 @@ pub async fn leave_team(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("✅ {} left team {}", customer.id, id);
+ tracing::info!(" {} left team {}", customer.id, id);
 
     let _ = crate::audit::log_action(&pool, customer.id, "MEMBER_LEAVE", "team", Some(&id.to_string()),
         None, None, None).await;
@@ -317,7 +317,7 @@ pub async fn transfer_ownership(
         .execute(&pool)
         .await?;
 
-    tracing::info!("✅ Team '{}' ownership transferred from {} to {}", team.name, customer.id, req.new_owner_id);
+ tracing::info!(" Team '{}' ownership transferred from {} to {}", team.name, customer.id, req.new_owner_id);
 
     // Notify the new owner
     {

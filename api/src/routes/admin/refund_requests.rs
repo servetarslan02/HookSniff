@@ -172,7 +172,7 @@ pub async fn admin_approve_refund(
     let billing_svc = crate::billing::BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription(&customer).await {
         tracing::warn!(
-            "⚠️ Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund",
+ " Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund",
             customer_id, e
         );
     }
@@ -288,7 +288,7 @@ pub async fn admin_approve_refund(
     ).await;
 
     tracing::info!(
-        "✅ Refund request {} approved by admin {} — customer {} refunded {} {}",
+ " Refund request {} approved by admin {} — customer {} refunded {} {}",
         id,
         admin.id,
         customer_id,
@@ -352,7 +352,7 @@ pub async fn admin_deny_refund(
     .await?;
 
     tracing::info!(
-        "❌ Refund request {} denied by admin {} — reason: {}",
+ " Refund request {} denied by admin {} — reason: {}",
         id,
         admin.id,
         notes

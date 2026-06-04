@@ -71,7 +71,7 @@ pub async fn register(
     .bind(&req.email).bind(&api_key_hash).bind(&api_key_prefix).bind(&password_hash).bind(&req.name)
     .fetch_one(&pool).await?;
 
-    tracing::info!("✅ New customer registered: {}", req.email);
+ tracing::info!(" New customer registered: {}", req.email);
     send_audit_log(&pool, customer.id, "REGISTER", &headers).await;
 
     if let Some(ref publisher) = event_publisher {
@@ -122,7 +122,7 @@ pub async fn login(
     let rl_key = format!("login:{}", client_ip);
     let rl_result = rate_limiter.check_with_headers(&rl_key, LOGIN_RATE_LIMIT).await;
     if !rl_result.allowed {
-        tracing::warn!("⚠️ Login rate limit exceeded for IP: {}", client_ip);
+ tracing::warn!(" Login rate limit exceeded for IP: {}", client_ip);
         return Err(AppError::RateLimitExceeded);
     }
 
@@ -157,7 +157,7 @@ pub async fn login(
             let is_admin = sqlx::query_scalar::<_, bool>("SELECT COALESCE(is_admin, false) FROM customers WHERE email = $1")
                 .bind(&req.email).fetch_optional(&pool).await.unwrap_or(None).unwrap_or(false);
             if !is_admin {
-                tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
+ tracing::warn!(" Login blocked — brute force detected: {} from {}", req.email, client_ip);
                 let _ = sqlx::query(
                     "INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active, expires_at)
                      VALUES ($1, $2, true, true, NOW() + INTERVAL '24 hours')
@@ -169,7 +169,7 @@ pub async fn login(
                 .await;
                 return Err(AppError::coded(ErrorCode::TooManyAttempts));
             } else {
-                tracing::warn!("⚠️ Brute force detected for admin {} from {} — NOT blocking IP", req.email, client_ip);
+ tracing::warn!(" Brute force detected for admin {} from {} — NOT blocking IP", req.email, client_ip);
             }
         }
     }
@@ -264,11 +264,11 @@ pub async fn login(
             let is_last_admin = customer.is_admin && admin_count.0 <= 1;
 
             if is_last_admin {
-                tracing::info!("🔓 SSO bypass for last admin: {}", req.email);
+ tracing::info!(" SSO bypass for last admin: {}", req.email);
             } else if bypass && customer.is_admin {
-                tracing::info!("🔓 SSO admin bypass for: {}", req.email);
+ tracing::info!(" SSO admin bypass for: {}", req.email);
             } else {
-                tracing::warn!("🔒 SSO login blocked for {}: SSO enforced", req.email);
+ tracing::warn!(" SSO login blocked for {}: SSO enforced", req.email);
                 return Err(AppError::BadRequest(
                     "SSO is required for this account. Please use Single Sign-On to log in.".into()
                 ));
@@ -292,7 +292,7 @@ pub async fn login(
     let token = jwt::generate_access_token(customer.id, &customer.email, &customer.plan, &cfg.jwt_secret, customer.is_admin)?;
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
-    tracing::info!("✅ Customer logged in: {}", req.email);
+ tracing::info!(" Customer logged in: {}", req.email);
     send_audit_log(&pool, customer.id, "LOGIN", &headers).await;
 
     Ok(auth_response_with_cookie(AuthResponse {

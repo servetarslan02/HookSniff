@@ -50,7 +50,7 @@ pub async fn verify_email(
     sqlx::query("UPDATE customers SET email_verified = true, updated_at = NOW() WHERE id = $1")
         .bind(customer_id).execute(&pool).await?;
 
-    tracing::info!("✅ Email verified for customer {}", customer_id);
+ tracing::info!(" Email verified for customer {}", customer_id);
     Ok(Json(serde_json::json!({"message": "Email verified successfully."})))
 }
 
@@ -176,7 +176,7 @@ pub async fn revoke_current_token(
     let claims = jwt::verify_token(token, &cfg.jwt_secret)?;
     if let Some(ref jti) = claims.jti {
         jwt::revoke_token(&pool, jti, claims.exp as i64).await?;
-        tracing::info!("🔑 Token revoked: jti={}", jti);
+ tracing::info!(" Token revoked: jti={}", jti);
     }
     Ok(Json(serde_json::json!({"revoked": true, "message": "Token has been revoked."})))
 }
@@ -186,6 +186,6 @@ pub async fn revoke_all_tokens(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     jwt::revoke_all_tokens_for_customer(&pool, customer.id).await?;
-    tracing::info!("🔑 All tokens revoked for customer {}", customer.id);
+ tracing::info!(" All tokens revoked for customer {}", customer.id);
     Ok(Json(serde_json::json!({"revoked": true, "message": "All access tokens have been revoked."})))
 }

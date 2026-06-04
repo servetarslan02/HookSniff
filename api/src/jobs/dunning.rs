@@ -26,7 +26,7 @@ const DUNNING_DAYS_ANNUAL: [i64; 5] = [30, 7, 3, 2, 1];
 /// 2. Send email + in-app notification
 /// 3. Track which reminders have been sent to avoid duplicates
 pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Result<u64> {
-    tracing::info!("🔔 Running dunning job...");
+ tracing::info!(" Running dunning job...");
 
     let now = Utc::now();
 
@@ -91,14 +91,14 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
         match email_client.send_contact_email(&email, &subject, &html).await {
             Ok(_) => {
                 tracing::info!(
-                    "📧 Dunning email sent: customer={}, days_remaining={}, plan={}",
+ " Dunning email sent: customer={}, days_remaining={}, plan={}",
                     customer_id, days_remaining, plan
                 );
                 emails_sent += 1;
             }
             Err(e) => {
                 tracing::warn!(
-                    "⚠️ Dunning email failed for customer {}: {:?}",
+ " Dunning email failed for customer {}: {:?}",
                     customer_id, e
                 );
             }
@@ -128,7 +128,7 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
         .await?;
     }
 
-    tracing::info!("✅ Dunning job completed: {} emails sent", emails_sent);
+ tracing::info!(" Dunning job completed: {} emails sent", emails_sent);
     Ok(emails_sent)
 }
 
@@ -149,7 +149,7 @@ pub async fn retry_failed_payments(_pool: &PgPool) -> Result<u64> {
 ///
 /// These customers are moved to "paused" state (free plan, limits reduced).
 pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
-    tracing::info!("⏸️ Checking for subscriptions to pause...");
+ tracing::info!("⏸ Checking for subscriptions to pause...");
 
     let free_limit = crate::billing::Plan::Developer.max_webhooks_per_day() as i64;
 
@@ -170,7 +170,7 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
 
     let count = result.rows_affected();
     if count > 0 {
-        tracing::info!("⏸️ Activated pause for {} customers", count);
+ tracing::info!("⏸ Activated pause for {} customers", count);
 
         // Create notifications for paused customers
         let customers: Vec<(uuid::Uuid, String)> = sqlx::query_as(
@@ -184,7 +184,7 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
                 pool,
                 *cid,
                 "billing",
-                "⏸️ Abonelik Donduruldu",
+ "⏸ Abonelik Donduruldu",
                 &format!(
                     "{} plan aboneliğiniz donduruldu. Devam etmek için \"Devam Et\" butonuna tıklayın.",
                     plan
@@ -237,42 +237,42 @@ fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> Dunn
     match lang {
         Language::Tr => match days_remaining {
             30 => DunningNotif {
-                title: "📅 Yıllık Abonelik — Son Ay".into(),
+ title: " Yıllık Abonelik — Son Ay".into(),
                 message: format!(
                     "{} plan yıllık aboneliğiniz 30 gün sonra sona erecek. Ödeme yönteminizin güncel olduğundan emin olun.",
                     plan
                 ),
             },
             7 => DunningNotif {
-                title: "⚠️ Yıllık Abonelik — Son Hafta".into(),
+ title: " Yıllık Abonelik — Son Hafta".into(),
                 message: format!(
                     "{} plan yıllık aboneliğiniz 7 gün sonra sona erecek. Ödeme yönteminizi kontrol edin.",
                     plan
                 ),
             },
             3 => DunningNotif {
-                title: "⚠️ Abonelik Bitiyor — 3 Gün Kaldı".into(),
+ title: " Abonelik Bitiyor — 3 Gün Kaldı".into(),
                 message: format!(
                     "{} plan aboneliğiniz 3 gün sonra sona erecek. Ödeme yönteminizin güncel olduğundan emin olun. Ödeme alınamazsa hesabınız ücretsiz plana düşürülecek.",
                     plan
                 ),
             },
             2 => DunningNotif {
-                title: "🔴 Abonelik Bitiyor — 2 Gün Kaldı".into(),
+ title: " Abonelik Bitiyor — 2 Gün Kaldı".into(),
                 message: format!(
                     "{} plan aboneliğiniz 2 gün sonra sona erecek. Ödeme yönteminizi kontrol edin, aksi halde hesabınız ücretsiz plana düşürülecek.",
                     plan
                 ),
             },
             1 => DunningNotif {
-                title: "🚨 Son Uyarı — Yarın Sona Eriyor".into(),
+ title: " Son Uyarı — Yarın Sona Eriyor".into(),
                 message: format!(
                     "Yarın {} plan aboneliğiniz sona erecek. Ödeme yönteminizi şimdi güncelleyerek hizmetinizi koruyun.",
                     plan
                 ),
             },
             _ => DunningNotif {
-                title: "💳 Abonelik Hatırlatması".into(),
+ title: " Abonelik Hatırlatması".into(),
                 message: format!(
                     "{} plan aboneliğiniz yakında sona erecek. Ödeme yönteminizi kontrol edin.",
                     plan
@@ -281,42 +281,42 @@ fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> Dunn
         },
         Language::En => match days_remaining {
             30 => DunningNotif {
-                title: "📅 Annual Subscription — Final Month".into(),
+ title: " Annual Subscription — Final Month".into(),
                 message: format!(
                     "Your {} annual subscription expires in 30 days. Make sure your payment method is up to date.",
                     plan
                 ),
             },
             7 => DunningNotif {
-                title: "⚠️ Annual Subscription — Final Week".into(),
+ title: " Annual Subscription — Final Week".into(),
                 message: format!(
                     "Your {} annual subscription expires in 7 days. Check your payment method.",
                     plan
                 ),
             },
             3 => DunningNotif {
-                title: "⚠️ Subscription Expiring — 3 Days Left".into(),
+ title: " Subscription Expiring — 3 Days Left".into(),
                 message: format!(
                     "Your {} plan subscription expires in 3 days. Make sure your payment method is up to date. If payment fails, your account will be downgraded to the free plan.",
                     plan
                 ),
             },
             2 => DunningNotif {
-                title: "🔴 Subscription Expiring — 2 Days Left".into(),
+ title: " Subscription Expiring — 2 Days Left".into(),
                 message: format!(
                     "Your {} plan subscription expires in 2 days. Check your payment method or your account will be downgraded to the free plan.",
                     plan
                 ),
             },
             1 => DunningNotif {
-                title: "🚨 Final Warning — Expires Tomorrow".into(),
+ title: " Final Warning — Expires Tomorrow".into(),
                 message: format!(
                     "Your {} plan subscription expires tomorrow. Update your payment method now to keep your service running.",
                     plan
                 ),
             },
             _ => DunningNotif {
-                title: "💳 Subscription Reminder".into(),
+ title: " Subscription Reminder".into(),
                 message: format!(
                     "Your {} plan subscription is expiring soon. Check your payment method.",
                     plan
@@ -335,17 +335,17 @@ fn tpl_dunning_reminder(plan: &str, days_remaining: i64, lang: Language) -> (Str
 
 fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
     let (urgency_color, urgency_text) = match days_remaining {
-        1 => ("#dc2626", "🚨 Son Uyarı"),
-        2 => ("#ea580c", "🔴 Acil"),
-        7 => ("#d97706", "⚠️ Son Hafta"),
-        30 => ("#2563eb", "📅 Son Ay"),
-        _ => ("#d97706", "⚠️ Dikkat"),
+ 1 => ("#dc2626", " Son Uyarı"),
+ 2 => ("#ea580c", " Acil"),
+ 7 => ("#d97706", " Son Hafta"),
+ 30 => ("#2563eb", " Son Ay"),
+ _ => ("#d97706", " Dikkat"),
     };
 
     let subject = if days_remaining == 30 {
-        format!("📅 {} yıllık aboneliğiniz — son ay", plan)
+ format!(" {} yıllık aboneliğiniz — son ay", plan)
     } else if days_remaining == 7 {
-        format!("⚠️ {} yıllık aboneliğiniz — son hafta", plan)
+ format!(" {} yıllık aboneliğiniz — son hafta", plan)
     } else {
         format!(
             "{} — {} plan aboneliğiniz {} gün sonra sona erecek",
@@ -374,14 +374,14 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
 
     <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
       <p style="color: #92400e; margin: 0; font-size: 14px;">
-        💳 Ödeme yönteminizin güncel olduğundan emin olun. Ödeme alınamazsa hesabınız <strong>ücretsiz plana düşürülecek</strong> ve webhook limitleriniz sınırlandırılacaktır.
+ Ödeme yönteminizin güncel olduğundan emin olun. Ödeme alınamazsa hesabınız <strong>ücretsiz plana düşürülecek</strong> ve webhook limitleriniz sınırlandırılacaktır.
       </p>
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
       <a href="https://hooksniff.vercel.app/billing"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-        💳 Ödeme Yöntemini Kontrol Et
+ Ödeme Yöntemini Kontrol Et
       </a>
     </div>
 
@@ -407,17 +407,17 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
 
 fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
     let (urgency_color, urgency_text) = match days_remaining {
-        1 => ("#dc2626", "🚨 Final Warning"),
-        2 => ("#ea580c", "🔴 Urgent"),
-        7 => ("#d97706", "⚠️ Final Week"),
-        30 => ("#2563eb", "📅 Final Month"),
-        _ => ("#d97706", "⚠️ Action Required"),
+ 1 => ("#dc2626", " Final Warning"),
+ 2 => ("#ea580c", " Urgent"),
+ 7 => ("#d97706", " Final Week"),
+ 30 => ("#2563eb", " Final Month"),
+ _ => ("#d97706", " Action Required"),
     };
 
     let subject = if days_remaining == 30 {
-        format!("📅 Your {} annual subscription — final month", plan)
+ format!(" Your {} annual subscription — final month", plan)
     } else if days_remaining == 7 {
-        format!("⚠️ Your {} annual subscription — final week", plan)
+ format!(" Your {} annual subscription — final week", plan)
     } else {
         format!(
             "{} — Your {} plan expires in {} day{}",
@@ -446,14 +446,14 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
 
     <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
       <p style="color: #92400e; margin: 0; font-size: 14px;">
-        💳 Make sure your payment method is up to date. If payment cannot be processed, your account will be <strong>downgraded to the free plan</strong> and webhook limits will be restricted.
+ Make sure your payment method is up to date. If payment cannot be processed, your account will be <strong>downgraded to the free plan</strong> and webhook limits will be restricted.
       </p>
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
       <a href="https://hooksniff.vercel.app/billing"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-        💳 Check Payment Method
+ Check Payment Method
       </a>
     </div>
 

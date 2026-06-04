@@ -181,7 +181,7 @@ async fn set_rate_limit(
     .await?;
 
     tracing::info!(
-        "⚡ Rate limit set for endpoint {}: {} rps, burst {}",
+ " Rate limit set for endpoint {}: {} rps, burst {}",
         endpoint_id,
         rps,
         burst

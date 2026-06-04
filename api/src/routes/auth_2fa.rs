@@ -70,7 +70,7 @@ pub async fn verify_2fa_login(
     )?;
     let refresh_token_value = crate::routes::auth::create_refresh_token(&pool, customer.id).await?;
 
-    tracing::info!("✅ 2FA verified for customer: {}", customer.email);
+ tracing::info!(" 2FA verified for customer: {}", customer.email);
     send_audit_log(&pool, customer.id, "LOGIN", &headers).await;
 
     Ok(auth_response_with_cookie(AuthResponse {
@@ -163,7 +163,7 @@ pub async fn confirm_2fa(
         .execute(&pool)
         .await?;
 
-    tracing::info!("✅ 2FA enabled for customer {}", customer.id);
+ tracing::info!(" 2FA enabled for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "2FA_ENABLE", &headers).await;
 
     // HS-039: Notify user of 2FA enablement
@@ -207,7 +207,7 @@ pub async fn disable_2fa(
         .execute(&pool)
         .await?;
 
-    tracing::info!("✅ 2FA disabled for customer {}", customer.id);
+ tracing::info!(" 2FA disabled for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "2FA_DISABLE", &headers).await;
 
     // HS-039: Notify user of 2FA disablement

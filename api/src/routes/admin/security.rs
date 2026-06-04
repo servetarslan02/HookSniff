@@ -378,7 +378,7 @@ pub async fn block_ip(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("🚫 Admin blocked IP: {} (reason: {:?})", entry.ip_address, entry.reason);
+ tracing::info!(" Admin blocked IP: {} (reason: {:?})", entry.ip_address, entry.reason);
 
     Ok(Json(entry))
 }
@@ -402,7 +402,7 @@ pub async fn unblock_ip(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("✅ Admin unblocked IP blocklist entry: {}", id);
+ tracing::info!(" Admin unblocked IP blocklist entry: {}", id);
 
     Ok(Json(serde_json::json!({ "unblocked": true })))
 }

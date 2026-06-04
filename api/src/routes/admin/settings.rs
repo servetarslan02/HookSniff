@@ -271,7 +271,7 @@ pub async fn update_settings(
     .execute(&pool)
     .await?;
 
-    tracing::info!("✅ Admin updated platform settings");
+ tracing::info!(" Admin updated platform settings");
 
     let startup_price = saved_settings.plan_price_startup;
     let pro_price = saved_settings.plan_price_pro;
@@ -356,7 +356,7 @@ pub async fn notify_sdk_update(
         ));
     }
 
-    let title = format!("🚀 {} SDK güncellemesi mevcut", req.updates.len());
+ let title = format!(" {} SDK güncellemesi mevcut", req.updates.len());
     let details: Vec<String> = req
         .updates
         .iter()
@@ -397,7 +397,7 @@ pub async fn notify_sdk_update(
         q.execute(&pool).await?;
     }
 
-    tracing::info!("📢 SDK update notification sent to {} users", users.len());
+ tracing::info!(" SDK update notification sent to {} users", users.len());
 
     Ok(Json(serde_json::json!({
         "message": format!("Notification sent to {} user(s)", users.len()),

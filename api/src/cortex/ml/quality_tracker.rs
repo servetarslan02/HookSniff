@@ -133,7 +133,7 @@ pub async fn check_and_reset_degraded_models(
         .await?;
 
         tracing::warn!(
-            "🔄 ML model reset: endpoint {} model '{}' quality below {}%",
+ " ML model reset: endpoint {} model '{}' quality below {}%",
             eid, model_type, min_quality_score
         );
         reset_count += 1;
