@@ -105,7 +105,7 @@ steps:
     waitFor: ['push-worker', 'run-migrations']
 
 options:
-  machineType: 'E2_STANDARD_4'
+  machineType: 'E2_STANDARD_8'
   logging: CLOUD_LOGGING_ONLY
 
 images:
