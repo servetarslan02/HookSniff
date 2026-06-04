@@ -1,6 +1,7 @@
 # Ignore non-build directories
 dashboard/
-docs/
+docs/*
+!docs/openapi.yaml
 docs-sdk/
 landing/
 portal/
