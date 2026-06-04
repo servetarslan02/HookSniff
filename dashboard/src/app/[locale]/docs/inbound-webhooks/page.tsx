@@ -65,9 +65,9 @@ async function InboundWebhooksPageContent(params: Promise<{ locale: string }>) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">Stripe</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">Stripe-Signature</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400"></td></tr>
-              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">GitHub</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">X-Hub-Signature-256</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400"></td></tr>
-              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">Shopify</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">X-Shopify-Hmac-SHA256</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400"></td></tr>
+              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">Stripe</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">Stripe-Signature</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400">✅</td></tr>
+              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">GitHub</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">X-Hub-Signature-256</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400">✅</td></tr>
+              <tr><td className="px-4 py-3 text-gray-600 dark:text-slate-400">Shopify</td><td className="px-4 py-3 font-mono text-gray-600 dark:text-slate-400">X-Shopify-Hmac-SHA256</td><td className="px-4 py-3 text-gray-600 dark:text-slate-400">✅</td></tr>
             </tbody>
           </table>
         </div>
@@ -77,11 +77,11 @@ async function InboundWebhooksPageContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('benefits')}</h2>
         <ul className="space-y-2">
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit1')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit2')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit3')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit4')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit5')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit1')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit2')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit3')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit4')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit5')}</li>
         </ul>
       </section>
     </article>

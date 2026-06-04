@@ -34,7 +34,7 @@ export default function OperationalWebhooksPage() {
         { key: 'templates', label: t('templates'), icon: <FileText size={16} strokeWidth={1.75} />, content: () => <TemplatesPage /> },
         { key: 'transforms', label: t('transforms'), icon: <RefreshCw size={16} strokeWidth={1.75} />, content: () => <TransformsPage /> },
         { key: 'inbound', label: t('inboundWebhooks'), icon: <Download size={16} strokeWidth={1.75} />, content: () => <InboundPage /> },
- { key: 'operational', label: t('operationalWebhooks'), icon: '', content: () => <OperationalWebhooksListPage /> },
+        { key: 'operational', label: t('operationalWebhooks'), icon: '🪝', content: () => <OperationalWebhooksListPage /> },
         { key: 'poller', label: t('messagePoller'), icon: <Inbox size={16} strokeWidth={1.75} />, content: () => <MessagePollerPage /> },
         { key: 'tasks', label: t('backgroundTasks'), icon: <Clock size={16} strokeWidth={1.75} />, content: () => <BackgroundTasksPage /> },
       ]}

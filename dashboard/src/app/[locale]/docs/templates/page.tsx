@@ -54,22 +54,22 @@ async function TemplatesPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('templateDetails')}</h2>
         <div className="space-y-6 not-prose">
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('ecommerceTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🛒 {t('ecommerceTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('ecommerceDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('ecommerceEvents')}</code>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
- <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('saasTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">☁️ {t('saasTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('saasDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('saasEvents')}</code>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('cicdTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 {t('cicdTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('cicdDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('cicdEvents')}</code>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('customTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">⚙️ {t('customTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('customDesc')}</p>
           </div>
         </div>

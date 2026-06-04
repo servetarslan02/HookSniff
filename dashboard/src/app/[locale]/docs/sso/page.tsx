@@ -50,7 +50,7 @@ export default function SsoDocsPage() {
         {/* Azure AD / Entra ID */}
         <div className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600"></div>
+            <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">🪟</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Microsoft Azure AD (Entra ID)</h3>
             <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">OIDC</span>
           </div>
@@ -75,7 +75,7 @@ export default function SsoDocsPage() {
         {/* Google Workspace */}
         <div className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600"></div>
+            <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">🔴</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Google Workspace</h3>
             <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">OIDC</span>
           </div>
@@ -99,7 +99,7 @@ export default function SsoDocsPage() {
         {/* Okta */}
         <div className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600"></div>
+            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600">🔵</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Okta</h3>
             <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">OIDC</span>
           </div>
@@ -124,7 +124,7 @@ export default function SsoDocsPage() {
         {/* Keycloak */}
         <div className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600"></div>
+            <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">🦁</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Keycloak</h3>
             <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">OIDC</span>
           </div>
@@ -150,7 +150,7 @@ export default function SsoDocsPage() {
         {/* OneLogin */}
         <div className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600"></div>
+            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">🟢</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">OneLogin</h3>
             <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">SAML</span>
           </div>
@@ -229,7 +229,7 @@ export default function SsoDocsPage() {
             { q: 'Users not auto-joining team', a: 'Make sure Auto Team Join is configured and the verified domain matches users\' email domain.' },
           ].map((item, i) => (
             <div key={i} className="glass-card p-4">
-              <div className="font-medium text-gray-900 dark:text-white text-sm mb-1"> {item.q}</div>
+              <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">❓ {item.q}</div>
               <div className="text-sm text-gray-600 dark:text-slate-400">{item.a}</div>
             </div>
           ))}
