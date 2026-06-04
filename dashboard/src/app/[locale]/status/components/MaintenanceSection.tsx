@@ -8,8 +8,19 @@ import { Calendar, Wrench } from '@/components/icons';
 
 export function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
   const t = useTranslations('status');
-  const upcoming = maintenance.filter(m => m.status === 'scheduled' || m.status === 'in_progress');
-  const past = maintenance.filter(m => m.status === 'completed');
+  const now = Date.now();
+  // Auto-expire: scheduled entries past their end date move to "past"
+  const upcoming = maintenance.filter(m => {
+    if (m.status === 'completed') return false;
+    if (m.status === 'scheduled' && new Date(m.scheduled_end).getTime() < now) return false;
+    return m.status === 'scheduled' || m.status === 'in_progress';
+  });
+  const past = maintenance.filter(m => {
+    if (m.status === 'completed') return true;
+    // Auto-expire scheduled entries past their end date
+    if (m.status === 'scheduled' && new Date(m.scheduled_end).getTime() < now) return true;
+    return false;
+  });
 
   return (
     <div className="space-y-4">
