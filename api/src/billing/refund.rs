@@ -25,15 +25,20 @@ pub const REFUND_WINDOW_DAYS: i64 = 0;
 /// With REFUND_WINDOW_DAYS=0, this always returns false.
 /// Admin can override by using force=true in the approve endpoint.
 pub async fn is_within_refund_window(
-    pool: &PgPool,
-    customer_id: Uuid,
+    _pool: &PgPool,
+    _customer_id: Uuid,
 ) -> Result<bool, AppError> {
+    // Refund window disabled — no automatic refunds
+    if REFUND_WINDOW_DAYS == 0 {
+        return Ok(false);
+    }
+
     let latest_payment: Option<DateTime<Utc>> = sqlx::query_scalar(
         "SELECT MAX(paid_at) FROM invoices \
          WHERE customer_id = $1 AND status = 'paid'",
     )
-    .bind(customer_id)
-    .fetch_one(pool)
+    .bind(_customer_id)
+    .fetch_one(_pool)
     .await?;
 
     match latest_payment {
