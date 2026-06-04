@@ -109,7 +109,7 @@ pub async fn create_platform_alert(
     }
 
     let channels_json = serde_json::json!(req.channels);
-    let target_customer_id: Option<Uuid> = req.customer_id;
+    let target_customer_id: Option<Uuid> = req.customer_id.or(Some(customer.id));
 
     let alert = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
         "INSERT INTO alert_rules (customer_id, name, condition, threshold, channels, is_active)
