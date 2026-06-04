@@ -32,5 +32,11 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Ensure provider_tx_id column exists (handles partially applied migrations)
+DO $$ BEGIN
+    ALTER TABLE payment_transactions ADD COLUMN IF NOT EXISTS provider_tx_id TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_payment_tx_customer ON payment_transactions(customer_id);
 CREATE INDEX IF NOT EXISTS idx_payment_tx_provider ON payment_transactions(provider, provider_tx_id);

@@ -45,44 +45,44 @@ const publicPages = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
+  // With localePrefix: 'never', URLs don't have /en/ or /tr/ prefix.
+  // Each page has a single canonical URL without locale prefix.
+  // The alternates.languages field handles hreflang for different locales.
+
   // Static pages
   for (const page of publicPages) {
-    for (const locale of locales) {
-      entries.push({
-        url: `${BASE_URL}/${locale}${page}`,
-        lastModified,
-        changeFrequency: page === '' ? 'daily' : 'weekly',
-        priority: page === '' ? 1 : page.startsWith('/blog') ? 0.9 : 0.8,
-        alternates: {
-          languages: Object.fromEntries(
-            [
-              ...locales.map((l) => [l, `${BASE_URL}/${l}${page}`]),
-              ['x-default', `${BASE_URL}/en${page}`],
-            ]
-          ),
-        },
-      });
-    }
+    entries.push({
+      url: `${BASE_URL}${page}`,
+      lastModified,
+      changeFrequency: page === '' ? 'daily' : 'weekly',
+      priority: page === '' ? 1 : page.startsWith('/blog') ? 0.9 : 0.8,
+      alternates: {
+        languages: Object.fromEntries(
+          [
+            ...locales.map((l) => [l, `${BASE_URL}${page}`]),
+            ['x-default', `${BASE_URL}${page}`],
+          ]
+        ),
+      },
+    });
   }
 
   // Blog posts
   for (const slug of blogSlugs) {
-    for (const locale of locales) {
-      entries.push({
-        url: `${BASE_URL}/${locale}/blog/${slug}`,
-        lastModified,
-        changeFrequency: 'monthly',
-        priority: 0.7,
-        alternates: {
-          languages: Object.fromEntries(
-            [
-              ...locales.map((l) => [l, `${BASE_URL}/${l}/blog/${slug}`]),
-              ['x-default', `${BASE_URL}/en/blog/${slug}`],
-            ]
-          ),
-        },
-      });
-    }
+    entries.push({
+      url: `${BASE_URL}/blog/${slug}`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: Object.fromEntries(
+          [
+            ...locales.map((l) => [l, `${BASE_URL}/blog/${slug}`]),
+            ['x-default', `${BASE_URL}/blog/${slug}`],
+          ]
+        ),
+      },
+    });
   }
 
   return entries;

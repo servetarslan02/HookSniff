@@ -81,3 +81,6 @@ gcp-key.json
 .env*
 
 gcp-config.json
+
+# Secrets
+secrets/

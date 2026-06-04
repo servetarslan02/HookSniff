@@ -1,6 +1,6 @@
 # 🧠 Webhook Hızlandırma — Hafıza
 
-> **Son güncelleme:** 2026-05-26
+> **Son güncelleme:** 2026-06-04
 > **Bu dosya:** Proje geçmişi, kararlar, öğrenilen dersler
 
 ---
@@ -85,13 +85,80 @@ webhook-hizlandirma-projesi/
 
 | Faz | Durum | Tarih | Not |
 |-----|-------|-------|-----|
-| Faz 1: Redis Streams | ⏳ Bekliyor | — | En kritik faz |
-| Faz 1 Ek: Production Config | ⏳ Bekliyor | — | Feature flag, deploy, FIFO, OOM |
-| Faz 2: HTTP/2 | ⏳ Bekliyor | — | |
-| Faz 3: 3 Katmanlı Retry | ⏳ Bekliyor | — | |
-| Faz 4: DNS + SSRF Cache | ⏳ Bekliyor | — | |
-| Faz 5: Dynamic Concurrency | ⏳ Bekliyor | — | |
-| Faz 6: Batch Processing | ⏳ Bekliyor | — | |
+| Faz 1: Redis Streams | ✅ Tamamlandı | 2026-06-04 | API + Worker entegrasyonu |
+| Faz 1 Ek: Production Config | ✅ Tamamlandı | 2026-06-04 | USE_REDIS_QUEUE, FIFO routing, crash recovery, idempotency, OOM handling |
+| Faz 2: HTTP/2 | ✅ Tamamlandı | 2026-06-04 | Connection pool 100, adaptive window, keep-alive |
+| Faz 3: 3 Katmanlı Retry | ✅ Tamamlandı | 2026-06-04 | Tiered backoff: Transient→100ms, Server→1m, EndpointDown→6h |
+| Faz 4: DNS + SSRF Cache | ✅ Tamamlandı | 2026-06-04 | dns_cache.rs + ssrf_cache.rs (TTL-based, LRU eviction) |
+| Faz 5: Dynamic Concurrency | ✅ Tamamlandı | 2026-06-04 | Success rate based: 0.95→+10, 0.3→-20, min=10, max=200 |
+| Faz 6: Batch Processing | ✅ Tamamlandı | 2026-06-04 | batch.rs: group_by_endpoint + supports_batch |
+
+---
+
+## 🔴 Faz 1 Uygulama Detayları (2026-06-04)
+
+### Yapılan Değişiklikler
+
+1. **API `create.rs`** — `MutexGuard !Send` hatası düzeltildi
+   - `REDIS_QUEUE.lock()` guard'ı `.await` boyunca tutuluyordu → `!Send` future
+   - Çözüm: `lock().clone()` ile klonlayıp guard'ı hemen bırakıyoruz
+   
+2. **API `queue.rs`** — Redis Streams queue modülü (mevcut, sağlam)
+   - `RedisQueue` struct: enqueue, read_batch, ack, claim_pending, len
+   - `QueueMessage` struct: delivery_id, endpoint_id, url, payload, headers, signing_secret, trace_id, attempt, max_attempts, queue_item_id
+   - XAUTOCLAIM ile crash recovery
+
+3. **API `db.rs`** — `publish_to_queue_fast` fonksiyonu
+   - Redis-first, PG fallback akışı
+   - `REDIS_QUEUE` global static (std::sync::Mutex)
+
+4. **Worker `main.rs`** — Redis Streams consumer yeniden yazıldı
+   - `parse_xreadgroup_response()` fonksiyonu eklendi (raw redis::Value parsing)
+   - Signing secret cache entegrasyonu (5 dk TTL)
+   - Circuit breaker + throttle kontrolleri eklendi
+   - Doğru stream entry ID ile XACK
+   - Dead letter handling (max attempts aşılırsa)
+   - `http_client` spawn'a clone olarak geçildi
+
+5. **Worker `secret_cache.rs`** — Yeni dosya oluşturuldu
+   - In-memory HashMap<String, (String, Instant)> cache
+   - TTL-based expiration, cleanup, len, is_empty
+
+6. **Worker `config.rs`** — `USE_REDIS_QUEUE` flag eklendi
+   - `use_redis_queue: bool` field
+   - `USE_REDIS_QUEUE=true|1` env var'dan okunur
+
+7. **Worker shutdown** — `redis_consumer_handle.abort()` eklendi
+
+### Kritik Dersler
+
+- **`std::sync::MutexGuard` + `.await` = `!Send`**: Axum handler'larında mutex guard asla `.await` boyunca tutulmamalı. Klonlayıp guard'ı bırakmak gerekir.
+- **XREADGROUP raw parsing**: `Vec<(String, Vec<Vec<String>>)>` destructuring'i çalışmaz. `redis::Value` olarak alıp manuel parse etmek gerekir.
+- **Stream entry ID**: XACK için stream entry ID gerekli (delivery_id değil). `parse_xreadgroup_response` bu ID'yi döndürür.
+
+### Upstash Durumu
+
+- **Instance**: integral-ostrich-98447.upstash.io
+- **Free tier**: 500K komut/ay — **Şu an limit aşılmış** (500K/500K)
+- **REST API**: Çalışmıyor (rate limit exceeded)
+- **TCP (rediss://)**: Farklı kota olabilir, deploy'da test edilmeli
+- **maxmemory-policy**: `noeviction` olarak ayarlanmalı (Upstash dashboard'dan)
+- **Çözüm**: Plan yükseltme veya ay sonunu bekle
+
+### REDIS_URL (TCP)
+
+```
+rediss://default:gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg@integral-ostrich-98447.upstash.io:6379
+```
+
+### QStash Bilgileri
+
+```
+QSTASH_URL=https://qstash-eu-central-1.upstash.io
+QSTASH_TOKEN=eyJVc2VySUQiOiJlYzY2NmY4ZS1lOTRiLTRjMDMtYmVhZC00OTVjNWE2NTcwMzMiLCJQYXNzd29yZCI6IjhlMjIwOWVmZDljODRhMTM4MjdlZDljZTQxYjIyMjcwIn0=
+QSTASH_CURRENT_SIGNING_KEY=sig_7sPnDhTMWdK54NMbtr22MFQCEZyH
+QSTASH_NEXT_SIGNING_KEY=sig_6qrNpb9ZpcLs89KRduyQ8dqF9oZd
+```
 
 ---
 

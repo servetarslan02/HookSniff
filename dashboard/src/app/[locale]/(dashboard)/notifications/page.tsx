@@ -34,23 +34,25 @@ const TYPE_I18N_MAP: Record<string, string> = {
   billing: 'billing',
 };
 
-/** Format type string for display: "webhook_failed" → "Webhook Failed" */
-function formatType(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+/** Format type string for display using i18n, fallback to formatted raw string */
+function formatType(type: string, t: any): string {
+  const key = `typeLabels.${type}`;
+  const translated = t(key);
+  return translated !== key ? translated : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-/** Relative time string: "2m ago", "3h ago", "5d ago" */
-function relativeTime(dateStr: string): string {
+/** Relative time string using i18n */
+function relativeTime(dateStr: string, t: any): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
   const diff = Math.max(0, now - then);
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t('timeAgo.justNow');
+  if (mins < 60) return t('timeAgo.minutes', { n: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('timeAgo.hours', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return t('timeAgo.days', { n: days });
   return new Date(dateStr).toLocaleDateString();
 }
 
@@ -288,11 +290,11 @@ export default function NotificationsPage() {
                       </div>
                       <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{n.message}</p>
                       <div className="flex items-center gap-3 mt-2">
-                        <span className="text-xs text-gray-500 dark:text-slate-500" title={new Date(n.created_at).toLocaleString()}>
-                          {relativeTime(n.created_at)}
+                        <span className="text-xs text-gray-500 dark:text-slate-500" title={String(n.created_at)}>
+                          {relativeTime(String(n.created_at), t)}
                         </span>
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
-                          {formatType(n.type)}
+                          {formatType(String(n.type), t)}
                         </span>
                       </div>
                       {n.link && (

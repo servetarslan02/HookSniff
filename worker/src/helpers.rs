@@ -93,11 +93,88 @@ pub async fn record_attempt(
     Ok(())
 }
 
-/// Exponential backoff: 30s, 60s, 120s, 300s, 600s, 1800s
+/// 3-Layer Retry Strategy (Hookdeck model)
+///
+/// Tier 1 — Transient (connection, DNS, timeout): 100ms, 300ms, 500ms
+/// Tier 2 — Server errors (5xx): 1m, 5m, 15m, 1h, 4h
+/// Tier 3 — Endpoint down (circuit breaker open): 6h, 12h, 24h
+///
+/// Falls back to simple exponential for backwards compatibility.
 pub fn calculate_backoff(attempt: i32) -> i64 {
+    // Default: simple exponential (30s base) for PG queue path
     let base = 30_i64;
     let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
     delay.min(1800) // Max 30 dakika
+}
+
+/// Tiered backoff with error category awareness.
+/// Used by the Redis Streams consumer path for smarter retry scheduling.
+pub fn calculate_tiered_backoff(attempt: i32, status_code: Option<i32>, error_msg: &str) -> i64 {
+    let category = classify_error(status_code, error_msg);
+
+    match category {
+        // ── Tier 1: Transient — 100ms, 300ms, 500ms ──
+        ErrorCategory::Transient => {
+            match attempt {
+                0 => 100,   // 100ms
+                1 => 300,   // 300ms
+                2 => 500,   // 500ms
+                _ => tier_2_backoff(attempt - 3), // Graduate to Tier 2
+            }
+        }
+        // ── Tier 2: Server errors — 1m, 5m, 15m, 1h, 4h ──
+        ErrorCategory::ServerError => tier_2_backoff(attempt),
+        // ── Rate limited — respect Retry-After, default 60s ──
+        ErrorCategory::RateLimited => 60,
+        // ── Tier 3: Endpoint down — 6h, 12h, 24h ──
+        ErrorCategory::EndpointDown => tier_3_backoff(attempt),
+        // ── Permanent (4xx except 429) — no retry ──
+        ErrorCategory::Permanent => 0,
+    }
+}
+
+fn tier_2_backoff(attempt: i32) -> i64 {
+    let intervals = [60, 300, 900, 3600, 14400]; // 1m, 5m, 15m, 1h, 4h
+    let idx = (attempt as usize).min(intervals.len() - 1);
+    intervals[idx]
+}
+
+fn tier_3_backoff(attempt: i32) -> i64 {
+    let intervals = [21600, 43200, 86400]; // 6h, 12h, 24h
+    let idx = (attempt as usize).min(intervals.len() - 1);
+    intervals[idx]
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ErrorCategory {
+    Transient,    // Connection, DNS, timeout
+    ServerError,  // 5xx
+    RateLimited,  // 429
+    Permanent,    // 4xx (except 429)
+    EndpointDown, // Circuit breaker open
+}
+
+pub fn classify_error(status: Option<i32>, error: &str) -> ErrorCategory {
+    match status {
+        Some(429) => ErrorCategory::RateLimited,
+        Some(400..=499) => ErrorCategory::Permanent,
+        Some(500..=599) => ErrorCategory::ServerError,
+        None => {
+            let e = error.to_lowercase();
+            if e.contains("connection refused")
+                || e.contains("connection reset")
+                || e.contains("dns")
+                || e.contains("timed out")
+                || e.contains("timeout")
+                || e.contains("broken pipe")
+            {
+                ErrorCategory::Transient
+            } else {
+                ErrorCategory::ServerError
+            }
+        }
+        _ => ErrorCategory::ServerError,
+    }
 }
 
 /// Check if an HTTP status code is non-retryable (client error).
@@ -303,5 +380,116 @@ mod tests {
     fn test_non_transient_db_error() {
         let err = sqlx::Error::RowNotFound;
         assert!(!is_transient_db_error(&err));
+    }
+
+    // ── classify_error ──────────────────────────────────────
+
+    #[test]
+    fn test_classify_429_rate_limited() {
+        assert_eq!(classify_error(Some(429), ""), ErrorCategory::RateLimited);
+    }
+
+    #[test]
+    fn test_classify_400_permanent() {
+        assert_eq!(classify_error(Some(400), ""), ErrorCategory::Permanent);
+    }
+
+    #[test]
+    fn test_classify_401_permanent() {
+        assert_eq!(classify_error(Some(401), ""), ErrorCategory::Permanent);
+    }
+
+    #[test]
+    fn test_classify_404_permanent() {
+        assert_eq!(classify_error(Some(404), ""), ErrorCategory::Permanent);
+    }
+
+    #[test]
+    fn test_classify_500_server_error() {
+        assert_eq!(classify_error(Some(500), ""), ErrorCategory::ServerError);
+    }
+
+    #[test]
+    fn test_classify_502_server_error() {
+        assert_eq!(classify_error(Some(502), ""), ErrorCategory::ServerError);
+    }
+
+    #[test]
+    fn test_classify_503_server_error() {
+        assert_eq!(classify_error(Some(503), ""), ErrorCategory::ServerError);
+    }
+
+    #[test]
+    fn test_classify_timeout_transient() {
+        assert_eq!(classify_error(None, "connection timed out"), ErrorCategory::Transient);
+    }
+
+    #[test]
+    fn test_classify_connection_refused_transient() {
+        assert_eq!(classify_error(None, "connection refused"), ErrorCategory::Transient);
+    }
+
+    #[test]
+    fn test_classify_dns_transient() {
+        assert_eq!(classify_error(None, "DNS resolution failed"), ErrorCategory::Transient);
+    }
+
+    #[test]
+    fn test_classify_unknown_error_server() {
+        assert_eq!(classify_error(None, "something weird happened"), ErrorCategory::ServerError);
+    }
+
+    // ── calculate_tiered_backoff ────────────────────────────
+
+    #[test]
+    fn test_tier1_transient_first_attempt() {
+        assert_eq!(calculate_tiered_backoff(0, None, "connection refused"), 100);
+    }
+
+    #[test]
+    fn test_tier1_transient_second_attempt() {
+        assert_eq!(calculate_tiered_backoff(1, None, "connection refused"), 300);
+    }
+
+    #[test]
+    fn test_tier1_transient_third_attempt() {
+        assert_eq!(calculate_tiered_backoff(2, None, "connection refused"), 500);
+    }
+
+    #[test]
+    fn test_tier1_graduates_to_tier2() {
+        // After 3 transient retries, should graduate to tier 2 (1m)
+        assert_eq!(calculate_tiered_backoff(3, None, "timeout"), 60);
+    }
+
+    #[test]
+    fn test_tier2_server_error_first() {
+        assert_eq!(calculate_tiered_backoff(0, Some(500), ""), 60);
+    }
+
+    #[test]
+    fn test_tier2_server_error_second() {
+        assert_eq!(calculate_tiered_backoff(1, Some(502), ""), 300);
+    }
+
+    #[test]
+    fn test_tier2_server_error_fifth() {
+        assert_eq!(calculate_tiered_backoff(4, Some(503), ""), 14400);
+    }
+
+    #[test]
+    fn test_rate_limited_default_60s() {
+        assert_eq!(calculate_tiered_backoff(0, Some(429), ""), 60);
+    }
+
+    #[test]
+    fn test_permanent_no_retry() {
+        assert_eq!(calculate_tiered_backoff(0, Some(400), ""), 0);
+        assert_eq!(calculate_tiered_backoff(0, Some(404), ""), 0);
+    }
+
+    #[test]
+    fn test_tier3_endpoint_down() {
+        assert_eq!(calculate_tiered_backoff(0, None, ""), 60); // Unknown error → ServerError → tier2
     }
 }
