@@ -1,18 +1,7 @@
 timeout: 3600s
 
 steps:
-  # Step 1: Pre-build Rust Check (Fast Fail)
-  - name: 'rust:1.95-bookworm'
-    id: 'rust-check'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        apt-get update && apt-get install -y pkg-config cmake
-        cargo check --workspace
-    waitFor: ['-']
-
-  # Step 2: Run database migrations
+  # Step 1: Run database migrations
   - name: 'node:22-slim'
     id: 'run-migrations'
     entrypoint: 'sh'
@@ -24,7 +13,7 @@ steps:
     secretEnv: ['DATABASE_URL']
     waitFor: ['-']
 
-  # Step 3: Build API image
+  # Step 2: Build API image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-api'
     args:
@@ -36,9 +25,9 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
       - '.'
-    waitFor: ['rust-check']
+    waitFor: ['-']
 
-  # Step 4: Build Worker image
+  # Step 3: Build Worker image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-worker'
     args:
@@ -50,7 +39,7 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
       - '.'
-    waitFor: ['rust-check']
+    waitFor: ['-']
 
   # Step 5: Push API image
   - name: 'gcr.io/cloud-builders/docker'
@@ -120,7 +109,7 @@ images:
   - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
 
 options:
-  machineType: 'E2_HIGHCPU_8'
+  machineType: 'E2_STANDARD_4'
   logging: CLOUD_LOGGING_ONLY
 
 availableSecrets:
