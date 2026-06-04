@@ -140,7 +140,81 @@ pub async fn create_coupon(
         None, None,
     ).await;
 
+    // Auto-sync polar coupons to Polar.sh from backend
+    let mut coupon = coupon;
+    if coupon.coupon_type == "polar" && coupon.polar_discount_id.is_none() {
+        match auto_sync_to_polar(&coupon).await {
+            Ok(discount_id) => {
+                tracing::info!("Auto-synced coupon '{}' to Polar, discount_id={}", coupon.code, discount_id);
+                let updated = sqlx::query_as::<_, CouponCode>(
+                    "UPDATE coupon_codes SET polar_discount_id = $2, updated_at = NOW() WHERE id = $1 RETURNING *"
+                )
+                .bind(coupon.id)
+                .bind(&discount_id)
+                .fetch_one(&pool)
+                .await;
+                match updated {
+                    Ok(u) => coupon = u,
+                    Err(e) => tracing::error!("Failed to save polar_discount_id for coupon '{}': {:?}", coupon.code, e),
+                }
+            }
+            Err(e) => {
+                tracing::error!("Auto-sync failed for coupon '{}': {:?}", coupon.code, e);
+                // Don't fail creation — admin can manually sync later
+            }
+        }
+    }
+
     Ok((StatusCode::CREATED, Json(coupon)))
+}
+
+/// Auto-sync a coupon to Polar.sh (used by both create and upgrade flows).
+async fn auto_sync_to_polar(coupon: &CouponCode) -> Result<String, AppError> {
+    let polar_cfg = crate::billing::polar::PolarConfig::from_env()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar not configured")))?;
+    let client = crate::http_client::get_client();
+
+    let basis_points = (coupon.discount_value as u64) * 100; // e.g., 100% = 10000
+
+    let mut polar_body = serde_json::json!({
+        "name": coupon.code,
+        "code": coupon.code,
+        "type": "percentage",
+        "basis_points": if coupon.discount_type == "free_month" { 10000 } else { basis_points },
+        "duration": "once"
+    });
+
+    if let Some(ref expires_at) = coupon.expires_at {
+        polar_body["ends_at"] = serde_json::json!(expires_at.to_rfc3339());
+    }
+
+    let resp = client
+        .post(format!("{}/v1/discounts", polar_cfg.base_url))
+        .header("Authorization", format!("Bearer {}", polar_cfg.access_token))
+        .header("Content-Type", "application/json")
+        .json(&polar_body)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar API error: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        tracing::error!("Polar discount creation failed: {} {}", status, body);
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Failed to create discount in Polar.sh ({}): {}", status, body
+        )));
+    }
+
+    #[derive(serde::Deserialize)]
+    struct PolarDiscount {
+        id: String,
+    }
+
+    let discount: PolarDiscount = resp.json().await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse Polar response: {}", e)))?;
+
+    Ok(discount.id)
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -295,7 +369,7 @@ pub async fn sync_to_polar(
     }
 
     let resp = client
-        .post(format!("{}/v1/discounts/", polar_cfg.base_url))
+        .post(format!("{}/v1/discounts", polar_cfg.base_url))
         .header("Authorization", format!("Bearer {}", polar_cfg.access_token))
         .header("Content-Type", "application/json")
         .json(&polar_body)

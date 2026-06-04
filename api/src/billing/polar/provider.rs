@@ -18,6 +18,7 @@ impl PaymentProviderImpl for PolarProvider {
         yearly: bool,
         discount_code: Option<&str>,
         has_used_startup_trial: bool,
+        pre_resolved_discount_id: Option<String>,
     ) -> Result<CheckoutResult, AppError> {
         let product_id = self
             .config
@@ -36,32 +37,43 @@ impl PaymentProviderImpl for PolarProvider {
             None
         };
 
-        // If user provided a discount code, look up its ID via Polar API
-        // (discount_code only prefills the input; discount_id auto-applies)
-        let resolved_discount_id = if let Some(code) = discount_code {
+        // Resolve discount ID: prefer pre-resolved from DB, then Polar API lookup
+        let resolved_discount_id = if let Some(id) = pre_resolved_discount_id {
+            tracing::info!("Using pre-resolved polar_discount_id: {}", id);
+            Some(id)
+        } else if let Some(code) = discount_code {
             match self.lookup_discount_id(code).await {
-                Ok(Some(id)) => Some(id),
+                Ok(Some(id)) => {
+                    tracing::info!("Resolved discount code '{}' to Polar discount_id: {}", code, id);
+                    Some(id)
+                }
                 Ok(None) => {
                     tracing::warn!("Discount code '{}' not found in Polar", code);
-                    None
+                    return Err(AppError::BadRequest(format!(
+                        "Discount code '{}' could not be applied. The code may not have been synced to the payment provider. Please contact support.",
+                        code
+                    )));
                 }
                 Err(e) => {
-                    tracing::warn!("Failed to lookup discount code '{}': {}", code, e);
-                    None
+                    tracing::error!("Failed to lookup discount code '{}': {}", code, e);
+                    return Err(AppError::BadRequest(
+                        "Failed to validate discount code. Please try again later.".into()
+                    ));
                 }
             }
         } else {
             auto_discount_id
         };
 
+        let has_discount = resolved_discount_id.is_some();
         let req_body = CreateCheckoutRequest {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
             success_url: Some(format!("{}/billing?upgraded=true", app_url)),
             locale: Some("en".to_string()),
-            discount_code: None, // Don't use discount_code — it only prefills, doesn't apply
             discount_id: resolved_discount_id,
+            allow_discount_codes: if has_discount { Some(false) } else { None },
             metadata: Some(metadata),
         };
 
