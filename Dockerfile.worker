@@ -18,13 +18,14 @@ COPY common/Cargo.toml common/Cargo.toml
 COPY vendor/ vendor/
 
 # Step 3: Pre-build dependencies with dummy sources
-RUN mkdir -p api/src worker/src common/src && \
+RUN mkdir -p api/src api/benches worker/src common/src && \
     echo "fn main() {}" > api/src/main.rs && \
     echo "fn main() {}" > worker/src/main.rs && \
+    echo "fn bench() {}" > api/benches/api_benchmarks.rs && \
     echo "pub mod lib;" > common/src/lib.rs && \
     touch common/src/lib.rs && \
     cargo build --release -p hooksniff-worker 2>/dev/null || true && \
-    rm -rf api/src worker/src common/src
+    rm -rf api/src api/benches worker/src common/src
 
 # Step 4: Copy actual source
 COPY api/src/ api/src/
