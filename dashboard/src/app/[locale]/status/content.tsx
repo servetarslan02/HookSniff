@@ -108,7 +108,9 @@ export function StatusPageContent() {
         if (histRes?.ok) {
           const raw: HistoryDay[] = await histRes.json();
           // Filter out corrupted entries (uptime < 50% without incidents)
-          const cleaned = raw.filter((h) => h.uptime > 50 || (h.incidents && h.incidents.length > 0));
+          const cleaned = raw
+            .filter((h) => h.uptime > 50 || (h.incidents && h.incidents.length > 0))
+            .map((h) => ({ ...h, uptime: h.uptime >= 99.9 ? 100 : h.uptime }));
           setHistory(cleaned);
         }
         if (incRes?.ok) setIncidents(await incRes.json());
