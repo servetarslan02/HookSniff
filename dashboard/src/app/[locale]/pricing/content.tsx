@@ -191,7 +191,7 @@ export function PricingPageContent() {
     },
   ];
 
-  const faqCount = 16;
+  const faqCount = 17;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -480,6 +480,15 @@ export function PricingPageContent() {
           >
             {t('startupCta')}
           </Link>
+        </div>
+
+        {/* Refund Policy */}
+        <div className="mb-12 max-w-2xl mx-auto">
+          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-5 text-center">
+            <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+              📋 {t('refundPolicyNote') || 'All fees are non-refundable. Cancel anytime — access continues until the end of your billing period.'}
+            </p>
+          </div>
         </div>
 
         {/* FAQ */}

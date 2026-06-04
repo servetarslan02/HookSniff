@@ -1490,7 +1490,8 @@
     "s9Title": "9. Payment and Billing",
     "s9Items": [
       "Paid plans are billed monthly or annually (20% discount on annual plans)",
-      "All fees are non-refundable except as required by applicable law",
+      "All fees are non-refundable — periods already billed are not refunded regardless of usage or cancellation reason",
+      "You may cancel your subscription at any time — access continues until the end of the current billing period",
       "We may change pricing with 180 days notice",
       "Failure to pay may result in account suspension or downgrade to Free plan",
       "Overage charges may apply if you exceed your plan limits"
@@ -2972,7 +2973,8 @@
     "eventTypes": "Event types",
     "subscriptions": "Subscriptions",
     "overagePerEvent": "Overage per event",
-    "custom": "Custom"
+    "custom": "Custom",
+    "refundPolicyNote": "All fees are non-refundable. Cancel anytime — access continues until the end of your billing period."
   },
   "pricingFaq": [
     {
@@ -3038,6 +3040,10 @@
     {
       "q": "Can I export my data?",
       "a": "Yes. You can export all your webhook logs, endpoint configurations, and delivery history as JSON or CSV from the dashboard."
+    },
+    {
+      "q": "What is your refund policy?",
+      "a": "All fees are non-refundable. You may cancel your subscription at any time and retain access until the end of your current billing period. We do not offer refunds for partially used periods. For billing errors, contact our support team."
     }
   ],
   "transforms": {
