@@ -1,7 +1,7 @@
 use axum::{
     extract::{Extension, Query},
     http::HeaderMap,
-    response::Redirect,
+    response::{IntoResponse, Redirect},
 };
 use sqlx::PgPool;
 
