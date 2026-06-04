@@ -365,7 +365,7 @@ async fn main() -> Result<()> {
                                         payload: payload.clone(),
                                         custom_headers: None,
                                     };
-                                    let delivery_svc = delivery::DeliveryService::new(pool.clone(), reqwest::Client::new());
+                                    let delivery_svc = delivery::DeliveryRouter::new(pool.clone(), reqwest::Client::new());
                                     let _ = delivery_svc.deliver(&msg).await;
                                 }
 
