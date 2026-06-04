@@ -104,10 +104,6 @@ steps:
       - '--quiet'
     waitFor: ['push-worker', 'run-migrations']
 
-options:
-  machineType: 'E2_STANDARD_8'
-  logging: CLOUD_LOGGING_ONLY
-
 images:
   - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
   - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
