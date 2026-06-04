@@ -768,7 +768,39 @@ async fn dead_letter_delivery(
     )
     .bind(endpoint_id).fetch_one(&mut *tx).await.unwrap_or(0);
 
+    // Get endpoint URL for notification message
+    let endpoint_url: String = sqlx::query_scalar(
+        "SELECT url FROM endpoints WHERE id = $1"
+    )
+    .bind(endpoint_id).fetch_one(&mut *tx).await.unwrap_or_default();
+
     commit_delivery_tx(tx, delivery_id, context).await?;
+
+    // ── Send notifications (best-effort, outside transaction) ──
+
+    // 1. Delivery failed notification
+    let _ = sqlx::query(
+        "INSERT INTO notifications (customer_id, type, title, message, is_read, link) \
+         SELECT $1, 'webhook_failed', 'Webhook Delivery Failed', \
+         'Delivery to ' || $3 || ' failed: ' || $4, false, '/deliveries/' || $2::text \
+         WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='webhook_failed' AND link='/deliveries/'||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
+    )
+    .bind(customer_id).bind(delivery_id).bind(&endpoint_url).bind(error_msg)
+    .execute(pool).await.ok();
+
+    // 2. Endpoint down notification (when streak hits 5)
+    if new_streak == 5 {
+        let _ = sqlx::query(
+            "INSERT INTO notifications (customer_id, type, title, message, is_read, link) \
+             SELECT $1, 'alert', 'Endpoint Down', \
+             $3 || ' consecutive failures detected at ' || $4 || '. The endpoint may be down.', \
+             false, '/applications?endpoint=' || $2::text \
+             WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='alert' AND link='/applications?endpoint='||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
+        )
+        .bind(customer_id).bind(endpoint_id).bind(new_streak).bind(&endpoint_url)
+        .execute(pool).await.ok();
+    }
+
     Ok((new_streak, customer_id))
 }
 
@@ -1041,7 +1073,7 @@ async fn process_pending(
                             "UPDATE webhook_queue SET status = 'delivered', processed_at = now() WHERE id = $1"
                         )
                         .bind(item.id)
-                        .execute(&pool)
+                        .execute(pool)
                         .await;
                         return Ok::<(), anyhow::Error>(());
                     }
@@ -1060,7 +1092,7 @@ async fn process_pending(
                     "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '60 seconds' WHERE id = $1"
                 )
                 .bind(item.id)
-                .execute(&pool)
+                .execute(pool)
                 .await;
                 return Ok::<(), anyhow::Error>(());
             }
@@ -1080,7 +1112,7 @@ async fn process_pending(
                     "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '5 seconds' WHERE id = $1"
                 )
                 .bind(item.id)
-                .execute(&pool)
+                .execute(pool)
                 .await;
                 return Ok::<(), anyhow::Error>(());
             }
@@ -1306,6 +1338,23 @@ async fn process_pending(
 
                 // HS-020: Record success in circuit breaker
                 cb.record_success(endpoint_id).await;
+
+                // ── Endpoint recovered notification (best-effort) ──
+                // Only notify if this endpoint previously had failures
+                if item.attempt_count > 0 {
+                    let _ = sqlx::query(
+                        "INSERT INTO notifications (customer_id, type, title, message, is_read, link) \
+                         SELECT c.id, 'alert', 'Endpoint Recovered', \
+                         'Endpoint at ' || e.url || ' is healthy again.', \
+                         false, '/applications?endpoint=' || e.id::text \
+                         FROM deliveries d JOIN endpoints e ON e.id = d.endpoint_id \
+                         JOIN customers c ON c.id = d.customer_id \
+                         WHERE d.id = $1 \
+                         AND NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=c.id AND type='alert' AND link='/applications?endpoint='||e.id::text AND title='Endpoint Recovered' AND created_at > now()-interval '1 hour')"
+                    )
+                    .bind(delivery_id)
+                    .execute(pool).await.ok();
+                }
 
                 // HS-023: Mark FIFO item as delivered
                 let _ = fifo::mark_fifo_delivered(&pool, endpoint_id, delivery_id).await;
