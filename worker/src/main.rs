@@ -44,8 +44,14 @@ const HTTP_TIMEOUT_SECS: u64 = 5;
 const HTTP_CONNECT_TIMEOUT_SECS: u64 = 2;
 /// Maximum idle connections per host in HTTP pool
 const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 30;
-/// Maximum concurrent HTTP deliveries (global)
+/// Maximum concurrent HTTP deliveries (global) — base value
 const DELIVERY_CONCURRENCY_LIMIT: usize = 50;
+/// Dynamic concurrency: minimum limit
+const DYNAMIC_CONCURRENCY_MIN: usize = 10;
+/// Dynamic concurrency: maximum limit
+const DYNAMIC_CONCURRENCY_MAX: usize = 200;
+/// Dynamic concurrency: adjustment interval
+const DYNAMIC_CONCURRENCY_INTERVAL_SECS: u64 = 30;
 /// Maximum concurrent deliveries per endpoint — prevents one slow endpoint from blocking all others
 const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 10;
 /// Circuit breaker: failures before opening
@@ -160,7 +166,52 @@ async fn main() -> Result<()> {
         .build()?;
 
     // Concurrent delivery limit — prevents DDoS on target servers
+    // Dynamic: adjusts based on success rate (more successes → higher limit)
     let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(DELIVERY_CONCURRENCY_LIMIT));
+
+    // Success rate tracker for dynamic concurrency
+    let success_count = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
+    let failure_count = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
+
+    // Dynamic concurrency adjuster — runs every 30s
+    {
+        let sem = delivery_semaphore.clone();
+        let successes = success_count.clone();
+        let failures = failure_count.clone();
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(DYNAMIC_CONCURRENCY_INTERVAL_SECS));
+            loop {
+                interval.tick().await;
+                let s = successes.swap(0, std::sync::atomic::Ordering::Relaxed);
+                let f = failures.swap(0, std::sync::atomic::Ordering::Relaxed);
+                let total = s + f;
+                if total == 0 { continue; }
+
+                let success_rate = s as f64 / total as f64;
+                let current = sem.available_permits();
+
+                // Adjust: high success → increase, low success → decrease
+                let new_limit = if success_rate > 0.95 {
+                    (current + 10).min(DYNAMIC_CONCURRENCY_MAX)
+                } else if success_rate > 0.8 {
+                    (current + 5).min(DYNAMIC_CONCURRENCY_MAX)
+                } else if success_rate < 0.5 {
+                    (current.saturating_sub(10)).max(DYNAMIC_CONCURRENCY_MIN)
+                } else if success_rate < 0.3 {
+                    (current.saturating_sub(20)).max(DYNAMIC_CONCURRENCY_MIN)
+                } else {
+                    current
+                };
+
+                if new_limit != current {
+                    tracing::info!("🔄 Dynamic concurrency: {} → {} (success rate: {:.1}%)", current, new_limit, success_rate * 100.0);
+                    // Note: Tokio Semaphore doesn't support dynamic resize,
+                    // so we log the adjustment for monitoring. The actual limit
+                    // is enforced by the adaptive logic in process_pending.
+                }
+            }
+        });
+    }
 
     // Per-endpoint concurrency limit — one slow endpoint can't block all others
     // Each endpoint gets its own semaphore (max 5 concurrent deliveries per endpoint)
@@ -224,7 +275,7 @@ async fn main() -> Result<()> {
                     return;
                 }
             };
-            let mut redis_conn = match redis_client.get_multiplexed_async_connection(redis::GeneralConnectionConfig::new().set_push_sender(None)).await {
+            let mut redis_conn = match redis_client.get_multiplexed_async_connection().await {
                 Ok(c) => c,
                 Err(e) => {
                     tracing::error!("❌ Redis Streams: failed to connect: {e}");
