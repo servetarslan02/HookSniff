@@ -95,7 +95,7 @@ export function SetupChecklist() {
            ? 'bg-green-500 text-white'
            : 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
          }`}>
-          {isDone ? '✓' : item.icon}
+ {isDone ? '': item.icon}
          </div>
          <span className={`text-sm ${
           isDone

@@ -9,12 +9,12 @@ import { getErrorMessage } from '@/lib/errors';
 import { X, AlertTriangle, CheckCircle2 } from '@/components/icons';
 
 const REFUND_CATEGORIES = [
-  { value: 'accidental_purchase', icon: '🛒' },
-  { value: 'not_satisfied', icon: '😞' },
-  { value: 'missing_features', icon: '🧩' },
-  { value: 'technical_issues', icon: '🔧' },
-  { value: 'billing_error', icon: '💳' },
-  { value: 'other', icon: '📝' },
+  { value: 'accidental_purchase', icon: null },
+  { value: 'not_satisfied', icon: null },
+  { value: 'missing_features', icon: null },
+  { value: 'technical_issues', icon: null },
+  { value: 'billing_error', icon: null },
+  { value: 'other', icon: null },
 ] as const;
 
 export function RefundRequestModal({

@@ -145,7 +145,7 @@ export function StatusPageContent() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin text-3xl mb-3">🪝</div>
+ <div className="animate-spin text-3xl mb-3"></div>
           <p className="text-gray-500 dark:text-slate-400">{t('loadingStatus')}</p>
         </div>
       </div>

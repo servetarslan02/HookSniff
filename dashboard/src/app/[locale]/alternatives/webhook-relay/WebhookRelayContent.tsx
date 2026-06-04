@@ -19,7 +19,7 @@ export function WebhookRelayContent() {
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr className="border-b border-gray-200 dark:border-slate-700">
               <th className="text-left py-3 px-6 font-semibold text-gray-900 dark:text-white">{t("feature")}</th>
-              <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30">🪝 {t('hooksniff')}</th>
+ <th className="text-center py-3 px-4 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50/30"> {t('hooksniff')}</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Webhook Relay</th>
             </tr></thead>
             <tbody>{[
@@ -43,7 +43,7 @@ export function WebhookRelayContent() {
         {/* When to choose each */}
         <div className="space-y-6 mb-12">
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
+ <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"> {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Full webhook platform:</strong> 11 SDKs (in development), retries, DLQ, dashboard, FIFO, schema validation</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source & self-hosted:</strong> MIT licensed, Docker deployment</li>

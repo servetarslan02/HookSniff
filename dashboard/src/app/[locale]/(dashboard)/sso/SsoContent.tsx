@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Info, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 import { IDP_TEMPLATES } from './sso-utils';
 import { useSsoHandlers } from './useSsoHandlers';
@@ -97,7 +97,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
           <div className="flex-1">
             <select value={h.selectedTemplate} onChange={(e) => h.handleTemplateSelect(e.target.value)} disabled={h.isEnforced}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed appearance-none">
-              <option value="">{h.t('manualSetup') || '⚙️ Manual Setup'}</option>
+              <option value="">{h.t('manualSetup') || ' Manual Setup'}</option>
               {IDP_TEMPLATES.map((tmpl) => (
                 <option key={tmpl.id} value={tmpl.id}>{tmpl.icon} {tmpl.name} ({tmpl.provider === 'oidc' ? 'OIDC' : 'SAML'})</option>
               ))}
@@ -110,7 +110,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
           if (!tmpl) return null;
           return (
             <div className="flex items-start gap-3 mt-4 p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20">
-              <span className="text-blue-500 mt-0.5">💡</span>
+              <span className="text-blue-500 mt-0.5"><Info size={16} /></span>
               <div className="flex-1">
                 <p className="text-sm text-blue-700 dark:text-blue-300">{tmpl.hint}</p>
                 {tmpl.helpUrl && (
@@ -219,7 +219,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
                 {h.metadata && !h.isEnforced && (
                   <button type="button" onClick={h.handleFetchSamlMetadata} disabled={h.fetchingMetadata}
                     className="px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 whitespace-nowrap">
-                    {h.fetchingMetadata ? '...' : (h.t('fetchMetadata') || '🔍 Fetch')}
+                    {h.fetchingMetadata ? '...' : (h.t('fetchMetadata') || 'Fetch')}
                   </button>
                 )}
               </div>
@@ -433,7 +433,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
       {h.friendlyError && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <span className="text-red-500 mt-0.5">⚠️</span>
+            <span className="text-red-500 mt-0.5"><AlertTriangle size={16} /></span>
             <div className="flex-1">
               <div className="font-semibold text-red-800 dark:text-red-300">{h.friendlyError.title}</div>
               <p className="text-sm text-red-700 dark:text-red-400 mt-1">{h.friendlyError.message}</p>
@@ -468,7 +468,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
             <button type="button" onClick={h.handleTestAndActivate} disabled={h.testAndActivateLoading || !h.isConfigured}
               className="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition disabled:opacity-50 flex items-center gap-2">
               {h.testAndActivateLoading ? (
-                <><span className="animate-spin">⏳</span> {h.t('testingAndActivating') || 'Testing & Activating...'}</>
+                <><span className="animate-spin"></span> {h.t('testingAndActivating') || 'Testing & Activating...'}</>
               ) : (
                 <><ShieldCheck size={16} /> {h.t('testAndActivate') || 'Test & Activate'}</>
               )}

@@ -7,10 +7,10 @@ import { Brain, Clock, Info } from '@/components/icons';
 
 function describePrediction(probability: number, _factors: any, t: any): { title: string; detail: string; emoji: string; advice: string } {
   const pct = Math.round(probability * 100);
-  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), emoji: '🔴', advice: t('advice.high') };
-  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), emoji: '🟠', advice: t('advice.medium') };
-  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), emoji: '🟡', advice: t('advice.low') };
-  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), emoji: '🟢', advice: t('advice.minimal') };
+  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), emoji: 'high', advice: t('advice.high') };
+  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), emoji: 'medium', advice: t('advice.medium') };
+  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), emoji: 'low', advice: t('advice.low') };
+  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), emoji: 'minimal', advice: t('advice.minimal') };
 }
 
 export function PredictionsTab({ token }: { token: string | null }) {

@@ -84,11 +84,11 @@ pub async fn payment_failed(pool: &PgPool, customer_id: Uuid, provider: &str) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "💳 Ödeme Başarısız",
+            "Ödeme Başarısız",
             format!("{} üzerinden ödeme başarısız oldu. Lütfen ödeme bilgilerinizi güncelleyin. Hizmetiniz geçici olarak durdurulabilir.", provider),
         ),
         Lang::En => (
-            "💳 Payment Failed",
+            "Payment Failed",
             format!("Payment via {} failed. Please update your payment method. Your service may be temporarily suspended.", provider),
         ),
     };
@@ -100,11 +100,11 @@ pub async fn payment_recovered(pool: &PgPool, customer_id: Uuid, provider: &str)
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "✅ Ödeme Başarılı",
+            "Ödeme Başarılı",
             format!("{} üzerinden ödemeniz alındı. Hizmetiniz normal şekilde devam ediyor.", provider),
         ),
         Lang::En => (
-            "✅ Payment Successful",
+            "Payment Successful",
             format!("Payment via {} received. Your service is operating normally.", provider),
         ),
     };
@@ -116,11 +116,11 @@ pub async fn subscription_canceled(pool: &PgPool, customer_id: Uuid, plan: &str)
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "❌ Abonelik İptal Edildi",
+            "Abonelik İptal Edildi",
             format!("{} plan aboneliğiniz iptal edildi. Dönem sonuna kadar mevcut özelliklerinizi kullanmaya devam edebilirsiniz.", plan),
         ),
         Lang::En => (
-            "❌ Subscription Canceled",
+            "Subscription Canceled",
             format!("Your {} plan subscription has been canceled. You can continue using your current features until the end of the billing period.", plan),
         ),
     };
@@ -133,8 +133,8 @@ pub async fn plan_upgraded(pool: &PgPool, customer_id: Uuid, old_plan: &str, new
 
     // Deduplication uses the title, so we need to check with the correct language title
     let title = match lang {
-        Lang::Tr => "🚀 Plan Yükseltildi",
-        Lang::En => "🚀 Plan Upgraded",
+        Lang::Tr => "Plan Yükseltildi",
+        Lang::En => "Plan Upgraded",
     };
 
     let exists: (bool,) = sqlx::query_as(
@@ -176,11 +176,11 @@ pub async fn delivery_failed(
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "⚠️ Webhook Teslimat Başarısız",
+            "Webhook Teslimat Başarısız",
             format!("{} adresine teslimat başarısız oldu: {}", endpoint_url, error_msg),
         ),
         Lang::En => (
-            "⚠️ Webhook Delivery Failed",
+            "Webhook Delivery Failed",
             format!("Delivery to {} failed: {}", endpoint_url, error_msg),
         ),
     };
@@ -192,11 +192,11 @@ pub async fn endpoint_down(pool: &PgPool, customer_id: Uuid, endpoint_id: Uuid, 
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🔴 Endpoint Çöktü",
+            "Endpoint Çöktü",
             format!("{} adresinde {} ardışık başarısızlık tespit edildi. Endpoint devre dışı olabilir.", endpoint_url, streak),
         ),
         Lang::En => (
-            "🔴 Endpoint Down",
+            "Endpoint Down",
             format!("{} consecutive failures detected at {}. The endpoint may be down.", streak, endpoint_url),
         ),
     };
@@ -208,11 +208,11 @@ pub async fn endpoint_recovered(pool: &PgPool, customer_id: Uuid, endpoint_id: U
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🟢 Endpoint Kurtarıldı",
+            "Endpoint Kurtarıldı",
             format!("{} adresindeki endpoint tekrar sağlıklı durumda.", endpoint_url),
         ),
         Lang::En => (
-            "🟢 Endpoint Recovered",
+            "Endpoint Recovered",
             format!("Endpoint at {} is healthy again.", endpoint_url),
         ),
     };
@@ -226,11 +226,11 @@ pub async fn password_changed(pool: &PgPool, customer_id: Uuid) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🔒 Şifre Değiştirildi",
+            "Şifre Değiştirildi",
             "Hesap şifreniz değiştirildi. Bu işlemi siz yapmadıysanız hemen şifrenizi sıfırlayın.".to_string(),
         ),
         Lang::En => (
-            "🔒 Password Changed",
+            "Password Changed",
             "Your account password has been changed. If you didn't do this, reset your password immediately.".to_string(),
         ),
     };
@@ -242,11 +242,11 @@ pub async fn email_changed(pool: &PgPool, customer_id: Uuid, new_email: &str) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "📧 E-posta Adresi Değiştirildi",
+            "E-posta Adresi Değiştirildi",
             format!("Hesap e-posta adresiniz {} olarak güncellendi. Bu işlemi siz yapmadıysanız hemen destek ile iletişime geçin.", new_email),
         ),
         Lang::En => (
-            "📧 Email Address Changed",
+            "Email Address Changed",
             format!("Your account email has been updated to {}. If you didn't do this, contact support immediately.", new_email),
         ),
     };
@@ -258,11 +258,11 @@ pub async fn two_factor_enabled(pool: &PgPool, customer_id: Uuid) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🔐 İki Faktörlü Doğrulama Aktif",
+            "İki Faktörlü Doğrulama Aktif",
             "Hesabınız için iki faktörlü doğrulama (2FA) etkinleştirildi. Hesabınız artık daha güvende.".to_string(),
         ),
         Lang::En => (
-            "🔐 Two-Factor Authentication Enabled",
+            "Two-Factor Authentication Enabled",
             "Two-factor authentication (2FA) has been enabled for your account. Your account is now more secure.".to_string(),
         ),
     };
@@ -274,11 +274,11 @@ pub async fn two_factor_disabled(pool: &PgPool, customer_id: Uuid) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "⚠️ İki Faktörlü Doğrulama Kapatıldı",
+            "İki Faktörlü Doğrulama Kapatıldı",
             "Hesabınız için iki faktörlü doğrulama (2FA) devre dışı bırakıldı. Güvenliğiniz için tekrar açmanız önerilir.".to_string(),
         ),
         Lang::En => (
-            "⚠️ Two-Factor Authentication Disabled",
+            "Two-Factor Authentication Disabled",
             "Two-factor authentication (2FA) has been disabled for your account. We recommend re-enabling it for security.".to_string(),
         ),
     };
@@ -290,11 +290,11 @@ pub async fn api_key_created(pool: &PgPool, customer_id: Uuid, key_name: &str) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🔑 Yeni API Key Oluşturuldu",
+            "Yeni API Key Oluşturuldu",
             format!("\"{}\" adında yeni bir API key oluşturuldu. Bu işlemi siz yapmadıysanız hemen iptal edin.", key_name),
         ),
         Lang::En => (
-            "🔑 New API Key Created",
+            "New API Key Created",
             format!("A new API key \"{}\" has been created. If you didn't do this, revoke it immediately.", key_name),
         ),
     };
@@ -306,11 +306,11 @@ pub async fn api_key_revoked(pool: &PgPool, customer_id: Uuid, key_name: &str) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🗑️ API Key İptal Edildi",
+            "API Key İptal Edildi",
             format!("\"{}\" adındaki API key iptal edildi.", key_name),
         ),
         Lang::En => (
-            "🗑️ API Key Revoked",
+            "API Key Revoked",
             format!("API key \"{}\" has been revoked.", key_name),
         ),
     };
@@ -324,11 +324,11 @@ pub async fn member_joined(pool: &PgPool, customer_id: Uuid, member_name: &str, 
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "👥 Yeni Üye Katıldı",
+            "Yeni Üye Katıldı",
             format!("{} ekibine katıldı: {}", member_name, team_name),
         ),
         Lang::En => (
-            "👥 New Member Joined",
+            "New Member Joined",
             format!("{} joined team: {}", member_name, team_name),
         ),
     };
@@ -340,11 +340,11 @@ pub async fn member_removed(pool: &PgPool, customer_id: Uuid, member_name: &str,
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "👤 Üye Çıkarıldı",
+            "Üye Çıkarıldı",
             format!("{} ekibinden çıkarıldı: {}", member_name, team_name),
         ),
         Lang::En => (
-            "👤 Member Removed",
+            "Member Removed",
             format!("{} has been removed from team: {}", member_name, team_name),
         ),
     };
@@ -356,11 +356,11 @@ pub async fn ownership_transferred(pool: &PgPool, customer_id: Uuid, team_name: 
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🔄 Sahiplik Devredildi",
+            "Sahiplik Devredildi",
             format!("{} ekibinin sahipliği {} kullanıcısına devredildi.", team_name, new_owner),
         ),
         Lang::En => (
-            "🔄 Ownership Transferred",
+            "Ownership Transferred",
             format!("Ownership of team {} has been transferred to {}.", team_name, new_owner),
         ),
     };
@@ -375,11 +375,11 @@ pub async fn limit_approaching(pool: &PgPool, customer_id: Uuid, current: i64, l
     let pct = (current as f64 / limit as f64 * 100.0) as i32;
     let (title, message) = match lang {
         Lang::Tr => (
-            "⚠️ Webhook Limiti Yaklaşıyor",
+            "Webhook Limiti Yaklaşıyor",
             format!("Webhook kullanımınız %{} seviyesinde ({}/{}). Limiti aşarsınızsanız hizmetiniz durabilir.", pct, current, limit),
         ),
         Lang::En => (
-            "⚠️ Webhook Limit Approaching",
+            "Webhook Limit Approaching",
             format!("Your webhook usage is at {}% ({}/{}). Exceeding the limit may suspend your service.", pct, current, limit),
         ),
     };
@@ -391,11 +391,11 @@ pub async fn limit_exceeded(pool: &PgPool, customer_id: Uuid, current: i64, limi
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "🚫 Webhook Limiti Aşıldı",
+            "Webhook Limiti Aşıldı",
             format!("Webhook limitiniz aşıldı ({}/{}). Yeni webhook'lar reddedilebilir. Planınızı yükseltmeyi düşünün.", current, limit),
         ),
         Lang::En => (
-            "🚫 Webhook Limit Exceeded",
+            "Webhook Limit Exceeded",
             format!("Your webhook limit has been exceeded ({}/{}). New webhooks may be rejected. Consider upgrading your plan.", current, limit),
         ),
     };
@@ -407,11 +407,11 @@ pub async fn payment_failed_warning(pool: &PgPool, customer_id: Uuid, provider: 
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "⚠️ Ödeme Başarısız",
+            "Ödeme Başarısız",
             format!("{} üzerinden ödemeniz başarısız oldu. Lütfen ödeme yönteminizi 3 gün içinde güncelleyin, aksi takdirde planınız Ücretsiz'e düşürülecektir.", provider),
         ),
         Lang::En => (
-            "⚠️ Payment Failed",
+            "Payment Failed",
             format!("Your payment via {} failed. Please update your payment method within 3 days, or your plan will be downgraded to Free.", provider),
         ),
     };
@@ -423,11 +423,11 @@ pub async fn refund_processed(pool: &PgPool, customer_id: Uuid, amount_cents: i6
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "💰 İade İşlendi",
+            "İade İşlendi",
             format!("${:.2} tutarındaki iade talebiniz onaylandı ve işlendi. Planınız Free'ye düşürüldü.", amount_cents as f64 / 100.0),
         ),
         Lang::En => (
-            "💰 Refund Processed",
+            "Refund Processed",
             format!("Your refund request for ${:.2} has been approved and processed. Your plan has been downgraded to Free.", amount_cents as f64 / 100.0),
         ),
     };
@@ -439,7 +439,7 @@ pub async fn refund_denied(pool: &PgPool, customer_id: Uuid, reason: &str) {
     let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => (
-            "❌ İade Talebi Reddedildi",
+            "İade Talebi Reddedildi",
             if reason.is_empty() {
                 "İade talebiniz reddedildi. Daha fazla bilgi için destek ekibiyle iletişime geçin.".to_string()
             } else {
@@ -447,7 +447,7 @@ pub async fn refund_denied(pool: &PgPool, customer_id: Uuid, reason: &str) {
             },
         ),
         Lang::En => (
-            "❌ Refund Request Denied",
+            "Refund Request Denied",
             if reason.is_empty() {
                 "Your refund request has been denied. Contact support for more information.".to_string()
             } else {
@@ -456,4 +456,88 @@ pub async fn refund_denied(pool: &PgPool, customer_id: Uuid, reason: &str) {
         ),
     };
     create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
+}
+// ── Endpoint Lifecycle Notifications ──────────────────────
+
+/// Endpoint auto-disabled due to consecutive failures.
+pub async fn endpoint_auto_disabled(pool: &PgPool, customer_id: Uuid, endpoint_id: Uuid, endpoint_url: &str, streak: i32) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("Endpoint Otomatik Devre Dışı", format!("{} adresindeki endpoint {} ardışık başarısızlık nedeniyle otomatik devre dışı bırakıldı.", endpoint_url, streak)),
+        Lang::En => ("Endpoint Auto-Disabled", format!("Endpoint at {} was automatically disabled due to {} consecutive failures.", endpoint_url, streak)),
+    };
+    create(pool, customer_id, "alert", title, &message, Some(&format!("/applications?endpoint={}", endpoint_id))).await;
+}
+
+/// Endpoint auto-re-enabled after cooldown.
+pub async fn endpoint_auto_enabled(pool: &PgPool, customer_id: Uuid, endpoint_id: Uuid, endpoint_url: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("Endpoint Tekrar Aktif", format!("{} adresindeki endpoint tekrar aktif hale getirildi.", endpoint_url)),
+        Lang::En => ("Endpoint Re-Enabled", format!("Endpoint at {} has been re-enabled.", endpoint_url)),
+    };
+    create(pool, customer_id, "alert", title, &message, Some(&format!("/applications?endpoint={}", endpoint_id))).await;
+}
+
+// ── Security Notifications (Extended) ─────────────────────
+
+/// SSRF attack detected and blocked.
+pub async fn ssrf_detected(pool: &PgPool, customer_id: Uuid, endpoint_url: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("SSRF Saldırısı Tespit Edildi", format!("{} adresine yapılan istek SSRF koruması tarafından engellendi.", endpoint_url)),
+        Lang::En => ("SSRF Attack Detected", format!("Request to {} was blocked by SSRF protection.", endpoint_url)),
+    };
+    create(pool, customer_id, "security", title, &message, Some("/routing-config")).await;
+}
+
+/// API key rotated.
+pub async fn api_key_rotated(pool: &PgPool, customer_id: Uuid, key_name: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("API Key Döndürüldü", format!("\"{}\" adındaki API key döndürüldü. Eski key geçersiz kılındı.", key_name)),
+        Lang::En => ("API Key Rotated", format!("API key \"{}\" has been rotated. The old key has been invalidated.", key_name)),
+    };
+    create(pool, customer_id, "security", title, &message, Some("/core")).await;
+}
+
+/// New device login detected.
+pub async fn new_device_login(pool: &PgPool, customer_id: Uuid, ip: &str, user_agent: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let device = extract_device_name(user_agent);
+    let (title, message) = match lang {
+        Lang::Tr => ("Yeni Cihazdan Giriş", format!("{} adresinden {} cihazından yeni bir giriş tespit edildi.", ip, device)),
+        Lang::En => ("New Device Login", format!("New login detected from {} using {}. If this wasn't you, change your password.", ip, device)),
+    };
+    create(pool, customer_id, "security", title, &message, Some("/account?tab=security")).await;
+}
+
+fn extract_device_name(ua: &str) -> String {
+    let l = ua.to_lowercase();
+    if l.contains("chrome") && !l.contains("edg") { "Chrome".into() }
+    else if l.contains("firefox") { "Firefox".into() }
+    else if l.contains("safari") && !l.contains("chrome") { "Safari".into() }
+    else if l.contains("edg") { "Edge".into() }
+    else if l.contains("curl") || l.contains("python") { "API/CLI".into() }
+    else { "Unknown Device".into() }
+}
+
+// ── Grace Period Notifications ─────────────────────────────
+
+pub async fn grace_period_started(pool: &PgPool, customer_id: Uuid, days: i32) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("Ödeme Süresi Başladı", format!("Ödeme başarısız oldu. {} gün içinde ödeme yönteminizi güncellemezseniz planınız Ücretsiz'e düşürülecektir.", days)),
+        Lang::En => ("Grace Period Started", format!("Payment failed. Update your payment method within {} days or your plan will be downgraded to Free.", days)),
+    };
+    create(pool, customer_id, "billing", title, &message, Some("/account?tab=billing")).await;
+}
+
+pub async fn grace_period_ending(pool: &PgPool, customer_id: Uuid, hours: i32) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => ("Ödeme Süresi Bitmek Üzere", format!("Ödeme yönteminizi {} saat içinde güncellemezseniz planınız Ücretsiz'e düşürülecektir.", hours)),
+        Lang::En => ("Grace Period Ending Soon", format!("Update your payment method within {} hours or your plan will be downgraded to Free.", hours)),
+    };
+    create(pool, customer_id, "billing", title, &message, Some("/account?tab=billing")).await;
 }

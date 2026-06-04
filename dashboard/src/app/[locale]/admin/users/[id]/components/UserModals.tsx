@@ -258,7 +258,7 @@ export function UserModals({
      <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => { setShowTestWebhookModal(false); setTestWebhookResult(null); }} />
      <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-       🪝 {t('testWebhook') || 'Test Webhook'}
+ {t('testWebhook') || 'Test Webhook'}
       </h3>
       <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
        {t('testWebhookDesc') || `Send a test webhook to ${detail.user.email}'s endpoint`}
