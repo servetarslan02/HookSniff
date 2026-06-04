@@ -19,11 +19,21 @@ async function checkEndpoint(url: string, timeout = TIMEOUT): Promise<{ ok: bool
 }
 
 async function loadJSON(filename: string) {
+  // On Vercel, public/ files are served by CDN, not from filesystem.
+  // Try filesystem first (local dev), then fall back to fetching from CDN.
   try {
     const filePath = path.join(process.cwd(), 'public', filename);
     const raw = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(raw);
   } catch {
+    // Fall back: fetch from own domain CDN
+    try {
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://hooksniff.vercel.app';
+      const res = await fetch(`${baseUrl}/${filename}`, { cache: 'no-store' });
+      if (res.ok) return await res.json();
+    } catch { /* ignore */ }
     return null;
   }
 }
