@@ -188,7 +188,7 @@ pub async fn upgrade_plan(
                 }
             }
 
-            let updated_rows: i64 = if let Some(_max) = coupon.max_redemptions {
+            let updated_rows: i32 = if let Some(_max) = coupon.max_redemptions {
                 sqlx::query_scalar(
                     "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() \
                      WHERE id = $1 AND (max_redemptions IS NULL OR redemption_count < max_redemptions) \
