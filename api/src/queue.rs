@@ -54,7 +54,7 @@ impl RedisQueue {
             .await;
 
         tracing::info!(
- " Redis Streams queue active — stream={}, group={}",
+            "✅ Redis Streams queue active — stream={}, group={}",
             STREAM_KEY,
             CONSUMER_GROUP
         );

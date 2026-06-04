@@ -141,7 +141,7 @@ pub async fn bot_detection_middleware(
             ip = %ip,
             ua = %ua,
             path = %request.uri().path(),
- " Bot/scanner blocked"
+            "🤖 Bot/scanner blocked"
         );
 
         crate::security_monitor::log_security_event(

@@ -63,7 +63,7 @@ pub async fn forgot_password(
             },
         ).await;
 
- tracing::info!(" Password reset email sent to: {}", email);
+        tracing::info!("📧 Password reset email sent to: {}", email);
     }
 
     Ok(Json(serde_json::json!({"message": "If the email exists, a reset link has been sent."})))
@@ -100,7 +100,7 @@ pub async fn reset_password(
     sqlx::query("UPDATE refresh_tokens SET revoked = true WHERE customer_id = $1")
         .bind(customer_id).execute(&pool).await?;
 
- tracing::info!(" Password reset completed for customer {}", customer_id);
+    tracing::info!("✅ Password reset completed for customer {}", customer_id);
     Ok(Json(serde_json::json!({"message": "Password has been reset successfully."})))
 }
 
@@ -126,7 +126,7 @@ pub async fn change_password(
         .bind(customer.id).execute(&pool).await?;
     let _ = jwt::revoke_all_tokens_for_customer(&pool, customer.id).await;
 
- tracing::info!(" Password changed for customer {}", customer.id);
+    tracing::info!("✅ Password changed for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "PASSWORD_CHANGE", &headers).await;
 
     crate::notifications::helpers::password_changed(&pool, customer.id).await;

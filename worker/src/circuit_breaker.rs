@@ -105,11 +105,11 @@ impl CircuitBreaker {
         .await
         {
             Ok(mut conn) => {
- tracing::info!(" Circuit breaker: Redis connected, loading persisted state");
+                tracing::info!("⚡ Circuit breaker: Redis connected, loading persisted state");
                 let circuits = Self::load_from_redis(&mut conn).await;
                 let count = circuits.len();
                 if count > 0 {
- tracing::info!(" Circuit breaker: restored {} endpoint states from Redis", count);
+                    tracing::info!("⚡ Circuit breaker: restored {} endpoint states from Redis", count);
                 }
                 Self {
                     circuits: Arc::new(RwLock::new(circuits)),
@@ -119,7 +119,7 @@ impl CircuitBreaker {
             }
             Err(e) => {
                 tracing::warn!(
- " Circuit breaker: Redis connection failed ({}), using in-memory only",
+                    "⚡ Circuit breaker: Redis connection failed ({}), using in-memory only",
                     e
                 );
                 Self::new(config)
@@ -141,7 +141,7 @@ impl CircuitBreaker {
         {
             Ok(keys) => keys,
             Err(e) => {
- tracing::warn!(" Failed to scan Redis keys: {}", e);
+                tracing::warn!("⚡ Failed to scan Redis keys: {}", e);
                 return circuits;
             }
         };
@@ -251,7 +251,7 @@ impl CircuitBreaker {
                 .await;
 
             if let Err(e) = result {
- tracing::warn!(" Failed to persist circuit state to Redis: {}", e);
+                tracing::warn!("⚡ Failed to persist circuit state to Redis: {}", e);
             }
         }
     }
@@ -308,7 +308,7 @@ impl CircuitBreaker {
             };
             circuit.total_opens += 1;
             tracing::warn!(
- " Circuit OPENED for endpoint {} after {} consecutive failures (total opens: {})",
+                "⚡ Circuit OPENED for endpoint {} after {} consecutive failures (total opens: {})",
                 endpoint_id,
                 circuit.consecutive_failures,
                 circuit.total_opens

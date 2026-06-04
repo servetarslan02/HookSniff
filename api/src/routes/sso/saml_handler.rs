@@ -135,7 +135,7 @@ pub async fn saml_callback(
     if let (Some(ref in_response_to), Some(ref ls)) = (&assertion.in_response_to, &login_state) {
         if let Some(ref expected_id) = ls.saml_request_id {
             if in_response_to != expected_id {
- tracing::warn!(" SAML InResponseTo mismatch: expected={}, got={}", expected_id, in_response_to);
+                tracing::warn!("⚠️ SAML InResponseTo mismatch: expected={}, got={}", expected_id, in_response_to);
                 // Log but don't block — some IdPs don't set InResponseTo correctly
             }
         }
@@ -175,7 +175,7 @@ pub async fn saml_callback(
             let response_norm = normalize(response_cert);
 
             if expected_norm != response_norm {
- tracing::warn!(" SAML certificate mismatch: response certificate does not match configured IdP certificate");
+                tracing::warn!("⚠️ SAML certificate mismatch: response certificate does not match configured IdP certificate");
                 log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Certificate mismatch — possible tampering"), &headers).await;
                 return Err(AppError::coded(ErrorCode::SamlCertMismatch));
             }
@@ -183,7 +183,7 @@ pub async fn saml_callback(
 
             // Verify cryptographic signature (RSA-SHA256)
             if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
- tracing::warn!(" SAML cryptographic signature verification failed: {}", e);
+                tracing::warn!("⚠️ SAML cryptographic signature verification failed: {}", e);
                 log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed"), &headers).await;
                 return Err(e);
             }
@@ -193,7 +193,7 @@ pub async fn saml_callback(
             tracing::info!("SAML response missing embedded certificate, attempting verification with configured IdP certificate");
             if let Some(ref expected_cert) = configured_cert {
                 if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
- tracing::warn!(" SAML signature verification failed (using configured cert): {}", e);
+                    tracing::warn!("⚠️ SAML signature verification failed (using configured cert): {}", e);
                     log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed with configured cert"), &headers).await;
                     return Err(e);
                 }

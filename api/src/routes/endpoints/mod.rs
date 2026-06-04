@@ -500,7 +500,7 @@ async fn rotate_secret(
     .execute(&pool)
     .await?;
 
- tracing::info!(" Signing secret rotated for endpoint {}", id);
+    tracing::info!("🔑 Signing secret rotated for endpoint {}", id);
 
     Ok(Json(serde_json::json!({
         "id": id,

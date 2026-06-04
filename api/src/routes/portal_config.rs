@@ -209,7 +209,7 @@ async fn upsert_portal_config(
     .execute(&pool)
     .await?;
 
- tracing::info!(" Portal config updated for customer {}", customer.id);
+    tracing::info!("🎨 Portal config updated for customer {}", customer.id);
 
     Ok(Json(serde_json::json!({
         "updated": true,

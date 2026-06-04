@@ -48,7 +48,7 @@ pub async fn deliver_http(
     // Prevents DNS rebinding attacks where a domain resolves to a public IP during
     // endpoint creation but to a private IP during actual delivery.
     if let Err(e) = validate_delivery_url(&webhook.endpoint_url).await {
- warn!(" SSRF blocked delivery {} to {}: {}", webhook.delivery_id, webhook.endpoint_url, e);
+        warn!("🚫 SSRF blocked delivery {} to {}: {}", webhook.delivery_id, webhook.endpoint_url, e);
         return Ok(DeliveryResult {
             success: false,
             status_code: 0,
@@ -79,7 +79,7 @@ pub async fn deliver_http(
             for (key, value) in obj {
                 if !is_valid_header_name(key) {
                     warn!(
- " Skipping invalid custom header name '{}' for delivery {}",
+                        "⚠️ Skipping invalid custom header name '{}' for delivery {}",
                         key, webhook.delivery_id
                     );
                     continue;
@@ -129,10 +129,10 @@ pub async fn deliver_http(
             let success = (200..300).contains(&status_code);
 
             if success {
- info!(" HTTP delivery {} succeeded", webhook.delivery_id);
+                info!("✅ HTTP delivery {} succeeded", webhook.delivery_id);
             } else {
                 warn!(
- " HTTP delivery {} got status {}",
+                    "⚠️ HTTP delivery {} got status {}",
                     webhook.delivery_id, status_code
                 );
             }
@@ -147,7 +147,7 @@ pub async fn deliver_http(
             })
         }
         Err(e) => {
- warn!(" HTTP delivery {} failed: {:?}", webhook.delivery_id, e);
+            warn!("❌ HTTP delivery {} failed: {:?}", webhook.delivery_id, e);
             Ok(DeliveryResult {
                 success: false,
                 status_code: 0,
@@ -352,8 +352,8 @@ mod tests {
 
     #[test]
     fn truncate_utf8_multibyte_chars() {
- // Turkish: "merhaba" (7 bytes), emoji: "" (4 bytes)
- let s = "merhaba dünya ";
+        // Turkish: "merhaba" (7 bytes), emoji: "🪝" (4 bytes)
+        let s = "merhaba dünya 🪝";
         let result = truncate_str(s, 10);
         // Should not panic on char boundary
         assert!(result.ends_with("..."));
@@ -362,7 +362,7 @@ mod tests {
 
     #[test]
     fn truncate_unicode_emoji() {
- let s = "";
+        let s = "🪝🪝🪝🪝🪝";
         let result = truncate_str(s, 8);
         // Each emoji is 4 bytes, so 8 bytes = 2 emojis
         assert!(result.ends_with("..."));
