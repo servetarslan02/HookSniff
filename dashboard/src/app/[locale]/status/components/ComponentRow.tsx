@@ -3,7 +3,27 @@
 import { useTranslations } from 'next-intl';
 import type { ComponentStatus } from './types';
 import { StatusBadge } from './StatusBadge';
-import { Wrench } from '@/components/icons';
+import { Zap, Monitor, Settings, Database, HardDrive, Mail, Cloud, Wrench } from '@/components/icons';
+import type { LucideIcon } from '@/components/icons';
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  zap: Zap,
+  monitor: Monitor,
+  settings: Settings,
+  database: Database,
+  harddrive: HardDrive,
+  mail: Mail,
+  cloud: Cloud,
+};
+
+function resolveIcon(icon: React.ReactNode | string | null | undefined): React.ReactNode {
+  if (!icon) return <Wrench size={16} strokeWidth={1.75} />;
+  if (typeof icon === 'string') {
+    const Icon = ICON_MAP[icon.toLowerCase()];
+    return Icon ? <Icon size={16} strokeWidth={1.75} /> : <Wrench size={16} strokeWidth={1.75} />;
+  }
+  return icon;
+}
 
 export function ComponentRow({ component: _component, responseTimes: _responseTimes }: { component: ComponentStatus; responseTimes: number[] }) {
   const t = useTranslations('status');
@@ -13,7 +33,7 @@ export function ComponentRow({ component: _component, responseTimes: _responseTi
     <div className="py-4 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-lg">{_component.icon || <Wrench size={16} strokeWidth={1.75} />}</span>
+          <span className="text-lg">{resolveIcon(_component.icon)}</span>
           <div>
             <div className="font-medium text-gray-900 dark:text-white">{_component.name}</div>
             <div className="text-sm text-gray-500 dark:text-slate-400">{_component.description}</div>
