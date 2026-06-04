@@ -7,13 +7,31 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Step 1: Copy manifests
 COPY Cargo.toml Cargo.lock ./
-COPY api/ api/
-COPY worker/ worker/
-COPY common/ common/
+COPY api/Cargo.toml api/Cargo.toml
+COPY worker/Cargo.toml worker/Cargo.toml
+COPY common/Cargo.toml common/Cargo.toml
+
+# Step 2: Copy vendor
 COPY vendor/ vendor/
 
-# Build release binary with optimizations
+# Step 3: Pre-build dependencies with dummy sources
+RUN mkdir -p api/src worker/src common/src && \
+    echo "fn main() {}" > api/src/main.rs && \
+    echo "fn main() {}" > worker/src/main.rs && \
+    echo "pub mod lib;" > common/src/lib.rs && \
+    touch common/src/lib.rs && \
+    cargo build --release -p hooksniff-worker 2>/dev/null || true && \
+    rm -rf api/src worker/src common/src
+
+# Step 4: Copy actual source
+COPY api/src/ api/src/
+COPY worker/src/ worker/src/
+COPY common/src/ common/src/
+
+# Build release binary
 RUN cargo build --release -p hooksniff-worker && \
     strip /app/target/release/hooksniff-worker
 
