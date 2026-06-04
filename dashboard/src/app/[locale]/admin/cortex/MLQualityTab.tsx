@@ -15,11 +15,11 @@ interface ModelQuality {
   quality_score: number;
 }
 
-function describeQuality(score: number, accuracy: number, avgError: number, t: any): { title: string; detail: string; emoji: string; color: string } {
-  if (score >= 80) return { title: t('quality.excellent'), detail: t('detail.excellent', {acc: Math.round(accuracy), err: avgError.toFixed(1)}), emoji: 'excellent', color: 'text-emerald-600 dark:text-emerald-400' };
-  if (score >= 60) return { title: t('quality.good'), detail: t('detail.good', {acc: Math.round(accuracy)}), emoji: 'good', color: 'text-yellow-600 dark:text-yellow-400' };
-  if (score >= 40) return { title: t('quality.low'), detail: t('detail.low', {acc: Math.round(accuracy)}), emoji: 'low', color: 'text-orange-600 dark:text-orange-400' };
-  return { title: t('quality.critical'), detail: t('detail.critical', {acc: Math.round(accuracy)}), emoji: 'critical', color: 'text-red-600 dark:text-red-400' };
+function describeQuality(score: number, accuracy: number, avgError: number, t: any): { title: string; detail: string; severity: string; color: string } {
+  if (score >= 80) return { title: t('quality.excellent'), detail: t('detail.excellent', {acc: Math.round(accuracy), err: avgError.toFixed(1)}), severity: 'excellent', color: 'text-emerald-600 dark:text-emerald-400' };
+  if (score >= 60) return { title: t('quality.good'), detail: t('detail.good', {acc: Math.round(accuracy)}), severity: 'good', color: 'text-yellow-600 dark:text-yellow-400' };
+  if (score >= 40) return { title: t('quality.low'), detail: t('detail.low', {acc: Math.round(accuracy)}), severity: 'low', color: 'text-orange-600 dark:text-orange-400' };
+  return { title: t('quality.critical'), detail: t('detail.critical', {acc: Math.round(accuracy)}), severity: 'critical', color: 'text-red-600 dark:text-red-400' };
 }
 
 export function MLQualityTab({ token }: { token: string | null }) {
@@ -101,7 +101,11 @@ export function MLQualityTab({ token }: { token: string | null }) {
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <span className={`w-3 h-3 rounded-full mt-1 ${
+                    info.severity === 'excellent' ? 'bg-green-500' :
+                    info.severity === 'good' ? 'bg-yellow-500' :
+                    info.severity === 'low' ? 'bg-orange-500' : 'bg-red-500'
+                  }`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{m.model_type.replace(/_/g, ' ')}</p>

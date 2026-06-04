@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/api';
 import { Clock, Info, Shield } from '@/components/icons';
 import { ProactiveInsight } from './types';
 
-function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; emoji: string; advice: string } {
+function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; severity: string; advice: string } {
   const type = insight.insight_type;
   const severity = insight.severity;
   const data = (insight as any).data || {};
@@ -14,7 +14,7 @@ function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: s
   const base = {
     title: (insight as any).title || type.replace(/_/g, ' '),
     detail: data.description || data.detail || '',
-    emoji: severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok',
+    severity: severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok',
     advice: data.advice || data.recommendation || '',
   };
 
@@ -85,7 +85,11 @@ export function ProactiveTab({ token }: { token: string | null }) {
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <span className={`w-3 h-3 rounded-full mt-1 ${
+                    info.severity === 'critical' ? 'bg-red-500' :
+                    info.severity === 'warning' ? 'bg-orange-500' :
+                    info.severity === 'info' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>
