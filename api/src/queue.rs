@@ -219,7 +219,6 @@ fn parse_stream_entry(entry: &redis::Value) -> Option<(String, QueueMessage)> {
 
         let stream_id = match &entry_data[0] {
             redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
-            redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
             _ => return None,
         };
 
@@ -265,14 +264,12 @@ fn extract_fields(value: &redis::Value) -> std::collections::HashMap<String, Str
         while i + 1 < items.len() {
             let key = match &items[i] {
                 redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
-                redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
                 _ => {
                     i += 2;
                     continue;
                 }
             };
             let val = match &items[i + 1] {
-                redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
                 redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
                 redis::Value::Int(n) => n.to_string(),
                 redis::Value::Nil => String::new(),

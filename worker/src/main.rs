@@ -204,6 +204,147 @@ async fn main() -> Result<()> {
     tracing::info!("⚡ Circuit breaker: {} failures → {}s cooldown", CIRCUIT_BREAKER_FAILURE_THRESHOLD, CIRCUIT_BREAKER_COOLDOWN_SECS);
     tracing::info!("🧹 Retention cleanup: every {}h (reads plan limits from platform_settings)", RETENTION_CLEANUP_INTERVAL_SECS / 3600);
 
+    // ── Redis Streams Consumer (Faz 1: < 10ms delivery latency) ──
+    // If REDIS_URL is set, spawn a Redis Streams consumer alongside PG polling.
+    // Redis handles fast path; PG polling handles fallback + FIFO.
+    let redis_consumer_handle = if let Some(ref redis_url) = cfg.redis_url {
+        let redis_url = redis_url.clone();
+        let pool = pool.clone();
+        let circuit_breaker = circuit_breaker.clone();
+        let throttle_manager = throttle_manager.clone();
+        let delivery_semaphore = delivery_semaphore.clone();
+        let endpoint_semaphores = endpoint_semaphores.clone();
+
+        Some(tokio::spawn(async move {
+            // Connect to Redis
+            let redis_client = match redis::Client::open(redis_url) {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::error!("❌ Redis Streams: failed to create client: {e}");
+                    return;
+                }
+            };
+            let mut redis_conn = match redis_client.get_multiplexed_async_connection(redis::GeneralConnectionConfig::new().set_push_sender(None)).await {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::error!("❌ Redis Streams: failed to connect: {e}");
+                    return;
+                }
+            };
+
+            let stream_key = "hooksniff:webhooks";
+            let group_name = "hooksniff-workers";
+            let consumer_name = format!("worker-{}", std::process::id());
+
+            // Create consumer group (ignore BUSYGROUP = already exists)
+            let _: Result<(), _> = redis::cmd("XGROUP")
+                .arg("CREATE").arg(stream_key).arg(group_name).arg("0").arg("MKSTREAM")
+                .query_async(&mut redis_conn).await;
+
+            tracing::info!("🔴 Redis Streams consumer started: group={group_name} consumer={consumer_name}");
+
+            loop {
+                // Read new messages from the stream
+                let result: Result<Vec<(String, Vec<Vec<String>>)>, _> = redis::cmd("XREADGROUP")
+                    .arg("GROUP").arg(group_name).arg(&consumer_name)
+                    .arg("COUNT").arg(50)
+                    .arg("BLOCK").arg(1000)
+                    .arg("STREAMS").arg(stream_key).arg(">")
+                    .query_async(&mut redis_conn).await;
+
+                match result {
+                    Ok(entries) if !entries.is_empty() => {
+                        for (_stream_id, messages) in &entries {
+                            for fields in messages {
+                                // Parse fields: [key1, val1, key2, val2, ...]
+                                let mut delivery_id = String::new();
+                                let mut endpoint_id_str = String::new();
+                                let mut url = String::new();
+                                let mut payload = String::new();
+
+                                let mut i = 0;
+                                while i + 1 < fields.len() {
+                                    match fields[i].as_str() {
+                                        "delivery_id" => delivery_id = fields[i + 1].clone(),
+                                        "endpoint_id" => endpoint_id_str = fields[i + 1].clone(),
+                                        "url" => url = fields[i + 1].clone(),
+                                        "payload" => payload = fields[i + 1].clone(),
+                                        _ => {}
+                                    }
+                                    i += 2;
+                                }
+
+                                if delivery_id.is_empty() || endpoint_id_str.is_empty() {
+                                    continue;
+                                }
+
+                                let delivery_uuid = match uuid::Uuid::parse_str(&delivery_id) {
+                                    Ok(u) => u,
+                                    Err(_) => continue,
+                                };
+                                let endpoint_uuid = match uuid::Uuid::parse_str(&endpoint_id_str) {
+                                    Ok(u) => u,
+                                    Err(_) => continue,
+                                };
+
+                                // Fetch signing secret from DB
+                                let secret_row = sqlx::query_scalar::<_, String>(
+                                    "SELECT signing_secret FROM endpoints WHERE id = $1"
+                                )
+                                .bind(endpoint_uuid)
+                                .fetch_optional(&pool)
+                                .await;
+
+                                let signing_secret = match secret_row {
+                                    Ok(Some(s)) => s,
+                                    _ => {
+                                        tracing::warn!("⚠️ Redis: no secret for endpoint {endpoint_uuid}, skipping");
+                                        continue;
+                                    }
+                                };
+
+                                // Deliver webhook
+                                let permit = delivery_semaphore.clone().acquire_owned().await;
+                                if let Ok(_permit) = permit {
+                                    let _ = delivery::deliver_webhook(
+                                        &pool,
+                                        delivery_uuid,
+                                        endpoint_uuid,
+                                        &url,
+                                        &payload,
+                                        None,
+                                        &signing_secret,
+                                        &circuit_breaker,
+                                        &throttle_manager,
+                                        1,
+                                        None,
+                                    ).await;
+                                }
+
+                                // ACK the message
+                                let msg_id: String = _stream_id.clone();
+                                let _: Result<(), _> = redis::cmd("XACK")
+                                    .arg(stream_key).arg(group_name).arg(&msg_id)
+                                    .query_async(&mut redis_conn).await;
+                            }
+                        }
+                    }
+                    Ok(_) => {
+                        // No new messages — sleep briefly
+                        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+                    }
+                    Err(e) => {
+                        tracing::warn!("⚠️ Redis Streams read error: {e}, retrying in 1s");
+                        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    }
+                }
+            }
+        }))
+    } else {
+        tracing::info!("📦 Redis Streams: no REDIS_URL, using PG-only queue");
+        None
+    };
+
     // Graceful shutdown: listen for SIGTERM/SIGINT
     let shutdown = shutdown_signal();
 
