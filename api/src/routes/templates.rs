@@ -98,7 +98,7 @@ async fn apply_template(
         .collect();
 
     tracing::info!(
-        "📋 Applied template '{}' to customer {} — endpoint {} created",
+ " Applied template '{}' to customer {} — endpoint {} created",
         template.name,
         customer.id,
         endpoint.id

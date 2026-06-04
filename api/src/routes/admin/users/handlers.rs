@@ -253,7 +253,7 @@ pub async fn change_plan(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("✅ Admin changed plan for user {} to {}", id, req.plan);
+ tracing::info!(" Admin changed plan for user {} to {}", id, req.plan);
 
     let _ = crate::audit::log_action(
         &pool,
@@ -424,7 +424,7 @@ pub async fn change_status(
     } else {
         "deactivated"
     };
-    tracing::info!("✅ Admin {} user {} (reason: {:?})", status, id, req.reason);
+ tracing::info!(" Admin {} user {} (reason: {:?})", status, id, req.reason);
 
     let details = serde_json::json!({
         "is_active": req.is_active,
@@ -506,7 +506,7 @@ pub async fn impersonate_user(
     .await;
 
     tracing::warn!(
-        "⚠️ Admin {} impersonating user {} ({})",
+ " Admin {} impersonating user {} ({})",
         customer.email,
         target_id,
         target_email

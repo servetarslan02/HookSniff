@@ -97,7 +97,7 @@ pub async fn invite_member(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("✅ Invite sent to {} for team {}", req.email, id);
+ tracing::info!(" Invite sent to {} for team {}", req.email, id);
 
     // Audit log
     {
@@ -206,7 +206,7 @@ pub async fn accept_invite(
     .execute(&pool)
     .await;
 
-    tracing::info!("✅ {} accepted invite to team {}", customer.id, invite.team_id);
+ tracing::info!(" {} accepted invite to team {}", customer.id, invite.team_id);
 
     // Notify team owner about the new member
     {
@@ -266,7 +266,7 @@ pub async fn revoke_invite(
         .execute(&pool)
         .await?;
 
-    tracing::info!("✅ Invite {} revoked by {}", invite_id, customer.id);
+ tracing::info!(" Invite {} revoked by {}", invite_id, customer.id);
 
     let _ = crate::audit::log_action(&pool, customer.id, "INVITE_REVOKE", "team",
         Some(&invite.team_id.to_string()),
@@ -301,7 +301,7 @@ pub async fn resend_invite(
 
     let invite_link = format!("/organization?invite_token={}", invite.token);
 
-    tracing::info!("✅ Invite {} resent by {} (expires: {})", invite_id, customer.id, new_expires_at);
+ tracing::info!(" Invite {} resent by {} (expires: {})", invite_id, customer.id, new_expires_at);
 
     let _ = crate::audit::log_action(&pool, customer.id, "INVITE_RESEND", "team",
         Some(&invite.team_id.to_string()),

@@ -141,7 +141,7 @@ fn test_build_raw_message_with_special_chars() {
 
     let raw = client.build_raw_message(
         "user+tag@example.com",
-        "Ünïcödé Subject 🎉",
+ "Ünïcödé Subject ",
         "<p>Café & résumé</p>",
     );
 
@@ -151,7 +151,7 @@ fn test_build_raw_message_with_special_chars() {
     let mime = String::from_utf8(decoded).expect("should be valid UTF-8");
 
     assert!(mime.contains("To: user+tag@example.com"));
-    assert!(mime.contains("Subject: Ünïcödé Subject 🎉"));
+ assert!(mime.contains("Subject: Ünïcödé Subject "));
     assert!(mime.contains("<p>Café & résumé</p>"));
 }
 

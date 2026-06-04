@@ -122,7 +122,7 @@ async fn main() -> Result<()> {
         cfg.otel_exporter_otlp_headers.as_deref(),
     );
 
-    tracing::info!("🔧 HookSniff Worker starting...");
+ tracing::info!(" HookSniff Worker starting...");
 
     // ── CRITICAL: Start health server FIRST ──
     // Cloud Run startup probe checks port 8080 within 240s.
@@ -136,11 +136,11 @@ async fn main() -> Result<()> {
         tokio::net::TcpListener::bind(std::net::SocketAddr::from(([0, 0, 0, 0], health_port)))
             .await?;
     tokio::spawn(health::start_health_server(health_listener));
-    tracing::info!("🏥 Health server bound on :{}", health_port);
+ tracing::info!(" Health server bound on :{}", health_port);
 
     // Start worker health metrics push to Grafana Cloud (every 60s)
     tokio::spawn(metrics_push::run());
-    tracing::info!("📊 Worker metrics push started");
+ tracing::info!(" Worker metrics push started");
 
     // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
     let db_url = cfg
@@ -155,14 +155,14 @@ async fn main() -> Result<()> {
         .connect(&db_url)
         .await
         .map_err(|e| {
-            tracing::error!("❌ Database connection failed: {}", e);
+ tracing::error!(" Database connection failed: {}", e);
             tracing::error!("   URL prefix: {}", &db_url[..30.min(db_url.len())]);
             e
         })?;
 
     // Mark readiness — DB pool connected, ready to serve traffic
     health::READY.store(true, std::sync::atomic::Ordering::Relaxed);
-    tracing::info!("✅ Readiness probe: ready (DB connected)");
+ tracing::info!(" Readiness probe: ready (DB connected)");
 
     // HTTP client (shared, connection pooling, HTTP/2 multiplexing)
     // Faz 2: HTTP/2 + Connection Pool — reduces connection setup from ~50ms to ~0ms
@@ -222,7 +222,7 @@ async fn main() -> Result<()> {
                 };
 
                 if new_limit != current {
-                    tracing::info!("🔄 Dynamic concurrency: {} → {} (success rate: {:.1}%)", current, new_limit, success_rate * 100.0);
+ tracing::info!(" Dynamic concurrency: {} → {} (success rate: {:.1}%)", current, new_limit, success_rate * 100.0);
                     // Note: Tokio Semaphore doesn't support dynamic resize,
                     // so we log the adjustment for monitoring. The actual limit
                     // is enforced by the adaptive logic in process_pending.
@@ -249,7 +249,7 @@ async fn main() -> Result<()> {
         )
         .await
     } else {
-        tracing::info!("⚡ Circuit breaker: no REDIS_URL, using in-memory only");
+ tracing::info!(" Circuit breaker: no REDIS_URL, using in-memory only");
         circuit_breaker::CircuitBreaker::new(circuit_breaker::CircuitBreakerConfig {
             failure_threshold: CIRCUIT_BREAKER_FAILURE_THRESHOLD,
             cooldown_secs: CIRCUIT_BREAKER_COOLDOWN_SECS,
@@ -265,14 +265,14 @@ async fn main() -> Result<()> {
         )
         .await
     } else {
-        tracing::info!("🚦 Throttle: no REDIS_URL, using in-memory only");
+ tracing::info!(" Throttle: no REDIS_URL, using in-memory only");
         throttle::ThrottleManager::new(throttle::ThrottleConfig::default())
     };
 
-    tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
-    tracing::info!("🔒 Concurrent delivery limit: {} global, {} per endpoint", DELIVERY_CONCURRENCY_LIMIT, PER_ENDPOINT_CONCURRENCY_LIMIT);
-    tracing::info!("⚡ Circuit breaker: {} failures → {}s cooldown", CIRCUIT_BREAKER_FAILURE_THRESHOLD, CIRCUIT_BREAKER_COOLDOWN_SECS);
-    tracing::info!("🧹 Retention cleanup: every {}h (reads plan limits from platform_settings)", RETENTION_CLEANUP_INTERVAL_SECS / 3600);
+ tracing::info!(" Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
+ tracing::info!(" Concurrent delivery limit: {} global, {} per endpoint", DELIVERY_CONCURRENCY_LIMIT, PER_ENDPOINT_CONCURRENCY_LIMIT);
+ tracing::info!(" Circuit breaker: {} failures → {}s cooldown", CIRCUIT_BREAKER_FAILURE_THRESHOLD, CIRCUIT_BREAKER_COOLDOWN_SECS);
+ tracing::info!(" Retention cleanup: every {}h (reads plan limits from platform_settings)", RETENTION_CLEANUP_INTERVAL_SECS / 3600);
 
     // ── Redis Streams Consumer (Faz 1: < 10ms delivery latency) ──
     // If REDIS_URL is set AND USE_REDIS_QUEUE=true, spawn a Redis Streams consumer
@@ -294,14 +294,14 @@ async fn main() -> Result<()> {
             let redis_client = match redis::Client::open(redis_url) {
                 Ok(c) => c,
                 Err(e) => {
-                    tracing::error!("❌ Redis Streams: failed to create client: {e}");
+ tracing::error!(" Redis Streams: failed to create client: {e}");
                     return;
                 }
             };
             let mut redis_conn = match redis_client.get_multiplexed_async_connection().await {
                 Ok(c) => c,
                 Err(e) => {
-                    tracing::error!("❌ Redis Streams: failed to connect: {e}");
+ tracing::error!(" Redis Streams: failed to connect: {e}");
                     return;
                 }
             };
@@ -315,7 +315,7 @@ async fn main() -> Result<()> {
                 .arg("CREATE").arg(stream_key).arg(group_name).arg("0").arg("MKSTREAM")
                 .query_async(&mut redis_conn).await;
 
-            tracing::info!("🔴 Redis Streams consumer started: group={group_name} consumer={consumer_name}");
+ tracing::info!(" Redis Streams consumer started: group={group_name} consumer={consumer_name}");
 
             // ── Crash recovery: claim pending messages from crashed workers ──
             // XAUTOCLAIM finds messages idle > 5 min and transfers them to this consumer
@@ -328,12 +328,12 @@ async fn main() -> Result<()> {
                 Ok(val) => {
                     let recovered = parse_xreadgroup_response(val);
                     if !recovered.is_empty() {
-                        tracing::warn!("🔄 Crash recovery: claimed {} pending messages from previous worker", recovered.len());
+ tracing::warn!(" Crash recovery: claimed {} pending messages from previous worker", recovered.len());
                         // Process recovered messages immediately (same loop as below)
                         for (stream_entry_id, fields) in &recovered {
                             if let Some(delivery_id) = fields.get("delivery_id") {
                                 if !delivery_id.is_empty() {
-                                    tracing::info!("🔄 Recovered message: entry={} delivery={}", stream_entry_id, delivery_id);
+ tracing::info!(" Recovered message: entry={} delivery={}", stream_entry_id, delivery_id);
                                 }
                             }
                             // ACK recovered messages so they don't pile up
@@ -342,11 +342,11 @@ async fn main() -> Result<()> {
                                 .query_async(&mut redis_conn).await;
                         }
                     } else {
-                        tracing::info!("✅ No pending messages to recover");
+ tracing::info!(" No pending messages to recover");
                     }
                 }
                 Err(e) => {
-                    tracing::warn!("⚠️ XAUTOCLAIM failed ({}), will retry on next cycle", e);
+ tracing::warn!(" XAUTOCLAIM failed ({}), will retry on next cycle", e);
                 }
             }
 
@@ -368,10 +368,10 @@ async fn main() -> Result<()> {
                     Err(e) => {
                         let err_msg = e.to_string();
                         if err_msg.contains("max requests limit exceeded") || err_msg.contains("OOM") {
-                            tracing::error!("🔴 Redis rate limit/OOM: stopping Redis consumer, PG polling takes over");
+ tracing::error!(" Redis rate limit/OOM: stopping Redis consumer, PG polling takes over");
                             break; // Exit Redis loop — PG polling in main select! handles delivery
                         }
-                        tracing::warn!("⚠️ Redis Streams read error: {e}, retrying in 1s");
+ tracing::warn!(" Redis Streams read error: {e}, retrying in 1s");
                         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                         continue;
                     }
@@ -425,7 +425,7 @@ async fn main() -> Result<()> {
                     .await
                     {
                         if status == "delivered" {
-                            tracing::debug!("⏭️ {} already delivered, ACKing and skipping", delivery_id);
+ tracing::debug!("⏭ {} already delivered, ACKing and skipping", delivery_id);
                             let _: Result<(), _> = redis::cmd("XACK")
                                 .arg(stream_key).arg(group_name).arg(stream_entry_id)
                                 .query_async(&mut redis_conn).await;
@@ -435,14 +435,14 @@ async fn main() -> Result<()> {
 
                     // Circuit breaker check — skip delivery if endpoint is open
                     if !circuit_breaker.allow_request(endpoint_uuid).await {
-                        tracing::warn!("⚡ Redis: circuit open for endpoint {endpoint_uuid}, requeuing");
+ tracing::warn!(" Redis: circuit open for endpoint {endpoint_uuid}, requeuing");
                         // Don't ACK — XAUTOCLAIM will pick it up later
                         continue;
                     }
 
                     // Throttle check — respect per-endpoint rate limits
                     if let Err(wait_dur) = throttle_manager.check_allowed(endpoint_uuid).await {
-                        tracing::debug!("🚦 Redis: throttled endpoint {endpoint_uuid}, wait {}ms", wait_dur.as_millis());
+ tracing::debug!(" Redis: throttled endpoint {endpoint_uuid}, wait {}ms", wait_dur.as_millis());
                         continue;
                     }
 
@@ -465,7 +465,7 @@ async fn main() -> Result<()> {
                                 s
                             }
                             _ => {
-                                tracing::warn!("⚠️ Redis: no secret for endpoint {endpoint_uuid}, skipping");
+ tracing::warn!(" Redis: no secret for endpoint {endpoint_uuid}, skipping");
                                 // ACK so we don't keep retrying a missing endpoint
                                 let _: Result<(), _> = redis::cmd("XACK")
                                     .arg(stream_key).arg(group_name).arg(stream_entry_id)
@@ -531,9 +531,9 @@ async fn main() -> Result<()> {
         }))
     } else {
         if cfg.redis_url.is_some() && !cfg.use_redis_queue {
-            tracing::info!("📦 Redis Streams: USE_REDIS_QUEUE=false, using PG-only queue");
+ tracing::info!(" Redis Streams: USE_REDIS_QUEUE=false, using PG-only queue");
         } else {
-            tracing::info!("📦 Redis Streams: no REDIS_URL configured, using PG-only queue");
+ tracing::info!(" Redis Streams: no REDIS_URL configured, using PG-only queue");
         }
         None
     };
@@ -546,7 +546,7 @@ async fn main() -> Result<()> {
     // Create a dedicated PgListener connection for NOTIFY
     let mut listener = PgListener::connect(&db_url).await?;
     listener.listen("new_webhook").await?;
-    tracing::info!("🔔 Listening on 'new_webhook' channel for instant wake-up");
+ tracing::info!(" Listening on 'new_webhook' channel for instant wake-up");
 
     // Zombie reaper: recover stuck "processing" records every 30s
     let mut reaper_interval = tokio::time::interval(std::time::Duration::from_secs(ZOMBIE_REAPER_INTERVAL_SECS));
@@ -571,30 +571,30 @@ async fn main() -> Result<()> {
     loop {
         tokio::select! {
             _ = &mut shutdown => {
-                tracing::info!("🛑 Shutdown signal received, waiting for in-flight deliveries...");
+ tracing::info!(" Shutdown signal received, waiting for in-flight deliveries...");
                 break;
             }
             result = listener.recv() => {
                 // NOTIFY received — wake up immediately
                 match result {
                     Ok(notification) => {
-                        tracing::debug!("🔔 NOTIFY received on '{}' — processing now", notification.channel());
+ tracing::debug!(" NOTIFY received on '{}' — processing now", notification.channel());
                     }
                     Err(e) => {
-                        tracing::warn!("⚠️ PgListener error, reconnecting: {:?}", e);
+ tracing::warn!(" PgListener error, reconnecting: {:?}", e);
                         // Reconnect listener on error
                         match PgListener::connect(&db_url).await {
                             Ok(mut new_listener) => {
                                 if new_listener.listen("new_webhook").await.is_ok() {
                                     listener = new_listener;
-                                    tracing::info!("🔔 PgListener reconnected");
+ tracing::info!(" PgListener reconnected");
                                 } else {
-                                    tracing::error!("❌ Failed to re-listen on 'new_webhook'");
+ tracing::error!(" Failed to re-listen on 'new_webhook'");
                                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                                 }
                             }
                             Err(conn_err) => {
-                                tracing::error!("❌ Failed to reconnect PgListener: {:?}", conn_err);
+ tracing::error!(" Failed to reconnect PgListener: {:?}", conn_err);
                                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                             }
                         }
@@ -604,11 +604,11 @@ async fn main() -> Result<()> {
                 match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
-                            tracing::debug!("✅ Processed {} deliveries", processed);
+ tracing::debug!(" Processed {} deliveries", processed);
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Queue processing error: {:?}", e);
+ tracing::error!(" Queue processing error: {:?}", e);
                     }
                 }
             }
@@ -617,11 +617,11 @@ async fn main() -> Result<()> {
                 match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
-                            tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
+ tracing::debug!(" Processed {} deliveries (poll fallback)", processed);
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Queue processing error: {:?}", e);
+ tracing::error!(" Queue processing error: {:?}", e);
                     }
                 }
             }
@@ -629,33 +629,33 @@ async fn main() -> Result<()> {
                 match queue::reap_zombies(&pool).await {
                     Ok(reaped) => {
                         if reaped > 0 {
-                            tracing::warn!("🧟 Zombie reaper recovered {} stuck records", reaped);
+ tracing::warn!(" Zombie reaper recovered {} stuck records", reaped);
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Zombie reaper error: {:?}", e);
+ tracing::error!(" Zombie reaper error: {:?}", e);
                     }
                 }
                 // Also recover orphaned deliveries
                 match queue::reap_orphaned_deliveries(&pool).await {
                     Ok(orphaned) => {
                         if orphaned > 0 {
-                            tracing::warn!("🧟 Re-queued {} orphaned deliveries", orphaned);
+ tracing::warn!(" Re-queued {} orphaned deliveries", orphaned);
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Orphaned delivery reaper error: {:?}", e);
+ tracing::error!(" Orphaned delivery reaper error: {:?}", e);
                     }
                 }
                 // HS-023: Check FIFO timeouts
                 match fifo::check_fifo_timeouts(&pool).await {
                     Ok(timed_out) => {
                         if timed_out > 0 {
-                            tracing::warn!("📦 FIFO: {} items timed out", timed_out);
+ tracing::warn!(" FIFO: {} items timed out", timed_out);
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ FIFO timeout checker error: {:?}", e);
+ tracing::error!(" FIFO timeout checker error: {:?}", e);
                     }
                 }
             }
@@ -671,7 +671,7 @@ async fn main() -> Result<()> {
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Grace period checker error: {:?}", e);
+ tracing::error!(" Grace period checker error: {:?}", e);
                     }
                 }
             }
@@ -681,13 +681,13 @@ async fn main() -> Result<()> {
                     Ok((deliveries, attempts)) => {
                         if deliveries > 0 || attempts > 0 {
                             tracing::info!(
-                                "🧹 Retention cleanup complete: {} deliveries, {} other records deleted",
+ " Retention cleanup complete: {} deliveries, {} other records deleted",
                                 deliveries, attempts
                             );
                         }
                     }
                     Err(e) => {
-                        tracing::error!("❌ Retention cleanup error: {:?}", e);
+ tracing::error!(" Retention cleanup error: {:?}", e);
                     }
                 }
             }
@@ -710,12 +710,12 @@ async fn main() -> Result<()> {
         }
     }
 
-    tracing::info!("👋 HookSniff Worker shut down gracefully");
+ tracing::info!(" HookSniff Worker shut down gracefully");
 
     // Abort Redis consumer task if running
     if let Some(handle) = redis_consumer_handle {
         handle.abort();
-        tracing::info!("🔴 Redis Streams consumer stopped");
+ tracing::info!(" Redis Streams consumer stopped");
     }
 
     Ok(())
@@ -1066,7 +1066,7 @@ async fn process_pending(
                 if let Some((ref status,)) = existing_status {
                     if status == "delivered" {
                         tracing::info!(
-                            "⏭️ Delivery {} already delivered — marking queue as done (idempotency)",
+ "⏭ Delivery {} already delivered — marking queue as done (idempotency)",
                             delivery_id
                         );
                         let _ = sqlx::query::<sqlx::Postgres>(
@@ -1083,7 +1083,7 @@ async fn process_pending(
             // HS-020: Circuit breaker — skip delivery if endpoint circuit is open
             if !cb.allow_request(endpoint_id).await {
                 tracing::warn!(
-                    "⚡ Circuit OPEN — skipping delivery {} for endpoint {} (cooldown active)",
+ " Circuit OPEN — skipping delivery {} for endpoint {} (cooldown active)",
                     delivery_id,
                     endpoint_id
                 );
@@ -1103,7 +1103,7 @@ async fn process_pending(
                 .unwrap_or(true)
             {
                 tracing::debug!(
-                    "📦 FIFO: delivery {} waiting for previous item (endpoint {})",
+ " FIFO: delivery {} waiting for previous item (endpoint {})",
                     delivery_id,
                     endpoint_id
                 );
@@ -1131,7 +1131,7 @@ async fn process_pending(
             let trace_id = telemetry::current_trace_id();
 
             tracing::info!(
-                "📤 Delivery {} (attempt {}/{})",
+ " Delivery {} (attempt {}/{})",
                 delivery_id,
                 attempt,
                 item.max_attempts
@@ -1142,7 +1142,7 @@ async fn process_pending(
                 Some(s) if !s.is_empty() => s.clone(),
                 _ => {
                     tracing::error!(
-                        "❌ No signing_secret for endpoint {} — delivery {} will fail verification",
+ " No signing_secret for endpoint {} — delivery {} will fail verification",
                         item.endpoint_id,
                         delivery_id
                     );
@@ -1175,9 +1175,9 @@ async fn process_pending(
                     // Item 34: Classify commit errors for monitoring
                     if let Err(e) = tx.commit().await {
                         if is_transient_db_error(&e) {
-                            tracing::warn!("⚠️ Transient DB commit failure (dead_letter, signing missing): {e:?}");
+ tracing::warn!(" Transient DB commit failure (dead_letter, signing missing): {e:?}");
                         } else {
-                            tracing::error!("❌ DB commit failure (dead_letter, signing missing): {e:?}");
+ tracing::error!(" DB commit failure (dead_letter, signing missing): {e:?}");
                         }
                     }
                     return Ok::<(), anyhow::Error>(());
@@ -1196,7 +1196,7 @@ async fn process_pending(
             let mut cortex_routing_url: Option<String> = None;
             if let Ok(Some(url)) = cortex_integration::get_routing_decision(&pool, endpoint_id).await {
                 cortex_routing_url = Some(url.clone());
-                tracing::info!("🔀 Cortex routing: endpoint {} → {}", endpoint_id, url);
+ tracing::info!(" Cortex routing: endpoint {} → {}", endpoint_id, url);
             }
 
             // Build WebhookMessage and delegate HTTP delivery to the delivery module
@@ -1267,9 +1267,9 @@ async fn process_pending(
             };
 
             if result.success {
-                // ✅ Başarılı
+ // Başarılı
                 tracing::info!(
-                    "✅ Delivery {} → HTTP {} ({}ms)",
+ " Delivery {} → HTTP {} ({}ms)",
                     delivery_id,
                     status_code,
                     duration_ms
@@ -1359,8 +1359,8 @@ async fn process_pending(
                 // HS-023: Mark FIFO item as delivered
                 let _ = fifo::mark_fifo_delivered(&pool, endpoint_id, delivery_id).await;
             } else if is_non_retryable(status_code) {
-                // ❌ Client error (4xx except 429) → dead letter, don't retry
-                tracing::error!("❌ Delivery {} → {} — non-retryable (HTTP {}), dead letter", delivery_id, error_msg, status_code);
+ // Client error (4xx except 429) → dead letter, don't retry
+ tracing::error!(" Delivery {} → {} — non-retryable (HTTP {}), dead letter", delivery_id, error_msg, status_code);
 
                 let dl_err = format!("{} (HTTP {}, non-retryable)", error_msg, status_code);
                 let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
@@ -1402,8 +1402,8 @@ async fn process_pending(
                 tm.record_attempt(endpoint_id).await;
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else if attempt >= item.max_attempts {
-                // ❌ Max deneme aşıldı → dead letter
-                tracing::error!("❌ Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
+ // Max deneme aşıldı → dead letter
+ tracing::error!(" Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
 
                 let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
 
@@ -1444,11 +1444,11 @@ async fn process_pending(
                 tm.record_attempt(endpoint_id).await;
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else {
-                // 🔄 Retry — exponential backoff
+ // Retry — exponential backoff
                 let delay = calculate_backoff(attempt);
                 let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
-                tracing::warn!("⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
+ tracing::warn!(" Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
 
                 retry_delivery(&pool, item.id, delivery_id, attempt, next_retry, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref()).await?;
 
@@ -1469,11 +1469,11 @@ async fn process_pending(
         match handle.await {
             Ok(Ok(())) => processed += 1,
             Ok(Err(e)) => {
-                tracing::error!("❌ Delivery task error: {:?}", e);
+ tracing::error!(" Delivery task error: {:?}", e);
                 processed += 1; // Still counts as processed (attempted)
             }
             Err(e) => {
-                tracing::error!("❌ Delivery task panicked: {:?}", e);
+ tracing::error!(" Delivery task panicked: {:?}", e);
                 // Panicked tasks don't count as processed
             }
         }

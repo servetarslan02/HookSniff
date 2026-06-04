@@ -70,7 +70,7 @@ pub async fn delivery_event_stream(
     let active_connections = gateway.connection_count().await;
 
     tracing::info!(
-        "📡 SSE delivery stream opened for customer {} (active WS connections: {})",
+ " SSE delivery stream opened for customer {} (active WS connections: {})",
         customer_id,
         active_connections
     );
@@ -91,7 +91,7 @@ pub async fn delivery_event_stream(
         if let Some(last_id) = headers.get("last-event-id") {
             if let Ok(id_str) = last_id.to_str() {
                 tracing::info!(
-                    "📡 SSE reconnection: client sent Last-Event-ID: {}",
+ " SSE reconnection: client sent Last-Event-ID: {}",
                     id_str
                 );
                 // Get recent events and replay those the client missed
@@ -246,7 +246,7 @@ pub async fn channel_event_stream(
     let mut rx = publisher.subscribe();
 
     tracing::info!(
-        "📡 SSE channel stream opened for customer {} channel {}",
+ " SSE channel stream opened for customer {} channel {}",
         customer_id,
         channel_id
     );

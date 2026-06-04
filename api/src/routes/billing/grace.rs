@@ -92,7 +92,7 @@ pub async fn cleanup_excess_endpoints(
     .await?;
 
     tracing::info!(
-        "🔧 Disabled {} excess endpoints for customer {} (plan: {}, limit: {})",
+ " Disabled {} excess endpoints for customer {} (plan: {}, limit: {})",
         result.rows_affected(),
         customer_id,
         new_plan.as_str(),

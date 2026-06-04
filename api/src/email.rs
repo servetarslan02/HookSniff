@@ -26,15 +26,15 @@ impl EmailProvider {
     /// Create from environment: Resend if RESEND_API_KEY is set, else GCloud, else None.
     pub fn from_config(cfg: &Config) -> Self {
         if let Some(resend) = ResendEmailClient::from_env() {
-            tracing::info!("📧 Email provider: Resend");
+ tracing::info!(" Email provider: Resend");
             return Self::Resend(resend);
         }
         if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
-            tracing::info!("📧 Email provider: GCloud Gmail API");
+ tracing::info!(" Email provider: GCloud Gmail API");
             return Self::GCloud(gcloud);
         }
         tracing::warn!(
-            "⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)"
+ " No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)"
         );
         Self::None
     }
@@ -281,7 +281,7 @@ impl GCloudEmailClient {
         };
 
         tracing::info!(
-            "✅ GCloud Email client initialized (service_account={}, from={})",
+ " GCloud Email client initialized (service_account={}, from={})",
             sa_key.client_email,
             cfg.notify_from_email
         );
@@ -474,7 +474,7 @@ impl GCloudEmailClient {
             )));
         }
 
-        tracing::info!("✅ Email sent to {}: {}", to, subject);
+ tracing::info!(" Email sent to {}: {}", to, subject);
         Ok(())
     }
 

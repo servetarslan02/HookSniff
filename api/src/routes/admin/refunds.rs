@@ -97,7 +97,7 @@ pub async fn admin_refund_user(
     let billing_svc = crate::billing::BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription(&target).await {
         tracing::warn!(
-            "⚠️ Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund anyway",
+ " Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund anyway",
             id, e
         );
     }

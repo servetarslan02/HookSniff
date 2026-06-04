@@ -65,7 +65,7 @@ impl CacheLayer {
     pub async fn new(redis_url: &str, default_ttl: Duration) -> Result<Self, redis::RedisError> {
         let client = redis::Client::open(redis_url)?;
         let conn = ConnectionManager::new(client).await?;
-        tracing::info!("✅ Redis cache layer connected");
+ tracing::info!(" Redis cache layer connected");
         Ok(Self { conn, default_ttl })
     }
 

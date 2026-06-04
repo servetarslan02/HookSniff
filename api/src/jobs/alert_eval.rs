@@ -27,7 +27,7 @@ const EVAL_WINDOW_MINUTES: i64 = 30;
 /// - latency: avg duration_ms → threshold is milliseconds (e.g. 5000 = 5s)
 /// - consecutive_failures: failure_streak on endpoint → threshold is count
 pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClient) -> Result<u64> {
-    tracing::info!("🔔 Running alert evaluation...");
+ tracing::info!(" Running alert evaluation...");
 
     let now = Utc::now();
     let mut alerts_triggered = 0u64;
@@ -82,7 +82,7 @@ pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClien
         }
 
         tracing::warn!(
-            "🚨 Alert triggered: '{}' — {} = {:.1} (threshold: {})",
+ " Alert triggered: '{}' — {} = {:.1} (threshold: {})",
             rule.name, rule.condition, actual_value, rule.threshold
         );
 
@@ -139,7 +139,7 @@ pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClien
             pool,
             rule.customer_id,
             "alert",
-            &format!("🚨 Alert: {}", rule.name),
+ &format!(" Alert: {}", rule.name),
             &format!(
                 "{} = {:.1} (threshold: {}). Channels: {}",
                 rule.condition, actual_value, rule.threshold,
@@ -174,9 +174,9 @@ pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClien
     }
 
     if alerts_triggered > 0 {
-        tracing::info!("✅ Alert evaluation complete: {} alerts triggered", alerts_triggered);
+ tracing::info!(" Alert evaluation complete: {} alerts triggered", alerts_triggered);
     } else {
-        tracing::debug!("✅ Alert evaluation complete: no alerts triggered");
+ tracing::debug!(" Alert evaluation complete: no alerts triggered");
     }
 
     Ok(alerts_triggered)
@@ -250,10 +250,10 @@ pub async fn send_alert_email(
 ) -> Result<()> {
     let (subject, html) = match lang {
         Language::Tr => (
-            format!("🚨 HookSniff Uyarısı: {}", alert_name),
+ format!(" HookSniff Uyarısı: {}", alert_name),
             format!(
                 r#"<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px;">
-                <h2 style="color:#dc2626;">🚨 Uyarı Tetiklendi</h2>
+ <h2 style="color:#dc2626;"> Uyarı Tetiklendi</h2>
                 <p><strong>{}</strong> kuralı tetiklendi.</p>
                 <table style="width:100%;border-collapse:collapse;margin:16px 0;">
                 <tr><td style="padding:8px;border:1px solid #e5e7eb;">Koşul</td><td style="padding:8px;border:1px solid #e5e7eb;"><strong>{}</strong></td></tr>
@@ -266,10 +266,10 @@ pub async fn send_alert_email(
             ),
         ),
         Language::En => (
-            format!("🚨 HookSniff Alert: {}", alert_name),
+ format!(" HookSniff Alert: {}", alert_name),
             format!(
                 r#"<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px;">
-                <h2 style="color:#dc2626;">🚨 Alert Triggered</h2>
+ <h2 style="color:#dc2626;"> Alert Triggered</h2>
                 <p>Rule <strong>{}</strong> has been triggered.</p>
                 <table style="width:100%;border-collapse:collapse;margin:16px 0;">
                 <tr><td style="padding:8px;border:1px solid #e5e7eb;">Condition</td><td style="padding:8px;border:1px solid #e5e7eb;"><strong>{}</strong></td></tr>
@@ -298,7 +298,7 @@ pub async fn send_slack_webhook(
 
     let payload = serde_json::json!({
         "text": format!(
-            "🚨 *Alert: {}*\nCondition: {}\nValue: {:.1}\nThreshold: {}",
+ " *Alert: {}*\nCondition: {}\nValue: {:.1}\nThreshold: {}",
             alert_name, condition, actual_value, threshold
         ),
         "username": "HookSniff Alerts",

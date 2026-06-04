@@ -52,7 +52,7 @@ fn load_outbound_ips() -> OutboundIpsResponse {
             .filter(|s| !s.is_empty())
             .collect(),
         _ => {
-            tracing::warn!("⚠️ OUTBOUND_IPS not configured — returning empty list");
+ tracing::warn!(" OUTBOUND_IPS not configured — returning empty list");
             DEFAULT_IPS.iter().map(|s| s.to_string()).collect()
         }
     };

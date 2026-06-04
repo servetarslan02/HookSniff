@@ -58,7 +58,7 @@ async fn register_device(
     .fetch_one(&pool)
     .await?;
 
-    tracing::info!("📱 Device token registered for customer {}", customer.id);
+ tracing::info!(" Device token registered for customer {}", customer.id);
 
     Ok(Json(DeviceTokenResponse {
         id: row.id,
@@ -113,7 +113,7 @@ async fn remove_device(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("📱 Device token removed for customer {}", customer.id);
+ tracing::info!(" Device token removed for customer {}", customer.id);
 
     Ok(Json(serde_json::json!({"deleted": true})))
 }

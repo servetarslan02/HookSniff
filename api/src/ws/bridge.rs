@@ -23,7 +23,7 @@ impl EventBridge {
     pub fn start(publisher: EventPublisher, gateway: Arc<WsGateway>) -> Self {
         let handle = tokio::spawn(async move {
             let mut rx = publisher.subscribe();
-            info!("🌉 Event bridge started (EventPublisher → WsGateway)");
+ info!(" Event bridge started (EventPublisher → WsGateway)");
 
             loop {
                 match rx.recv().await {

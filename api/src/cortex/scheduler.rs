@@ -188,7 +188,7 @@ async fn run_stage_with_timeout(
     let mut lock_conn = match super::try_cortex_lock(pool, lock_name, timeout.as_secs() as i64).await {
         Some(conn) => conn,
         None => {
-            tracing::debug!("⏭️  Cortex [{}] — lock busy, skipping", stage.name());
+ tracing::debug!("⏭ Cortex [{}] — lock busy, skipping", stage.name());
             let _ = super::ml::cortex_tracing::record_trace(pool, &super::ml::cortex_tracing::CortexTrace {
                 run_id: run_id.clone(),
                 stage_name: stage.name().to_string(),
@@ -218,7 +218,7 @@ async fn run_stage_with_timeout(
     let (outcome, trace_status, items, error_msg) = match &result {
         Ok(Ok(count)) => {
             tracing::info!(
-                "✅ Cortex [{}] — {} items in {}ms",
+ " Cortex [{}] — {} items in {}ms",
                 stage.name(), count, duration_ms
             );
             (
@@ -227,7 +227,7 @@ async fn run_stage_with_timeout(
             )
         }
         Ok(Err(e)) => {
-            tracing::error!("❌ Cortex [{}]: {:?}", stage.name(), e);
+ tracing::error!(" Cortex [{}]: {:?}", stage.name(), e);
             (
                 StageResult { stage: stage.name(), outcome: StageOutcome::Error(format!("{:?}", e)), duration_ms },
                 "error", 0, Some(format!("{:?}", e))
@@ -356,7 +356,7 @@ async fn execute_stage(
                         if let Err(e) = super::recovery_surge::start_surge(pool, *eid, queued.0, config).await {
                             tracing::debug!("Surge start skipped for {}: {:?}", eid, e);
                         } else {
-                            tracing::info!("🚀 Recovery surge triggered for endpoint {} ({} queued)", eid, queued.0);
+ tracing::info!(" Recovery surge triggered for endpoint {} ({} queued)", eid, queued.0);
                         }
                     }
                 }
@@ -383,14 +383,14 @@ async fn execute_stage(
             // Check model quality and reset degraded models
             let reset_count = super::ml::quality_tracker::check_and_reset_degraded_models(pool, 60.0).await?;
             if reset_count > 0 {
-                tracing::info!("🧠 ML Quality: reset {} degraded models", reset_count);
+ tracing::info!(" ML Quality: reset {} degraded models", reset_count);
             }
             // Get quality summary for logging
             if let Ok(summary) = super::ml::quality_tracker::get_quality_summary(pool).await {
                 for m in &summary {
                     if m.quality_score < 50.0 {
                         tracing::warn!(
-                            "🧠 ML Quality: endpoint {} model '{}' score {:.0}% (accuracy {:.0}%)",
+ " ML Quality: endpoint {} model '{}' score {:.0}% (accuracy {:.0}%)",
                             m.endpoint_id, m.model_type, m.quality_score, m.accuracy_pct
                         );
                     }
@@ -446,7 +446,7 @@ async fn execute_stage(
                     let event_id = super::ml::drift_detection::record_drift_event(pool, *eid, &result).await?;
 
                     tracing::warn!(
-                        "🔀 Drift detected for endpoint {}: type={}, severity={:.2}, features={:?}, action={}, event_id={}",
+ " Drift detected for endpoint {}: type={}, severity={:.2}, features={:?}, action={}, event_id={}",
                         eid, result.drift_type, result.severity, result.features_affected, result.recommended_action, event_id
                     );
 
@@ -454,7 +454,7 @@ async fn execute_stage(
                         if let Err(e) = super::ml::train_endpoint_for_drift(pool, *eid).await {
                             tracing::error!("Failed to retrain after drift for {}: {:?}", eid, e);
                         } else {
-                            tracing::info!("🔄 Retrained models for endpoint {} after drift", eid);
+ tracing::info!(" Retrained models for endpoint {} after drift", eid);
                             sqlx::query("UPDATE ml_models SET parameters = jsonb_set(parameters, '{baseline_collected}', 'false') WHERE endpoint_id = $1 AND model_type = 'drift_detector'")
                                 .bind(eid).execute(pool).await?;
                         }
@@ -472,7 +472,7 @@ async fn execute_stage(
             // 1. Prune old model versions (keep last 10 per model)
             if let Ok(n) = super::ml::versioning::prune_old_versions(pool, 10).await {
                 cleaned += n;
-                if n > 0 { tracing::info!("🧹 Cleanup: pruned {} old model versions", n); }
+ if n > 0 { tracing::info!(" Cleanup: pruned {} old model versions", n); }
             }
 
             // 2. Clean old cortex traces (90 days)
@@ -509,7 +509,7 @@ async fn execute_stage(
             super::ml::feature_store::FEATURE_STORE.evict_expired();
 
             if cleaned > 0 {
-                tracing::info!("🧹 Cleanup: removed {} total old records", cleaned);
+ tracing::info!(" Cleanup: removed {} total old records", cleaned);
             }
             Ok(cleaned)
         }
@@ -534,7 +534,7 @@ enum StageOutcome {
 /// Call this ONCE from main.rs — replaces all individual tokio::spawn stage tasks.
 pub fn start_cortex_scheduler(pool: PgPool) {
     tokio::spawn(async move {
-        tracing::info!("🧠 Cortex Scheduler started — tick every 30s, {} stages", ALL_STAGES.len());
+ tracing::info!(" Cortex Scheduler started — tick every 30s, {} stages", ALL_STAGES.len());
 
         let mut last_runs: Vec<Option<Instant>> = vec![None; ALL_STAGES.len()];
         let mut ticker = tokio::time::interval(Duration::from_secs(30));
@@ -563,7 +563,7 @@ pub fn start_cortex_scheduler(pool: PgPool) {
                         StageOutcome::Timeout => "timeout".to_string(),
                     };
                     tracing::info!(
-                        "🧠 Cortex tick #{} — [{}] {} ({}ms)",
+ " Cortex tick #{} — [{}] {} ({}ms)",
                         tick_count, result.stage, summary, result.duration_ms
                     );
                 }
