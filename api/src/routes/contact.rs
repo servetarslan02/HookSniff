@@ -123,7 +123,7 @@ pub async fn handle_contact(
         r#"<!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
- <h1 style="color: #6d28d9;">Thanks for reaching out, {}! </h1>
+  <h1 style="color: #6d28d9;">Thanks for reaching out, {}! 📩</h1>
   <p>We've received your message and will get back to you as soon as possible.</p>
   <div style="background: #f3f4f6; border-radius: 6px; padding: 16px; margin: 16px 0;">
     <p style="margin: 0; font-weight: bold;">Subject: {}</p>

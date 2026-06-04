@@ -9,7 +9,7 @@ async fn cleanup_idempotency_keys(pool: &PgPool) -> Result<u64> {
         .await?;
 
     tracing::info!(
- " Cleaned up {} expired idempotency keys",
+        "🧹 Cleaned up {} expired idempotency keys",
         result.rows_affected()
     );
     Ok(result.rows_affected())
@@ -27,7 +27,7 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} processed queue items",
+            "🧹 Cleaned up {} processed queue items",
             result.rows_affected()
         );
     }
@@ -63,7 +63,7 @@ pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Reset monthly webhook counters for {} customers (period-based)",
+            "🔄 Reset monthly webhook counters for {} customers (period-based)",
             result.rows_affected()
         );
     }
@@ -83,7 +83,7 @@ pub async fn reset_daily_webhook_counts(pool: &PgPool) -> Result<()> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Reset daily webhook counters for {} customers",
+            "🔄 Reset daily webhook counters for {} customers",
             result.rows_affected()
         );
     }
@@ -98,7 +98,7 @@ async fn cleanup_seen_webhooks(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} expired seen webhooks",
+            "🧹 Cleaned up {} expired seen webhooks",
             result.rows_affected()
         );
     }
@@ -115,7 +115,7 @@ async fn cleanup_sso_login_attempts(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} old SSO login attempts",
+            "🧹 Cleaned up {} old SSO login attempts",
             result.rows_affected()
         );
     }
@@ -132,7 +132,7 @@ async fn cleanup_old_dunning_reminders(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} old dunning reminders",
+            "🧹 Cleaned up {} old dunning reminders",
             result.rows_affected()
         );
     }
@@ -149,7 +149,7 @@ async fn cleanup_old_payment_retries(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} old payment retry attempts",
+            "🧹 Cleaned up {} old payment retry attempts",
             result.rows_affected()
         );
     }
@@ -161,7 +161,7 @@ async fn cleanup_old_payment_retries(pool: &PgPool) -> Result<u64> {
 /// Per-customer retention: each customer's data is retained based on their plan's
 /// retention_days (7 for Developer, 14 for Startup, 180 for Pro, 365 for Enterprise).
 pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Result<()> {
- tracing::info!(" Running per-customer retention job");
+    tracing::info!("🔄 Running per-customer retention job");
 
     // Get all active customers with their plan
     let customers: Vec<(uuid::Uuid, String)> = sqlx::query_as(
@@ -213,7 +213,7 @@ pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Resul
 
         if deleted.rows_affected() > 0 {
             tracing::info!(
- " Customer {}: deleted {} deliveries older than {} days (plan: {})",
+                "🗑️ Customer {}: deleted {} deliveries older than {} days (plan: {})",
                 customer_id, deleted.rows_affected(), retention, plan_str
             );
             total_deleted += deleted.rows_affected();
@@ -221,7 +221,7 @@ pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Resul
     }
 
     if total_deleted > 0 {
- tracing::info!(" Total: {} old deliveries deleted across all customers", total_deleted);
+        tracing::info!("🗑️ Total: {} old deliveries deleted across all customers", total_deleted);
     }
 
     // Global cleanup tasks (not per-customer)
@@ -234,7 +234,7 @@ pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Resul
     cleanup_old_payment_retries(pool).await?;
     reset_monthly_webhook_counts(pool).await?;
 
- tracing::info!(" Retention job completed");
+    tracing::info!("✅ Retention job completed");
     Ok(())
 }
 
@@ -248,7 +248,7 @@ async fn cleanup_daily_event_usage(pool: &PgPool) -> Result<u64> {
 
     if result.rows_affected() > 0 {
         tracing::info!(
- " Cleaned up {} old daily_event_usage rows",
+            "🧹 Cleaned up {} old daily_event_usage rows",
             result.rows_affected()
         );
     }

@@ -90,7 +90,7 @@ pub async fn train(
         del.extend(std::iter::repeat(golden_del).take(golden_count));
 
         tracing::info!(
- " Golden dataset: endpoint {} degraded (median SR {:.1}%) — blended {}% baseline",
+            "🛡️ Golden dataset: endpoint {} degraded (median SR {:.1}%) — blended {}% baseline",
             endpoint_id, recent_median, 30
         );
 

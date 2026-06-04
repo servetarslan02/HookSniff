@@ -48,7 +48,7 @@ pub async fn run() {
         .build()
         .expect("reqwest client");
 
- tracing::info!(" Worker metrics push started — pushing to {} every 60s", otlp_url);
+    tracing::info!("📊 Worker metrics push started — pushing to {} every 60s", otlp_url);
 
     loop {
         tokio::time::sleep(Duration::from_secs(60)).await;
@@ -88,15 +88,15 @@ pub async fn run() {
         match req.json(&payload).send().await {
             Ok(resp) => {
                 if resp.status().is_success() {
- tracing::debug!(" Worker health pushed: hooksniff_worker_healthy=1");
+                    tracing::debug!("📊 Worker health pushed: hooksniff_worker_healthy=1");
                 } else {
                     let status = resp.status();
                     let body = resp.text().await.unwrap_or_default();
- tracing::warn!(" Worker metrics push failed: {} — {}", status, &body[..body.len().min(200)]);
+                    tracing::warn!("📊 Worker metrics push failed: {} — {}", status, &body[..body.len().min(200)]);
                 }
             }
             Err(e) => {
- tracing::warn!(" Worker metrics push error: {}", e);
+                tracing::warn!("📊 Worker metrics push error: {}", e);
             }
         }
     }

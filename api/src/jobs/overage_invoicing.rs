@@ -37,7 +37,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
         .unwrap();
 
     tracing::info!(
- " Running overage invoicing for {} to {}",
+        "💰 Running overage invoicing for {} to {}",
         prev_month_start,
         prev_month_end
     );
@@ -106,7 +106,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
 
         if existing.is_some() {
             tracing::info!(
- "⏭ Overage invoice already exists for {} ({} {})",
+                "⏭️ Overage invoice already exists for {} ({} {})",
                 email, prev_month_start, plan_str
             );
             continue;
@@ -140,7 +140,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
             Language::En => {
             (
                 format!(
- " HookSniff: Overage Invoice — ${:.2}",
+                    "💰 HookSniff: Overage Invoice — ${:.2}",
                     total_dollars
                 ),
                 format!(
@@ -164,7 +164,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
             Language::Tr => {
             (
                 format!(
- " HookSniff: Aşım Faturası — ${:.2}",
+                    "💰 HookSniff: Aşım Faturası — ${:.2}",
                     total_dollars
                 ),
                 format!(
@@ -190,13 +190,13 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
         let _ = email_client.send_contact_email(&email, &subject, &body).await;
 
         tracing::info!(
- " Overage invoice created for {}: {} events × ${:.6} = ${:.2} ({} cents)",
+            "💰 Overage invoice created for {}: {} events × ${:.6} = ${:.2} ({} cents)",
             email, total_overage, price_per_event_dollars, total_dollars, amount_cents
         );
     }
 
     tracing::info!(
- " Overage invoicing complete: {} invoices created",
+        "💰 Overage invoicing complete: {} invoices created",
         invoices_created
     );
 

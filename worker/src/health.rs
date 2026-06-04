@@ -27,10 +27,10 @@ pub async fn start_health_server(listener: tokio::net::TcpListener) {
         )
         .route(
             "/",
- get(|| async { "HookSniff Worker " }),
+            get(|| async { "HookSniff Worker 🐝" }),
         );
 
     if let Err(e) = axum::serve(listener, app).await {
- tracing::error!(" Health server error: {}", e);
+        tracing::error!("❌ Health server error: {}", e);
     }
 }

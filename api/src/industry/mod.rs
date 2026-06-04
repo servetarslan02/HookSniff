@@ -130,7 +130,7 @@ impl PackageManager {
 
     /// Register an industry package
     pub fn register(&mut self, package: Box<dyn IndustryPackage>) {
- tracing::info!(" Registering industry package: {}", package.name());
+        tracing::info!("📦 Registering industry package: {}", package.name());
         self.packages.push(package);
     }
 

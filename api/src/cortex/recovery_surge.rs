@@ -28,7 +28,7 @@ pub async fn start_surge(
     .await?;
 
     super::CORTEX_METRICS.recovery_surges_started.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
- tracing::info!(" Recovery surge started for endpoint {}: {} queued, {} steps", endpoint_id, queued_count, total_steps);
+    tracing::info!("🔄 Recovery surge started for endpoint {}: {} queued, {} steps", endpoint_id, queued_count, total_steps);
 
     Ok(id.0)
 }

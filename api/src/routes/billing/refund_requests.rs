@@ -149,7 +149,7 @@ pub async fn create_refund_request(
     .await?;
 
     tracing::info!(
- " Refund request created by customer {} (category: {}, amount: {} {})",
+        "📋 Refund request created by customer {} (category: {}, amount: {} {})",
         customer.id,
         req.category.as_str(),
         amount_cents as f64 / 100.0,

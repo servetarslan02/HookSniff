@@ -188,7 +188,7 @@ impl RedisRateLimiter {
     pub async fn new(redis_url: &str) -> Result<Self, redis::RedisError> {
         let client = redis::Client::open(redis_url)?;
         let conn = redis::aio::ConnectionManager::new(client).await?;
- tracing::info!(" Redis rate limiter connected");
+        tracing::info!("✅ Redis rate limiter connected");
         Ok(Self { conn })
     }
 }
@@ -395,7 +395,7 @@ pub async fn create_rate_limiter() -> RateLimiter {
                     );
                     if is_production {
                         tracing::error!(
- " PRODUCTION WARNING: Using in-memory rate limiter! \
+                            "⚠️  PRODUCTION WARNING: Using in-memory rate limiter! \
                              Rate limits will be per-instance and lost on restart. \
                              Fix Redis connection immediately."
                         );
@@ -413,7 +413,7 @@ pub async fn create_rate_limiter() -> RateLimiter {
                     );
                 if is_production {
                     tracing::error!(
- " PRODUCTION WARNING: Redis URL not configured! \
+                        "⚠️  PRODUCTION WARNING: Redis URL not configured! \
                          Using in-memory rate limiter — rate limits are per-instance and lost on restart. \
                          Set REDIS_URL or UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN."
                     );
@@ -424,7 +424,7 @@ pub async fn create_rate_limiter() -> RateLimiter {
         _ => {
             if is_production {
                 tracing::error!(
- " PRODUCTION WARNING: RATE_LIMIT_STORE not set to 'redis'. \
+                    "⚠️  PRODUCTION WARNING: RATE_LIMIT_STORE not set to 'redis'. \
                      Using in-memory rate limiter — rate limits are per-instance and lost on restart. \
                      Set RATE_LIMIT_STORE=redis and REDIS_URL for production use."
                 );

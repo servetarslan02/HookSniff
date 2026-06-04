@@ -91,7 +91,7 @@ pub async fn process_refund(
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription(&customer).await {
         tracing::warn!(
- " Failed to cancel subscription at provider for customer {}: {:?} \
+            "⚠️ Failed to cancel subscription at provider for customer {}: {:?} \
              — proceeding with refund anyway",
             customer_id,
             e
@@ -151,7 +151,7 @@ pub async fn process_refund(
     .await?;
 
     tracing::info!(
- " Refund processed for customer {} (plan: {}, reason: {})",
+        "✅ Refund processed for customer {} (plan: {}, reason: {})",
         customer_id,
         customer.plan,
         reason
@@ -249,7 +249,7 @@ pub async fn handle_chargeback(
         .await
     {
         tracing::warn!(
- " Failed to cancel {} subscription {} during chargeback handling: {:?}",
+            "⚠️ Failed to cancel {} subscription {} during chargeback handling: {:?}",
             provider,
             provider_subscription_id,
             e
@@ -273,7 +273,7 @@ pub async fn handle_chargeback(
     .await?;
 
     tracing::warn!(
- " Chargeback received for customer {} ({} subscription {}) — account suspended",
+        "🚨 Chargeback received for customer {} ({} subscription {}) — account suspended",
         customer_id,
         provider,
         provider_subscription_id

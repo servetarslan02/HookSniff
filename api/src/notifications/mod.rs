@@ -74,7 +74,7 @@ impl FcmClient {
             return Err(anyhow::anyhow!("FCM returned {}: {}", status, text));
         }
 
- tracing::debug!(" Push notification sent to device token");
+        tracing::debug!("📱 Push notification sent to device token");
         Ok(())
     }
 }
@@ -135,7 +135,7 @@ pub async fn notify_delivery_failed(
     endpoint_name: &str,
     error_details: &str,
 ) {
- let title = " Delivery Failed";
+    let title = "⚠️ Delivery Failed";
     let body = &format!("Webhook to {} failed: {}", endpoint_name, error_details);
     let data = serde_json::json!({
         "type": "delivery_failed",
@@ -151,7 +151,7 @@ pub async fn notify_delivery_success(
     customer_id: Uuid,
     endpoint_name: &str,
 ) {
- let title = " Delivery Successful";
+    let title = "✅ Delivery Successful";
     let body = &format!("Webhook to {} delivered successfully", endpoint_name);
     let data = serde_json::json!({
         "type": "delivery_success",

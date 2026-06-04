@@ -112,7 +112,7 @@ pub async fn process_inbound(
     // Verify signature — reject if secret is empty
     if config.secret.is_empty() {
         tracing::warn!(
- " Inbound config for provider '{}' has empty secret — rejecting (customer={})",
+            "❌ Inbound config for provider '{}' has empty secret — rejecting (customer={})",
             provider,
             customer.id
         );
