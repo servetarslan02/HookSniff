@@ -197,7 +197,7 @@ export function verificationEmail(code: string) {
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <span style="font-size: 32px;">🪝</span>
+ <span style="font-size: 32px;"></span>
         <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">Email Doğrulama</h1>
       </div>
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
@@ -217,7 +217,7 @@ export function passwordResetEmail(resetUrl: string) {
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <span style="font-size: 32px;">🪝</span>
+ <span style="font-size: 32px;"></span>
         <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">Şifre Sıfırlama</h1>
       </div>
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
@@ -242,7 +242,7 @@ export function deliveryFailedEmail(event: string, endpoint: string, attempts: n
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <span style="font-size: 32px;">⚠️</span>
+ <span style="font-size: 32px;"></span>
         <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">Webhook Teslimatı Başarısız</h1>
       </div>
       <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 16px 0;">
@@ -271,7 +271,7 @@ export function welcomeEmail(name: string, username?: string) {
   return `
     <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <span style="font-size: 32px;">🪝</span>
+ <span style="font-size: 32px;"></span>
         <h1 style="color: #111827; font-size: 20px; margin-top: 8px;">HookSniff'e Hoş Geldin!</h1>
       </div>
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">

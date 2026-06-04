@@ -20,7 +20,7 @@ function formatDate(s: string | null) {
 const CHANNEL_TYPES = [
   { value: 'sse', icon: <Radio size={16} strokeWidth={1.75} />, label: 'SSE (Server-Sent Events)' },
   { value: 'websocket', icon: <Plug size={16} strokeWidth={1.75} />, label: 'WebSocket' },
-  { value: 'webhook', icon: '🪝', label: 'Webhook' },
+ { value: 'webhook', icon: '', label: 'Webhook' },
 ];
 
 const MAX_LIVE_EVENTS = 100;

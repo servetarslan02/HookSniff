@@ -14,7 +14,7 @@ function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: s
   const base = {
     title: (insight as any).title || type.replace(/_/g, ' '),
     detail: data.description || data.detail || '',
-    emoji: severity === 'critical' ? '🔴' : severity === 'warning' ? '🟠' : severity === 'info' ? '🟡' : '🟢',
+    emoji: severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok',
     advice: data.advice || data.recommendation || '',
   };
 

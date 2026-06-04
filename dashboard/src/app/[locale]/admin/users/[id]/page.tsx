@@ -380,7 +380,7 @@ export default function AdminUserDetailPage() {
             }}
             className="px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 transition"
           >
-            🪝 {t('testWebhook') || 'Test Webhook'}
+ {t('testWebhook') || 'Test Webhook'}
           </button>
           <button
             onClick={() => setShowEmailModal(true)}

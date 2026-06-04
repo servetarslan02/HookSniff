@@ -22,7 +22,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
         {/* Left: Logo + breadcrumb */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
+ <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white"> HookSniff</Link>
           {pageTitle && (
             <>
               <span className="text-gray-500 hidden sm:inline">/</span>

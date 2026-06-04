@@ -101,7 +101,17 @@ pub async fn run_healing(
                 sqlx::query(
                     "UPDATE endpoints SET auto_disabled = true, auto_disabled_at = NOW(), auto_disable_reason = $1 WHERE id = $2"
                 ).bind(&reason).bind(endpoint_id).execute(pool).await?;
-                tracing::warn!("🔧 Cortex: Auto-disabled endpoint {} (score {}, {} consecutive)", endpoint_id, score, consecutive_high.0);
+
+                // Notify customer about auto-disable
+                if let Ok(Some((url, customer_id))) = sqlx::query_as::<_, (String, uuid::Uuid)>(
+                    "SELECT url, customer_id FROM endpoints WHERE id = $1"
+                ).bind(endpoint_id).fetch_optional(pool).await {
+                    let _ = crate::notifications::helpers::endpoint_auto_disabled(
+                        pool, customer_id, endpoint_id, &url, consecutive_high.0 as i32
+                    ).await;
+                }
+
+                tracing::warn!("Cortex: Auto-disabled endpoint {} (score {}, {} consecutive)", endpoint_id, score, consecutive_high.0);
             }
             "retry_slowdown" => {
                 // Signal to retry policy to slow down (stored in healing_actions, read by worker)
@@ -246,6 +256,15 @@ async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Resul
                 sqlx::query(
                     "UPDATE endpoints SET auto_disabled = false, auto_disabled_at = NULL, auto_disable_reason = NULL WHERE id = $1"
                 ).bind(endpoint_id).execute(pool).await?;
+
+                // Notify customer about auto-enable
+                if let Ok(Some((url, customer_id))) = sqlx::query_as::<_, (String, uuid::Uuid)>(
+                    "SELECT url, customer_id FROM endpoints WHERE id = $1"
+                ).bind(endpoint_id).fetch_optional(pool).await {
+                    let _ = crate::notifications::helpers::endpoint_auto_enabled(
+                        pool, customer_id, endpoint_id, &url
+                    ).await;
+                }
 
                 // Record recovery
                 sqlx::query(

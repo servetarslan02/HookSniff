@@ -22,12 +22,12 @@ interface RefundRequest {
 }
 
 const CATEGORY_LABELS: Record<string, { en: string; tr: string; icon: string }> = {
-  accidental_purchase: { en: 'Accidental Purchase', tr: 'Yanlışlıkla Satın Alma', icon: '🛒' },
-  not_satisfied: { en: 'Not Satisfied', tr: 'Memnun Değilim', icon: '😞' },
-  missing_features: { en: 'Missing Features', tr: 'Eksik Özellikler', icon: '🧩' },
-  technical_issues: { en: 'Technical Issues', tr: 'Teknik Sorunlar', icon: '🔧' },
-  billing_error: { en: 'Billing Error', tr: 'Faturalandırma Hatası', icon: '💳' },
-  other: { en: 'Other', tr: 'Diğer', icon: '📝' },
+  accidental_purchase: { en: 'Accidental Purchase', tr: 'Yanlislikla Satin Alma', icon: '' },
+  not_satisfied: { en: 'Not Satisfied', tr: 'Memnun Degilim', icon: '' },
+  missing_features: { en: 'Missing Features', tr: 'Eksik Ozellikler', icon: '' },
+  technical_issues: { en: 'Technical Issues', tr: 'Teknik Sorunlar', icon: '' },
+  billing_error: { en: 'Billing Error', tr: 'Faturalandirma Hatasi', icon: '' },
+  other: { en: 'Other', tr: 'Diger', icon: '' },
 };
 
 export function AdminRefundRequests() {
@@ -102,9 +102,9 @@ export function AdminRefundRequests() {
           onChange={(e) => setFilter(e.target.value)}
           className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
         >
-          <option value="pending">⏳ {t('pending') || 'Pending'}</option>
-          <option value="processed">✅ {t('processed') || 'Processed'}</option>
-          <option value="denied">❌ {t('denied') || 'Denied'}</option>
+          <option value="pending">{t('pending') || 'Pending'}</option>
+          <option value="processed">{t('processed') || 'Processed'}</option>
+          <option value="denied">{t('denied') || 'Denied'}</option>
           <option value="">{t('all') || 'All'}</option>
         </select>
       </div>
@@ -136,7 +136,6 @@ export function AdminRefundRequests() {
                   </div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs text-gray-500 dark:text-slate-400">
-                      {CATEGORY_LABELS[req.category]?.icon || '📝'}{' '}
                       {CATEGORY_LABELS[req.category]?.[lang] || req.category}
                     </span>
                     <span className="text-xs text-gray-400 dark:text-slate-500">•</span>

@@ -10,15 +10,15 @@ function describeAnomaly(score: number, factors: any, t: any): { title: string; 
   const latency = factors?.latency || factors?.latency_ms;
 
   if (score >= 80) {
-    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), emoji: '🔴' };
+    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), emoji: 'critical' };
   }
   if (score >= 60) {
-    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), emoji: '🟠' };
+    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), emoji: 'major' };
   }
   if (score >= 40) {
-    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), emoji: '🟡' };
+    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), emoji: 'minor' };
   }
-  return { title: t('severity.normal'), detail: t('detail.noConcern'), emoji: '🟢' };
+  return { title: t('severity.normal'), detail: t('detail.noConcern'), emoji: 'normal' };
 }
 
 export function AnomaliesTab({ token }: { token: string | null }) {
