@@ -15,7 +15,7 @@ use super::{require_admin, require_admin_write};
 // ── Platform Settings ─────────────────────────────────────
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(deny_unknown_fields)]
+#[serde(default)]
 pub struct PlatformSettings {
     pub default_plan: String,
     pub max_endpoints_free: i32,
@@ -216,50 +216,66 @@ pub async fn get_settings(
     Ok(Json(PlatformSettings::default()))
 }
 
-/// PUT /v1/admin/settings — Update platform settings.
+/// PUT /v1/admin/settings — Update platform settings (partial update supported).
 pub async fn update_settings(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Json(settings): Json<PlatformSettings>,
+    Json(incoming): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
 
-    if settings.max_endpoints_free < 1 || settings.max_endpoints_startup < 1 || settings.max_endpoints_pro < 1 || settings.max_endpoints_enterprise < 1 {
-        return Err(AppError::BadRequest("max_endpoints must be at least 1".into()));
-    }
-    if settings.max_webhooks_free < 0 || settings.max_webhooks_startup < 0 || settings.max_webhooks_pro < 0 || settings.max_webhooks_enterprise < 0 {
-        return Err(AppError::BadRequest("max_webhooks cannot be negative".into()));
-    }
-    if settings.rate_limit_free < 1 || settings.rate_limit_startup < 1 || settings.rate_limit_pro < 1 || settings.rate_limit_enterprise < 1 {
-        return Err(AppError::coded(ErrorCode::InvalidRateLimit));
-    }
-    if settings.retention_days_free < 1 || settings.retention_days_startup < 1 || settings.retention_days_pro < 1 || settings.retention_days_enterprise < 1 {
-        return Err(AppError::coded(ErrorCode::InvalidRetention));
-    }
-    if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
-        return Err(AppError::coded(ErrorCode::InvalidRetryAttempts));
-    }
-    if settings.plan_price_startup < 0.0 || settings.plan_price_pro < 0.0 || settings.plan_price_enterprise < 0.0 {
-        return Err(AppError::coded(ErrorCode::NegativePrice));
-    }
-
-    let mut saved_settings = settings;
+    // Load current settings
     let current: Option<(serde_json::Value,)> =
         sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
             .fetch_optional(&pool)
             .await?;
-    if let Some((value,)) = current {
-        if let Ok(current_settings) = serde_json::from_value::<PlatformSettings>(value) {
-            if saved_settings.resend_api_key.as_deref() == Some("***") {
-                saved_settings.resend_api_key = current_settings.resend_api_key;
-            }
-            if saved_settings.webhook_secret.as_deref() == Some("***") {
-                saved_settings.webhook_secret = current_settings.webhook_secret;
+
+    let mut settings: PlatformSettings = if let Some((value,)) = current {
+        serde_json::from_value(value).unwrap_or_default()
+    } else {
+        PlatformSettings::default()
+    };
+
+    // Merge incoming fields into current settings
+    if let Some(obj) = incoming.as_object() {
+        for (key, value) in obj {
+            match key.as_str() {
+                "default_plan" => { if let Some(v) = value.as_str() { settings.default_plan = v.to_string(); } }
+                "max_endpoints_free" => { if let Some(v) = value.as_i64() { settings.max_endpoints_free = v as i32; } }
+                "max_endpoints_startup" => { if let Some(v) = value.as_i64() { settings.max_endpoints_startup = v as i32; } }
+                "max_endpoints_pro" => { if let Some(v) = value.as_i64() { settings.max_endpoints_pro = v as i32; } }
+                "max_endpoints_enterprise" => { if let Some(v) = value.as_i64() { settings.max_endpoints_enterprise = v as i32; } }
+                "max_webhooks_free" => { if let Some(v) = value.as_i64() { settings.max_webhooks_free = v as i32; } }
+                "max_webhooks_startup" => { if let Some(v) = value.as_i64() { settings.max_webhooks_startup = v as i32; } }
+                "max_webhooks_pro" => { if let Some(v) = value.as_i64() { settings.max_webhooks_pro = v as i32; } }
+                "max_webhooks_enterprise" => { if let Some(v) = value.as_i64() { settings.max_webhooks_enterprise = v as i32; } }
+                "rate_limit_free" => { if let Some(v) = value.as_i64() { settings.rate_limit_free = v as i32; } }
+                "rate_limit_startup" => { if let Some(v) = value.as_i64() { settings.rate_limit_startup = v as i32; } }
+                "rate_limit_pro" => { if let Some(v) = value.as_i64() { settings.rate_limit_pro = v as i32; } }
+                "rate_limit_enterprise" => { if let Some(v) = value.as_i64() { settings.rate_limit_enterprise = v as i32; } }
+                "retention_days_free" => { if let Some(v) = value.as_i64() { settings.retention_days_free = v as i32; } }
+                "retention_days_startup" => { if let Some(v) = value.as_i64() { settings.retention_days_startup = v as i32; } }
+                "retention_days_pro" => { if let Some(v) = value.as_i64() { settings.retention_days_pro = v as i32; } }
+                "retention_days_enterprise" => { if let Some(v) = value.as_i64() { settings.retention_days_enterprise = v as i32; } }
+                "retry_max_attempts" => { if let Some(v) = value.as_i64() { settings.retry_max_attempts = v as i32; } }
+                "maintenance_mode" => { if let Some(v) = value.as_bool() { settings.maintenance_mode = v; } }
+                "signup_enabled" => { if let Some(v) = value.as_bool() { settings.signup_enabled = v; } }
+                "plan_price_startup" => { if let Some(v) = value.as_f64() { settings.plan_price_startup = v; } }
+                "plan_price_pro" => { if let Some(v) = value.as_f64() { settings.plan_price_pro = v; } }
+                "plan_price_enterprise" => { if let Some(v) = value.as_f64() { settings.plan_price_enterprise = v; } }
+                "plan_price_business" => { if let Some(v) = value.as_f64() { settings.plan_price_business = v; } }
+                "resend_api_key" => { if let Some(v) = value.as_str() { settings.resend_api_key = Some(v.to_string()); } }
+                "email_sender" => { if let Some(v) = value.as_str() { settings.email_sender = Some(v.to_string()); } }
+                "webhook_secret" => { if let Some(v) = value.as_str() { settings.webhook_secret = Some(v.to_string()); } }
+                "backup_retention_days" => { if let Some(v) = value.as_i64() { settings.backup_retention_days = v as i32; } }
+                "global_rate_limit" => { if let Some(v) = value.as_i64() { settings.global_rate_limit = v as i32; } }
+                "cors_origins" => { if let Some(v) = value.as_str() { settings.cors_origins = Some(v.to_string()); } }
+                _ => {} // Ignore unknown fields
             }
         }
     }
 
-    let value = serde_json::to_value(&saved_settings)
+    let value = serde_json::to_value(&settings)
         .map_err(|e| AppError::BadRequest(format!("Invalid settings: {}", e)))?;
 
     sqlx::query(
@@ -273,9 +289,9 @@ pub async fn update_settings(
 
  tracing::info!(" Admin updated platform settings");
 
-    let startup_price = saved_settings.plan_price_startup;
-    let pro_price = saved_settings.plan_price_pro;
-    let enterprise_price = saved_settings.plan_price_enterprise;
+    let startup_price = settings.plan_price_startup;
+    let pro_price = settings.plan_price_pro;
+    let enterprise_price = settings.plan_price_enterprise;
     tokio::spawn(async move {
         match crate::billing::polar::PolarConfig::from_env() {
             Some(config) => {
