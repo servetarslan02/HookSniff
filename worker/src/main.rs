@@ -786,7 +786,7 @@ async fn dead_letter_delivery(
          WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='webhook_failed' AND link='/deliveries/'||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
     )
     .bind(customer_id).bind(delivery_id).bind(&endpoint_url).bind(error_msg)
-    .execute(&pool).await.ok();
+    .execute(pool).await.ok();
 
     // 2. Endpoint down notification (when streak hits 5)
     if new_streak == 5 {
@@ -798,7 +798,7 @@ async fn dead_letter_delivery(
              WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='alert' AND link='/applications?endpoint='||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
         )
         .bind(customer_id).bind(endpoint_id).bind(new_streak).bind(&endpoint_url)
-        .execute(&pool).await.ok();
+        .execute(pool).await.ok();
     }
 
     Ok((new_streak, customer_id))
@@ -1363,7 +1363,7 @@ async fn process_pending(
                 tracing::error!("❌ Delivery {} → {} — non-retryable (HTTP {}), dead letter", delivery_id, error_msg, status_code);
 
                 let dl_err = format!("{} (HTTP {}, non-retryable)", error_msg, status_code);
-                let (new_streak, customer_id) = dead_letter_delivery(pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
+                let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
 
                 // Create in-app notification for the customer
                 {
@@ -1405,7 +1405,7 @@ async fn process_pending(
                 // ❌ Max deneme aşıldı → dead letter
                 tracing::error!("❌ Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
 
-                let (new_streak, customer_id) = dead_letter_delivery(pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
+                let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
 
                 // Create in-app notification for the customer
                 {
