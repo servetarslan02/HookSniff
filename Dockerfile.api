@@ -16,7 +16,6 @@ COPY common/Cargo.toml common/Cargo.toml
 # Step 2: Copy vendor and non-source dirs (rarely changes)
 COPY vendor/ vendor/
 COPY docs/ docs/
-COPY migrations/ migrations/
 
 # Step 3: Pre-build dependencies with dummy sources (cached if manifests unchanged)
 RUN mkdir -p api/src worker/src common/src && \
