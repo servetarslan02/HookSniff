@@ -5,12 +5,12 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Brain, Clock, Info } from '@/components/icons';
 
-function describePrediction(probability: number, _factors: any, t: any): { title: string; detail: string; emoji: string; advice: string } {
+function describePrediction(probability: number, _factors: any, t: any): { title: string; detail: string; severity: string; advice: string } {
   const pct = Math.round(probability * 100);
-  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), emoji: 'high', advice: t('advice.high') };
-  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), emoji: 'medium', advice: t('advice.medium') };
-  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), emoji: 'low', advice: t('advice.low') };
-  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), emoji: 'minimal', advice: t('advice.minimal') };
+  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), severity: 'high', advice: t('advice.high') };
+  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), severity: 'medium', advice: t('advice.medium') };
+  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), severity: 'low', advice: t('advice.low') };
+  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), severity: 'minimal', advice: t('advice.minimal') };
 }
 
 export function PredictionsTab({ token }: { token: string | null }) {
@@ -55,7 +55,11 @@ export function PredictionsTab({ token }: { token: string | null }) {
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <span className={`w-3 h-3 rounded-full mt-1 ${
+                    info.severity === 'high' ? 'bg-red-500' :
+                    info.severity === 'medium' ? 'bg-orange-500' :
+                    info.severity === 'low' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>

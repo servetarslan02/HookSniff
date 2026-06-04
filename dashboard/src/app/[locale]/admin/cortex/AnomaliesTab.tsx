@@ -5,20 +5,20 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { CheckCircle2, Clock } from '@/components/icons';
 
-function describeAnomaly(score: number, factors: any, t: any): { title: string; detail: string; emoji: string } {
+function describeAnomaly(score: number, factors: any, t: any): { title: string; detail: string; severity: string } {
   const sr = factors?.sr || factors?.success_rate;
   const latency = factors?.latency || factors?.latency_ms;
 
   if (score >= 80) {
-    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), emoji: 'critical' };
+    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), severity: 'critical' };
   }
   if (score >= 60) {
-    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), emoji: 'major' };
+    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), severity: 'major' };
   }
   if (score >= 40) {
-    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), emoji: 'minor' };
+    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), severity: 'minor' };
   }
-  return { title: t('severity.normal'), detail: t('detail.noConcern'), emoji: 'normal' };
+  return { title: t('severity.normal'), detail: t('detail.noConcern'), severity: 'normal' };
 }
 
 export function AnomaliesTab({ token }: { token: string | null }) {
@@ -65,7 +65,11 @@ export function AnomaliesTab({ token }: { token: string | null }) {
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <span className={`w-3 h-3 rounded-full mt-1 ${
+                    info.severity === 'critical' ? 'bg-red-500' :
+                    info.severity === 'major' ? 'bg-orange-500' :
+                    info.severity === 'minor' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>
