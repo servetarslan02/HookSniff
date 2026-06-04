@@ -104,13 +104,13 @@ steps:
       - '--quiet'
     waitFor: ['push-worker', 'run-migrations']
 
-images:
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
-
 options:
   machineType: 'E2_STANDARD_4'
   logging: CLOUD_LOGGING_ONLY
+
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
 
 availableSecrets:
   secretManager:
