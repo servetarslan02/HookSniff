@@ -34,6 +34,7 @@ export function AdminRefundRequests() {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('admin');
+  const tc = useTranslations('common');
   const [requests, setRequests] = useState<RefundRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending');
@@ -66,7 +67,7 @@ export function AdminRefundRequests() {
       const { api } = await import('@/lib/api');
       await api.post(`/admin/refund-requests/${id}/${action}`, { admin_notes: adminNotes }, token);
       toast(
-        action === 'approve' ? 'Refund approved and processed' : 'Refund request denied',
+        action === 'approve' ? (t('refundApproved') || 'Refund approved and processed') : (t('refundDenied') || 'Refund request denied'),
         'success'
       );
       setReviewingId(null);
@@ -74,7 +75,7 @@ export function AdminRefundRequests() {
       setActionType(null);
       fetchRequests();
     } catch (err: unknown) {
-      toast(getErrorMessage(err, 'Action failed'), 'error');
+      toast(getErrorMessage(err, tc('error')), 'error');
     }
   };
 
@@ -186,7 +187,7 @@ export function AdminRefundRequests() {
                   <textarea
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
-                    placeholder={t('adminNotesPlaceholder') || 'Optional notes...'}
+                    placeholder={t('adminNotesPlaceholder') || tc('optionalNotes') || 'Optional notes...'}
                     className="w-full p-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white resize-none"
                     rows={2}
                   />
@@ -196,7 +197,7 @@ export function AdminRefundRequests() {
                       onClick={() => { setReviewingId(null); setAdminNotes(''); setActionType(null); }}
                       className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:underline"
                     >
-                      Cancel
+                      {tc('cancel')}
                     </button>
                     <button
                       type="button"
@@ -207,7 +208,7 @@ export function AdminRefundRequests() {
                           : 'bg-red-600 hover:bg-red-700'
                       }`}
                     >
-                      {actionType === 'approve' ? 'Confirm Approve' : 'Confirm Deny'}
+                      {actionType === 'approve' ? (t('confirmApprove') || 'Confirm Approve') : (t('confirmDeny') || 'Confirm Deny')}
                     </button>
                   </div>
                 </div>

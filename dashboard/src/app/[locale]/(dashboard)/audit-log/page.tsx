@@ -120,7 +120,7 @@ export default function AuditLogPage() {
                     <div className="w-[160px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis">{new Date(entry.timestamp).toLocaleString()}</div>
                     <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 flex items-center gap-1.5">
                       <span className="shrink-0">{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
-                      <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white truncate">{entry.action}</span>
+                      <span className="text-xs sm:text-sm text-gray-900 dark:text-white truncate">{t(`actions.${entry.action}`) !== `actions.${entry.action}` ? t(`actions.${entry.action}`) : entry.action}</span>
                     </div>
                     <div className="flex-1 min-w-[120px] px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 overflow-hidden text-ellipsis hidden sm:flex items-center">{entry.actor_email || entry.actor}</div>
                     <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis hidden md:flex items-center">{entry.resource_type}/{entry.resource_id?.slice(0, 8)}</div>

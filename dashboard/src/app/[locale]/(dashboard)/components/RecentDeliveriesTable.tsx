@@ -59,7 +59,7 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
                   d.status === 'failed' ? 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400' :
                   'bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400'
                 }`}>
-                  {d.status}
+                  {t(`statusLabels.${d.status}`) !== `statusLabels.${d.status}` ? t(`statusLabels.${d.status}`) : d.status}
                 </span>
               </td>
               <td className="py-2.5 px-4 text-gray-500 dark:text-slate-400 text-xs">

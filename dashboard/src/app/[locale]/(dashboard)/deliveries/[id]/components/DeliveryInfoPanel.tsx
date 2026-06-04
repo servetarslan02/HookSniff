@@ -28,7 +28,7 @@ export function DeliveryInfoPanel({
           <DetailRow label={t('endpointUrl')} value={delivery.endpoint_url} mono copyable onCopy={() => onCopy(delivery.endpoint_url!, 'url')} copied={copiedField === 'url'} />
         )}
         <DetailRow label={t('eventType')} value={delivery.event || '—'} />
-        <DetailRow label={t('status')} value={delivery.status} />
+        <DetailRow label={t('status')} value={t(`statusLabels.${delivery.status}`) !== `statusLabels.${delivery.status}` ? t(`statusLabels.${delivery.status}`) : delivery.status} />
         <DetailRow label={t('attemptCount')} value={String(delivery.attempt_count)} />
         {delivery.response_status && (
           <DetailRow label={t('lastResponse')} value={String(delivery.response_status)} />

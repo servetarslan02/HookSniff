@@ -88,20 +88,37 @@ async fn main() -> Result<()> {
     routes::health::set_health_checks_ready();
 
     // ── Redis Streams Queue (webhook fast path) ─────────────────
+    // USE_REDIS_QUEUE=true enables Redis queue; otherwise PG-only (safe rollback)
+    let use_redis_queue = std::env::var("USE_REDIS_QUEUE")
+        .map(|v| v == "true" || v == "1")
+        .unwrap_or(false);
     let mut redis_queue: Option<queue::RedisQueue> = None;
-    if let Some(ref url) = redis_url {
-        match tokio::time::timeout(redis_startup, queue::RedisQueue::new(url)).await {
-            Ok(Ok(q)) => {
-                tracing::info!("✅ Redis Streams webhook queue active");
-                redis_queue = Some(q);
+    if use_redis_queue {
+        if let Some(ref url) = redis_url {
+            match tokio::time::timeout(redis_startup, queue::RedisQueue::new(url)).await {
+                Ok(Ok(q)) => {
+                    tracing::info!("✅ Redis Streams webhook queue active (USE_REDIS_QUEUE=true)");
+                    redis_queue = Some(q);
+                }
+                Ok(Err(e)) => {
+                    tracing::warn!("⚠️ Redis Streams queue unavailable ({}), using PG fallback", e);
+                }
+                Err(_) => {
+                    tracing::warn!("⚠️ Redis Streams queue timed out, using PG fallback");
+                }
             }
-            Ok(Err(e)) => {
-                tracing::warn!("Redis Streams queue unavailable ({}), using PG fallback", e);
-            }
-            Err(_) => {
-                tracing::warn!("Redis Streams queue timed out, using PG fallback");
-            }
+        } else {
+            tracing::warn!("⚠️ USE_REDIS_QUEUE=true but REDIS_URL not set, using PG queue");
         }
+    } else {
+        tracing::info!("ℹ️ Redis queue disabled (USE_REDIS_QUEUE=false), using PG queue");
+    }
+
+    // Initialize global REDIS_QUEUE for handler access
+    if let Some(q) = redis_queue.take() {
+        let mut global = crate::db::REDIS_QUEUE.lock().expect("REDIS_QUEUE lock");
+        *global = Some(q);
+        tracing::info!("✅ Global REDIS_QUEUE initialized");
     }
 
     // ── Warm-up (background) ────────────────────────────────────
@@ -299,7 +316,6 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(health_pool))
-        .layer(axum::Extension(std::sync::Arc::new(std::sync::Mutex::new(redis_queue))))
         .layer(axum::Extension(pool.clone()));
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──

@@ -310,6 +310,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         _yearly: bool,
         _discount_code: Option<&str>,
         _has_used_startup_trial: bool,
+        _polar_discount_id: Option<String>,
     ) -> Result<CheckoutResult, AppError> {
         let price_kurus = self
             .config
