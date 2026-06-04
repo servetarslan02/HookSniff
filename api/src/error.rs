@@ -372,10 +372,10 @@ impl AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let (status, code, _message) = match &self {
-            AppError::NotFound => (StatusCode::NOT_FOUND, ErrorCode::NotFound.as_str(), ""),
-            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, ErrorCode::Unauthorized.as_str(), ""),
-            AppError::Forbidden => (StatusCode::FORBIDDEN, ErrorCode::Forbidden.as_str(), ""),
+        let (status, code, detail): (StatusCode, &str, String) = match self {
+            AppError::NotFound => (StatusCode::NOT_FOUND, ErrorCode::NotFound.as_str(), String::new()),
+            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, ErrorCode::Unauthorized.as_str(), String::new()),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, ErrorCode::Forbidden.as_str(), String::new()),
             AppError::Coded(code) => {
                 let status = match code {
                     ErrorCode::NotFound => StatusCode::NOT_FOUND,
@@ -393,32 +393,33 @@ impl IntoResponse for AppError {
                     | ErrorCode::SsoConfigNotFound => StatusCode::BAD_REQUEST,
                     _ => StatusCode::BAD_REQUEST,
                 };
-                (status, code.as_str(), "")
+                (status, code.as_str(), String::new())
             }
-            AppError::BadRequest(_) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", ""),
-            AppError::PayloadTooLarge => (StatusCode::PAYLOAD_TOO_LARGE, ErrorCode::PayloadTooLarge.as_str(), ""),
-            AppError::Conflict => (StatusCode::CONFLICT, ErrorCode::Conflict.as_str(), ""),
-            AppError::Validation(_) => (StatusCode::UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", ""),
-            AppError::RateLimitExceeded => (StatusCode::TOO_MANY_REQUESTS, ErrorCode::RateLimitExceeded.as_str(), ""),
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg),
+            AppError::PayloadTooLarge => (StatusCode::PAYLOAD_TOO_LARGE, ErrorCode::PayloadTooLarge.as_str(), String::new()),
+            AppError::Conflict => (StatusCode::CONFLICT, ErrorCode::Conflict.as_str(), String::new()),
+            AppError::Validation(msg) => (StatusCode::UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", msg),
+            AppError::RateLimitExceeded => (StatusCode::TOO_MANY_REQUESTS, ErrorCode::RateLimitExceeded.as_str(), String::new()),
             AppError::Internal(e) => {
                 tracing::error!("Internal error: {:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, ErrorCode::InternalError.as_str(), "")
+                (StatusCode::INTERNAL_SERVER_ERROR, ErrorCode::InternalError.as_str(), String::new())
             }
             AppError::Database(e) => {
-                tracing::error!("Database error: {:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, ErrorCode::DatabaseError.as_str(), "")
+                let msg = format!("{:?}", e);
+                tracing::error!("Database error: {}", msg);
+                (StatusCode::INTERNAL_SERVER_ERROR, ErrorCode::DatabaseError.as_str(), msg)
             }
             AppError::Serialization(e) => {
                 tracing::error!("Serialization error: {:?}", e);
-                (StatusCode::BAD_REQUEST, ErrorCode::InvalidFormat.as_str(), "")
+                (StatusCode::BAD_REQUEST, ErrorCode::InvalidFormat.as_str(), String::new())
             }
         };
 
-        let body = json!({
-            "error": {
-                "code": code,
-            }
-        });
+        let body = if detail.is_empty() {
+            json!({ "error": { "code": code } })
+        } else {
+            json!({ "error": { "code": code, "detail": detail } })
+        };
 
         (status, Json(body)).into_response()
     }
