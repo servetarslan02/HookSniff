@@ -79,7 +79,7 @@ impl PaymentProviderImpl for PolarProvider {
 
         let resp = self
             .client
-            .post(format!("{}/v1/checkouts", self.config.base_url))
+            .post(format!("{}/v1/checkouts/", self.config.base_url))
             .header(
                 "Authorization",
                 format!("Bearer {}", self.config.access_token),

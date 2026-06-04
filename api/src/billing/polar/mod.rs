@@ -245,7 +245,7 @@ impl PolarProvider {
     async fn lookup_discount_id(&self, code: &str) -> Result<Option<String>, AppError> {
         let resp = self
             .client
-            .get(format!("{}/v1/discounts", self.config.base_url))
+            .get(format!("{}/v1/discounts/", self.config.base_url))
             .header(
                 "Authorization",
                 format!("Bearer {}", self.config.access_token),
