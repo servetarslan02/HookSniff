@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from '@/components/icons';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1';
 const TIMEOUT = 5000;
@@ -52,7 +51,7 @@ export async function GET() {
   const components = [
     {
       name: 'API',
-      icon: <Zap size={16} strokeWidth={1.75} />,
+      icon: 'zap',
       status: apiCheck.ok ? 'healthy' : 'down',
       latency_ms: apiCheck.latency,
       description: 'HookSniff REST API (Cloud Run)',
@@ -60,7 +59,7 @@ export async function GET() {
     },
     {
       name: 'Dashboard',
-      icon: <Monitor size={16} strokeWidth={1.75} />,
+      icon: 'monitor',
       status: selfCheck.ok ? 'healthy' : 'degraded',
       latency_ms: selfCheck.latency,
       description: 'Next.js frontend (Vercel)',
@@ -68,7 +67,7 @@ export async function GET() {
     },
     {
       name: 'Worker',
-      icon: <Settings size={16} strokeWidth={1.75} />,
+      icon: 'settings',
       status: apiCheck.ok ? 'healthy' : 'unknown',
       latency_ms: null,
       description: 'Background delivery worker (Cloud Run)',
@@ -76,7 +75,7 @@ export async function GET() {
     },
     {
       name: 'Database',
-      icon: <Database size={16} strokeWidth={1.75} />,
+      icon: 'database',
       status: apiCheck.ok ? 'healthy' : 'down',
       latency_ms: Math.round(apiCheck.latency * 0.15),
       description: 'PostgreSQL (Neon)',
@@ -84,7 +83,7 @@ export async function GET() {
     },
     {
       name: 'Cache',
-      icon: <HardDrive size={16} strokeWidth={1.75} />,
+      icon: 'harddrive',
       status: apiCheck.ok ? 'healthy' : 'unknown',
       latency_ms: Math.round(apiCheck.latency * 0.05),
       description: 'Redis (Upstash)',
@@ -92,7 +91,7 @@ export async function GET() {
     },
     {
       name: 'Email Service',
-      icon: <Mail size={16} strokeWidth={1.75} />,
+      icon: 'mail',
       status: 'healthy',
       latency_ms: Math.round(250 + Math.random() * 100),
       description: 'Gmail API',
@@ -100,7 +99,7 @@ export async function GET() {
     },
     {
       name: 'Storage',
-      icon: <Cloud size={16} strokeWidth={1.75} />,
+      icon: 'cloud',
       status: 'healthy',
       latency_ms: Math.round(35 + Math.random() * 20),
       description: 'Cloudflare R2',
