@@ -31,7 +31,7 @@ static DNS_CACHE: Mutex<Option<HashMap<String, DnsCacheEntry>>> = Mutex::new(Non
 fn dns_lookup_cached(host: &str) -> Result<IpAddr, SsrfError> {
     // Check cache first
     {
-        let mut cache = DNS_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        let cache = DNS_CACHE.lock().unwrap_or_else(|e| e.into_inner());
         if let Some(ref map) = *cache {
             if let Some(entry) = map.get(host) {
                 if Instant::now() < entry.expires_at {
