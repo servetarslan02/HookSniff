@@ -15,9 +15,9 @@ impl PolarProvider {
 
         let body = serde_json::json!({
             "prices": [{
-                "price_type": "fixed",
+                "amount_type": "fixed",
                 "price_amount": price_cents,
-                "currency": currency.to_uppercase(),
+                "price_currency": currency.to_lowercase(),
             }]
         });
 
