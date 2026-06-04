@@ -16,10 +16,10 @@ interface ModelQuality {
 }
 
 function describeQuality(score: number, accuracy: number, avgError: number, t: any): { title: string; detail: string; emoji: string; color: string } {
-  if (score >= 80) return { title: t('quality.excellent'), detail: t('detail.excellent', {acc: Math.round(accuracy), err: avgError.toFixed(1)}), emoji: '🟢', color: 'text-emerald-600 dark:text-emerald-400' };
-  if (score >= 60) return { title: t('quality.good'), detail: t('detail.good', {acc: Math.round(accuracy)}), emoji: '🟡', color: 'text-yellow-600 dark:text-yellow-400' };
-  if (score >= 40) return { title: t('quality.low'), detail: t('detail.low', {acc: Math.round(accuracy)}), emoji: '🟠', color: 'text-orange-600 dark:text-orange-400' };
-  return { title: t('quality.critical'), detail: t('detail.critical', {acc: Math.round(accuracy)}), emoji: '🔴', color: 'text-red-600 dark:text-red-400' };
+  if (score >= 80) return { title: t('quality.excellent'), detail: t('detail.excellent', {acc: Math.round(accuracy), err: avgError.toFixed(1)}), emoji: 'excellent', color: 'text-emerald-600 dark:text-emerald-400' };
+  if (score >= 60) return { title: t('quality.good'), detail: t('detail.good', {acc: Math.round(accuracy)}), emoji: 'good', color: 'text-yellow-600 dark:text-yellow-400' };
+  if (score >= 40) return { title: t('quality.low'), detail: t('detail.low', {acc: Math.round(accuracy)}), emoji: 'low', color: 'text-orange-600 dark:text-orange-400' };
+  return { title: t('quality.critical'), detail: t('detail.critical', {acc: Math.round(accuracy)}), emoji: 'critical', color: 'text-red-600 dark:text-red-400' };
 }
 
 export function MLQualityTab({ token }: { token: string | null }) {

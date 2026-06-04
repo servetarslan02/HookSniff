@@ -5,8 +5,8 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+ { code: 'en', name: 'English', flag: '' },
+ { code: 'tr', name: 'Türkçe', flag: '' },
 ];
 
 export function LanguageSwitcher({ className }: { className?: string }) {

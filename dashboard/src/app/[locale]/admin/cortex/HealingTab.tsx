@@ -8,18 +8,18 @@ import { Clock, ShieldCheck } from '@/components/icons';
 function describeHealingAction(actionType: string, reason: string, outcome: string, t: any): { title: string; detail: string; emoji: string; actionEmoji: string } {
   const isRecovered = outcome === 'recovered';
   const actions: Record<string, { title: string; detail: string; emoji: string }> = {
-    'auto_disable': { title: isRecovered ? t('action.auto_disable.recovered') : t('action.auto_disable.disabled'), detail: isRecovered ? t('detail.auto_disable.recovered') : t('detail.auto_disable.disabled'), emoji: isRecovered ? '✅' : '🚫' },
-    'circuit_tighten': { title: t('action.circuit_tighten'), detail: t('detail.circuit_tighten'), emoji: '🛡️' },
-    'retry_slowdown': { title: t('action.retry_slowdown'), detail: t('detail.retry_slowdown'), emoji: '⏳' },
-    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: t('detail.rate_limit_reduce'), emoji: '🚦' },
-    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: t('detail.fallback_url_switch'), emoji: '🔀' },
-    'retry_increase': { title: t('action.retry_increase'), detail: t('detail.retry_increase'), emoji: '🔄' },
-    'timeout_adjust': { title: t('action.timeout_adjust'), detail: t('detail.timeout_adjust'), emoji: '⏰' },
-    'proactive_throttle': { title: t('action.proactive_throttle'), detail: t('detail.proactive_throttle'), emoji: '🔮' },
-    'cascade_alert': { title: t('action.cascade_alert'), detail: t('detail.cascade_alert'), emoji: '🌊' },
+    'auto_disable': { title: isRecovered ? t('action.auto_disable.recovered') : t('action.auto_disable.disabled'), detail: isRecovered ? t('detail.auto_disable.recovered') : t('detail.auto_disable.disabled'), emoji: isRecovered ? 'ok' : 'disabled' },
+    'circuit_tighten': { title: t('action.circuit_tighten'), detail: t('detail.circuit_tighten'), emoji: 'shield' },
+    'retry_slowdown': { title: t('action.retry_slowdown'), detail: t('detail.retry_slowdown'), emoji: 'slowdown' },
+    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: t('detail.rate_limit_reduce'), emoji: 'throttle' },
+    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: t('detail.fallback_url_switch'), emoji: 'switch' },
+    'retry_increase': { title: t('action.retry_increase'), detail: t('detail.retry_increase'), emoji: 'retry' },
+    'timeout_adjust': { title: t('action.timeout_adjust'), detail: t('detail.timeout_adjust'), emoji: 'timeout' },
+    'proactive_throttle': { title: t('action.proactive_throttle'), detail: t('detail.proactive_throttle'), emoji: 'throttle' },
+    'cascade_alert': { title: t('action.cascade_alert'), detail: t('detail.cascade_alert'), emoji: 'alert' },
   };
-  const info = actions[actionType] || { title: actionType.replace(/_/g, ' '), detail: reason || t('action.unknown'), emoji: '⚙️' };
-  return { ...info, actionEmoji: isRecovered ? '✅' : '⚡' };
+  const info = actions[actionType] || { title: actionType.replace(/_/g, ' '), detail: reason || t('action.unknown'), emoji: 'config' };
+  return { ...info, actionEmoji: isRecovered ? 'ok' : 'action' };
 }
 
 export function HealingTab({ token }: { token: string | null }) {

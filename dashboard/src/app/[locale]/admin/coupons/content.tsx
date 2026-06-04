@@ -290,8 +290,8 @@ export default function CouponsContent() {
           className="px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
         >
           <option value="">{t('allTypes') || 'Tüm tipler'}</option>
-          <option value="internal">🔵 Internal</option>
-          <option value="polar">🟣 Polar</option>
+          <option value="internal"> Internal</option>
+          <option value="polar"> Polar</option>
         </select>
       </div>
 
@@ -361,7 +361,7 @@ export default function CouponsContent() {
       {/* Info boxes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-          <p className="text-sm font-medium text-blue-700 dark:text-blue-400">{t('internalCodeInfo') || '🔵 Internal Kod'}</p>
+          <p className="text-sm font-medium text-blue-700 dark:text-blue-400">{t('internalCodeInfo') || ' Internal Kod'}</p>
           <p className="text-xs text-blue-600 dark:text-blue-400/70 mt-1">{t('internalCodeDesc') || 'Müşteri kodu girdiğinde plan direkt uygulanır. Polar\'a gitmez.'}</p>
           <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
             <span className="font-medium">{t('flowLabel')}</span>
@@ -373,7 +373,7 @@ export default function CouponsContent() {
           </div>
         </div>
         <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
-          <p className="text-sm font-medium text-purple-700 dark:text-purple-400">{t('polarCodeInfo') || '🟣 Polar Kod'}</p>
+          <p className="text-sm font-medium text-purple-700 dark:text-purple-400">{t('polarCodeInfo') || ' Polar Kod'}</p>
           <p className="text-xs text-purple-600 dark:text-purple-400/70 mt-1">{t('polarCodeDesc') || 'Girdiğin kod Polar.sh\'a gönderilir. Polar\'da aynı kod indirim olarak çalışır.'}</p>
           <div className="mt-2 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
             <span className="font-medium">{t('flowLabel')}</span>
@@ -396,7 +396,7 @@ export default function CouponsContent() {
         </div>
         {filteredCoupons.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <div className="text-4xl mb-3">🎫</div>
+ <div className="text-4xl mb-3"></div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
               {coupons.length === 0 ? (t('noCoupons') || 'Henüz kupon yok') : (t('noCouponsMatch') || 'Aramaya uygun kupon yok')}
             </h3>
@@ -437,7 +437,7 @@ export default function CouponsContent() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${c.type === 'polar' ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>
-                          {c.type === 'polar' ? '🟣 Polar' : '🔵 Internal'}
+                          {c.type === 'polar' ? ' Polar' : ' Internal'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
@@ -481,7 +481,7 @@ export default function CouponsContent() {
                             </button>
                           )}
                           {c.type === 'polar' && c.polar_discount_id && (
-                            <span className="text-xs text-green-600 dark:text-green-400">✓ Synced</span>
+ <span className="text-xs text-green-600 dark:text-green-400"> Synced</span>
                           )}
                           <button type="button" onClick={() => setDeleteTarget(c.id)} className="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition" title={tc('delete') || 'Sil'}>
                             <Trash2 size={14} />

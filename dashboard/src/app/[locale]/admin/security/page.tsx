@@ -11,7 +11,7 @@ import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import {
   Shield, AlertTriangle, AlertCircle, Info, Ban, Unlock,
   CheckCircle2, XCircle, Search, Globe, Clock, RefreshCw,
-  Download, Eye,
+  Download, Eye, Mail,
 } from '@/components/icons';
 
 // ── Types ─────────────────────────────────────────────────
@@ -252,9 +252,9 @@ export default function AdminSecurityPage() {
       {/* Quick Stats */}
       {stats && (
         <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1.5 text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-full">🔴 Brute Force: {stats.recent_brute_force} (24sa)</span>
-          <span className="px-3 py-1.5 text-xs font-medium bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 rounded-full">🟠 Credential Stuffing: {stats.recent_credential_stuffing} (24sa)</span>
-          <span className="px-3 py-1.5 text-xs font-medium bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 rounded-full">🟣 Injection: {stats.recent_injection_attempts} (24sa)</span>
+          <span className="px-3 py-1.5 text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-full"> Brute Force: {stats.recent_brute_force} (24sa)</span>
+          <span className="px-3 py-1.5 text-xs font-medium bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 rounded-full"> Credential Stuffing: {stats.recent_credential_stuffing} (24sa)</span>
+          <span className="px-3 py-1.5 text-xs font-medium bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 rounded-full"> Injection: {stats.recent_injection_attempts} (24sa)</span>
         </div>
       )}
 
@@ -377,7 +377,7 @@ export default function AdminSecurityPage() {
                             {event.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full"><CheckCircle2 size={12} strokeWidth={1.75} /> {t('resolvedBadge')}</span>}
                           </div>
                           <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 flex-wrap">
-                            {event.email && <span>📧 {event.email}</span>}
+                            {event.email && <span><Mail size={12} /> {event.email}</span>}
                             {event.ip_address && (
                               <button onClick={(e) => { e.stopPropagation(); handleBlockFromEvent(event.ip_address!); }} className="inline-flex items-center gap-1 hover:text-red-600 dark:hover:text-red-400 transition" title="Bu IP'yi blokla">
                                 <Globe size={12} strokeWidth={1.75} /> {event.ip_address}<Ban size={10} strokeWidth={1.75} />
@@ -477,9 +477,9 @@ export default function AdminSecurityPage() {
                         {!entry.is_active && <span className="px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400 rounded">KALDIRILDI</span>}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                        {entry.reason && <span>📝 {entry.reason}</span>}
+                        {entry.reason && <span>{entry.reason}</span>}
                         <span>{relativeTime(entry.created_at)}</span>
-                        {entry.expires_at && <span>⏰ Bitiş: {new Date(entry.expires_at).toLocaleDateString()}</span>}
+                        {entry.expires_at && <span>Expires: {new Date(entry.expires_at).toLocaleDateString()}</span>}
                       </div>
                     </div>
                     {entry.is_active && (

@@ -126,7 +126,7 @@ export function PlanCards({
                   onClick={() => { setShowCoupon(false); setCouponInput(''); onDiscountCodeChange(''); }}
                   className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
                 >
-                  ✕
+ 
                 </button>
               </>
             ) : (
@@ -135,7 +135,7 @@ export function PlanCards({
                 onClick={() => setShowCoupon(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
               >
-                {discountCode ? `🎟️ ${discountCode}` : (t('enterCoupon') || 'Enter Coupon Code')}
+ {discountCode ? ` ${discountCode}`: (t('enterCoupon') || 'Enter Coupon Code')}
               </button>
             )}
           </div>
@@ -161,7 +161,7 @@ export function PlanCards({
               )}
               {plan.key === 'startup' && !hasUsedStartupTrial && (
                 <div className="absolute -top-3 right-3 bg-green-500 dark:bg-green-600 text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap">
-                  🎁 {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
+ {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
                 </div>
               )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>

@@ -220,6 +220,11 @@ pub async fn login(
         &pool, &req.email, &client_ip, Some(user_agent), true, None,
     ).await;
 
+    // Notify about new device login (best-effort)
+    let _ = crate::notifications::helpers::new_device_login(
+        &pool, customer.id, &client_ip, user_agent
+    ).await;
+
     if !customer.email_verified {
         return Err(AppError::coded(ErrorCode::EmailNotVerified));
     }

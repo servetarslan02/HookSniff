@@ -214,7 +214,7 @@ export function useSsoHandlers(teamIdProp?: string) {
       body.enabled = true;
       await apiFetch('/sso/config', { method: 'POST', body, token });
       setTestPassed(true);
-      toast(t('ssoActivated') || 'SSO activated successfully! 🎉', 'success');
+ toast(t('ssoActivated') || 'SSO activated successfully! ', 'success');
       refetch();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';

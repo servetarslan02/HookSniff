@@ -296,6 +296,11 @@ pub async fn admin_approve_refund(
         request.currency
     );
 
+    // ── Notify customer about refund (best-effort) ──
+    let _ = crate::notifications::helpers::refund_processed(
+        &pool, customer_id, request.amount_cents
+    ).await;
+
     Ok(Json(serde_json::json!({
         "message": "Refund approved and processed. Customer downgraded to Free plan.",
         "refund_id": refund_id,
@@ -352,6 +357,11 @@ pub async fn admin_deny_refund(
         admin.id,
         notes
     );
+
+    // ── Notify customer about refund denial (best-effort) ──
+    let _ = crate::notifications::helpers::refund_denied(
+        &pool, request.customer_id, &notes
+    ).await;
 
     // Audit log for denial
     let _ = crate::audit::log_action(
