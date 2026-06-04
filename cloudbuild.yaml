@@ -29,7 +29,6 @@ steps:
     id: 'build-api'
     args:
       - 'build'
-      - '--no-cache'
       - '-f'
       - 'Dockerfile.api'
       - '-t'
@@ -44,7 +43,6 @@ steps:
     id: 'build-worker'
     args:
       - 'build'
-      - '--no-cache'
       - '-f'
       - 'Dockerfile.worker'
       - '-t'
@@ -89,8 +87,8 @@ steps:
       - '--max-instances=3'
       - '--timeout=300'
       - '--startup-probe=httpGet.port=3000,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
-      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,CORS_ORIGINS=https://hooksniff.vercel.app,APP_URL=https://hooksniff.vercel.app,NOTIFY_EMAIL=support@hooksniff.vercel.app,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app,POLAR_ENV=production'
-      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest,POLAR_PRODUCT_PRO=hooksniff-polar-product-pro:latest,POLAR_PRODUCT_BUSINESS=hooksniff-polar-product-business:latest'
+      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,CORS_ORIGINS=https://hooksniff.vercel.app,APP_URL=https://hooksniff.vercel.app,NOTIFY_EMAIL=support@hooksniff.vercel.app,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app,POLAR_ENV=production,USE_REDIS_QUEUE=true,QSTASH_URL=https://qstash-eu-central-1.upstash.io'
+      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest,POLAR_PRODUCT_PRO=hooksniff-polar-product-pro:latest,POLAR_PRODUCT_BUSINESS=hooksniff-polar-product-business:latest,QSTASH_TOKEN=hooksniff-qstash-token:latest,QSTASH_CURRENT_SIGNING_KEY=hooksniff-qstash-current-key:latest,QSTASH_NEXT_SIGNING_KEY=hooksniff-qstash-next-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
     waitFor: ['push-api', 'run-migrations']
@@ -111,7 +109,7 @@ steps:
       - '--cpu=1'
       - '--min-instances=0'
       - '--max-instances=4'
-      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,WEBHOOK_FORMAT=standard,RATE_LIMIT_STORE=redis,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app'
+      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,WEBHOOK_FORMAT=standard,RATE_LIMIT_STORE=redis,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app,USE_REDIS_QUEUE=true'
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
