@@ -248,7 +248,15 @@ export function NotificationCenter() {
               ))
             )}
           </div>
-          <div className="px-4 py-2.5 border-t border-gray-200 dark:border-slate-700 text-center">
+          <div className="px-4 py-2.5 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between">
+            {unreadCount > 0 ? (
+              <button
+                onClick={handleMarkAllAsRead}
+                className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 font-medium transition"
+              >
+                {t('markAllRead') || 'Mark all read'}
+              </button>
+            ) : <span />}
             <Link
               href="/account?tab=notifications"
               onClick={() => setOpen(false)}
