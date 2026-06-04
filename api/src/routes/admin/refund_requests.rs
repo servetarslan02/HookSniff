@@ -29,6 +29,9 @@ pub struct RefundRequestQuery {
 #[derive(Debug, Deserialize)]
 pub struct ReviewRefundRequest {
     pub admin_notes: Option<String>,
+    /// Admin can force refund outside 14-day window
+    #[serde(default)]
+    pub force: bool,
 }
 
 /// Refund request with customer email (for admin view).
@@ -144,8 +147,35 @@ pub async fn admin_approve_refund(
         )));
     }
 
+    // Check 14-day refund window (admin can force override)
+    if !req.force {
+        let within_window = crate::billing::refund::is_within_refund_window(&pool, request.customer_id).await?;
+        if !within_window {
+            return Err(AppError::BadRequest(
+                "Refund window (14 days) has expired. Use force=true to override.".into()
+            ));
+        }
+    }
+
     let customer_id = request.customer_id;
     let reason = format!("[{}] {}", request.category, request.description);
+
+    // Cancel subscription at provider FIRST (before DB changes)
+    let customer = sqlx::query_as::<_, Customer>(
+        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, overage_terms_accepted_at, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1",
+    )
+    .bind(customer_id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let billing_svc = crate::billing::BillingService::new(pool.clone(), cfg.clone());
+    if let Err(e) = billing_svc.cancel_customer_subscription(&customer).await {
+        tracing::warn!(
+            "⚠️ Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund",
+            customer_id, e
+        );
+    }
 
     // Process the refund in a transaction
     let mut tx = pool.begin().await?;
@@ -239,24 +269,23 @@ pub async fn admin_approve_refund(
 
     tx.commit().await?;
 
-    // Cancel subscription at provider (best-effort, after commit)
-    let customer = sqlx::query_as::<_, Customer>(
-        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, overage_terms_accepted_at, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1",
-    )
-    .bind(customer_id)
-    .fetch_optional(&pool)
-    .await?;
 
-    if let Some(customer) = customer {
-        let billing_svc = crate::billing::BillingService::new(pool.clone(), cfg.clone());
-        if let Err(e) = billing_svc.cancel_customer_subscription(&customer).await {
-            tracing::warn!(
-                "⚠️ Failed to cancel subscription at provider for customer {}: {:?}",
-                customer_id,
-                e
-            );
-        }
-    }
+    // Audit log
+    let _ = crate::audit::log_action(
+        &pool,
+        admin.id,
+        "REFUND_APPROVED",
+        "billing",
+        Some(&id.to_string()),
+        Some(serde_json::json!({
+            "customer_id": customer_id,
+            "amount_cents": request.amount_cents,
+            "currency": request.currency,
+            "forced": req.force,
+        })),
+        None,
+        None,
+    ).await;
 
     tracing::info!(
         "✅ Refund request {} approved by admin {} — customer {} refunded {} {}",
@@ -323,6 +352,22 @@ pub async fn admin_deny_refund(
         admin.id,
         notes
     );
+
+    // Audit log for denial
+    let _ = crate::audit::log_action(
+        &pool,
+        admin.id,
+        "REFUND_DENIED",
+        "billing",
+        Some(&id.to_string()),
+        Some(serde_json::json!({
+            "customer_id": request.customer_id,
+            "amount_cents": request.amount_cents,
+            "reason": notes,
+        })),
+        None,
+        None,
+    ).await;
 
     Ok(Json(serde_json::json!({
         "message": "Refund request denied.",
