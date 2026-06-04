@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
-import { ShieldCheck, CheckCircle2, ClipboardList } from '@/components/icons';
+import { ShieldCheck, CheckCircle2 } from '@/components/icons';
 // import DOMPurify from 'dompurify';
 
 export function TwoFactorSection() {
@@ -203,7 +203,7 @@ export function TwoFactorSection() {
                       }}
                       className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-200 dark:bg-slate-600 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition"
                     >
-                      <ClipboardList size={14} />
+                      📋
                     </button>
                   </div>
                   <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">

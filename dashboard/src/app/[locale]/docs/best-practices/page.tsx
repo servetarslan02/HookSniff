@@ -133,7 +133,7 @@ def handle_webhook():
                 "webhook-signature": request.headers["webhook-signature"],
             },
         )
- # Valid — process event
+        # ✅ Valid — process event
         return "", 200
     except Exception:
         return "Invalid signature", 401`}

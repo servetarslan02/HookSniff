@@ -65,7 +65,7 @@ def handle_webhook():
             },
         )
 
- # Signature valid
+        # ✅ Signature valid
         event = payload["event"]
         data = payload["data"]
 
@@ -76,7 +76,7 @@ def handle_webhook():
 
         return "", 200
     except Exception:
- # Invalid signature
+        # ❌ Invalid signature
         return "Invalid signature", 401
 
 # FastAPI handler
@@ -174,7 +174,7 @@ post '/webhook' do
     },
   )
 
- # Signature valid
+  # ✅ Signature valid
   puts "Event: #{payload['event']}"
 
   case payload['event']
@@ -186,7 +186,7 @@ post '/webhook' do
 
   status 200
 rescue HookSniff::SignatureVerificationError
- # Invalid signature
+  # ❌ Invalid signature
   status 401
 end
 
@@ -329,12 +329,12 @@ def handle_webhook(conn, _params) do
 
   case HookSniff.Webhook.verify(wh, body, conn.req_headers) do
     {:ok, payload} ->
- # Signature valid
+      # ✅ Signature valid
       IO.puts("Event: #{payload["event"]}")
       send_resp(conn, 200, "OK")
 
     {:error, _reason} ->
- # Invalid signature
+      # ❌ Invalid signature
       send_resp(conn, 401, "Invalid signature")
   end
 end`,
