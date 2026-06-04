@@ -1,25 +1,36 @@
-# Ignore dashboard (not needed for API build)
+# Ignore non-build directories
 dashboard/
-# Ignore docs and non-build files
 docs/
 docs-sdk/
+landing/
+portal/
+zrok-bin/
+scripts/
+cli/
+sdks/
+deploy/
+terraform/
+monitoring/
+reddit-launch/
+research/
+tests/
+mcp/
 .ai-context/
 .git/
 node_modules/
 target/
 .next/
-# Ignore non-essential files
+vendor/.zig-cache/
+
+# Ignore non-essential root files
 *.md
 *.ps1
 *.sh
 *.py
 *.patch
-terraform/
-monitoring/
 grafana-*.json
-reddit-launch/
-research/
-vendor/.zig-cache/
-tests/
-mcp/
-src/
+.env*
+LICENSE
+NOTICE
+
+# DO NOT exclude: *.toml (Cargo.toml), *.rs (source), *.sql (migrations), Cargo.lock
