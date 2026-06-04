@@ -52,7 +52,7 @@ pub fn spawn_background_jobs(
             }
         });
 
-        tracing::info!("✅ Redis job queue worker started");
+ tracing::info!(" Redis job queue worker started");
     }
 
     // ── Retention cleanup (daily, distributed lock) ─────────────
@@ -68,7 +68,7 @@ pub fn spawn_background_jobs(
             };
             if should_run {
                 if let Err(e) = jobs::retention::run_retention(&sched_pool, retention_days).await {
-                    tracing::error!("❌ Retention job failed: {:?}", e);
+ tracing::error!(" Retention job failed: {:?}", e);
                 }
             }
         }
@@ -87,7 +87,7 @@ pub fn spawn_background_jobs(
             };
             if should_run {
                 if let Err(e) = jobs::retention::reset_monthly_webhook_counts(&reset_pool).await {
-                    tracing::error!("❌ Monthly count reset failed: {:?}", e);
+ tracing::error!(" Monthly count reset failed: {:?}", e);
                 }
             }
         }
@@ -110,11 +110,11 @@ pub fn spawn_background_jobs(
                 if !failed.is_empty() {
                     tracing::warn!(
                         failed_count = failed.len(),
-                        "⚠️ Compliance audit found issues: {}",
+ " Compliance audit found issues: {}",
                         failed.iter().map(|r| format!("{}: {}", r.check_name, r.details)).collect::<Vec<_>>().join("; ")
                     );
                 } else {
-                    tracing::info!("✅ Compliance audit: all checks passed");
+ tracing::info!(" Compliance audit: all checks passed");
                 }
             }
         }
@@ -126,7 +126,7 @@ pub fn spawn_background_jobs(
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
             if let Err(e) = jobs::retention::reset_daily_webhook_counts(&daily_reset_pool).await {
-                tracing::error!("❌ Daily count reset failed: {:?}", e);
+ tracing::error!(" Daily count reset failed: {:?}", e);
             }
         }
     });
@@ -151,10 +151,10 @@ pub fn spawn_background_jobs(
                     Ok(r) => {
                         let deleted = r.rows_affected();
                         if deleted > 0 {
-                            tracing::info!("🧹 Cleaned {} expired seen_webhooks", deleted);
+ tracing::info!(" Cleaned {} expired seen_webhooks", deleted);
                         }
                     }
-                    Err(e) => tracing::error!("❌ seen_webhooks cleanup failed: {:?}", e),
+ Err(e) => tracing::error!(" seen_webhooks cleanup failed: {:?}", e),
                 }
                 // Clean expired idempotency_keys
                 match sqlx::query("DELETE FROM idempotency_keys WHERE expires_at < now()")
@@ -164,10 +164,10 @@ pub fn spawn_background_jobs(
                     Ok(r) => {
                         let deleted = r.rows_affected();
                         if deleted > 0 {
-                            tracing::info!("🧹 Cleaned {} expired idempotency_keys", deleted);
+ tracing::info!(" Cleaned {} expired idempotency_keys", deleted);
                         }
                     }
-                    Err(e) => tracing::error!("❌ idempotency_keys cleanup failed: {:?}", e),
+ Err(e) => tracing::error!(" idempotency_keys cleanup failed: {:?}", e),
                 }
                 // Clean expired revoked_tokens
                 match sqlx::query("DELETE FROM revoked_tokens WHERE expires_at < now()")
@@ -177,10 +177,10 @@ pub fn spawn_background_jobs(
                     Ok(r) => {
                         let deleted = r.rows_affected();
                         if deleted > 0 {
-                            tracing::info!("🧹 Cleaned {} expired revoked_tokens", deleted);
+ tracing::info!(" Cleaned {} expired revoked_tokens", deleted);
                         }
                     }
-                    Err(e) => tracing::error!("❌ revoked_tokens cleanup failed: {:?}", e),
+ Err(e) => tracing::error!(" revoked_tokens cleanup failed: {:?}", e),
                 }
             }
         }
@@ -208,31 +208,31 @@ pub fn spawn_background_jobs(
                     match jobs::dunning::run_dunning(&dunning_pool, &email_client).await {
                         Ok(sent) => {
                             if sent > 0 {
-                                tracing::info!("📧 Dunning: {} payment reminder emails sent", sent);
+ tracing::info!(" Dunning: {} payment reminder emails sent", sent);
                             }
                         }
-                        Err(e) => tracing::error!("❌ Dunning job failed: {:?}", e),
+ Err(e) => tracing::error!(" Dunning job failed: {:?}", e),
                     }
                 } else {
-                    tracing::warn!("⚠️ Resend not configured, dunning emails skipped");
+ tracing::warn!(" Resend not configured, dunning emails skipped");
                 }
 
                 match jobs::dunning::retry_failed_payments(&dunning_pool).await {
                     Ok(retried) => {
                         if retried > 0 {
-                            tracing::info!("🔄 Payment retry: {} retries attempted", retried);
+ tracing::info!(" Payment retry: {} retries attempted", retried);
                         }
                     }
-                    Err(e) => tracing::error!("❌ Payment retry job failed: {:?}", e),
+ Err(e) => tracing::error!(" Payment retry job failed: {:?}", e),
                 }
 
                 match jobs::dunning::activate_paused_subscriptions(&dunning_pool).await {
                     Ok(count) => {
                         if count > 0 {
-                            tracing::info!("⏸️ Activated pause for {} subscriptions", count);
+ tracing::info!("⏸ Activated pause for {} subscriptions", count);
                         }
                     }
-                    Err(e) => tracing::error!("❌ Pause activation job failed: {:?}", e),
+ Err(e) => tracing::error!(" Pause activation job failed: {:?}", e),
                 }
 
                 match jobs::dunning::expire_paused_subscriptions(&dunning_pool).await {
@@ -241,7 +241,7 @@ pub fn spawn_background_jobs(
                             tracing::info!("⏰ Expired {} paused subscriptions", count);
                         }
                     }
-                    Err(e) => tracing::error!("❌ Pause expiry job failed: {:?}", e),
+ Err(e) => tracing::error!(" Pause expiry job failed: {:?}", e),
                 }
             }
         }
@@ -263,13 +263,13 @@ pub fn spawn_background_jobs(
                     match jobs::alert_eval::run_alert_evaluation(&alert_pool, &email_client).await {
                         Ok(triggered) => {
                             if triggered > 0 {
-                                tracing::info!("🚨 Alert eval: {} alerts triggered", triggered);
+ tracing::info!(" Alert eval: {} alerts triggered", triggered);
                             }
                         }
-                        Err(e) => tracing::error!("❌ Alert evaluation job failed: {:?}", e),
+ Err(e) => tracing::error!(" Alert evaluation job failed: {:?}", e),
                     }
                 } else {
-                    tracing::warn!("⚠️ Resend not configured, alert emails skipped");
+ tracing::warn!(" Resend not configured, alert emails skipped");
                 }
             }
         }
@@ -291,13 +291,13 @@ pub fn spawn_background_jobs(
                     match jobs::overage_invoicing::run_overage_invoicing(&overage_pool, &email_client).await {
                         Ok(created) => {
                             if created > 0 {
-                                tracing::info!("💰 Overage invoicing: {} invoices created", created);
+ tracing::info!(" Overage invoicing: {} invoices created", created);
                             }
                         }
-                        Err(e) => tracing::error!("❌ Overage invoicing job failed: {:?}", e),
+ Err(e) => tracing::error!(" Overage invoicing job failed: {:?}", e),
                     }
                 } else {
-                    tracing::warn!("⚠️ Resend not configured, overage invoice emails skipped");
+ tracing::warn!(" Resend not configured, overage invoice emails skipped");
                 }
             }
         }
@@ -332,12 +332,12 @@ pub fn spawn_background_jobs(
                 if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env() {
                     match jobs::weekly_digest::run_weekly_digest(&digest_pool, &email_client).await {
                         Ok(sent) => {
-                            tracing::info!("📊 Weekly digest: {} emails sent", sent);
+ tracing::info!(" Weekly digest: {} emails sent", sent);
                         }
-                        Err(e) => tracing::error!("❌ Weekly digest job failed: {:?}", e),
+ Err(e) => tracing::error!(" Weekly digest job failed: {:?}", e),
                     }
                 } else {
-                    tracing::warn!("⚠️ Resend not configured, weekly digest emails skipped");
+ tracing::warn!(" Resend not configured, weekly digest emails skipped");
                 }
             }
         }

@@ -218,7 +218,7 @@ pub async fn create_broadcast(
     .await?;
 
     tracing::info!(
-        "📢 Admin created broadcast: '{}' (type={}, severity={})",
+ " Admin created broadcast: '{}' (type={}, severity={})",
         broadcast.title,
         broadcast.broadcast_type,
         broadcast.severity
@@ -274,7 +274,7 @@ pub async fn update_broadcast(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    tracing::info!("📢 Admin updated broadcast: {}", broadcast.title);
+ tracing::info!(" Admin updated broadcast: {}", broadcast.title);
 
     Ok(Json(broadcast))
 }
@@ -296,7 +296,7 @@ pub async fn delete_broadcast(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("📢 Admin deleted broadcast: {}", id);
+ tracing::info!(" Admin deleted broadcast: {}", id);
 
     Ok(Json(serde_json::json!({ "deleted": true })))
 }

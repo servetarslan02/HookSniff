@@ -58,7 +58,7 @@ impl JobQueue {
     pub async fn new(redis_url: &str) -> Result<Self> {
         let client = redis::Client::open(redis_url)?;
         let conn = ConnectionManager::new(client).await?;
-        tracing::info!("✅ Redis job queue connected");
+ tracing::info!(" Redis job queue connected");
         Ok(Self { conn })
     }
 
@@ -71,7 +71,7 @@ impl JobQueue {
             .arg(&payload)
             .query_async(&mut conn)
             .await?;
-        tracing::debug!("📥 Job enqueued");
+ tracing::debug!(" Job enqueued");
         Ok(())
     }
 
@@ -100,14 +100,14 @@ impl JobQueue {
         fcm: Option<crate::notifications::FcmClient>,
         pool: sqlx::PgPool,
     ) {
-        tracing::info!("🔄 Job queue worker started");
+ tracing::info!(" Job queue worker started");
         loop {
             match self.poll_one_job(&email_provider, fcm.as_ref(), &pool).await {
                 Ok(()) => {
                     tokio::time::sleep(Duration::from_millis(500)).await;
                 }
                 Err(e) => {
-                    tracing::error!("❌ Job processing error: {:?}", e);
+ tracing::error!(" Job processing error: {:?}", e);
                     // Brief pause before retrying to avoid tight error loops
                     tokio::time::sleep(Duration::from_secs(1)).await;
                 }
@@ -170,11 +170,11 @@ impl JobQueue {
                     }
                 };
                 if let Err(e) = result {
-                    tracing::warn!("📧 Email send failed to {}: {:?}", to, e);
+ tracing::warn!(" Email send failed to {}: {:?}", to, e);
                     // Re-enqueue with retry (max 3 attempts)
                     self.maybe_retry(&job, 3).await?;
                 } else {
-                    tracing::info!("📧 Email sent to {}: {:?}", to, template);
+ tracing::info!(" Email sent to {}: {:?}", to, template);
                 }
             }
             Job::Notification { customer_id, token, title, body, data } => {
@@ -193,16 +193,16 @@ impl JobQueue {
                             .await;
                         }
                         Err(e) => {
-                            tracing::warn!("🔔 Notification failed for {}: {:?}", customer_id, e);
+ tracing::warn!(" Notification failed for {}: {:?}", customer_id, e);
                         }
                     }
                 } else {
-                    tracing::warn!("🔔 FCM not configured, skipping notification for {}", customer_id);
+ tracing::warn!(" FCM not configured, skipping notification for {}", customer_id);
                 }
             }
             Job::ScheduledCleanup { task } => {
                 // This shouldn't be enqueued — scheduled tasks use try_acquire_lock directly
-                tracing::warn!("⚠️ ScheduledCleanup job found in queue (should use lock): {}", task);
+ tracing::warn!(" ScheduledCleanup job found in queue (should use lock): {}", task);
             }
         }
         Ok(())
@@ -226,7 +226,7 @@ impl JobQueue {
                 .arg(&retry_key)
                 .query_async(&mut conn)
                 .await?;
-            tracing::error!("❌ Job dropped after {} retries: {:?}", max_retries, job);
+ tracing::error!(" Job dropped after {} retries: {:?}", max_retries, job);
             return Ok(());
         }
 
@@ -254,7 +254,7 @@ impl JobQueue {
             .query_async(&mut conn)
             .await?;
 
-        tracing::info!("🔄 Job scheduled for retry in {}s (attempt {})", delay, count);
+ tracing::info!(" Job scheduled for retry in {}s (attempt {})", delay, count);
         Ok(())
     }
 }

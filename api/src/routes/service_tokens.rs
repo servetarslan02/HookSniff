@@ -112,7 +112,7 @@ async fn create_service_token(
     .await?;
 
     tracing::info!(
-        "🎟️ New service token '{}' created for team {} (customer {})",
+ " New service token '{}' created for team {} (customer {})",
         name,
         team_id.0,
         customer.id
@@ -168,7 +168,7 @@ async fn delete_service_token(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("🗑️ Service token {} deleted by customer {}", id, customer.id);
+ tracing::info!(" Service token {} deleted by customer {}", id, customer.id);
 
     // Audit log
     {
@@ -248,7 +248,7 @@ async fn update_service_token(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("✏️ Service token {} renamed by customer {}", id, customer.id);
+ tracing::info!(" Service token {} renamed by customer {}", id, customer.id);
 
     Ok(Json(serde_json::json!({"updated": true, "name": req.name})))
 }

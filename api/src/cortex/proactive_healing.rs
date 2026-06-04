@@ -104,7 +104,7 @@ async fn detect_degradation_trends(
             .await?;
 
             tracing::warn!(
-                "🔮 Proactive: endpoint {} degrading {:.1}% → {:.1}% (~{:.0}h to threshold)",
+ " Proactive: endpoint {} degrading {:.1}% → {:.1}% (~{:.0}h to threshold)",
                 endpoint_id, older_sr, recent_sr, hours_to_anomaly
             );
             actions += 1;
@@ -179,7 +179,7 @@ async fn predict_peak_preparation(
             .await?;
 
             tracing::info!(
-                "📊 Proactive: endpoint {} at {:.0}% rate limit ({}h remaining)",
+ " Proactive: endpoint {} at {:.0}% rate limit ({}h remaining)",
                 endpoint_id, usage_pct, hours_until_limit
             );
             actions += 1;
@@ -262,7 +262,7 @@ async fn preemptive_rate_adjustment(
         ).await?;
 
         tracing::info!(
-            "⚡ Proactive: endpoint {} latency stress {}ms → {}ms (+{:.0}%)",
+ " Proactive: endpoint {} latency stress {}ms → {}ms (+{:.0}%)",
             endpoint_id, older_p95, recent_p95, increase_pct
         );
         actions += 1;

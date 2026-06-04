@@ -69,7 +69,7 @@ fn init_otel(
     // to avoid spamming error logs every few seconds
     if headers.is_empty() && (otlp_endpoint.contains("sentry.io") || otlp_endpoint.contains("ingest")) {
         tracing::warn!(
-            "⚠️ OTEL endpoint ({}) requires auth but OTEL_EXPORTER_OTLP_HEADERS is empty — disabling OTEL. \
+ " OTEL endpoint ({}) requires auth but OTEL_EXPORTER_OTLP_HEADERS is empty — disabling OTEL. \
              Set OTEL_EXPORTER_OTLP_HEADERS or remove OTEL_EXPORTER_OTLP_ENDPOINT to suppress this warning.",
             otlp_endpoint
         );
@@ -78,7 +78,7 @@ fn init_otel(
     }
 
     tracing::info!(
-        "🔧 OTEL config — endpoint: {}, headers count: {}",
+ " OTEL config — endpoint: {}, headers count: {}",
         otlp_endpoint,
         headers.len()
     );
@@ -90,12 +90,12 @@ fn init_otel(
         .build()
     {
         Ok(exporter) => {
-            tracing::info!("✅ OTLP span exporter built successfully (HTTP/JSON)");
+ tracing::info!(" OTLP span exporter built successfully (HTTP/JSON)");
             exporter
         }
         Err(e) => {
             tracing::error!(
-                "❌ Failed to build OTLP exporter: {:?} — falling back to plain logging",
+ " Failed to build OTLP exporter: {:?} — falling back to plain logging",
                 e
             );
             init_plain(env_filter, use_json, "production");
@@ -109,7 +109,7 @@ fn init_otel(
         .with_batch_exporter(exporter)
         .build();
 
-    tracing::info!("✅ OTel SdkTracerProvider created with batch exporter");
+ tracing::info!(" OTel SdkTracerProvider created with batch exporter");
 
     // HS-061: Register custom metrics
     init_metrics();
@@ -123,7 +123,7 @@ fn init_otel(
         let span = tracer.start("otel_boot_test");
         let cx = opentelemetry::Context::current().with_span(span);
         cx.span().end();
-        tracing::info!("🔬 OTEL boot test span created — check Grafana for 'otel_boot_test' trace");
+ tracing::info!(" OTEL boot test span created — check Grafana for 'otel_boot_test' trace");
     }
 
     if use_json {
@@ -242,7 +242,7 @@ fn init_metrics() {
         rate_limit_rejected: AtomicU64::new(0),
     };
     let _ = METRICS.set(metrics);
-    tracing::info!("📊 Custom metrics initialized (atomic counters)");
+ tracing::info!(" Custom metrics initialized (atomic counters)");
 }
 
 /// Get the global metrics registry.

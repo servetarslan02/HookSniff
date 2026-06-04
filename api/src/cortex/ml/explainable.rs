@@ -136,7 +136,7 @@ pub fn explain_anomaly_score(
         latency, baseline_latency,
         if latency_diff > 500.0 { format!("{:.0}ms arttı", latency_diff) } else { "normal".to_string() },
         p95_latency / latency.max(1.0),
-        if p95_ratio > 3.0 { "⚠️ yüksek" } else { "✅ normal" },
+ if p95_ratio > 3.0 { " yüksek" } else { " normal" },
         anomaly_score
     );
 
@@ -228,17 +228,17 @@ pub fn explain_prediction(
     );
 
     let human_readable = format!(
-        "📈 Tahmin ({} saat sonrası):\n• Success Rate: ~{:.1}% {}\n• Latency: ~{:.0}ms {}\n• Güven aralığı: {:.0}%\n• Trend: {}",
+ " Tahmin ({} saat sonrası):\n• Success Rate: ~{:.1}% {}\n• Latency: ~{:.0}ms {}\n• Güven aralığı: {:.0}%\n• Trend: {}",
         forecast_steps,
         predicted_sr,
-        if predicted_sr < 80.0 { "⚠️ düşük" } else { "✅" },
+ if predicted_sr < 80.0 { " düşük" } else { "" },
         predicted_latency,
-        if predicted_latency > 2000.0 { "⚠️ yüksek" } else { "✅" },
+ if predicted_latency > 2000.0 { " yüksek" } else { "" },
         confidence * 100.0,
         match trend {
-            "improving" => "📈 İyileşiyor",
-            "declining" => "📉 Kötüleşiyor",
-            "stable" => "➡️ Stabil",
+ "improving" => " İyileşiyor",
+ "declining" => " Kötüleşiyor",
+ "stable" => " Stabil",
             _ => trend,
         }
     );

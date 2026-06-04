@@ -49,7 +49,7 @@ pub async fn export_data(
         "created_at": row.get::<chrono::DateTime<Utc>, _>("created_at"),
     })).collect();
 
-    tracing::info!("📦 Data export requested by customer {}", customer.id);
+ tracing::info!(" Data export requested by customer {}", customer.id);
     Ok(Json(serde_json::json!({
         "export_date": Utc::now().to_rfc3339(),
         "account": { "id": customer.id, "email": customer.email, "name": customer.name, "plan": customer.plan, "email_verified": customer.email_verified, "created_at": customer.created_at },
@@ -101,7 +101,7 @@ pub async fn delete_account(
         .bind(customer.id).execute(&mut *tx).await?;
     tx.commit().await?;
 
-    tracing::info!("🗑️ Account deleted for customer {} ({})", customer.id, customer.email);
+ tracing::info!(" Account deleted for customer {} ({})", customer.id, customer.email);
     Ok(Json(serde_json::json!({"message": "Account and all associated data have been permanently deleted.", "deleted_at": Utc::now().to_rfc3339()})))
 }
 
@@ -182,7 +182,7 @@ pub async fn request_email_change(
         },
     ).await;
 
-    tracing::info!("📧 Email change code sent for customer {} to {}", customer.id, &email_clone);
+ tracing::info!(" Email change code sent for customer {} to {}", customer.id, &email_clone);
     Ok(Json(serde_json::json!({
         "message": "A verification code has been sent to your new email address.",
         "expires_in_minutes": 15
@@ -248,7 +248,7 @@ pub async fn confirm_email_change(
     sqlx::query("DELETE FROM email_change_codes WHERE id = $1")
         .bind(code_id).execute(&pool).await?;
 
-    tracing::info!("✅ Email changed for customer {} to {}", customer.id, &new_email);
+ tracing::info!(" Email changed for customer {} to {}", customer.id, &new_email);
 
     crate::notifications::helpers::email_changed(&pool, customer.id, &new_email).await;
 

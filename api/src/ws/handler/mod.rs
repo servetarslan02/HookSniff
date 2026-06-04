@@ -217,7 +217,7 @@ pub async fn handle_connection(
 
     // Cleanup
     gateway.remove_connection(&connection_id).await;
-    info!("🔌 WebSocket handler for {} finished", connection_id);
+ info!(" WebSocket handler for {} finished", connection_id);
 }
 
 /// Handle a message from a WebSocket client.
@@ -234,7 +234,7 @@ async fn handle_client_message(text: &str, connection_id: &str, gateway: &Arc<Ws
     match msg {
         ClientMessage::Subscribe { event_types } => {
             info!(
-                "📡 Connection {} subscribing to: {:?}",
+ " Connection {} subscribing to: {:?}",
                 connection_id, event_types
             );
             if let Err(e) = gateway
@@ -246,7 +246,7 @@ async fn handle_client_message(text: &str, connection_id: &str, gateway: &Arc<Ws
         }
         ClientMessage::Unsubscribe { event_types } => {
             info!(
-                "📡 Connection {} unsubscribing from: {:?}",
+ " Connection {} unsubscribing from: {:?}",
                 connection_id, event_types
             );
             // Get current filters and remove the specified ones

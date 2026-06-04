@@ -187,7 +187,7 @@ pub async fn get_endpoint_throttle(
 /// Throttle migration'ını çalıştır
 pub async fn run_throttle_migration(pool: &PgPool) -> anyhow::Result<()> {
     sqlx::query(THROTTLE_MIGRATION).execute(pool).await?;
-    tracing::info!("✅ Throttle migration completed");
+ tracing::info!(" Throttle migration completed");
     Ok(())
 }
 

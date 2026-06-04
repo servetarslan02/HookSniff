@@ -625,7 +625,7 @@ pub async fn request_metrics_middleware(
     if duration.as_secs() >= 5 {
         tracing::warn!(
             method = %method, path = %path, status = status,
-            duration_ms = duration.as_millis(), "⚠️ Slow request"
+ duration_ms = duration.as_millis(), " Slow request"
         );
     }
 

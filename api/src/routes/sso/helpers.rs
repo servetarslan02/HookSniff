@@ -107,7 +107,7 @@ pub async fn auto_join_team_direct(
     .execute(pool)
     .await?;
 
-    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", sso_user_id, team_id, default_role);
+ tracing::info!(" SSO auto-join: customer {} added to team {} as {}", sso_user_id, team_id, default_role);
 
     // Audit log
     let _ = crate::audit::log_action(pool, sso_user_id, "SSO_AUTO_JOIN_TEAM", "team",
@@ -302,7 +302,7 @@ pub async fn sync_team_memberships(
                         .execute(pool)
                         .await?;
 
-                        tracing::info!("✅ Group sync: customer {} added to team {} (group '{}')", customer_id, team_id, group);
+ tracing::info!(" Group sync: customer {} added to team {} (group '{}')", customer_id, team_id, group);
 
                         // Audit log
                         let _ = crate::audit::log_action(pool, customer_id, "SSO_GROUP_SYNC_JOIN", "team",

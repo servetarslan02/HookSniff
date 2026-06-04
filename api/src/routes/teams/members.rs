@@ -63,7 +63,7 @@ pub async fn remove_member(
         return Err(AppError::NotFound);
     }
 
-    tracing::info!("✅ Member {} removed from team {}", uid, team_id);
+ tracing::info!(" Member {} removed from team {}", uid, team_id);
 
     // Notify the removed member
     {
@@ -134,7 +134,7 @@ pub async fn change_role(
     }
 
     tracing::info!(
-        "✅ Role changed to '{}' for member {} in team {}",
+ " Role changed to '{}' for member {} in team {}",
         req.role,
         uid,
         team_id

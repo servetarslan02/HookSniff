@@ -145,7 +145,7 @@ pub async fn move_to_dead_letter(
         .execute(pool)
         .await?;
 
-    tracing::info!("🪦 Delivery {} moved to dead letter queue", input.delivery_id);
+ tracing::info!(" Delivery {} moved to dead letter queue", input.delivery_id);
     Ok(())
 }
 
@@ -156,7 +156,7 @@ pub async fn trigger_agents(
     _http_client: &reqwest::Client,
     _input: &TriggerAgentsInput,
 ) -> TriggerAgentsOutput {
-    tracing::debug!("⏭️ AI agent trigger skipped (ai-center not available)");
+ tracing::debug!("⏭ AI agent trigger skipped (ai-center not available)");
     TriggerAgentsOutput {
         agents_triggered: 0,
         actions_count: 0,

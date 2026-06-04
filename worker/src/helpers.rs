@@ -23,12 +23,12 @@ pub async fn commit_delivery_tx(
         Err(e) => {
             if is_transient_db_error(&e) {
                 tracing::warn!(
-                    "⚠️ Delivery {} — transient DB commit failure ({}): {:?}",
+ " Delivery {} — transient DB commit failure ({}): {:?}",
                     delivery_id, context, e
                 );
             } else {
                 tracing::error!(
-                    "❌ Delivery {} — permanent DB commit failure ({}): {:?}",
+ " Delivery {} — permanent DB commit failure ({}): {:?}",
                     delivery_id, context, e
                 );
             }

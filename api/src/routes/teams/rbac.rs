@@ -396,7 +396,7 @@ pub async fn check_role_rate_limit(
         let key = format!("rbac:{}:{}", team_id, customer_id);
         let result = rate_limiter.check_with_headers(&key, per_min as u32).await;
         if !result.allowed {
-            tracing::warn!("⚠️ Rate limit exceeded for {} (role: {}): {}/min", customer_id, role, per_min);
+ tracing::warn!(" Rate limit exceeded for {} (role: {}): {}/min", customer_id, role, per_min);
             return Err(AppError::RateLimitExceeded);
         }
         tracing::debug!("Rate limit check for {} (role: {}): {}/min OK", customer_id, role, per_min);

@@ -40,13 +40,13 @@ pub async fn cancel_subscription(
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription_at_period_end(&customer).await {
         tracing::warn!(
-            "⚠️ Failed to set cancel_at_period_end at provider for customer {}: {:?}",
+ " Failed to set cancel_at_period_end at provider for customer {}: {:?}",
             customer.id, e
         );
     }
 
     tracing::info!(
-        "✅ Subscription cancellation requested for customer {} (plan: {})",
+ " Subscription cancellation requested for customer {} (plan: {})",
         customer.id,
         customer.plan
     );
@@ -125,7 +125,7 @@ pub async fn pause_subscription(
     tokio::spawn(async move {
         crate::notifications::helpers::create(
             &pool_clone, cid, "billing",
-            "⏸️ Abonelik Dondurma Planlandı",
+ "⏸ Abonelik Dondurma Planlandı",
             &format!(
                 "{} plan aboneliğiniz dönem sonunda dondurulacak. Mevcut döneminizin sonuna kadar hizmeti kullanmaya devam edebilirsiniz. {} tarihine kadar dondurma süresi dolmadan devam edebilirsiniz.",
                 plan_name, paused_until.format("%d.%m.%Y")
@@ -135,14 +135,14 @@ pub async fn pause_subscription(
     });
 
     tracing::info!(
-        "⏸️ Customer {} scheduled pause for {} plan (max {} days, until {})",
+ "⏸ Customer {} scheduled pause for {} plan (max {} days, until {})",
         customer.id, current_plan.as_str(), days, paused_until
     );
 
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     if let Err(e) = billing_svc.cancel_customer_subscription_at_period_end(&customer).await {
         tracing::warn!(
-            "⚠️ Failed to set cancel_at_period_end at provider for paused customer {}: {:?}",
+ " Failed to set cancel_at_period_end at provider for paused customer {}: {:?}",
             customer.id, e
         );
     }
@@ -229,13 +229,13 @@ pub async fn resume_subscription(
     tokio::spawn(async move {
         crate::notifications::helpers::create(
             &pool_clone, cid, "billing",
-            "▶️ Abonelik Devam Ediyor",
+ "▶ Abonelik Devam Ediyor",
             &format!("{} plan aboneliğiniz yeniden aktif edildi. Dönem sonuna kadar hizmeti kullanmaya devam edebilirsiniz.", plan_name),
             Some("/billing"),
         ).await;
     });
 
-    tracing::info!("▶️ Customer {} resumed {} plan (pause cleared)", customer.id, resume_plan.as_str());
+ tracing::info!("▶ Customer {} resumed {} plan (pause cleared)", customer.id, resume_plan.as_str());
 
     Ok(Json(serde_json::json!({
         "message": format!("Your {} plan subscription has been restored. You can continue using the service until the end of your current billing period.", resume_plan.as_str()),

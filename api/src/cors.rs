@@ -61,7 +61,7 @@ pub fn build_cors_layer(cfg: &Config) -> CorsLayer {
     let effective_origins = if origins.is_empty() {
         if cfg.is_production() {
             tracing::warn!(
-                "⚠️ CORS_ORIGINS not set in production — defaulting to dashboard origins"
+ " CORS_ORIGINS not set in production — defaulting to dashboard origins"
             );
             vec![
                 "https://hooksniff.vercel.app",

@@ -378,7 +378,7 @@ impl PaymentProviderImpl for PolarProvider {
                     .and_then(|s| Uuid::parse_str(s).ok());
 
                 tracing::info!(
-                    "💰 Polar order refunded: {} (amount: {} cents)",
+ " Polar order refunded: {} (amount: {} cents)",
                     tx_id,
                     amount
                 );
@@ -431,7 +431,7 @@ impl PaymentProviderImpl for PolarProvider {
                     .await;
 
                     tracing::info!(
-                        "✅ Customer {} refunded via Polar order.refunded — downgraded to free",
+ " Customer {} refunded via Polar order.refunded — downgraded to free",
                         cid
                     );
                 }
@@ -563,7 +563,7 @@ impl PaymentProviderImpl for PolarProvider {
             let body = resp.text().await.unwrap_or_default();
             tracing::error!("Polar cancel_at_period_end failed ({}): {}", status, body);
             // Fallback: if PATCH doesn't work, just set it in our DB (Polar will still charge)
-            tracing::warn!("⚠️ Could not set cancel_at_period_end at Polar — customer will need to cancel manually via portal");
+ tracing::warn!(" Could not set cancel_at_period_end at Polar — customer will need to cancel manually via portal");
         }
 
         Ok(())

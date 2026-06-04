@@ -338,7 +338,7 @@ pub(super) async fn extract_and_save_card(
         .await;
 
         tracing::info!(
-            "💳 Saved card details for customer {}: {} {} {}/{}",
+ " Saved card details for customer {}: {} {} {}/{}",
             customer_id, brand, last4, exp_month, exp_year
         );
     }
