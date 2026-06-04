@@ -357,19 +357,16 @@ async fn main() -> Result<()> {
                                 // Deliver webhook
                                 let permit = delivery_semaphore.clone().acquire_owned().await;
                                 if let Ok(_permit) = permit {
-                                    let _ = delivery::deliver_webhook(
-                                        &pool,
-                                        delivery_uuid,
-                                        endpoint_uuid,
-                                        &url,
-                                        &payload,
-                                        None,
-                                        &signing_secret,
-                                        &circuit_breaker,
-                                        &throttle_manager,
-                                        1,
-                                        None,
-                                    ).await;
+                                    let msg = types::WebhookMessage {
+                                        delivery_id: delivery_id.clone(),
+                                        endpoint_id: endpoint_id_str.clone(),
+                                        endpoint_url: url.clone(),
+                                        signing_secret: signing_secret.clone(),
+                                        payload: payload.clone(),
+                                        custom_headers: None,
+                                    };
+                                    let delivery_svc = delivery::DeliveryService::new(pool.clone(), reqwest::Client::new());
+                                    let _ = delivery_svc.deliver(&msg).await;
                                 }
 
                                 // ACK the message
