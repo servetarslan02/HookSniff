@@ -139,6 +139,7 @@ export async function GET() {
     components,
     checked_at: now.toISOString(),
     response_times,
+    history,
   };
 
   // Save updated data (fire-and-forget)
