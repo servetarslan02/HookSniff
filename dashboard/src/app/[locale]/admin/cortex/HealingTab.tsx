@@ -5,21 +5,21 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Clock, ShieldCheck } from '@/components/icons';
 
-function describeHealingAction(actionType: string, reason: string, outcome: string, t: any): { title: string; detail: string; emoji: string; actionEmoji: string } {
+function describeHealingAction(actionType: string, reason: string, outcome: string, t: any): { title: string; detail: string; severity: string; actionSeverity: string } {
   const isRecovered = outcome === 'recovered';
-  const actions: Record<string, { title: string; detail: string; emoji: string }> = {
-    'auto_disable': { title: isRecovered ? t('action.auto_disable.recovered') : t('action.auto_disable.disabled'), detail: isRecovered ? t('detail.auto_disable.recovered') : t('detail.auto_disable.disabled'), emoji: isRecovered ? 'ok' : 'disabled' },
-    'circuit_tighten': { title: t('action.circuit_tighten'), detail: t('detail.circuit_tighten'), emoji: 'shield' },
-    'retry_slowdown': { title: t('action.retry_slowdown'), detail: t('detail.retry_slowdown'), emoji: 'slowdown' },
-    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: t('detail.rate_limit_reduce'), emoji: 'throttle' },
-    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: t('detail.fallback_url_switch'), emoji: 'switch' },
-    'retry_increase': { title: t('action.retry_increase'), detail: t('detail.retry_increase'), emoji: 'retry' },
-    'timeout_adjust': { title: t('action.timeout_adjust'), detail: t('detail.timeout_adjust'), emoji: 'timeout' },
-    'proactive_throttle': { title: t('action.proactive_throttle'), detail: t('detail.proactive_throttle'), emoji: 'throttle' },
-    'cascade_alert': { title: t('action.cascade_alert'), detail: t('detail.cascade_alert'), emoji: 'alert' },
+  const actions: Record<string, { title: string; detail: string; severity: string }> = {
+    'auto_disable': { title: isRecovered ? t('action.auto_disable.recovered') : t('action.auto_disable.disabled'), detail: isRecovered ? t('detail.auto_disable.recovered') : t('detail.auto_disable.disabled'), severity: isRecovered ? 'ok' : 'disabled' },
+    'circuit_tighten': { title: t('action.circuit_tighten'), detail: t('detail.circuit_tighten'), severity: 'shield' },
+    'retry_slowdown': { title: t('action.retry_slowdown'), detail: t('detail.retry_slowdown'), severity: 'slowdown' },
+    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: t('detail.rate_limit_reduce'), severity: 'throttle' },
+    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: t('detail.fallback_url_switch'), severity: 'switch' },
+    'retry_increase': { title: t('action.retry_increase'), detail: t('detail.retry_increase'), severity: 'retry' },
+    'timeout_adjust': { title: t('action.timeout_adjust'), detail: t('detail.timeout_adjust'), severity: 'timeout' },
+    'proactive_throttle': { title: t('action.proactive_throttle'), detail: t('detail.proactive_throttle'), severity: 'throttle' },
+    'cascade_alert': { title: t('action.cascade_alert'), detail: t('detail.cascade_alert'), severity: 'alert' },
   };
-  const info = actions[actionType] || { title: actionType.replace(/_/g, ' '), detail: reason || t('action.unknown'), emoji: 'config' };
-  return { ...info, actionEmoji: isRecovered ? 'ok' : 'action' };
+  const info = actions[actionType] || { title: actionType.replace(/_/g, ' '), detail: reason || t('action.unknown'), severity: 'config' };
+  return { ...info, actionSeverity: isRecovered ? 'ok' : 'action' };
 }
 
 export function HealingTab({ token }: { token: string | null }) {
@@ -65,7 +65,14 @@ export function HealingTab({ token }: { token: string | null }) {
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <span className={`w-3 h-3 rounded-full mt-1 ${
+                    info.severity === 'ok' ? 'bg-green-500' :
+                    info.severity === 'disabled' ? 'bg-red-500' :
+                    info.severity === 'shield' ? 'bg-blue-500' :
+                    info.severity === 'slowdown' ? 'bg-yellow-500' :
+                    info.severity === 'throttle' ? 'bg-orange-500' :
+                    info.severity === 'retry' ? 'bg-cyan-500' : 'bg-gray-500'
+                  }`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>
