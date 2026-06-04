@@ -112,6 +112,12 @@ export async function GET() {
   // Filter out corrupted entries (uptime < 50% when no real outages)
   history = history.filter((h: { uptime: number; incidents?: string[] }) => h.uptime > 50 || (h.incidents && h.incidents.length > 0));
 
+  // Normalize: entries ≥ 99.9% are effectively 100% (old calc method produced 99.99%)
+  history = history.map((h: { uptime: number; date: string; incidents?: string[] }) => ({
+    ...h,
+    uptime: h.uptime >= 99.9 ? 100 : h.uptime,
+  }));
+
   const todayIdx = history.findIndex((h: { date: string }) => h.date === todayStr);
   const healthyCount = components.filter(c => c.status === 'healthy').length;
   const todayUptime = (healthyCount / components.length) * 100;
