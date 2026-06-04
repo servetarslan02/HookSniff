@@ -60,7 +60,7 @@ async fn auto_sync_coupon_to_polar(
     }
 
     let resp = client
-        .post(format!("{}/v1/discounts", polar_cfg.base_url))
+        .post(format!("{}/v1/discounts/", polar_cfg.base_url))
         .header("Authorization", format!("Bearer {}", polar_cfg.access_token))
         .header("Content-Type", "application/json")
         .json(&polar_body)
