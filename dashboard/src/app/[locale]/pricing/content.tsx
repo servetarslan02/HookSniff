@@ -191,7 +191,7 @@ export function PricingPageContent() {
     },
   ];
 
-  const faqCount = 17;
+  const faqCount = 16;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -243,7 +243,7 @@ export function PricingPageContent() {
           </div>
           {/* Always-visible discount hint */}
           <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-            {t('savePercent', { percent: 20 })} {t('annual') || 'yıllık'} {t('billedAnnually') || 'ödeme ile'}
+            💡 {t('savePercent', { percent: 20 })} {t('annual') || 'yıllık'} {t('billedAnnually') || 'ödeme ile'}
           </p>
         </div>
 
@@ -268,7 +268,7 @@ export function PricingPageContent() {
               {/* Startup: First month free badge */}
               {plan.key === 'startup' && (
                 <div className="absolute -top-3.5 right-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg z-10 whitespace-nowrap">
- {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
+                  🎁 {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
                 </div>
               )}
               {/* Header */}
@@ -480,15 +480,6 @@ export function PricingPageContent() {
           >
             {t('startupCta')}
           </Link>
-        </div>
-
-        {/* Refund Policy */}
-        <div className="mb-12 max-w-2xl mx-auto">
-          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-5 text-center">
-            <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-              {t('refundPolicyNote') || 'All fees are non-refundable. Cancel anytime — access continues until the end of your billing period.'}
-            </p>
-          </div>
         </div>
 
         {/* FAQ */}

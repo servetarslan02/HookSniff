@@ -295,11 +295,11 @@ def handle_webhook():
         "webhook-signature": request.headers["webhook-signature"],
 },
     )
- # Valid
+    # ✅ Valid
     print(f"Event: {payload['event']}")
     return "", 200
   except Exception:
- # Invalid
+    # ❌ Invalid
     return "Invalid signature", 401`,
 },
  {

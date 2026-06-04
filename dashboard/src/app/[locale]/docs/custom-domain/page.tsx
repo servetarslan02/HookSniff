@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 async function CustomDomainDocsContent() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Custom Domain</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🌐 Custom Domain</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Use your own domain for the webhook portal. White-label your customers' experience.
       </p>
@@ -110,8 +110,8 @@ async function CustomDomainDocsContent() {
               After adding the DNS records and waiting a few minutes, click <strong>"Verify Domain"</strong> in the dashboard.
             </p>
             <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1 list-disc list-inside mb-3">
-              <li><strong>Success:</strong> Your domain is verified and SSL certificate is automatically provisioned</li>
-              <li><strong>Failed:</strong> DNS records not found yet — wait a few more minutes and try again</li>
+              <li><strong>✅ Success:</strong> Your domain is verified and SSL certificate is automatically provisioned</li>
+              <li><strong>❌ Failed:</strong> DNS records not found yet — wait a few more minutes and try again</li>
             </ul>
             <p className="text-sm text-gray-500 dark:text-slate-500 italic">
               Once verified, your customers can access the webhook portal through your custom domain with a valid HTTPS certificate.
@@ -190,10 +190,10 @@ DELETE /v1/custom-domains/:id`}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                <tr><td className="px-4 py-3">Developer</td><td className="px-4 py-3">—</td><td className="px-4 py-3">—</td></tr>
-                <tr><td className="px-4 py-3">Startup</td><td className="px-4 py-3">Yes</td><td className="px-4 py-3">Auto</td></tr>
-                <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">Yes</td><td className="px-4 py-3">Auto</td></tr>
-                <tr><td className="px-4 py-3">Enterprise</td><td className="px-4 py-3">Yes, Unlimited</td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Developer</td><td className="px-4 py-3">❌</td><td className="px-4 py-3">—</td></tr>
+                <tr><td className="px-4 py-3">Startup</td><td className="px-4 py-3">✅</td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">✅</td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Enterprise</td><td className="px-4 py-3">✅ Unlimited</td><td className="px-4 py-3">Auto</td></tr>
               </tbody>
             </table>
           </div>

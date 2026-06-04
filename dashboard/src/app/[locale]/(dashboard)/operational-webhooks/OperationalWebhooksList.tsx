@@ -183,7 +183,7 @@ export default function OperationalWebhooksList() {
         </div>
       ) : endpoints.length === 0 ? (
         <div className="glass-card p-12 text-center">
- <div className="text-5xl mb-4"></div>
+          <div className="text-5xl mb-4">🪝</div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noEndpoints')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noEndpointsDesc')}</p>
           <RoleGuard require="canManageOperationalWebhooks">

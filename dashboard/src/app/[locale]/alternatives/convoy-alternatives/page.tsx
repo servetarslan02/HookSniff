@@ -54,7 +54,7 @@ export default function ConvoyAlternativesPage() {
         </div>
 
         <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20 mb-16">
- <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"> Why Choose HookSniff Over Convoy?</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 Why Choose HookSniff Over Convoy?</h2>
           <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
             <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>11 SDKs (in development):</strong> Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift. Convoy is Go-only.</li>
             <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Managed cloud:</strong> Deploy in minutes on GCP Cloud Run. Convoy requires self-hosting.</li>
