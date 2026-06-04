@@ -100,7 +100,7 @@ export async function GET() {
   let history = (await loadJSON('status-history.json')) || [];
 
   // Filter out corrupted entries (uptime < 50% when no real outages)
-  history = history.filter((h: { uptime: number }) => h.uptime > 50 || h.incidents?.length > 0);
+  history = history.filter((h: { uptime: number; incidents?: string[] }) => h.uptime > 50 || (h.incidents && h.incidents.length > 0));
 
   const todayIdx = history.findIndex((h: { date: string }) => h.date === todayStr);
   const healthyCount = components.filter(c => c.status === 'healthy').length;
