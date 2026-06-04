@@ -91,11 +91,11 @@ impl ThrottleManager {
         .await
         {
             Ok(mut conn) => {
- tracing::info!(" Throttle: Redis connected, loading persisted state");
+                tracing::info!("🚦 Throttle: Redis connected, loading persisted state");
                 let throttles = Self::load_from_redis(&mut conn).await;
                 let count = throttles.len();
                 if count > 0 {
- tracing::info!(" Throttle: restored {} endpoint states from Redis", count);
+                    tracing::info!("🚦 Throttle: restored {} endpoint states from Redis", count);
                 }
                 Self {
                     throttles: Arc::new(RwLock::new(throttles)),
@@ -105,7 +105,7 @@ impl ThrottleManager {
             }
             Err(e) => {
                 tracing::warn!(
- " Throttle: Redis connection failed ({}), using in-memory only",
+                    "🚦 Throttle: Redis connection failed ({}), using in-memory only",
                     e
                 );
                 Self::new(config)
@@ -126,7 +126,7 @@ impl ThrottleManager {
         {
             Ok(keys) => keys,
             Err(e) => {
- tracing::warn!(" Failed to scan Redis throttle keys: {}", e);
+                tracing::warn!("🚦 Failed to scan Redis throttle keys: {}", e);
                 return throttles;
             }
         };
@@ -179,7 +179,7 @@ impl ThrottleManager {
                 .await;
 
             if let Err(e) = result {
- tracing::warn!(" Failed to persist throttle state to Redis: {}", e);
+                tracing::warn!("🚦 Failed to persist throttle state to Redis: {}", e);
             }
         }
     }
@@ -234,7 +234,7 @@ impl ThrottleManager {
             throttle.next_allowed_epoch_ms = now_ms + backoff_ms;
 
             tracing::warn!(
- " Throttle active for endpoint {}: {} attempts in window, backoff {}ms",
+                "🚦 Throttle active for endpoint {}: {} attempts in window, backoff {}ms",
                 endpoint_id,
                 throttle.attempt_count,
                 backoff_ms

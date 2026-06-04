@@ -45,7 +45,7 @@ impl ResendEmailClient {
             format!("HookSniff <{}>", from_email)
         };
 
- tracing::info!(" Resend email client initialized (from={})", from_email);
+        tracing::info!("✅ Resend email client initialized (from={})", from_email);
 
         Some(Self {
             api_key,
@@ -134,7 +134,7 @@ impl ResendEmailClient {
         })?;
 
         tracing::info!(
- " Email sent via Resend to {}: {} (id={})",
+            "✅ Email sent via Resend to {}: {} (id={})",
             to,
             subject,
             result.id

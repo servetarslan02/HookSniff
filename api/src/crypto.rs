@@ -28,7 +28,7 @@ static CIPHER: Lazy<Option<Aes256Gcm>> = Lazy::new(|| {
         return None;
     }
     let cipher = Aes256Gcm::new_from_slice(&key_bytes).ok()?;
- tracing::info!(" AES-256-GCM encryption key loaded");
+    tracing::info!("✅ AES-256-GCM encryption key loaded");
     Some(cipher)
 });
 

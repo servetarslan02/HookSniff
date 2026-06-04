@@ -41,7 +41,7 @@ pub async fn handle_polar_webhook(
             )
             .bind("polar").bind(event_id).fetch_one(&pool).await.unwrap_or(false);
             if already_processed {
- tracing::info!(" Polar event {} already processed, skipping", event_id);
+                tracing::info!("♻️ Polar event {} already processed, skipping", event_id);
                 return Ok(StatusCode::OK);
             }
         }
@@ -120,7 +120,7 @@ async fn check_webhook_idempotency(pool: &PgPool, body: &str, provider: &str) ->
             )
             .bind(provider).bind(event_id).fetch_one(pool).await.unwrap_or(false);
             if already_processed {
- tracing::info!(" {} event {} already processed, skipping", provider, event_id);
+                tracing::info!("♻️ {} event {} already processed, skipping", provider, event_id);
                 return Err(AppError::from(anyhow::anyhow!("already_processed")));
             }
         }
@@ -222,7 +222,7 @@ async fn process_webhook_result(
             // The invoice is created in the order.completed handler with the real amount.
 
             tracing::info!(
- " Customer {} upgraded to {} via {}",
+                "✅ Customer {} upgraded to {} via {}",
                 customer_id,
                 plan.as_str(),
                 provider
@@ -280,7 +280,7 @@ async fn process_webhook_result(
             }
 
             tracing::info!(
- " {} subscription {} updated: status={}, plan={}",
+                "✅ {} subscription {} updated: status={}, plan={}",
                 provider,
                 provider_subscription_id,
                 status,
@@ -309,7 +309,7 @@ async fn process_webhook_result(
             }
 
             tracing::info!(
- " {} subscription {} marked for cancellation (will downgrade at period end)",
+                "✅ {} subscription {} marked for cancellation (will downgrade at period end)",
                 provider,
                 provider_subscription_id
             );
@@ -336,7 +336,7 @@ async fn process_webhook_result(
         } => {
             // POL-04: Extend billing period on successful payment
             tracing::info!(
- " {} payment succeeded: {} ({} {})",
+                "✅ {} payment succeeded: {} ({} {})",
                 provider,
                 provider_tx_id,
                 *amount_cents as f64 / 100.0,
@@ -361,7 +361,7 @@ async fn process_webhook_result(
                 .await?;
 
                 tracing::info!(
- " Billing period extended for customer {} after successful payment",
+                    "📅 Billing period extended for customer {} after successful payment",
                     cid
                 );
 
@@ -461,18 +461,18 @@ async fn process_webhook_result(
                     });
 
                     tracing::warn!(
- " {} payment failed: {} — customer {} marked (Polar will retry)",
+                        "⚠️ {} payment failed: {} — customer {} marked (Polar will retry)",
                         provider, provider_tx_id, cid
                     );
                 } else {
                     tracing::info!(
- " {} payment failed again: {} — customer {} (Polar retry in progress)",
+                        "⚠️ {} payment failed again: {} — customer {} (Polar retry in progress)",
                         provider, provider_tx_id, cid
                     );
                 }
             } else {
                 tracing::warn!(
- " {} payment failed: {} — no customer_id, downgrade skipped",
+                    "⚠️ {} payment failed: {} — no customer_id, downgrade skipped",
                     provider, provider_tx_id
                 );
             }

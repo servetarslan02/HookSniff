@@ -17,7 +17,7 @@ pub async fn run(pool: PgPool) {
             Ok(v) => {
                 // If the OTEL endpoint is Sentry, metrics push won't work — skip it
                 if v.contains("sentry.io") || v.contains("ingest") {
- tracing::info!(" Metrics push disabled — OTEL endpoint is Sentry (not Grafana). Set GRAFANA_OTLP_ENDPOINT to enable.");
+                    tracing::info!("📊 Metrics push disabled — OTEL endpoint is Sentry (not Grafana). Set GRAFANA_OTLP_ENDPOINT to enable.");
                     loop {
                         tokio::time::sleep(Duration::from_secs(3600)).await;
                     }
@@ -33,7 +33,7 @@ pub async fn run(pool: PgPool) {
 
     // If no auth headers available, metrics push will fail — disable gracefully
     if otlp_headers.is_empty() {
- tracing::info!(" Metrics push disabled — no OTLP auth headers set. Set GRAFANA_OTLP_HEADERS or OTEL_EXPORTER_OTLP_HEADERS to enable.");
+        tracing::info!("📊 Metrics push disabled — no OTLP auth headers set. Set GRAFANA_OTLP_HEADERS or OTEL_EXPORTER_OTLP_HEADERS to enable.");
         loop {
             tokio::time::sleep(Duration::from_secs(3600)).await;
         }
@@ -74,7 +74,7 @@ pub async fn run(pool: PgPool) {
         .build()
         .expect("reqwest client");
 
- tracing::info!(" Metrics push job started — pushing to {} every 60s", otlp_url);
+    tracing::info!("📊 Metrics push job started — pushing to {} every 60s", otlp_url);
 
     loop {
         tokio::time::sleep(Duration::from_secs(60)).await;
@@ -253,7 +253,7 @@ pub async fn run(pool: PgPool) {
                     Ok(resp) => {
                         if resp.status().is_success() {
                             tracing::debug!(
- " Metrics pushed — ep={} cu={} deliveries_1h={} rate={:.1}%",
+                                "📊 Metrics pushed — ep={} cu={} deliveries_1h={} rate={:.1}%",
                                 stats.get("total_endpoints").and_then(|v| v.as_f64()).unwrap_or(0.0),
                                 stats.get("total_customers").and_then(|v| v.as_f64()).unwrap_or(0.0),
                                 deliveries_1h,
@@ -262,16 +262,16 @@ pub async fn run(pool: PgPool) {
                         } else {
                             let status = resp.status();
                             let body = resp.text().await.unwrap_or_default();
- tracing::warn!(" Metrics push failed: {} — {}", status, &body[..body.len().min(200)]);
+                            tracing::warn!("📊 Metrics push failed: {} — {}", status, &body[..body.len().min(200)]);
                         }
                     }
                     Err(e) => {
- tracing::warn!(" Metrics push error: {}", e);
+                        tracing::warn!("📊 Metrics push error: {}", e);
                     }
                 }
             }
             Err(e) => {
- tracing::warn!(" DB stats collection failed: {}", e);
+                tracing::warn!("📊 DB stats collection failed: {}", e);
             }
         }
     }

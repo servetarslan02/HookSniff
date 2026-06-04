@@ -47,7 +47,7 @@ pub fn resolve_redis_url() -> Option<String> {
 
     let redis_url = format!("rediss://default:{}@{}:6379", token, host);
     tracing::info!(
- " Redis URL constructed from UPSTASH_REDIS_REST_URL (host: {})",
+        "🔧 Redis URL constructed from UPSTASH_REDIS_REST_URL (host: {})",
         host
     );
     Some(redis_url)
@@ -221,7 +221,7 @@ const PLACEHOLDER_PATTERNS: &[&str] = &[
 fn validate_secret(value: &str, name: &str) -> Result<()> {
     if value.len() < 32 {
         anyhow::bail!(
- " {name} must be at least 32 characters (got {}). \
+            "🚫 {name} must be at least 32 characters (got {}). \
              Generate one with: openssl rand -hex 32",
             value.len()
         );
@@ -231,7 +231,7 @@ fn validate_secret(value: &str, name: &str) -> Result<()> {
     for pattern in PLACEHOLDER_PATTERNS {
         if lower.contains(&pattern.to_lowercase()) {
             anyhow::bail!(
- " {name} contains a placeholder pattern ('{pattern}'). \
+                "🚫 {name} contains a placeholder pattern ('{pattern}'). \
                  Set a unique secret before deploying to production. \
                  Generate one with: openssl rand -hex 32"
             );
@@ -257,13 +257,13 @@ impl Config {
 
         let hmac_secret = std::env::var("HMAC_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
- tracing::warn!(" HMAC_SECRET not set, using random secret (will change on restart!)");
+            tracing::warn!("⚠️ HMAC_SECRET not set, using random secret (will change on restart!)");
             random
         });
 
         let jwt_secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| {
             let random = format!("dev-{}", uuid::Uuid::new_v4());
- tracing::warn!(" JWT_SECRET not set, using random secret (will change on restart!)");
+            tracing::warn!("⚠️ JWT_SECRET not set, using random secret (will change on restart!)");
             random
         });
 

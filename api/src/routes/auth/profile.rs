@@ -24,7 +24,7 @@ pub async fn update_profile(
     let updated = sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING *")
         .bind(&req.name).bind(customer.id).fetch_one(&pool).await?;
 
- tracing::info!(" Profile updated for customer {}", customer.id);
+    tracing::info!("✅ Profile updated for customer {}", customer.id);
     Ok(Json(updated.to_response(None)))
 }
 

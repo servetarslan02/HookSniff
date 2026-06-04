@@ -120,7 +120,7 @@ impl CircuitBreaker {
             };
             circuit.total_opens += 1;
             tracing::warn!(
- " Circuit OPENED for endpoint {} after {} consecutive failures (total opens: {})",
+                "⚡ Circuit OPENED for endpoint {} after {} consecutive failures (total opens: {})",
                 endpoint_id,
                 circuit.consecutive_failures,
                 circuit.total_opens

@@ -1,4 +1,4 @@
-// Item 254 — Background alert evaluation worker IMPLEMENTED.
+// ✅ Item 254 — Background alert evaluation worker IMPLEMENTED.
 // See: api/src/jobs/alert_eval.rs (runs every 5 minutes)
 // Dispatchers: email (Resend), Slack webhook, operational webhook
 // Cooldown: 15 min default, configurable per rule via cooldown_minutes column
@@ -128,7 +128,7 @@ async fn create_alert(
     .await?;
 
     tracing::info!(
- " Alert rule created: {} for customer {}",
+        "🔔 Alert rule created: {} for customer {}",
         req.name,
         customer.id
     );
@@ -352,7 +352,7 @@ async fn test_alert(
     }
 
     // Log the test alert trigger for debugging
- tracing::info!(" Test alert triggered: '{}' (condition: {}, customer: {})", alert_name, alert_condition, customer.id);
+    tracing::info!("🔔 Test alert triggered: '{}' (condition: {}, customer: {})", alert_name, alert_condition, customer.id);
 
     // Send test notifications via configured channels
     let mut channels_sent: Vec<String> = Vec::new();
@@ -408,7 +408,7 @@ async fn test_alert(
         "INSERT INTO notifications (customer_id, type, title, message, is_read) VALUES ($1, 'alert', $2, $3, false)"
     )
     .bind(customer.id)
-.bind(format!(" Test Alert: {}", alert_name))
+    .bind(format!("🚨 Test Alert: {}", alert_name))
     .bind(format!(
         "Test notification sent via: {}. Condition '{}'.",
         if channels_sent.is_empty() { "none".to_string() } else { channels_sent.join(", ") },

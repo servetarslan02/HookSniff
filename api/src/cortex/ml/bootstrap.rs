@@ -195,7 +195,7 @@ pub async fn bootstrap_ml_data(
         return Ok(result);
     }
 
- tracing::info!(" ML Bootstrap: seeding {} endpoints with {}h history", endpoints.len(), hours_back);
+    tracing::info!("🧠 ML Bootstrap: seeding {} endpoints with {}h history", endpoints.len(), hours_back);
 
     for (i, (endpoint_id, customer_id, url)) in endpoints.iter().enumerate() {
         let profile_idx = i % PROFILES.len();
@@ -376,23 +376,23 @@ pub async fn bootstrap_ml_data(
         let delivery_rates: Vec<f64> = hourly_data.iter().map(|d| d.total_deliveries as f64).collect();
 
         if let Err(e) = super::adaptive_thresholds::train(pool, *endpoint_id, &success_rates, &latencies, &p95_latencies).await {
- tracing::warn!(" adaptive_thresholds: {:?}", e);
+            tracing::warn!("  ⚠️ adaptive_thresholds: {:?}", e);
         }
         if let Err(e) = super::anomaly_detection::train(pool, *endpoint_id, &success_rates, &latencies, &delivery_rates).await {
- tracing::warn!(" anomaly_detection: {:?}", e);
+            tracing::warn!("  ⚠️ anomaly_detection: {:?}", e);
         }
         if let Err(e) = super::time_series::train(pool, *endpoint_id, &success_rates, &latencies).await {
- tracing::warn!(" time_series: {:?}", e);
+            tracing::warn!("  ⚠️ time_series: {:?}", e);
         }
         if let Err(e) = super::bandit::init_if_needed(pool, *endpoint_id).await {
- tracing::warn!(" bandit: {:?}", e);
+            tracing::warn!("  ⚠️ bandit: {:?}", e);
         }
 
         result.models_trained += 1;
     }
 
     tracing::info!(
- " ML Bootstrap: {} stats, {} profiles, {} anomalies, {} models",
+        "🧠 ML Bootstrap: {} stats, {} profiles, {} anomalies, {} models",
         result.hourly_stats_inserted, result.profiles_updated,
         result.anomaly_scores_inserted, result.models_trained
     );

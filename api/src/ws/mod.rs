@@ -148,7 +148,7 @@ impl WsGateway {
         // HS-019: Check global connection limit
         if connections.len() >= self.max_connections {
             warn!(
- " WebSocket global limit reached ({}/{}), rejecting",
+                "⚠️ WebSocket global limit reached ({}/{}), rejecting",
                 connections.len(),
                 self.max_connections
             );
@@ -162,7 +162,7 @@ impl WsGateway {
             .count();
         if customer_count >= self.max_connections_per_customer {
             warn!(
- " WebSocket per-customer limit reached for {} ({}/{})",
+                "⚠️ WebSocket per-customer limit reached for {} ({}/{})",
                 customer_id, customer_count, self.max_connections_per_customer
             );
             self.metrics.rejected_connections.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
@@ -189,7 +189,7 @@ impl WsGateway {
         );
 
         info!(
- " WebSocket connection {} established ({}/{}, customer: {})",
+            "🔌 WebSocket connection {} established ({}/{}, customer: {})",
             connection_id,
             connections.len(),
             self.max_connections,
@@ -206,7 +206,7 @@ impl WsGateway {
                 connections.len() as u64,
                 std::sync::atomic::Ordering::Relaxed,
             );
- info!(" WebSocket connection {} removed", connection_id);
+            info!("🔌 WebSocket connection {} removed", connection_id);
         }
     }
 
@@ -220,7 +220,7 @@ impl WsGateway {
         if let Some(conn) = connections.get_mut(connection_id) {
             conn.event_filters = event_filters;
             debug!(
- " Updated subscriptions for {}: {:?}",
+                "📡 Updated subscriptions for {}: {:?}",
                 connection_id, conn.event_filters
             );
         }
@@ -255,7 +255,7 @@ impl WsGateway {
                         // Slow consumer — drop event, don't block
                         self.metrics.messages_dropped.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                         warn!(
- " Slow consumer: connection {} channel full, dropping event",
+                            "⚠️ Slow consumer: connection {} channel full, dropping event",
                             conn.connection_id
                         );
                     }
@@ -308,7 +308,7 @@ impl WsGateway {
                 std::sync::atomic::Ordering::Relaxed,
             );
             info!(
- " Cleaned up {} stale WebSocket connections ({} active)",
+                "🧹 Cleaned up {} stale WebSocket connections ({} active)",
                 stale_ids.len(),
                 connections.len()
             );
@@ -328,7 +328,7 @@ impl WsGateway {
             let _ = conn.tx.try_send(msg);
         }
 
- info!(" WebSocket gateway shutdown — {} connections notified", count);
+        info!("🔌 WebSocket gateway shutdown — {} connections notified", count);
     }
 
     /// Get connection metrics snapshot for monitoring.

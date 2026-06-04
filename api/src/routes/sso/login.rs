@@ -49,7 +49,7 @@ pub async fn initiate_sso_login(
     let rl_key = format!("sso_login:{}:{}", email, client_ip);
     let rl_result = rate_limiter.check_with_headers(&rl_key, 10).await;
     if !rl_result.allowed {
- tracing::warn!(" SSO login rate limit exceeded for email={} IP={}", email, client_ip);
+        tracing::warn!("⚠️ SSO login rate limit exceeded for email={} IP={}", email, client_ip);
         return Err(AppError::RateLimitExceeded);
     }
 

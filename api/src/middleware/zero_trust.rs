@@ -54,7 +54,7 @@ pub async fn zero_trust_middleware(
             ip = %ip,
             reason = %result.reason,
             risk_score = result.risk_score,
- " Zero Trust blocked request"
+            "🔒 Zero Trust blocked request"
         );
         return Err(AppError::Forbidden);
     }
@@ -64,7 +64,7 @@ pub async fn zero_trust_middleware(
             customer_id = %customer.id,
             risk_score = result.risk_score,
             reason = %result.reason,
- " Zero Trust elevated risk"
+            "⚠️ Zero Trust elevated risk"
         );
     }
 
@@ -96,7 +96,7 @@ pub async fn zero_trust_middleware(
                     threat_type = ?threat.threat_type,
                     confidence = threat.confidence,
                     details = %threat.details,
- " Threat detected — blocking request"
+                    "🔒 Threat detected — blocking request"
                 );
                 return Err(AppError::Forbidden);
             }
@@ -106,7 +106,7 @@ pub async fn zero_trust_middleware(
                 threat_type = ?threat.threat_type,
                 confidence = threat.confidence,
                 details = %threat.details,
- " Threat detected — logged, request allowed"
+                "⚠️ Threat detected — logged, request allowed"
             );
         }
     } else {

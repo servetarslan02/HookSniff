@@ -47,7 +47,7 @@ where
         tracing::warn!(
             query = query_name,
             duration_ms = ms as u64,
- " Slow query detected (>{SLOW_QUERY_THRESHOLD_MS}ms)"
+            "⚠️  Slow query detected (>{SLOW_QUERY_THRESHOLD_MS}ms)"
         );
     } else {
         tracing::debug!(
@@ -89,7 +89,7 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
- " Database pool created (min=0, max=30, acquire_timeout=15s, idle_timeout=5m)"
+        "✅ Database pool created (min=0, max=30, acquire_timeout=15s, idle_timeout=5m)"
     );
     Ok(pool)
 }
@@ -144,13 +144,13 @@ async fn record_migration(pool: &PgPool, name: &str) -> Result<()> {
 #[allow(dead_code)]
 async fn run_migration(pool: &PgPool, name: &str, sql: &str) -> Result<()> {
     if is_migration_applied(pool, name).await? {
- tracing::debug!("⏭ Migration '{}' already applied, skipping", name);
+        tracing::debug!("⏭️  Migration '{}' already applied, skipping", name);
         return Ok(());
     }
- tracing::info!(" Running migration: {}", name);
+    tracing::info!("🔄 Running migration: {}", name);
     sqlx::raw_sql(sql).execute(pool).await?;
     record_migration(pool, name).await?;
- tracing::info!(" Migration '{}' completed", name);
+    tracing::info!("✅ Migration '{}' completed", name);
     Ok(())
 }
 
@@ -230,15 +230,15 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
 
     for (name, sql) in migrations() {
         if !applied_names.contains(name) {
- tracing::info!(" Running migration: {}", name);
+            tracing::info!("🔄 Running migration: {}", name);
             sqlx::raw_sql(sql).execute(pool).await?;
             record_migration(pool, name).await?;
- tracing::info!(" Migration '{}' completed", name);
+            tracing::info!("✅ Migration '{}' completed", name);
         } else {
- tracing::debug!("⏭ Migration '{}' already applied, skipping", name);
+            tracing::debug!("⏭️  Migration '{}' already applied, skipping", name);
         }
     }
- tracing::info!(" All database migrations completed");
+    tracing::info!("✅ All database migrations completed");
     Ok(())
 }
 
@@ -270,7 +270,7 @@ pub async fn publish_to_queue(
     .bind(trace_id)
     .execute(pool)
     .await?;
- tracing::debug!(" Webhook {} queued for delivery", delivery_id);
+    tracing::debug!("📤 Webhook {} queued for delivery", delivery_id);
     Ok(())
 }
 
@@ -294,7 +294,7 @@ fn is_redis_circuit_open() -> bool {
         .as_secs();
     if now.saturating_sub(opened_at) > REDIS_CIRCUIT_COOLDOWN_SECS {
         REDIS_CIRCUIT_OPEN.store(false, Ordering::Relaxed);
- tracing::info!(" Redis circuit breaker closed — re-enabling Redis queue");
+        tracing::info!("🟢 Redis circuit breaker closed — re-enabling Redis queue");
         false
     } else {
         true
@@ -309,7 +309,7 @@ fn open_redis_circuit(reason: &str) {
             .unwrap_or_default()
             .as_secs();
         REDIS_CIRCUIT_OPENED_AT.store(now, Ordering::Relaxed);
- tracing::warn!(" Redis circuit breaker OPEN ({}). Falling back to PG for {}s", reason, REDIS_CIRCUIT_COOLDOWN_SECS);
+        tracing::warn!("🔴 Redis circuit breaker OPEN ({}). Falling back to PG for {}s", reason, REDIS_CIRCUIT_COOLDOWN_SECS);
     }
 }
 
@@ -332,7 +332,7 @@ pub async fn publish_to_queue_fast(
 
     // ── FIFO endpoints always use PG queue (Redis parallel reads break ordering) ──
     if fifo_enabled {
- tracing::debug!(" FIFO endpoint {} → PG queue (ordering guarantee)", endpoint_id);
+        tracing::debug!("📦 FIFO endpoint {} → PG queue (ordering guarantee)", endpoint_id);
         return publish_to_queue(pool, delivery_id, endpoint_id, endpoint_url, payload, custom_headers).await;
     }
 
@@ -358,13 +358,13 @@ pub async fn publish_to_queue_fast(
 
         match redis.enqueue(&msg).await {
             Ok(stream_id) => {
- tracing::debug!(" Webhook {} queued to Redis (stream_id={})", delivery_id, stream_id);
+                tracing::debug!("📤 Webhook {} queued to Redis (stream_id={})", delivery_id, stream_id);
                 return Ok(());
             }
             Err(e) => {
                 let err_msg = e.to_string();
                 if err_msg.contains("OOM") || err_msg.contains("maxmemory") || err_msg.contains("max requests") {
- tracing::error!(" Redis OOM/rate-limit for {}: {} — falling back to PG", delivery_id, err_msg);
+                    tracing::error!("🔴 Redis OOM/rate-limit for {}: {} — falling back to PG", delivery_id, err_msg);
                     open_redis_circuit("rate_limit/OOM");
                     crate::db::SLOW_QUERY_COUNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 } else {

@@ -83,7 +83,7 @@ pub async fn dispatch_event(
         Ok(rows) => rows,
         Err(e) => {
             warn!(
- " Failed to fetch operational webhook endpoints for customer {}: {:?}",
+                "⚠️ Failed to fetch operational webhook endpoints for customer {}: {:?}",
                 customer_id, e
             );
             return;
@@ -120,7 +120,7 @@ pub async fn dispatch_event(
     let payload_json = match serde_json::to_string(&payload) {
         Ok(j) => j,
         Err(e) => {
- warn!(" Failed to serialize operational webhook payload: {:?}", e);
+            warn!("⚠️ Failed to serialize operational webhook payload: {:?}", e);
             return;
         }
     };
@@ -144,7 +144,7 @@ pub async fn dispatch_event(
 
     for handle in handles {
         if let Err(e) = handle.await {
- warn!(" Operational webhook dispatch task panicked: {:?}", e);
+            warn!("⚠️ Operational webhook dispatch task panicked: {:?}", e);
         }
     }
 }
@@ -195,12 +195,12 @@ async fn dispatch_one(
 
             if success {
                 info!(
- " Operational webhook delivered: event={} endpoint={} status={}",
+                    "✅ Operational webhook delivered: event={} endpoint={} status={}",
                     event_type, endpoint_id, status
                 );
             } else {
                 warn!(
- " Operational webhook delivery failed: event={} endpoint={} status={}",
+                    "⚠️ Operational webhook delivery failed: event={} endpoint={} status={}",
                     event_type, endpoint_id, status
                 );
             }
@@ -225,7 +225,7 @@ async fn dispatch_one(
         }
         Err(e) => {
             warn!(
- " Operational webhook request error: event={} endpoint={} error={}",
+                "❌ Operational webhook request error: event={} endpoint={} error={}",
                 event_type, endpoint_id, e
             );
 
