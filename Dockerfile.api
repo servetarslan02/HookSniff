@@ -7,33 +7,22 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Step 1: Copy manifests and lock file (rarely changes)
 COPY Cargo.toml Cargo.lock ./
-COPY api/Cargo.toml api/Cargo.toml
-COPY worker/Cargo.toml worker/Cargo.toml
-COPY common/Cargo.toml common/Cargo.toml
-
-# Step 2: Copy vendor and non-source dirs (rarely changes)
+COPY api/ api/
+COPY worker/ worker/
+COPY common/ common/
 COPY vendor/ vendor/
-COPY docs/ docs/
 
-# Step 3: Pre-build dependencies with dummy sources (cached if manifests unchanged)
-RUN mkdir -p api/src api/benches worker/src common/src && \
+# Dependency cache (faster rebuilds)
+RUN mkdir -p api/src worker/src && \
     echo "fn main() {}" > api/src/main.rs && \
     echo "fn main() {}" > worker/src/main.rs && \
-    echo "fn bench() {}" > api/benches/api_benchmarks.rs && \
-    echo "pub mod lib;" > common/src/lib.rs && \
-    touch common/src/lib.rs && \
     cargo build --release -p hooksniff-api 2>/dev/null || true && \
-    rm -rf api/src api/benches worker/src common/src
+    rm -rf api/src worker/src
 
-# Step 4: Copy actual source (changes frequently - last for max cache)
 COPY api/src/ api/src/
 COPY worker/src/ worker/src/
-COPY common/src/ common/src/
-COPY api/migrations/ api/migrations/
-COPY api/sql/ api/sql/
-COPY api/benches/ api/benches/
+COPY docs/ docs/
 
 RUN cargo build --release -p hooksniff-api && \
     strip /app/target/release/hooksniff-api
