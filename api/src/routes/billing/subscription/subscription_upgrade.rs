@@ -352,7 +352,7 @@ pub async fn upgrade_plan(
             match billing_svc.cancel_at_provider(old_provider, old_sub_id).await {
                 Ok(()) => {
                     tracing::info!(
- " Canceled old {} subscription {} for customer {} (switching to {})",
+                        "✅ Canceled old {} subscription {} for customer {} (switching to {})",
                         old_provider, old_sub_id, customer.id, provider_name
                     );
                     let clear_col = match old_provider.as_str() {
@@ -370,7 +370,7 @@ pub async fn upgrade_plan(
                 }
                 Err(e) => {
                     tracing::warn!(
- " Failed to cancel old {} subscription {} for customer {}: {:?} — proceeding with upgrade anyway",
+                        "⚠️ Failed to cancel old {} subscription {} for customer {}: {:?} — proceeding with upgrade anyway",
                         old_provider, old_sub_id, customer.id, e
                     );
                 }

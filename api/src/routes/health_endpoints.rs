@@ -136,7 +136,7 @@ async fn list_endpoint_health(
     {
         Ok(rows) => rows,
         Err(e) => {
- warn!(" Health stats query failed: {:?}", e);
+            warn!("⚠️ Health stats query failed: {:?}", e);
             Vec::new()
         }
     };
@@ -162,7 +162,7 @@ async fn list_endpoint_health(
     {
         Ok(rows) => rows,
         Err(e) => {
- warn!(" Health percentile query failed: {:?} — falling back to empty", e);
+            warn!("⚠️ Health percentile query failed: {:?} — falling back to empty", e);
             Vec::new()
         }
     };
@@ -182,7 +182,7 @@ async fn list_endpoint_health(
     {
         Ok(rows) => rows,
         Err(e) => {
- warn!(" Health 7d stats query failed: {:?}", e);
+            warn!("⚠️ Health 7d stats query failed: {:?}", e);
             Vec::new()
         }
     };
@@ -200,7 +200,7 @@ async fn list_endpoint_health(
     {
         Ok(rows) => rows,
         Err(e) => {
- warn!(" Health last success query failed: {:?}", e);
+            warn!("⚠️ Health last success query failed: {:?}", e);
             Vec::new()
         }
     };
@@ -314,7 +314,7 @@ async fn get_endpoint_health(
     {
         Ok(row) => row,
         Err(e) => {
- warn!(" Health stats query failed for endpoint {}: {:?}", ep.id, e);
+            warn!("⚠️ Health stats query failed for endpoint {}: {:?}", ep.id, e);
             (0, 0, 0)
         }
     };
@@ -346,7 +346,7 @@ async fn get_endpoint_health(
         {
             Ok(row) => row,
             Err(e) => {
- warn!(" Health percentile query failed for endpoint {}: {:?}", ep.id, e);
+                warn!("⚠️ Health percentile query failed for endpoint {}: {:?}", ep.id, e);
                 (None, None, None)
             }
         };
@@ -362,7 +362,7 @@ async fn get_endpoint_health(
     {
         Ok(row) => row,
         Err(e) => {
- warn!(" Health 7d stats query failed for endpoint {}: {:?}", ep.id, e);
+            warn!("⚠️ Health 7d stats query failed for endpoint {}: {:?}", ep.id, e);
             (0, 0)
         }
     };
@@ -383,7 +383,7 @@ async fn get_endpoint_health(
     {
         Ok(val) => val,
         Err(e) => {
- warn!(" Health last success query failed for endpoint {}: {:?}", ep.id, e);
+            warn!("⚠️ Health last success query failed for endpoint {}: {:?}", ep.id, e);
             None
         }
     };

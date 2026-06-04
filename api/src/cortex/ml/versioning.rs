@@ -160,7 +160,7 @@ pub async fn rollback_to_version(
     .await?;
 
     tracing::info!(
- " Rollback: endpoint {} model {} → version {}",
+        "🔄 Rollback: endpoint {} model {} → version {}",
         endpoint_id, model_type, target_version
     );
 

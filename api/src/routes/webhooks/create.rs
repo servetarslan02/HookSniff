@@ -54,7 +54,7 @@ pub async fn create_webhook(
         if let Some(cached) =
             idempotency::check_idempotency(&pool, key, customer.id, body_hash.as_deref()).await
         {
- tracing::info!(" Returning cached response for idempotency key: {}", key);
+            tracing::info!("♻️ Returning cached response for idempotency key: {}", key);
             return Ok(Json(
                 serde_json::from_value(cached.response_body).unwrap_or_else(|_| DeliveryResponse {
                     id: Uuid::nil(),
@@ -94,7 +94,7 @@ pub async fn create_webhook(
 
         if let Some((dup_id, dup_status, dup_created)) = duplicate {
             tracing::info!(
- " Dedup: returning existing delivery {} for content hash (flag enabled)",
+                "🔁 Dedup: returning existing delivery {} for content hash (flag enabled)",
                 dup_id
             );
             return Ok(Json(DeliveryResponse {
@@ -160,7 +160,7 @@ pub async fn create_webhook(
     if let Some(ref event) = req.event {
         if !endpoint.matches_event_filter(event) {
             tracing::info!(
- "⏭ Event '{}' does not match filter for endpoint {}, skipping",
+                "⏭️ Event '{}' does not match filter for endpoint {}, skipping",
                 event,
                 endpoint.id
             );
@@ -242,7 +242,7 @@ pub async fn create_webhook(
         .await?;
 
         tracing::info!(
- " Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)",
+            "🧪 Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)",
             delivery.id
         );
 

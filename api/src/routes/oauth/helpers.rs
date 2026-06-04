@@ -135,7 +135,7 @@ pub async fn find_or_create_oauth_customer(
                 .await?;
             customer.avatar_url = avatar_url.map(|s| s.to_string());
         }
- tracing::info!(" OAuth login ({}): {}", provider, email);
+        tracing::info!("✅ OAuth login ({}): {}", provider, email);
         return Ok(customer);
     }
 
@@ -156,7 +156,7 @@ pub async fn find_or_create_oauth_customer(
     .fetch_one(pool)
     .await?;
 
- tracing::info!(" New OAuth customer created ({}): {}", provider, email);
+    tracing::info!("✅ New OAuth customer created ({}): {}", provider, email);
 
     Ok(customer)
 }

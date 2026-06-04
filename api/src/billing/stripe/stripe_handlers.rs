@@ -145,7 +145,7 @@ async fn handle_checkout_completed(
     .await?;
 
     tracing::info!(
- " Stripe checkout completed: customer {} → plan {}",
+        "✅ Stripe checkout completed: customer {} → plan {}",
         customer_id,
         plan.as_str()
     );
@@ -201,7 +201,7 @@ async fn handle_subscription_updated(
         .await?;
 
         tracing::info!(
- " Stripe subscription updated: customer {} → plan {}, cancel_at_period_end={}",
+            "🔄 Stripe subscription updated: customer {} → plan {}, cancel_at_period_end={}",
             cust.id,
             plan.as_str(),
             cancel_at_period_end
@@ -249,7 +249,7 @@ async fn handle_subscription_deleted(
         .await?;
 
         tracing::info!(
- " Stripe subscription deleted: customer {} downgraded to free",
+            "❌ Stripe subscription deleted: customer {} downgraded to free",
             cust.id
         );
     }
@@ -303,7 +303,7 @@ async fn handle_invoice_paid(
             extract_and_save_card(pool, cust.id, data).await;
 
             tracing::info!(
- " Stripe invoice paid: customer {}, period {:?}-{:?}",
+                "💰 Stripe invoice paid: customer {}, period {:?}-{:?}",
                 cust.id,
                 period_start,
                 period_end
@@ -346,13 +346,13 @@ async fn handle_invoice_failed(
                 .await?;
 
                 tracing::warn!(
- " Stripe invoice payment failed (attempt {}): customer {}",
+                    "⚠️ Stripe invoice payment failed (attempt {}): customer {}",
                     attempt_count,
                     cust.id
                 );
             } else {
                 tracing::warn!(
- " Stripe invoice payment failed (attempt {}): customer {}",
+                    "⚠️ Stripe invoice payment failed (attempt {}): customer {}",
                     attempt_count,
                     cust.id
                 );
@@ -416,7 +416,7 @@ async fn handle_chargeback_created(
         .await?;
 
         tracing::warn!(
- " Chargeback received: customer {} downgraded to free (charge: {})",
+            "🚨 Chargeback received: customer {} downgraded to free (charge: {})",
             cid,
             charge_id.unwrap_or("unknown")
         );

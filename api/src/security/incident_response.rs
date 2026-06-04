@@ -83,7 +83,7 @@ pub async fn create_incident(
         incident_id = %incident_id,
         severity = %severity.as_str(),
         ip = %ip,
- " Security incident created"
+        "🚨 Security incident created"
     );
 
     Ok(incident_id)
@@ -103,7 +103,7 @@ async fn auto_block_ip(pool: &PgPool, ip: &str, reason: &str) -> Result<(), sqlx
     .execute(pool)
     .await?;
 
- tracing::info!(ip = %ip, reason = %reason, " IP auto-blocked");
+    tracing::info!(ip = %ip, reason = %reason, "🚫 IP auto-blocked");
     Ok(())
 }
 
@@ -121,7 +121,7 @@ async fn alert_admin(
         severity = %severity.as_str(),
         ip = %ip,
         incident_type = ?incident_type,
- " Admin alert triggered"
+        "🔔 Admin alert triggered"
     );
     Ok(())
 }

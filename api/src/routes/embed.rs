@@ -73,7 +73,7 @@ async fn embed_portal(
 </head>
 <body>
   <div class="card">
- <h2> HookSniff — Webhook Status</h2>
+    <h2>🪝 HookSniff — Webhook Status</h2>
     <div style="margin-top: 16px;">
       <div class="stat">
         <div class="stat-value">{total}</div>

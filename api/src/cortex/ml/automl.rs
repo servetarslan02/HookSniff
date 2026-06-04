@@ -202,7 +202,7 @@ pub async fn run_automl_for_endpoint(
     optimizer.record_trial(pool, endpoint_id, params.clone(), score).await?;
 
     tracing::info!(
- " AutoML: endpoint {} model {} trial score={:.1} params={}",
+        "🤖 AutoML: endpoint {} model {} trial score={:.1} params={}",
         endpoint_id, model_type, score, params
     );
 
@@ -218,7 +218,7 @@ pub async fn run_automl_for_endpoint(
 
             if best_score > baseline + 5.0 {
                 tracing::info!(
- " AutoML: auto-deploying best params for {} (score {:.1} > baseline {:.1})",
+                    "🤖 AutoML: auto-deploying best params for {} (score {:.1} > baseline {:.1})",
                     model_type, best_score, baseline
                 );
                 super::save_model_params(pool, endpoint_id, model_type, best, 0).await?;

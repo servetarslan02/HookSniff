@@ -15,7 +15,7 @@ pub async fn create_delivery_failure_notification(
     endpoint_url: &str,
     error_msg: &str,
 ) {
- let title = " Webhook Teslimat Başarısız";
+    let title = "⚠️ Webhook Teslimat Başarısız";
     let message = format!(
         "{} adresine teslimat başarısız oldu: {}",
         endpoint_url, error_msg
@@ -71,7 +71,7 @@ pub async fn create_delivery_failure_notification(
                 let is_tr = lang.as_deref() == Some("tr");
                 let (subject, body) = if is_tr {
                     (
- format!(" Teslimat Başarısız: {}", endpoint_url),
+                        format!("❌ Teslimat Başarısız: {}", endpoint_url),
                         format!(
                             "Webhook teslimatınız başarısız oldu.\n\nEndpoint: {}\nHata: {}\nTeslimat ID: {}\n\nDashboard'dan kontrol edin: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
                             endpoint_url, error_msg, delivery_id, delivery_id
@@ -79,7 +79,7 @@ pub async fn create_delivery_failure_notification(
                     )
                 } else {
                     (
- format!(" Delivery Failed: {}", endpoint_url),
+                        format!("❌ Delivery Failed: {}", endpoint_url),
                         format!(
                             "Your webhook delivery has failed.\n\nEndpoint: {}\nError: {}\nDelivery ID: {}\n\nCheck your dashboard: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
                             endpoint_url, error_msg, delivery_id, delivery_id
@@ -170,7 +170,7 @@ pub async fn notify_endpoint_down(
 
     if !email_on_failure {
         tracing::debug!(
- " Skipping failure email for {} — user disabled email_on_failure",
+            "📧 Skipping failure email for {} — user disabled email_on_failure",
             endpoint_url
         );
         return;
@@ -183,7 +183,7 @@ pub async fn notify_endpoint_down(
 
     let sender = sender_opt.as_deref().unwrap_or("noreply@resend.dev");
 
- let subject = format!(" Endpoint Down: {}", endpoint_url);
+    let subject = format!("⚠️ Endpoint Down: {}", endpoint_url);
     let body = format!(
         "Your endpoint has been experiencing failures.\n\n\
          Endpoint: {}\n\
@@ -206,5 +206,5 @@ pub async fn notify_endpoint_down(
         .send()
         .await;
 
- tracing::info!(" Endpoint down notification sent for {}", endpoint_url);
+    tracing::info!("📧 Endpoint down notification sent for {}", endpoint_url);
 }

@@ -41,7 +41,7 @@ pub async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         if *attempt >= *max_attempts {
             // Max attempts exceeded → dead letter
             tracing::error!(
- " Zombie exceeded max attempts: queue_id={} delivery_id={} attempts={}/{} → dead_letter",
+                "🧟 Zombie exceeded max attempts: queue_id={} delivery_id={} attempts={}/{} → dead_letter",
                 id, delivery_id, attempt, max_attempts
             );
 
@@ -94,7 +94,7 @@ pub async fn reap_zombies(pool: &PgPool) -> Result<usize> {
             .await?;
 
             tracing::warn!(
- " Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
+                "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
                 id,
                 delivery_id,
                 attempt + 1
@@ -105,7 +105,7 @@ pub async fn reap_zombies(pool: &PgPool) -> Result<usize> {
     // Item 34: Add context for transient DB failures in zombie reaper
     tx.commit().await.map_err(|e| {
         if is_transient_db_error(&e) {
- tracing::warn!(" Zombie reaper: transient DB commit failure: {:?}", e);
+            tracing::warn!("⚠️ Zombie reaper: transient DB commit failure: {:?}", e);
         }
         anyhow::anyhow!("Zombie reaper commit failed: {}", e)
     })?;
@@ -190,7 +190,7 @@ pub async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
         .await?;
 
         tracing::warn!(
- " Re-queued orphaned delivery: {} (endpoint={})",
+            "🧟 Re-queued orphaned delivery: {} (endpoint={})",
             id,
             endpoint_id
         );

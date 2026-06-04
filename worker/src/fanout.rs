@@ -85,7 +85,7 @@ impl FanoutEngine {
         }
 
         info!(
- " Processing {} fan-out rules for delivery {} (event: {})",
+            "🔀 Processing {} fan-out rules for delivery {} (event: {})",
             rules.len(),
             webhook.delivery_id,
             event_type
@@ -149,7 +149,7 @@ impl FanoutEngine {
         }
 
         info!(
- " Fan-out complete for delivery {}: {} succeeded, {} failed",
+            "🔀 Fan-out complete for delivery {}: {} succeeded, {} failed",
             webhook.delivery_id, succeeded, failed
         );
 
