@@ -786,7 +786,7 @@ async fn dead_letter_delivery(
          WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='webhook_failed' AND link='/deliveries/'||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
     )
     .bind(customer_id).bind(delivery_id).bind(&endpoint_url).bind(error_msg)
-    .execute(pool).await.ok();
+    .execute(&pool).await.ok();
 
     // 2. Endpoint down notification (when streak hits 5)
     if new_streak == 5 {
@@ -798,7 +798,7 @@ async fn dead_letter_delivery(
              WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=$1 AND type='alert' AND link='/applications?endpoint='||$2::text AND is_read=false AND created_at > now()-interval '1 hour')"
         )
         .bind(customer_id).bind(endpoint_id).bind(new_streak).bind(&endpoint_url)
-        .execute(pool).await.ok();
+        .execute(&pool).await.ok();
     }
 
     Ok((new_streak, customer_id))
@@ -1073,7 +1073,7 @@ async fn process_pending(
                             "UPDATE webhook_queue SET status = 'delivered', processed_at = now() WHERE id = $1"
                         )
                         .bind(item.id)
-                        .execute(pool)
+                        .execute(&pool)
                         .await;
                         return Ok::<(), anyhow::Error>(());
                     }
@@ -1092,7 +1092,7 @@ async fn process_pending(
                     "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '60 seconds' WHERE id = $1"
                 )
                 .bind(item.id)
-                .execute(pool)
+                .execute(&pool)
                 .await;
                 return Ok::<(), anyhow::Error>(());
             }
@@ -1112,7 +1112,7 @@ async fn process_pending(
                     "UPDATE webhook_queue SET status = 'pending', next_retry_at = now() + interval '5 seconds' WHERE id = $1"
                 )
                 .bind(item.id)
-                .execute(pool)
+                .execute(&pool)
                 .await;
                 return Ok::<(), anyhow::Error>(());
             }
@@ -1353,7 +1353,7 @@ async fn process_pending(
                          AND NOT EXISTS (SELECT 1 FROM notifications WHERE customer_id=c.id AND type='alert' AND link='/applications?endpoint='||e.id::text AND title='Endpoint Recovered' AND created_at > now()-interval '1 hour')"
                     )
                     .bind(delivery_id)
-                    .execute(pool).await.ok();
+                    .execute(&pool).await.ok();
                 }
 
                 // HS-023: Mark FIFO item as delivered
