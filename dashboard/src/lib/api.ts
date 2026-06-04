@@ -238,9 +238,14 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   assertOnline(); // Item 169 — fail fast if offline
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...getCSRFHeaders(method),
   };
+
+  // Only set Content-Type when there's a body to send
+  // Sending Content-Type without body causes 411 Length Required on some proxies
+  if (body) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (token && token !== 'cookie') {
     headers["Authorization"] = `Bearer ${token}`;

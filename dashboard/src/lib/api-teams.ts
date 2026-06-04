@@ -61,10 +61,10 @@ export const notificationsApi = {
     apiFetch<{ unread_count: number }>('/notifications/unread-count', { token }),
 
   markAsRead: (token: string, id: string) =>
-    apiFetch<{ success: boolean }>(`/notifications/${id}/read`, { method: 'PUT', token }),
+    apiFetch<{ success: boolean }>(`/notifications/${id}/read`, { method: 'PUT', token, body: {} }),
 
   markAllAsRead: (token: string) =>
-    apiFetch<{ success: boolean }>('/notifications/read-all', { method: 'PUT', token }),
+    apiFetch<{ success: boolean }>('/notifications/read-all', { method: 'PUT', token, body: {} }),
 
   deleteNotification: (token: string, id: string) =>
     apiFetch<{ success: boolean }>(`/notifications/${id}`, { method: 'DELETE', token }),
