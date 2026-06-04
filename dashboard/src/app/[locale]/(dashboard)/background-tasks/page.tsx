@@ -128,7 +128,7 @@ export default function BackgroundTasksPage() {
 
                     {/* Status badge */}
                     <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium hidden sm:inline-block ${statusColors[task.status] || ''}`}>
-                      {task.status}
+                      {t(`statusLabels.${task.status}`) !== `statusLabels.${task.status}` ? t(`statusLabels.${task.status}`) : task.status}
                     </span>
 
                     {/* Progress bar */}

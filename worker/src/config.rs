@@ -7,6 +7,9 @@ pub struct WorkerConfig {
     /// Redis URL for state persistence (circuit breaker, throttle).
     /// If None, falls back to in-memory-only state.
     pub redis_url: Option<String>,
+    /// Redis Streams queue: runtime toggle (env: USE_REDIS_QUEUE).
+    /// When false, only PG queue is used. Allows instant rollback.
+    pub use_redis_queue: bool,
     /// OpenTelemetry: enable OTLP exporter
     pub otel_enabled: bool,
     /// OpenTelemetry: OTLP collector endpoint (e.g. http://localhost:4317)
@@ -33,6 +36,9 @@ impl WorkerConfig {
                     "postgresql://localhost:5432/hooksniff?sslmode=disable".into()
                 }),
             redis_url: std::env::var("REDIS_URL").ok(),
+            use_redis_queue: std::env::var("USE_REDIS_QUEUE")
+                .map(|v| v == "true" || v == "1")
+                .unwrap_or(false),
             otel_enabled,
             otel_exporter_otlp_endpoint,
             otel_exporter_otlp_headers,

@@ -1,0 +1,17 @@
+name = "hooksniff-cache"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# KV namespace for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "a8f27424f92d4bd397f7c1b9f8b37a7a"
+
+# D1 database for analytics
+[[d1_databases]]
+binding = "ANALYTICS"
+database_name = "hooksniff-analytics"
+database_id = "8fbc924b-6bc0-406d-8f50-bf0b72f1c3e0"
+
+[env.production]
+name = "hooksniff-cache"

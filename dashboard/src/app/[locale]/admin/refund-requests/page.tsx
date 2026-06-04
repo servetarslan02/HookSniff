@@ -7,7 +7,7 @@ export default function RefundRequestsPage() {
   const t = useTranslations('admin');
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
           {t('refundRequests') || 'Refund Requests'}

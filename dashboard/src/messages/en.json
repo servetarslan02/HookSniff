@@ -122,7 +122,25 @@
     "placeholderSearch": "Search…",
     "placeholderEmail": "you@example.com",
     "noData": "No data",
-    "unlimited": "Unlimited"
+    "unlimited": "Unlimited",
+    "statusLabels": {
+      "delivered": "Delivered",
+      "success": "Success",
+      "failed": "Failed",
+      "error": "Error",
+      "pending": "Pending",
+      "active": "Active",
+      "inactive": "Inactive",
+      "banned": "Banned",
+      "warning": "Warning",
+      "paid": "Paid",
+      "replayed": "Replayed",
+      "cached": "Cached",
+      "filtered": "Filtered",
+      "processing": "Processing",
+      "dead_letter": "Dead Letter",
+      "cancelled": "Cancelled"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -284,7 +302,25 @@
     "timeRange7d": "7 Days",
     "timeRange30d": "30 Days",
     "loadingShort": "Loading…",
-    "successLabel": "success"
+    "successLabel": "success",
+    "statusLabels": {
+      "delivered": "Delivered",
+      "success": "Success",
+      "failed": "Failed",
+      "error": "Error",
+      "pending": "Pending",
+      "active": "Active",
+      "inactive": "Inactive",
+      "banned": "Banned",
+      "warning": "Warning",
+      "paid": "Paid",
+      "replayed": "Replayed",
+      "cached": "Cached",
+      "filtered": "Filtered",
+      "processing": "Processing",
+      "dead_letter": "Dead Letter",
+      "cancelled": "Cancelled"
+    }
   },
   "endpoints": {
     "title": "Endpoints",
@@ -626,7 +662,23 @@
     "typeAlerts": "Alerts",
     "typeSystem": "System",
     "typeBilling": "Billing",
-    "typeTeamInvite": "Team Invite"
+    "typeTeamInvite": "Team Invite",
+    "typeLabels": {
+      "webhook_failed": "Webhook Failed",
+      "alert": "Alert",
+      "system": "System",
+      "billing": "Billing",
+      "team_invite": "Team Invite",
+      "delivery_failed": "Delivery Failed",
+      "endpoint_disabled": "Endpoint Disabled",
+      "usage_limit": "Usage Limit"
+    },
+    "timeAgo": {
+      "justNow": "just now",
+      "minutes": "{n}m ago",
+      "hours": "{n}h ago",
+      "days": "{n}d ago"
+    }
   },
   "webhooks": {
     "title": "Webhooks",
@@ -3202,7 +3254,26 @@
     "colResource": "Resource",
     "colDetails": "Details",
     "colIp": "IP",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "actions": {
+      "auth.login": "Signed in",
+      "auth.logout": "Signed out",
+      "auth.register": "Account created",
+      "endpoint.create": "Endpoint created",
+      "endpoint.update": "Endpoint updated",
+      "endpoint.delete": "Endpoint deleted",
+      "apikey.create": "API key created",
+      "apikey.rotate": "API key rotated",
+      "apikey.delete": "API key deleted",
+      "webhook.send": "Webhook sent",
+      "webhook.replay": "Webhook replayed",
+      "team.invite": "Team member invited",
+      "team.remove": "Team member removed",
+      "settings.update": "Settings updated",
+      "billing.update": "Billing updated",
+      "schema.create": "Schema created",
+      "portal.update": "Portal updated"
+    }
   },
   "routing": {
     "title": "📋€ Routing",
@@ -3411,7 +3482,25 @@
     "copyTitle": "Copy",
     "copyHeaders": "Copy headers",
     "copyPayload": "Copy payload",
-    "copyResponseBody": "Copy response body"
+    "copyResponseBody": "Copy response body",
+    "statusLabels": {
+      "delivered": "Delivered",
+      "success": "Success",
+      "failed": "Failed",
+      "error": "Error",
+      "pending": "Pending",
+      "active": "Active",
+      "inactive": "Inactive",
+      "banned": "Banned",
+      "warning": "Warning",
+      "paid": "Paid",
+      "replayed": "Replayed",
+      "cached": "Cached",
+      "filtered": "Filtered",
+      "processing": "Processing",
+      "dead_letter": "Dead Letter",
+      "cancelled": "Cancelled"
+    }
   },
   "templatesPage": {
     "title": "📦 Templates",
@@ -4975,7 +5064,14 @@
     "error": "Error",
     "cancelTask": "Cancel Task",
     "cancelTitle": "Cancel Task",
-    "cancelConfirm": "Are you sure you want to cancel this task? This action cannot be undone."
+    "cancelConfirm": "Are you sure you want to cancel this task? This action cannot be undone.",
+    "statusLabels": {
+      "pending": "Pending",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
   },
   "connectors": {
     "title": "Connectors",
@@ -5099,7 +5195,12 @@
     "commitConfirm": "This will mark this message as processed and move the cursor forward. Continue?",
     "seekTitle": "Seek Cursor",
     "seekConfirm": "This will move the cursor to this message. Previous messages will be skipped. Continue?",
-    "status": "Status"
+    "status": "Status",
+    "statusLabels": {
+      "delivered": "Delivered",
+      "failed": "Failed",
+      "pending": "Pending"
+    }
   },
   "streaming": {
     "title": "Streaming",
@@ -5953,7 +6054,12 @@
     "payload": "Payload",
     "deliveredAt": "Delivered at",
     "deleteEndpoint": "Delete Endpoint",
-    "deleteConfirm": "Are you sure you want to delete this endpoint? You will no longer receive system event notifications."
+    "deleteConfirm": "Are you sure you want to delete this endpoint? You will no longer receive system event notifications.",
+    "statusLabels": {
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending"
+    }
   },
   "integrations": {
     "title": "Integrations",
@@ -6022,7 +6128,16 @@
     "avgDuration": "Avg Duration",
     "last24h": "Last 24h",
     "deleteIntegration": "Delete Integration",
-    "deleteConfirm": "Are you sure you want to delete this integration? Events will no longer be routed to the endpoint."
+    "deleteConfirm": "Are you sure you want to delete this integration? Events will no longer be routed to the endpoint.",
+    "healthStatuses": {
+      "healthy": "Healthy",
+      "warning": "Warning",
+      "critical": "Critical",
+      "degraded": "Degraded",
+      "new": "New",
+      "inactive": "Inactive",
+      "error": "Error"
+    }
   },
   "docsDashboard": {
     "title": "Dashboard Guide",
@@ -7262,14 +7377,44 @@
       "avgAccuracy": "Avg Accuracy",
       "avgF1": "Avg F1 Score",
       "worstModels": "Worst Models",
-      "error": "Could not load model data. The Cortex ML service may be starting up."
+      "error": "Could not load model data. The Cortex ML service may be starting up.",
+      "modelTypes": {
+        "adaptive_threshold": "Smart Threshold",
+        "anomaly_detector": "Anomaly Detection",
+        "retry_bandit": "Smart Retry",
+        "latency_predictor": "Latency Predictor",
+        "pattern_classifier": "Pattern Classifier",
+        "drift_detector": "Drift Monitor"
+      },
+      "healthStatuses": {
+        "healthy": "Healthy",
+        "warning": "Needs Attention",
+        "critical": "Critical Issue",
+        "degraded": "Degraded",
+        "stale": "Outdated"
+      },
+      "issues": {
+        "model_stale": "Model outdated ({value})",
+        "few_samples": "Insufficient data ({value} samples)",
+        "low_accuracy": "Low accuracy ({value})",
+        "high_false_positive": "Too many false alarms ({value})",
+        "data_drift": "Data pattern changed",
+        "concept_drift": "Behavior pattern changed",
+        "prediction_lag": "Predictions delayed"
+      }
     },
     "abTest": {
       "title": "A/B Tests",
       "empty": "No A/B tests yet. Start a test from the API to compare models.",
       "endpoint": "Endpoint:",
       "traffic": "% traffic",
-      "winner": "Winner: {v}"
+      "winner": "Winner: {v}",
+      "statusLabels": {
+        "running": "Running",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "pending": "Pending"
+      }
     },
     "autoML": {
       "title": "AutoML Optimization Trials",
@@ -7309,6 +7454,13 @@
         "systemNormal": "No issues, system monitoring",
         "needsAttention": "Situations requiring attention"
       }
+    }
+  },
+  "operationalWebhooks": {
+    "statusLabels": {
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending"
     }
   }
 }

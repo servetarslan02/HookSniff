@@ -6,6 +6,7 @@ import { useLiveEndpoints } from '@/hooks/useCollections';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
+import { Link } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dice5, Pencil, RefreshCw, Scale, Shield, Shuffle, X } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
@@ -100,9 +101,9 @@ export default function RoutingPage() {
               <div key={ep.id} className="px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
-                    <a href={`/endpoints/${ep.id}`} className="text-sm font-mono text-gray-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 hover:underline truncate block">
+                    <Link href={`/endpoints/${ep.id}`} className="text-sm font-mono text-gray-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 hover:underline truncate block">
                       {ep.url}
-                    </a>
+                    </Link>
                     {ep.description && <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{ep.description}</p>}
                     {ep.fallback_url && (
                       <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">

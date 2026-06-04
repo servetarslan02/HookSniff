@@ -28,6 +28,39 @@ interface PlatformSummary {
   worst_models: ModelHealth[];
 }
 
+/** Translate raw model_type to user-friendly name */
+function translateModelType(modelType: string, t: any): string {
+  const key = `modelTypes.${modelType}`;
+  const translated = t(key);
+  // If translation exists, use it; otherwise format the raw string
+  return translated !== key ? translated : modelType
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/** Translate raw health_status to user-friendly label */
+function translateHealthStatus(status: string, t: any): string {
+  const key = `healthStatuses.${status}`;
+  const translated = t(key);
+  return translated !== key ? translated : status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+/** Translate raw issue codes to user-friendly descriptions */
+function translateIssue(issue: string, t: any): string {
+  // Issues can be like "model_stale (281h)" or "few_samples (0)"
+  const match = issue.match(/^(\w+)\s*\((.+)\)$/);
+  const code = match ? match[1] : issue;
+  const param = match ? match[2] : null;
+
+  const key = `issues.${code}`;
+  const translated = t(key);
+  if (translated !== key) {
+    return param ? translated.replace('{value}', param) : translated;
+  }
+  // Fallback: format the raw string
+  return code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + (param ? ` (${param})` : '');
+}
+
 export function ModelMonitorTab() {
   const t = useTranslations('cortex.modelMonitor');
   const tc = useTranslations('cortex.common');
@@ -90,14 +123,14 @@ export function ModelMonitorTab() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(m.health_status)}`}>
-                        {m.health_status}
+                        {translateHealthStatus(m.health_status, t)}
                       </span>
-                      <span className="text-sm font-mono text-gray-700 dark:text-slate-300">{m.model_type}</span>
+                      <span className="text-sm text-gray-700 dark:text-slate-300">{translateModelType(m.model_type, t)}</span>
                     </div>
-                    <span className="text-sm text-gray-500">Skor: {m.quality_score.toFixed(0)}</span>
+                    <span className="text-sm text-gray-500">{tc('score')}: {m.quality_score.toFixed(0)}</span>
                   </div>
                   {m.issues.length > 0 && (
-                    <div className="mt-2 text-xs text-red-500">{m.issues.join(' • ')}</div>
+                    <div className="mt-2 text-xs text-red-500">{m.issues.map(issue => translateIssue(issue, t)).join(' • ')}</div>
                   )}
                 </div>
               ))}

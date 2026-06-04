@@ -57,7 +57,7 @@ export function ABTestTab() {
                   <span className="ml-2 text-xs text-gray-500">{t('endpoint')} {abtest.endpoint_id.slice(0, 8)}...</span>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full ${abtest.status === 'running' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                  {abtest.status}
+                  {t(`statusLabels.${abtest.status}`) !== `statusLabels.${abtest.status}` ? t(`statusLabels.${abtest.status}`) : abtest.status}
                 </span>
               </div>
               <div className="mt-2 flex gap-4 text-sm">

@@ -164,7 +164,7 @@ export function MessagePollerContent() {
                     msg.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' :
                     'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400'
                   }`}>
-                    {msg.status}
+                    {t(`statusLabels.${msg.status}`) !== `statusLabels.${msg.status}` ? t(`statusLabels.${msg.status}`) : msg.status}
                   </span>
 
                   {/* Event type */}

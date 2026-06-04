@@ -6,7 +6,6 @@ use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::config::Config;
 use crate::db;
 use crate::error::{AppError, ErrorCode};
 use crate::events::overage::track_daily_event;
@@ -19,17 +18,19 @@ use crate::models::delivery::{
 use crate::models::endpoint::{Endpoint, RetryPolicy};
 use crate::validation;
 
+/// Type alias for Redis queue extension — simplifies handler signatures
+#[allow(dead_code)]
+type RedisQueueExt = Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>;
+
 use super::helpers::{reserve_webhook_slot, resolve_team_tracking};
 
 pub async fn create_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Extension(cfg): Extension<Config>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
-    Extension(_redis_queue): Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
@@ -122,7 +123,7 @@ pub async fn create_webhook(
     let payload_size = serde_json::to_string(&req.data)
         .map(|s| s.len())
         .unwrap_or(0);
-    if payload_size > cfg.max_webhook_payload_bytes {
+    if payload_size > 1_048_576 { // 1MB default max payload
         return Err(AppError::PayloadTooLarge);
     }
 
@@ -251,13 +252,30 @@ pub async fn create_webhook(
         return Ok(Json(resp));
     }
 
-    // ── Publish to queue ──
-    db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref())
+    // ── Publish to queue: Redis-first, PG fallback ──
+    // Clone the queue out of the mutex so the MutexGuard is NOT held across .await.
+    // std::sync::MutexGuard is !Send, which would make this async fn's Future !Send
+    // and break axum's Handler trait.
+    {
+        let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+        db::publish_to_queue_fast(
+            &pool,
+            &mut rq_clone,
+            delivery.id,
+            endpoint.id,
+            &endpoint.url,
+            &payload_str,
+            endpoint.custom_headers.as_ref(),
+            &endpoint.signing_secret,
+            5, // default max_attempts
+            endpoint.fifo_enabled.unwrap_or(false), // FIFO endpoints → PG queue
+        )
         .await
         .map_err(|e| {
             tracing::error!("Failed to publish to queue: {:?}", e);
             AppError::Internal(e)
         })?;
+    }
 
     // Store idempotency key if provided
     if let Some(key) = idempotency_key {
@@ -283,10 +301,8 @@ pub async fn create_webhook(
 pub async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Extension(cfg): Extension<Config>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
-    Extension(_redis_queue): Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
@@ -341,7 +357,7 @@ pub async fn batch_webhooks(
         let payload_size = serde_json::to_string(&webhook_req.data)
             .map(|s| s.len())
             .unwrap_or(0);
-        if payload_size > cfg.max_webhook_payload_bytes {
+        if payload_size > 1_048_576 { // 1MB default payload limit
             errors.push(BatchError {
                 index: i,
                 error: "Payload too large".to_string(),
@@ -402,8 +418,23 @@ pub async fn batch_webhooks(
         .await
         {
             Ok(delivery) => {
-                // ── Publish to queue ──
-                let queue_result = db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref()).await;
+                // ── Publish to queue: Redis-first, PG fallback ──
+                // Clone queue from mutex — MutexGuard is !Send and must not cross .await
+                let queue_result = {
+                    let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+                    db::publish_to_queue_fast(
+                        &pool,
+                        &mut rq_clone,
+                        delivery.id,
+                        endpoint.id,
+                        &endpoint.url,
+                        &payload_str,
+                        endpoint.custom_headers.as_ref(),
+                        &endpoint.signing_secret,
+                        retry_policy.max_attempts,
+                        endpoint.fifo_enabled.unwrap_or(false), // FIFO endpoints → PG queue
+                    ).await
+                };
 
                 if let Err(e) = queue_result {
                     tracing::error!(
@@ -459,3 +490,5 @@ pub async fn batch_webhooks(
 
     Ok(Json(BatchResponse { deliveries, errors }))
 }
+
+
