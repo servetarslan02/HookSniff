@@ -77,7 +77,11 @@ pub async fn github_callback(
     let client_secret = std::env::var("GITHUB_CLIENT_SECRET")
         .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
-    let access_token = exchange_github_code(&code, &client_id, &client_secret, None).await?;
+    let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
+        .unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string());
+    let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
+
+    let access_token = exchange_github_code(&code, &client_id, &client_secret, &redirect_uri, None).await?;
 
     let user_info = get_github_user_info(&access_token).await?;
 
@@ -109,12 +113,11 @@ pub async fn github_callback(
     headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
     Ok((headers, axum::response::Redirect::temporary(&redirect_url)))
 }
-
-/// Exchange GitHub OAuth code for access token
 pub async fn exchange_github_code(
     code: &str,
     client_id: &str,
     client_secret: &str,
+    redirect_uri: &str,
     code_verifier: Option<&str>,
 ) -> Result<String, AppError> {
     let client = crate::http_client::get_client().clone();
@@ -123,6 +126,7 @@ pub async fn exchange_github_code(
         ("code", code.to_string()),
         ("client_id", client_id.to_string()),
         ("client_secret", client_secret.to_string()),
+        ("redirect_uri", redirect_uri.to_string()),
     ];
     if let Some(verifier) = code_verifier {
         params.push(("code_verifier", verifier.to_string()));
