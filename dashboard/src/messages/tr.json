@@ -1491,11 +1491,12 @@
     ],
     "s9Title": "9. Ödeme ve Faturalama",
     "s9Items": [
-      "Ucretli planlar aylik veya yillik olarak faturalanir (yillik planlarda %20 indirim)",
-      "Tum ucretler yasanin gerektirdigi durumlar disinda iade edilmez",
-      "30 gun onceden bildirimle fiyat degisikligi yapabiliriz",
-      "Odeme yapilmamasi hesap askiya alinmasina veya Ucretsiz plana dusurulmeye yol acabillir",
-      "Plan limitlerinizi asarsaniz ek ucretler uygulanabilir"
+      "Ücretli planlar aylık veya yıllık olarak faturalandırılır (yıllık planlarda %20 indirim)",
+      "Tüm ücretler iade edilmez — kullanım veya iptal nedenine bakılmaksızın faturalanan dönemler iade edilmez",
+      "Aboneliğinizi istediğiniz zaman iptal edebilirsiniz — erişim mevcut fatura döneminin sonuna kadar devam eder",
+      "Fiyat değişikliklerini 180 gün önceden bildiririz",
+      "Ödeme yapılmaması hesap askıya alınmasına veya Ücretsiz plana düşürülmesine neden olabilir",
+      "Plan limitlerinizi aşmanız durumunda ek kullanım ücretleri uygulanabilir"
     ],
     "s10Title": "10. Fikri Mülkiyet",
     "s10Items": [
@@ -2974,7 +2975,8 @@
     "eventTypes": "Olay türleri",
     "subscriptions": "Abonelikler",
     "overagePerEvent": "Event başına overage",
-    "custom": "Özel"
+    "custom": "Özel",
+    "refundPolicyNote": "Tüm ücretler iade edilmez. istediğiniz zaman iptal edin — erişim fatura döneminizin sonuna kadar devam eder."
   },
   "pricingFaq": [
     {
@@ -3040,6 +3042,10 @@
     {
       "q": "Verilerimi dışa aktarabilir miyim?",
       "a": "Evet. Tüm webhook loglarınızı, endpoint yapılandırmalarınızı ve teslimat geçmişinizi panelden JSON veya CSV olarak dışa aktarabilirsiniz."
+    },
+    {
+      "q": "İade politikanız nedir?",
+      "a": "Tüm ücretler iade edilmez. Aboneliğinizi istediğiniz zaman iptal edebilir ve mevcut fatura döneminizin sonuna kadar erişiminizi koruyabilirsiniz. Kısmen kullanılan dönemler için iade yapılmaz. Fatura hataları için destek ekibimizle iletişime geçin."
     }
   ],
   "auditLog": {
