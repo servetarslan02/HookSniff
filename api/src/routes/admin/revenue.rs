@@ -355,9 +355,10 @@ pub async fn admin_revenue_cohorts(
            FROM cohort_revenue
            ORDER BY cohort_month DESC"#,
     )
-    .bind(months)
+    .bind(months.to_string())
     .fetch_all(&pool)
-    .await?;
+    .await
+    .unwrap_or_default();
 
     Ok(Json(serde_json::json!({
         "cohorts": cohorts,
