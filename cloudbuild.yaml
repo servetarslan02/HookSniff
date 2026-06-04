@@ -33,6 +33,7 @@ steps:
       - 'Dockerfile.api'
       - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:$BUILD_ID'
+      - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
       - '.'
     waitFor: ['rust-check']
