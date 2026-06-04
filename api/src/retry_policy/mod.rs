@@ -191,6 +191,59 @@ impl RetryPolicy {
             .collect()
     }
 
+    /// 3-Tier Retry Delay — Error-aware backoff strategy
+    ///
+    /// Classifies the error and applies different backoff:
+    /// - **Tier 1 (Fast):** Transient errors (timeout, 5xx, connection reset) → 100ms, 300ms, 500ms
+    /// - **Tier 2 (Standard):** Persistent errors (4xx, DNS) → exponential backoff
+    /// - **Tier 3 (Extended):** Unknown/severe → long delays (6h, 12h, 24h)
+    ///
+    /// Falls back to standard exponential if error type is unknown.
+    pub fn next_retry_delay_tiered(&self, attempt: i32, is_transient: bool, is_server_error: bool) -> Option<i64> {
+        if attempt >= self.max_attempts {
+            return None;
+        }
+
+        if is_transient || is_server_error {
+            // Tier 1: Fast retry for transient/server errors
+            // 100ms, 300ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1min, then standard
+            let fast_delays: [i64; 9] = [100, 300, 500, 1_000, 2_000, 5_000, 10_000, 30_000, 60_000];
+            let idx = (attempt - 1) as usize;
+            if idx < fast_delays.len() {
+                let delay = fast_delays[idx];
+                let jitter = delay as f64 * random_jitter_factor();
+                return Some((delay as f64 + jitter) as i64);
+            }
+            // After fast retries, fall through to standard exponential
+        }
+
+        // Tier 2: Standard exponential backoff
+        self.next_retry_delay(attempt)
+    }
+
+    /// Evaluate attempt with error classification for 3-tier retry
+    pub fn evaluate_attempt_tiered(&self, current_attempt: i32, success: bool, is_transient: bool, is_server_error: bool) -> RetryDecision {
+        if success {
+            return RetryDecision::Success;
+        }
+
+        let next_attempt = current_attempt + 1;
+
+        match self.next_retry_delay_tiered(next_attempt, is_transient, is_server_error) {
+            Some(delay_ms) => {
+                let retry_at = Utc::now() + chrono::Duration::milliseconds(delay_ms);
+                RetryDecision::Retry {
+                    attempt: next_attempt,
+                    delay_ms,
+                    retry_at,
+                }
+            }
+            None => RetryDecision::Exhausted {
+                total_attempts: current_attempt,
+            },
+        }
+    }
+
     /// Response DTO'ya dönüştür
     pub fn to_response(&self) -> RetryPolicyResponse {
         RetryPolicyResponse {
@@ -462,5 +515,41 @@ pub fn is_retryable_status(status: u16) -> bool {
     }
 }
 
+/// Classify if an error is transient (should use fast Tier 1 retry).
+///
+/// Transient errors:
+/// - Connection timeout/reset
+/// - DNS resolution failure
+/// - TLS handshake failure
+/// - 5xx server errors
+/// - 429 rate limit
+pub fn is_transient_error(status: Option<u16>, error_msg: Option<&str>) -> bool {
+    // HTTP status-based classification
+    if let Some(s) = status {
+        match s {
+            429 | 408 | 502 | 503 | 504 => return true,
+            500..=599 => return true,
+            _ => {}
+        }
+    }
+
+    // Error message-based classification
+    if let Some(msg) = error_msg {
+        let msg_lower = msg.to_lowercase();
+        if msg_lower.contains("timeout")
+            || msg_lower.contains("timed out")
+            || msg_lower.contains("connection reset")
+            || msg_lower.contains("connection refused")
+            || msg_lower.contains("dns")
+            || msg_lower.contains("resolve")
+            || msg_lower.contains("eof")
+            || msg_lower.contains("broken pipe")
+        {
+            return true;
+        }
+    }
+
+    false
+}
 
 mod tests;
