@@ -1,18 +1,7 @@
 timeout: 3600s
 
 steps:
-  # Step 1: Pre-build Rust Check (Fast Fail)
-  - name: 'rust:1.95-bookworm'
-    id: 'rust-check'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        apt-get update && apt-get install -y pkg-config cmake
-        cargo check --workspace
-    waitFor: ['-']
-
-  # Step 2: Run database migrations
+  # Step 1: Run database migrations (parallel with builds)
   - name: 'node:22-slim'
     id: 'run-migrations'
     entrypoint: 'sh'
@@ -24,11 +13,23 @@ steps:
     secretEnv: ['DATABASE_URL']
     waitFor: ['-']
 
-  # Step 3: Build API image
+  # Step 2: Pull previous images for cache (fast, parallel)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'pull-cache'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker pull europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest || true
+        docker pull europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest || true
+    waitFor: ['-']
+
+  # Step 3: Build API image (with cache from previous)
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-api'
     args:
       - 'build'
+      - '--cache-from=europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
       - '-f'
       - 'Dockerfile.api'
       - '-t'
@@ -36,13 +37,14 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
       - '.'
-    waitFor: ['rust-check']
+    waitFor: ['pull-cache']
 
-  # Step 4: Build Worker image
+  # Step 4: Build Worker image (with cache from previous)
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-worker'
     args:
       - 'build'
+      - '--cache-from=europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
       - '-f'
       - 'Dockerfile.worker'
       - '-t'
@@ -50,7 +52,7 @@ steps:
       - '-t'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
       - '.'
-    waitFor: ['rust-check']
+    waitFor: ['pull-cache']
 
   # Step 5: Push API image
   - name: 'gcr.io/cloud-builders/docker'
