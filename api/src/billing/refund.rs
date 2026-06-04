@@ -1,9 +1,12 @@
 // Item 251: Chargeback and refund handling.
 //
-// Provides:
-// - 14-day money-back guarantee (no questions asked)
-// - Refund processing (prorated for unused period)
-// - Chargeback handling (automatic account suspension)
+// Policy: No automatic refunds (industry standard for SaaS).
+// - Customers can cancel anytime → access until period end
+// - Admin can manually approve refunds for billing errors / exceptional cases
+// - Chargeback handling: automatic account suspension
+//
+// Ref: Hook0 Terms of Sale §10.3 — "No refund policy. Periods already billed
+//       and paid are non-refundable, regardless of the reason."
 
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
@@ -13,12 +16,14 @@ use crate::billing::{BillingService, Plan};
 use crate::config::Config;
 use crate::error::AppError;
 
-/// Number of days within which a refund is allowed (money-back guarantee).
-pub const REFUND_WINDOW_DAYS: i64 = 14;
+/// Refund window in days — set to 0 to disable automatic refund eligibility.
+/// Admin can still approve refunds manually for billing errors.
+pub const REFUND_WINDOW_DAYS: i64 = 0;
 
-/// Check if a customer is within the 14-day refund window.
+/// Check if a customer is eligible for a refund.
 ///
-/// Returns true if the subscription started within the last 14 days.
+/// With REFUND_WINDOW_DAYS=0, this always returns false.
+/// Admin can override by using force=true in the approve endpoint.
 pub async fn is_within_refund_window(
     pool: &PgPool,
     customer_id: Uuid,
@@ -55,10 +60,10 @@ pub async fn process_refund(
     customer_id: Uuid,
     reason: &str,
 ) -> Result<(), AppError> {
-    // 1. Check refund window
+    // 1. Check refund eligibility (disabled by default — admin must use force)
     if !is_within_refund_window(pool, customer_id).await? {
         return Err(AppError::BadRequest(
-            "Refund window has expired. Refunds are only available within 14 days of purchase.".into(),
+            "Refunds are not available for already-billed periods. Contact support for billing errors.".into(),
         ));
     }
 

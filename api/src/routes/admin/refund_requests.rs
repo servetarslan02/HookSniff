@@ -152,7 +152,7 @@ pub async fn admin_approve_refund(
         let within_window = crate::billing::refund::is_within_refund_window(&pool, request.customer_id).await?;
         if !within_window {
             return Err(AppError::BadRequest(
-                "Refund window (14 days) has expired. Use force=true to override.".into()
+                "No-refund policy: already-billed periods are non-refundable. Use force=true to override for billing errors.".into()
             ));
         }
     }
