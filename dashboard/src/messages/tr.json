@@ -7699,6 +7699,31 @@
         "requestsPerMin": "istek/dk",
         "rateLimitDesc": "En fazla izin ver",
         "requestsPerMinute": "dakika başına istek"
+      },
+      "modelTypes": {
+        "retry": "Yeniden Deneme Stratejisi",
+        "timeout": "Zaman Aşımı Stratejisi",
+        "circuit_breaker": "Devre Kesici",
+        "rate_limit": "Hız Sınırı",
+        "fallback": "Fallback URL",
+        "backoff": "Geri Çekilme Stratejisi",
+        "exponential": "Üstel",
+        "linear": "Doğrusal",
+        "fixed": "Sabit",
+        "adaptive_threshold": "Uyarlanabilir Eşik",
+        "anomaly_detector": "Anomali Dedektörü",
+        "retry_bandit": "Yeniden Deneme Stratejisi",
+        "circuit_bandit": "Devre Kesici",
+        "time_series": "Zaman Serisi",
+        "ts_latency": "Gecikme Tahmini",
+        "ts_success_rate": "Başarı Oranı Tahmini",
+        "healing_bandit": "İyileştirme Stratejisi",
+        "contextual_bandit": "Akıllı Strateji",
+        "throttle_bandit": "Hız Kontrol Stratejisi",
+        "failure_predictor": "Hata Tahmincisi",
+        "volume_forecaster": "Trafik Tahmincisi",
+        "latency_predictor": "Gecikme Tahmincisi",
+        "drift_detector": "Sapma Dedektörü"
       }
     },
     "autoML": {

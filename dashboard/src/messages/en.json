@@ -7663,6 +7663,31 @@
         "requestsPerMin": "req/min",
         "rateLimitDesc": "Allow up to",
         "requestsPerMinute": "requests per minute"
+      },
+      "modelTypes": {
+        "retry": "Retry Strategy",
+        "timeout": "Timeout Strategy",
+        "circuit_breaker": "Circuit Breaker",
+        "rate_limit": "Rate Limit",
+        "fallback": "Fallback URL",
+        "backoff": "Backoff Strategy",
+        "exponential": "Exponential",
+        "linear": "Linear",
+        "fixed": "Fixed",
+        "adaptive_threshold": "Adaptive Threshold",
+        "anomaly_detector": "Anomaly Detector",
+        "retry_bandit": "Retry Strategy",
+        "circuit_bandit": "Circuit Breaker",
+        "time_series": "Time Series",
+        "ts_latency": "Latency Forecast",
+        "ts_success_rate": "Success Rate Forecast",
+        "healing_bandit": "Healing Strategy",
+        "contextual_bandit": "Smart Strategy",
+        "throttle_bandit": "Throttle Strategy",
+        "failure_predictor": "Failure Predictor",
+        "volume_forecaster": "Volume Forecaster",
+        "latency_predictor": "Latency Predictor",
+        "drift_detector": "Drift Detector"
       }
     },
     "autoML": {
