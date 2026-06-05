@@ -3,7 +3,7 @@
 # Tek komut: .\BASLAT.ps1
 # ============================================================
 
-$VERCEL_TOKEN = "vcp_5D97CGRDJON4keD0BPp8YoQRH3NrUkCOw93jmDzBplmmhZ2tpB3OAHvx"
+$VERCEL_TOKEN = $env:VERCEL_TOKEN  # Never hardcode tokens!
 $TUNNEL_LOG = "C:\Users\msi-nb\HookSniff\tunnel.log"
 $PROJECT_DIR = "C:\Users\msi-nb\HookSniff"
 $DASHBOARD_DIR = "$PROJECT_DIR\dashboard"
