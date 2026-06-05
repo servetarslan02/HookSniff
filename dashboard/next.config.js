@@ -6,9 +6,9 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   reactStrictMode: true,
   // output: 'standalone' removed — incompatible with Vercel API routes
-  cacheComponents: true,
+  // cacheComponents removed — conflicts with dynamic routes (deliveries/[id])
   reactCompiler: true,
-  swcMinify: true,
+  // swcMinify removed — default in Next.js 16, no longer a valid config key
   poweredByHeader: false,
   turbopack: {
     root: __dirname,

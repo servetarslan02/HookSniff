@@ -5345,9 +5345,9 @@
     "step4": "Gerçek zamanlı teslimat.",
     "editChannel": "Kanalı Düzenle",
     "saveChanges": "Değişiklikleri Kaydet",
-    "edit": "Edit",
+    "edit": "Düzenle",
     "deleteChannel": "Kanalı Sil",
-    "deleteConfirmMsg": "Are you sure you want to delete this channel? All subscribers will be disconnected.",
+    "deleteConfirmMsg": "Bu kanalı silmek istediğinizden emin misiniz? Tüm abonelikler kesilecek.",
     "publishDesc": "Tüm abonelere bir test olayı gönderin.",
     "eventType": "Olay Türü",
     "payload": "Payload",
@@ -7565,7 +7565,36 @@
       "title": "AutoML Optimizasyon Denemeleri",
       "empty": "Henüz AutoML denemesi yok. En iyi model parametrelerini bulmak için API'den optimizasyon başlatın.",
       "best": "En İyi",
-      "trialCount": "{n} deneme"
+      "trialCount": "{n} deneme",
+      "modelTypes": {
+        "latency_predictor": "Gecikme Tahmincisi",
+        "failure_predictor": "Hata Tahmincisi",
+        "volume_forecaster": "Hacim Tahmincisi",
+        "anomaly_detector": "Anomali Dedektörü",
+        "adaptive_threshold": "Akıllı Eşik",
+        "retry_bandit": "Akıllı Yeniden Deneme",
+        "circuit_bandit": "Devre Stratejisi",
+        "time_series": "Zaman Serisi",
+        "contextual_bandit": "Bağlamsal Strateji",
+        "drift_detector": "Sapma İzleyici"
+      },
+      "metrics": {
+        "mae": "Ortalama Mutlak Hata",
+        "mse": "Ortalama Karesel Hata",
+        "rmse": "Kök Ortalama Karesel Hata",
+        "r2": "R² Skoru",
+        "accuracy": "Doğruluk"
+      },
+      "params": {
+        "maxDepth": "Maks Derinlik",
+        "nEstimators": "Ağaç Sayısı",
+        "learningRate": "Öğrenme Hızı",
+        "minSamplesSplit": "Bölünme İçin Min Örnek",
+        "minSamplesLeaf": "Yaprak Başına Min Örnek",
+        "maxFeatures": "Maks Özellik",
+        "subsample": "Alt Örnek Oranı",
+        "colsampleBytree": "Sütun Örnek Oranı"
+      }
     },
     "securityPage": {
       "title": "Güvenlik",

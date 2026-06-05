@@ -13,12 +13,6 @@ export function ServiceWorkerRegister() {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
 
-  // Track the SW version that was dismissed so "Later" persists across reloads
-  const [dismissedVersion, setDismissedVersion] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
-    try { return localStorage.getItem('sw_dismissed_version'); } catch { return null; }
-  });
-
   useEffect(() => {
     if (
       typeof window === 'undefined' ||
