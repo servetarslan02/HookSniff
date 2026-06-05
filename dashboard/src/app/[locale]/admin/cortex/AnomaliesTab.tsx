@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
-import { CheckCircle2, Clock } from '@/components/icons';
+import { CheckCircle2, Clock, ExternalLink, ArrowRight } from '@/components/icons';
+import { PrefetchLink } from '@/components/PrefetchLink';
 
 function describeAnomaly(score: number, factors: any, category: string, t: any): { title: string; detail: string; severity: string } {
   const current = factors?.current;
@@ -63,11 +64,21 @@ export function AnomaliesTab({ token }: { token: string | null }) {
       ) : (
         <div className="space-y-3">
           {anomalies.slice(0, 20).map((a: any, i: number) => {
+            const endpointId = a[1] || '';
             const score = a[3] || 0;
             const factors = a[4] || {};
             const category = a[5] || '';
             const ts = a[6];
             const info = describeAnomaly(score, factors, category, t);
+            // Category-specific action steps
+            const categorySteps: Record<string, string[]> = {
+              latency: [t('steps.checkEndpoint') || 'Check endpoint delivery history', t('steps.checkServer') || 'Check server response times'],
+              failure_rate: [t('steps.checkErrors') || 'Check error messages in delivery logs', t('steps.checkEndpoint') || 'Verify endpoint URL is reachable'],
+              volume: [t('steps.checkTraffic') || 'Check if traffic spike is expected', t('steps.checkCapacity') || 'Verify server capacity'],
+              timeout: [t('steps.increaseTimeout') || 'Consider increasing timeout in endpoint settings', t('steps.checkServer') || 'Check server load'],
+              error_pattern: [t('steps.checkLogs') || 'Check server logs for the new error pattern', t('steps.checkDeploy') || 'Check if a recent deploy caused the issue'],
+            };
+            const steps = categorySteps[category] || [t('steps.checkEndpoint') || 'Check the affected endpoint'];
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -95,6 +106,23 @@ export function AnomaliesTab({ token }: { token: string | null }) {
                       )}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
+                    {endpointId && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                        <ExternalLink size={11} />
+                        <PrefetchLink href={`/endpoints/${endpointId}`} className="hover:underline">
+                          {t('endpointLink') || 'View endpoint'}: {endpointId.substring(0, 8)}...
+                        </PrefetchLink>
+                      </p>
+                    )}
+                    {steps && steps.length > 0 && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <ol className="text-xs text-blue-600 dark:text-blue-400 space-y-0.5">
+                          {steps.map((step: string, si: number) => (
+                            <li key={si} className="flex items-start gap-1"><ArrowRight size={10} className="mt-0.5 flex-shrink-0" /> {step}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
                     <div className="flex items-center gap-4 mt-2">
                       {ts && (
                         <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1">

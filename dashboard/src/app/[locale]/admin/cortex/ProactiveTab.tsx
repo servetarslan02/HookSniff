@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Clock, Info, Shield, ExternalLink, ArrowRight } from '@/components/icons';
 import { ProactiveInsight } from './types';
-import { useAuth } from '@/lib/store';
 import { PrefetchLink } from '@/components/PrefetchLink';
 
 function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; severity: string; advice: string; steps: string[] } {
