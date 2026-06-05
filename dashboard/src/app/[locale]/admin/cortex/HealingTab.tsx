@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
-import { Clock, ShieldCheck } from '@/components/icons';
+import { Clock, ShieldCheck, ExternalLink } from '@/components/icons';
+import { PrefetchLink } from '@/components/PrefetchLink';
 
 function describeHealingAction(actionType: string, reason: string, outcome: string, t: any): { title: string; detail: string; severity: string; actionSeverity: string } {
   const isRecovered = outcome === 'recovered' || outcome === 'success';
@@ -74,6 +75,7 @@ export function HealingTab({ token }: { token: string | null }) {
       ) : (
         <div className="space-y-3">
           {actions.slice(0, 20).map((a: any, i: number) => {
+            const endpointId = a[1] || '';
             const actionType = a[2] || '';
             const reason = a[3] || '';
             const outcome = a[5] || 'pending';
@@ -103,6 +105,14 @@ export function HealingTab({ token }: { token: string | null }) {
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
+                    {endpointId && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                        <ExternalLink size={11} />
+                        <PrefetchLink href={`/endpoints/${endpointId}`} className="hover:underline">
+                          {t('endpointLink') || 'View endpoint'}: {endpointId.substring(0, 8)}...
+                        </PrefetchLink>
+                      </p>
+                    )}
                     <div className="flex items-center gap-4 mt-2">
                       {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString()}</p>}
                       {reason && <p className="text-xs text-gray-400 dark:text-slate-500">{t('reason', {v: reason})}</p>}
