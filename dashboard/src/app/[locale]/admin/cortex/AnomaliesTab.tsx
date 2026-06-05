@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 import { CheckCircle2, Clock, ExternalLink, ArrowRight } from '@/components/icons';
 import { PrefetchLink } from '@/components/PrefetchLink';
 
@@ -31,17 +32,12 @@ function describeAnomaly(score: number, factors: any, category: string, t: any):
 export function AnomaliesTab({ token }: { token: string | null }) {
   const t = useTranslations('cortex.anomalies');
   const tc = useTranslations('cortex.common');
-  const [anomalies, setAnomalies] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<any>('/cortex/anomalies', { token })
-      .then((d) => setAnomalies(d.anomalies || []))
-      .catch((err) => { console.error('[AnomaliesTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data, loading, error } = useCachedFetch<any>(
+    'anomalies',
+    () => apiFetch<any>('/cortex/anomalies', { token: token! }),
+    [token]
+  );
+  const anomalies = data?.anomalies || [];
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
