@@ -1,14 +1,16 @@
 # 🪝 HookSniff
 
 [![CI](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml)
-[![Deploy](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Rust](https://img.shields.io/badge/Rust-1.95+-orange.svg)](https://www.rust-lang.org/)
+[![Rust](https://img.shields.io/badge/Rust-1.96+-orange.svg)](https://www.rust-lang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev/)
 
 **The webhook infrastructure for developers.**
 
-HookSniff is an open-source webhook delivery platform built in Rust. It handles sending, receiving, retrying, and monitoring webhooks — so you can focus on building your product.
+HookSniff is an open-source webhook delivery platform built in Rust and Next.js. It handles sending, receiving, retrying, and monitoring webhooks — so you can focus on building your product.
+
+🌐 **Live:** [hooksniff.vercel.app](https://hooksniff.vercel.app) · 📖 **Docs:** [hooksniff.vercel.app/docs](https://hooksniff.vercel.app/docs)
 
 ---
 
@@ -22,7 +24,7 @@ Webhooks are the backbone of modern integrations, but building reliable webhook 
 - **FIFO ordering** — Guaranteed ordered delivery with sequence numbers for event-sourced systems.
 - **Real-time visibility** — SSE streaming, WebSocket updates, and a full analytics dashboard.
 - **Cortex AI** — ML-powered anomaly detection, auto-healing, drift detection, and predictive monitoring.
-- **11 SDKs (in development)** — Clients for Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift. See [SDK Status](#sdks) for current state.
+- **SDK ecosystem** — Node.js SDK available, more coming via OpenAPI codegen. See [SDK Status](#sdks) for current state.
 
 ---
 
@@ -119,24 +121,24 @@ Dashboard runs on `http://localhost:3001`
 
 ### Production Deployment (Free Tier)
 
-See **[FREE_TIER_SETUP.md](FREE_TIER_SETUP.md)** for a complete guide to deploying HookSniff on free-tier services (Google Cloud Run, Neon, Vercel, Upstash, Grafana Cloud, Cloudflare R2).
+See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for a complete guide to deploying HookSniff on Google Cloud Run.
 
 ## API Usage
 
 ```bash
 # Register
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/register \
+curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email": "you@example.com", "password": "your-password"}'
 
 # Create endpoint
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
+curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/endpoints \
   -H "Authorization: Bearer hr_live_YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-app.com/webhook"}'
 
 # Send webhook
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
+curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/webhooks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"endpoint_id": "YOUR_ENDPOINT_ID", "event": "order.created", "data": {"order_id": "12345"}}'
@@ -157,14 +159,13 @@ HookSniff/
 │   └── migrations/    # PostgreSQL migration scripts
 ├── worker/            # Background worker (retry + delivery)
 ├── dashboard/         # Next.js 16 dashboard + landing page
-├── sdks/              # SDKs (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
+├── sdks/              # SDKs (Node.js available, more via OpenAPI codegen)
 ├── cli/               # CLI tool
 ├── portal/            # Embeddable portal widget
 ├── docs/              # API documentation (OpenAPI)
 ├── monitoring/        # Grafana + OpenTelemetry config
 ├── tests/             # Integration + load tests (k6)
 ├── docker-compose.yml
-├── FREE_TIER_SETUP.md # Free-tier deployment guide
 └── Makefile
 ```
 
@@ -216,19 +217,21 @@ HookSniff/
 
 | Language | Package | Status |
 |----------|---------|--------|
-| Node.js | `hooksniff-sdk` | 🔄 In development |
-| Python | `hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Go | `hooksniff-go` | ⏳ Planned (OpenAPI codegen) |
-| Rust | `hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Ruby | `hooksniff` | 🔄 Models in `.cleanup/` |
-| Java | `com.hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Kotlin | `com.hooksniff` | 🔄 Models in `.cleanup/` |
-| PHP | `hooksniff/hooksniff` | 🔄 Tests in `.cleanup/` |
-| C# | `HookSniff` | 🔄 Models+API in `.cleanup/` |
-| Elixir | `hooksniff` | ⏳ Planned (OpenAPI codegen) |
+| Language | Package | Status |
+|----------|---------|--------|
+| Node.js | `hooksniff-sdk` | ✅ Available (v1.2.0) |
+| Python | `hooksniff` | 🔄 In development |
+| Go | `hooksniff-go` | 🔄 In development |
+| Rust | `hooksniff` | 🔄 In development |
+| Ruby | `hooksniff` | ⏳ Planned |
+| Java | `com.hooksniff` | ⏳ Planned |
+| Kotlin | `com.hooksniff` | ⏳ Planned |
+| PHP | `hooksniff/hooksniff` | ⏳ Planned |
+| C# | `HookSniff` | ⏳ Planned |
+| Elixir | `hooksniff` | ⏳ Planned |
 | Swift | `HookSniff` | ⏳ Planned |
 
-> **Note:** SDK source code is being reorganized from `.cleanup/` to `sdks/`. See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
+> See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 
 ## Testing
 
@@ -320,7 +323,7 @@ client.Webhooks.Send(&hooksniff.WebhookSend{
 | [Quickstart Guide](docs/QUICKSTART.md) | Get your first webhook running in 5 minutes |
 | [Architecture](docs/ARCHITECTURE.md) | System design, data flow, retry mechanism |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment on Google Cloud Run |
-| [Free Tier Setup](FREE_TIER_SETUP.md) | Deploy for $0/month on free-tier services |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Deploy on Google Cloud Run |
 | [Self-Host Guide](docs/SELF-HOST.md) | Run HookSniff on your own infrastructure |
 | [SDK Examples](docs/SDK_EXAMPLES.md) | Code examples for SDKs (Node.js available, others planned) |
 | [Developer Guide](docs/DEVELOPMENT.md) | Local development setup and workflows |
@@ -332,7 +335,7 @@ client.Webhooks.Send(&hooksniff.WebhookSend{
 Enterprise customers can whitelist HookSniff's static outbound IPs in their firewall/WAF. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list.
 
 ```bash
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips
+curl https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/outbound-ips
 # → { "ips": ["..."], "updated_at": "..." }
 ```
 

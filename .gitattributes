@@ -1,0 +1,37 @@
+# Linguist overrides — tell GitHub what languages this project uses
+# https://github.com/github-linguist/linguist/blob/master/docs/overrides.md
+
+# Primary languages
+*.rs linguist-detectable=true
+*.tsx linguist-detectable=true
+*.ts linguist-detectable=true
+
+# Vendor code — don't count toward language stats
+vendor/** linguist-vendored
+node_modules/** linguist-vendored
+target/** linguist-generated
+
+# Test files — don't count as primary code
+dashboard/src/__tests__/** linguist-documentation
+tests/** linguist-documentation
+
+# Docs — don't count
+docs/** linguist-documentation
+docs-sdk/** linguist-documentation
+*.md linguist-documentation
+
+# Config files — don't count as code
+*.toml linguist-detectable=false
+*.yaml linguist-detectable=false
+*.yml linguist-detectable=false
+*.json linguist-detectable=false
+*.sql linguist-detectable=false
+*.sh linguist-detectable=false
+*.ps1 linguist-detectable=false
+*.py linguist-detectable=false
+
+# Binary/generated — don't count
+*.lock linguist-generated
+*.png linguist-vendored
+*.jpg linguist-vendored
+*.svg linguist-vendored
