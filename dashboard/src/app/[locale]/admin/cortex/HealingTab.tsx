@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 import { Clock, ShieldCheck, ExternalLink } from '@/components/icons';
 import { PrefetchLink } from '@/components/PrefetchLink';
 
@@ -44,17 +45,12 @@ function describeHealingAction(actionType: string, reason: string, outcome: stri
 export function HealingTab({ token }: { token: string | null }) {
   const t = useTranslations('cortex.healing');
   const tc = useTranslations('cortex.common');
-  const [actions, setActions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<any>('/cortex/healing/actions', { token })
-      .then((d) => setActions(d.actions || []))
-      .catch((err) => { console.error('[HealingTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data, loading, error } = useCachedFetch<any>(
+    'healing',
+    () => apiFetch<any>('/cortex/healing/actions', { token: token! }),
+    [token]
+  );
+  const actions = data?.actions || [];
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;

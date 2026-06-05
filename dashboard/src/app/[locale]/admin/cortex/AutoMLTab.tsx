@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
@@ -19,9 +19,11 @@ export function AutoMLTab() {
   const { token } = useAuth();
   const [trials, setTrials] = useState<Trial[]>([]);
   const [loading, setLoading] = useState(true);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || fetchedRef.current) return;
+    fetchedRef.current = true;
     // Get automl trials - try all endpoints until we find trials
     apiFetch<{ stats: Array<{ endpoint_id: string }> }>('/cortex/stats', { token })
       .then(async (d) => {
