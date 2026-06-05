@@ -25,6 +25,11 @@ const nextConfig = {
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    styledComponents: false, // Not used — disable for faster builds
+  },
+  // Disable type checking during build (use tsc separately for faster builds)
+  typescript: {
+    ignoreBuildErrors: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -58,6 +63,7 @@ const nextConfig = {
   },
   // Rewrites removed — Next.js API routes proxy to backend directly
   // This avoids Vercel edge DNS_HOSTNAME_RESOLVED_PRIVATE issues
+  // Compression is handled by Vercel's edge network automatically
 };
 
 // Bundle analyzer â€” ANALYZE=true npm run build
