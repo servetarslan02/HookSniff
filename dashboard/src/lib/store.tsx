@@ -39,12 +39,11 @@ function toSlug(input: string): string {
     .slice(0, 50);
 }
 
-function setAuthCookie(_token: string) {
-  // HS-039: Do NOT set a non-HttpOnly cookie with the same name as the server's HttpOnly cookie.
-  // Two cookies named "hooksniff_token" cause unpredictable behavior.
-  // The middleware reads the HttpOnly cookie set by the server.
+function setAuthCookie(token: string) {
+  // Set a non-HttpOnly cookie for middleware auth check.
+  // The middleware reads this cookie to determine if the user is authenticated.
   // The frontend uses localStorage + Authorization header for API calls.
-  // This function is now a no-op kept for API compatibility.
+  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 }
 
 function clearAuthCookie() {
