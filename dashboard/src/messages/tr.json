@@ -7494,8 +7494,25 @@
         "latencyTrend": "Endpoint'i kontrol edin, sunucu yavaşlıyor olabilir",
         "rateLimitRisk": "Hız sınırını artırmayı veya istekleri azaltmayı düşünün",
         "stressDetection": "Sunucu kaynaklarını kontrol edin",
-        "cascadeRisk": "Ana endpoint'i düzeltin, diğerleri de etkilenebilir"
-      }
+        "cascadeRisk": "Ana endpoint'i düzeltin, diğerleri de etkilenebilir",
+        "degradation": "Bu endpoint'in başarı oranı düşüyor. Anomali eşiğine ulaşmadan harekete geçin."
+      },
+      "steps": {
+        "checkEndpoint": "Endpoint detay sayfasını açın ve son teslimatları kontrol edin",
+        "checkServer": "Sunucu loglarında hata veya yavaşlama olup olmadığını kontrol edin",
+        "enableFallback": "Endpoint ayarlarında fallback URL etkinleştirin",
+        "upgradePlan": "Daha yüksek limitler için plan yükseltmeyi düşünün",
+        "reduceTraffic": "Gereksiz webhook trafiğini gözden geçirin ve azaltın",
+        "checkResources": "Sunucu CPU, bellek ve disk kullanımını kontrol edin",
+        "scaleUp": "Sunucu kaynaklarını artırmayı düşünün",
+        "fixMainEndpoint": "Önce ana endpoint'i düzeltin — diğerleri buna bağlı",
+        "checkDependents": "Bağımlı endpoint'lerde zincirleme hata olup olmadığını kontrol edin",
+        "openEndpoint": "Etkilenen endpoint'i açın ve son teslimat geçmişini kontrol edin",
+        "checkServerLogs": "Sunucu loglarında hata veya zaman aşımı olup olmadığını kontrol edin",
+        "checkRecentDeploy": "Son kod deploy'unun soruna neden olup olmadığını kontrol edin"
+      },
+      "endpointLink": "Endpoint'i görüntüle",
+      "nextSteps": "Ne yapmalısınız:"
     },
     "drift": {
       "title": "Sapma Tespit Olayları",
