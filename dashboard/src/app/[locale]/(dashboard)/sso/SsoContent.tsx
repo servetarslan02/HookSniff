@@ -330,7 +330,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
                         onChange={(e) => { const next = [...h.roleEntries]; next[i] = { ...next[i], role: e.target.value }; h.setRoleEntries(next); }}
                         disabled={h.isEnforced}
                         className="w-36 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60">
-                        <option value="viewer">Viewer</option><option value="analyst">Analyst</option><option value="developer">Developer</option><option value="admin">Admin</option>
+                        <option value="viewer">{h.t('roleViewer') || 'Viewer'}</option><option value="analyst">{h.t('roleAnalyst') || 'Analyst'}</option><option value="developer">{h.t('roleDeveloper') || 'Developer'}</option><option value="admin">{h.t('roleAdmin') || 'Admin'}</option>
                       </select>
                       {!h.isEnforced && (
                         <button type="button" onClick={() => h.setRoleEntries(h.roleEntries.filter((_, j) => j !== i))}
@@ -342,7 +342,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
                     <span className="flex-1 text-sm text-gray-500 dark:text-slate-400 font-medium">{h.t('defaultRoleLabel') || 'Default (unmatched)'}</span>
                     <select value={h.defaultMappingRole} onChange={(e) => h.setDefaultMappingRole(e.target.value)} disabled={h.isEnforced}
                       className="w-36 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60">
-                      <option value="viewer">Viewer</option><option value="analyst">Analyst</option><option value="developer">Developer</option><option value="admin">Admin</option>
+                      <option value="viewer">{h.t('roleViewer') || 'Viewer'}</option><option value="analyst">{h.t('roleAnalyst') || 'Analyst'}</option><option value="developer">{h.t('roleDeveloper') || 'Developer'}</option><option value="admin">{h.t('roleAdmin') || 'Admin'}</option>
                     </select>
                   </div>
                   {!h.isEnforced && (
