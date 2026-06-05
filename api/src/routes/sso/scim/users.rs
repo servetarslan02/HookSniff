@@ -1,4 +1,4 @@
-use axum::{
+﻿use axum::{
     extract::{Extension, Path, Query},
     http::{HeaderMap, StatusCode},
     Json,
@@ -6,7 +6,7 @@ use axum::{
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::middleware::{generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
 
@@ -85,7 +85,7 @@ pub async fn scim_get_user(
     let config_id = validate_scim_token(&pool, &headers).await?;
 
     let customer_id = Uuid::parse_str(&id)
-        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidUserId))?;
 
     let customer = sqlx::query_as::<_, Customer>(
         "SELECT * FROM customers WHERE id = $1"
@@ -228,7 +228,7 @@ pub async fn scim_update_user(
     let config_id = validate_scim_token(&pool, &headers).await?;
 
     let customer_id = Uuid::parse_str(&id)
-        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidUserId))?;
 
     let _customer = sqlx::query_as::<_, Customer>(
         "SELECT * FROM customers WHERE id = $1"
@@ -303,7 +303,7 @@ pub async fn scim_patch_user(
     let config_id = validate_scim_token(&pool, &headers).await?;
 
     let customer_id = Uuid::parse_str(&id)
-        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidUserId))?;
 
     // Handle SCIM PATCH operations
     if let Some(operations) = body.get("Operations").and_then(|o| o.as_array()) {
@@ -416,7 +416,7 @@ pub async fn scim_delete_user(
     let config_id = validate_scim_token(&pool, &headers).await?;
 
     let customer_id = Uuid::parse_str(&id)
-        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidUserId))?;
 
     // Soft delete — deactivate instead of hard delete
     sqlx::query("UPDATE customers SET is_active = false, updated_at = NOW() WHERE id = $1")
