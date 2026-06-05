@@ -419,9 +419,111 @@ export default function AdminSecurityPage() {
                           <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Date</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
                           <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes${event.auto_resolved ? ` (${t('autoResolved')}${event.auto_resolve_reason ? ': ' + event.auto_resolve_reason.replace('auto:', '') : ''})` : ''} (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
                         </div>
-                        {event.details && Object.keys(event.details).length > 0 && (
-                          <div className="mt-3"><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-1">Details</span><pre className="text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
-                        )}
+                        {event.details && Object.keys(event.details).length > 0 && (() => {
+                          const d = event.details as Record<string, unknown>;
+                          return (
+                            <div className="mt-3">
+                              <span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-2">Details</span>
+                              <div className="space-y-2">
+                                {/* Threat info */}
+                                {d.threat_type && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Tehdit Türü:</span>
+                                    <span className="font-medium text-gray-700 dark:text-slate-300">{String(d.threat_type).replace(/([A-Z])/g, ' $1').trim()}</span>
+                                  </div>
+                                )}
+                                {/* HTTP Method + Path */}
+                                {d.method && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">İstek:</span>
+                                    <span className="font-mono text-gray-700 dark:text-slate-300 break-all">{String(d.method)} {String(d.path || '')}</span>
+                                  </div>
+                                )}
+                                {/* Risk score */}
+                                {d.score !== undefined && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Risk Skoru:</span>
+                                    <span className={`font-medium ${(d.score as number) >= 0.8 ? 'text-red-600' : (d.score as number) >= 0.5 ? 'text-orange-600' : 'text-green-600'}`}>
+                                      %{Math.round((d.score as number) * 100)} — {(d.score as number) >= 0.8 ? 'Yüksek risk' : (d.score as number) >= 0.5 ? 'Orta risk' : 'Düşük risk'}
+                                    </span>
+                                  </div>
+                                )}
+                                {/* Reasons */}
+                                {Array.isArray(d.reasons) && d.reasons.length > 0 && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Nedenler:</span>
+                                    <div className="space-y-1">
+                                      {d.reasons.map((r: string, i: number) => (
+                                        <div key={i} className="flex items-center gap-1">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+                                          <span className="text-gray-700 dark:text-slate-300">{r}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Payload info */}
+                                {d.payload && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Payload:</span>
+                                    <span className="font-mono text-gray-700 dark:text-slate-300 break-all">{typeof d.payload === 'string' ? d.payload.substring(0, 200) : JSON.stringify(d.payload).substring(0, 200)}</span>
+                                  </div>
+                                )}
+                                {/* Pattern matched */}
+                                {d.pattern_matched && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Eşleşen:</span>
+                                    <span className="font-mono text-red-600 dark:text-red-400">{String(d.pattern_matched)}</span>
+                                  </div>
+                                )}
+                                {/* Attack type */}
+                                {d.attack_type && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Saldırı Tipi:</span>
+                                    <span className="font-medium text-red-600 dark:text-red-400">{String(d.attack_type).replace(/_/g, ' ')}</span>
+                                  </div>
+                                )}
+                                {/* Confidence */}
+                                {d.confidence !== undefined && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Güven:</span>
+                                    <span className="font-medium text-gray-700 dark:text-slate-300">%{Math.round((d.confidence as number) * 100)}</span>
+                                  </div>
+                                )}
+                                {/* Decoded payload */}
+                                {d.decoded && d.decoded !== d.payload && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Çözümlenmiş:</span>
+                                    <span className="font-mono text-gray-600 dark:text-slate-400 break-all">{String(d.decoded).substring(0, 200)}</span>
+                                  </div>
+                                )}
+                                {/* Matched rules */}
+                                {Array.isArray(d.matched_rules) && d.matched_rules.length > 0 && (
+                                  <div className="flex items-start gap-2 text-xs">
+                                    <span className="text-gray-400 w-24 shrink-0">Kurallar:</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {d.matched_rules.map((r: string, i: number) => (
+                                        <span key={i} className="px-1.5 py-0.5 text-[10px] bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded">{r}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Raw JSON fallback for unknown fields */}
+                                {(() => {
+                                  const known = ['threat_type','method','path','score','reasons','payload','pattern_matched','attack_type','confidence','decoded','matched_rules'];
+                                  const unknown = Object.entries(d).filter(([k]) => !known.includes(k));
+                                  if (unknown.length === 0) return null;
+                                  return (
+                                    <details className="mt-2">
+                                      <summary className="text-[11px] text-gray-400 cursor-pointer hover:text-gray-600">Ham veri ({unknown.length} alan)</summary>
+                                      <pre className="text-xs font-mono text-gray-500 dark:text-slate-500 bg-gray-50 dark:bg-slate-800 rounded p-2 mt-1 overflow-x-auto max-h-24">{JSON.stringify(Object.fromEntries(unknown), null, 2)}</pre>
+                                    </details>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
