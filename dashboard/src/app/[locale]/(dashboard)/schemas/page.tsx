@@ -195,7 +195,7 @@ export default function SchemasPage() {
                       onClick={() => { setValidatingId(s.id); setValidationPayload(''); setValidationResult(null); }}
                       className="px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 hover:bg-brand-100 dark:hover:bg-brand-500/20 rounded-lg transition"
                     >
-                      Validate
+                      {t('validate') || 'Validate'}
                     </button>
                   </div>
                 </div>
