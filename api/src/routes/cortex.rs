@@ -313,10 +313,11 @@ async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extensio
     for (eid, mt, acc, samples, last_trained) in &models {
         acc_sum += acc;
         let stale = last_trained.map(|t| (chrono::Utc::now() - t).num_hours() > 48).unwrap_or(true);
+        let stale_hours = last_trained.map(|t| (chrono::Utc::now() - t).num_hours()).unwrap_or(999);
         let low_samples = *samples < 50;
-        let (status, issues) = if *acc < 0.5 { critical += 1; ("Critical", vec!["low_accuracy"]) }
-            else if stale && low_samples { degraded += 1; ("Degraded", vec!["model_stale","few_samples"]) }
-            else if stale || low_samples || *acc < 0.8 { warning += 1; ("Warning", vec![if stale {"model_stale"} else {"low_accuracy"}]) }
+        let (status, issues) = if *acc < 0.5 { critical += 1; ("Critical", vec![format!("low_accuracy ({})", (acc * 100.0) as i32)]) }
+            else if stale && low_samples { degraded += 1; ("Degraded", vec![format!("model_stale ({}h)", stale_hours), format!("few_samples ({})", samples)]) }
+            else if stale || low_samples || *acc < 0.8 { warning += 1; ("Warning", vec![if stale { format!("model_stale ({}h)", stale_hours) } else { format!("low_accuracy ({})", (acc * 100.0) as i32) }]) }
             else { healthy += 1; ("Healthy", vec![]) };
         worst_models.push(serde_json::json!({
             "endpoint_id": eid, "model_type": mt, "health_status": status,
