@@ -7303,7 +7303,12 @@
     "common": {
       "dataLoadError": "Veri yüklenemedi",
       "score": "Puan",
-      "severity": "Şiddet"
+      "severity": {
+        "critical": "Kritik",
+        "warning": "Uyarı",
+        "info": "Bilgi",
+        "normal": "Normal"
+      }
     },
     "overview": {
       "noData": "Henüz Cortex verisi yok. Endpoint'leriniz webhook almaya başlayınca veriler burada görünecek.",
@@ -7496,7 +7501,15 @@
       "affected": "Etkilenen:",
       "detected": "Tespit:",
       "action": "Aksiyon:",
-      "eventCount": "{n} olay"
+      "eventCount": "{n} olay",
+      "typeLabels": {
+        "feature_drift": "Özellik Drifti",
+        "concept_drift": "Kavram Drifti",
+        "data_drift": "Veri Drifti",
+        "sudden": "Ani",
+        "gradual": "Kademeli",
+        "incremental": "Artan"
+      }
     },
     "modelMonitor": {
       "stats": {
