@@ -82,6 +82,8 @@
     "copy": "Kopyala",
     "backToDashboard": "Panele Dön",
     "logout": "Çıkış Yap",
+    "documentation": "Dokümantasyon",
+    "apiReference": "API Referansı",
     "user": "Kullanıcı",
     "active": "Etkin",
     "inactive": "Pasif",
@@ -1642,7 +1644,7 @@
     "s8GdprText": "Avrupa Ekonomik Alanı'nda (AEA) bulunuyorsanız, Genel Veri Koruma Tüzüğü (GDPR) kapsamında ek haklarınız vardır:",
     "s8GdprItems": [
       "Yasal dayanak: Verileri rıza, sözleşme ifası ve meşru menfaatler temelinde işleriz",
-      "Veri Koruma Sorumlusu: dpo@hooksniff.com adresinden iletişime geçin",
+      "Veri Koruma Sorumlusu: servetarslan02@gmail.com adresinden iletişime geçin",
       "Denetim otoritesi: Yerel veri koruma makamına şikayette bulunma hakkınız vardır",
       "Veri taşınabilirliği: Verilerinizi yapılandırılmış, makine tarafından okunabilir formatta talep edebilirsiniz",
       "Silme hakkı: Kişisel verilerinizin tamamen silinmesini talep edebilirsiniz",
@@ -2398,7 +2400,9 @@
       "getStarted": "Başlayın",
       "login": "Giriş Yap",
       "register": "Kayıt Ol",
-      "playground": "Playground"
+      "playground": "Playground",
+      "logout": "Çıkış Yap",
+      "adminPanel": "Admin Panel"
     },
     "hero": {
       "uptime": "%99.9 uptime hedefi",
@@ -6890,7 +6894,7 @@
   "q24": "Başarısız webhook'ları tekrar gönderebilir miyim?",
   "a24": "Evet. Başarısız webhook'lar Dead Letter Queue'da (DLQ) saklanır. Payload'ları, hata mesajlarını ve yanıt kodlarını inceleyebilirsiniz. Panelden veya API'den tek tıklamayla bir veya birden fazla başarısız teslimatı tekrar gönderebilirsiniz.",
   "q25": "Destek ile nasıl iletişime geçebilirim?",
-  "a25": "Teknik sorular için github.com/servetarslan02/HookSniff/issues adresinden GitHub Issue açın. Hesap ve faturalandırma sorunları için support@hooksniff.com adresine e-posta gönderin. Güvenlik açıkları için security@hooksniff.com adresine e-posta gönderin. Enterprise müşterileri öncelikli destek alır.",
+  "a25": "Teknik sorular için github.com/servetarslan02/HookSniff/issues adresinden GitHub Issue açın. Hesap ve faturalandırma sorunları için servetarslan02@gmail.com adresine e-posta gönderin. Güvenlik açıkları için servetarslan02@gmail.com adresine e-posta gönderin. Enterprise müşterileri öncelikli destek alır.",
   "coupons": {
     "couponsLoadFailed": "Kuponlar yüklenemedi",
     "editCoupon": "Kuponu Düzenle",

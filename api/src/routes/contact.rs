@@ -106,7 +106,7 @@ pub async fn handle_contact(
     let admin_email = cfg
         .notify_email
         .clone()
-        .unwrap_or_else(|| "admin@hooksniff.dev".into());
+        .unwrap_or_else(|| "servetarslan02@gmail.com".into());
     if let Err(e) = email_provider
         .send_contact_email(
             &admin_email,
