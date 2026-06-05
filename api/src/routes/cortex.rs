@@ -93,7 +93,7 @@ async fn get_endpoint_profile(Extension(pool): Extension<PgPool>, Extension(c): 
 async fn get_anomalies(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
     let rows = sqlx::query_as::<_, (i64, Uuid, Uuid, i32, serde_json::Value, String, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, endpoint_id, customer_id, score, factors, category, created_at FROM anomaly_scores ORDER BY created_at DESC LIMIT 100"
+        "SELECT id, endpoint_id, customer_id, score, factors, category, created_at FROM anomaly_scores WHERE (category IS NULL OR category != 'security') ORDER BY created_at DESC LIMIT 100"
     ).fetch_all(&pool).await.unwrap_or_default();
     Ok(Json(serde_json::json!({ "anomalies": rows })))
 }
@@ -101,7 +101,7 @@ async fn get_anomalies(Extension(pool): Extension<PgPool>, Extension(c): Extensi
 async fn get_high_anomalies(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
     let rows = sqlx::query_as::<_, (i64, Uuid, Uuid, i32, serde_json::Value, String, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, endpoint_id, customer_id, score, factors, category, created_at FROM anomaly_scores WHERE score > 70 ORDER BY score DESC LIMIT 50"
+        "SELECT id, endpoint_id, customer_id, score, factors, category, created_at FROM anomaly_scores WHERE score > 70 AND (category IS NULL OR category != 'security') ORDER BY score DESC LIMIT 50"
     ).fetch_all(&pool).await.unwrap_or_default();
     Ok(Json(serde_json::json!({ "high_anomalies": rows })))
 }
@@ -188,7 +188,7 @@ async fn get_cortex_health(Extension(pool): Extension<PgPool>, Extension(c): Ext
     require_admin(&c)?;
     let stats_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM endpoint_hourly_stats").fetch_one(&pool).await.unwrap_or((0,));
     let profiles_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM endpoint_profiles").fetch_one(&pool).await.unwrap_or((0,));
-    let anomalies_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM anomaly_scores WHERE created_at > NOW() - INTERVAL '24 hours'").fetch_one(&pool).await.unwrap_or((0,));
+    let anomalies_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM anomaly_scores WHERE created_at > NOW() - INTERVAL '24 hours' AND (category IS NULL OR category != 'security')").fetch_one(&pool).await.unwrap_or((0,));
     let healing_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM healing_actions WHERE created_at > NOW() - INTERVAL '24 hours'").fetch_one(&pool).await.unwrap_or((0,));
     let memory_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM cortex_action_history").fetch_one(&pool).await.unwrap_or((0,));
     let predictions_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM predictions WHERE created_at > NOW() - INTERVAL '24 hours'").fetch_one(&pool).await.unwrap_or((0,));
