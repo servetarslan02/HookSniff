@@ -205,7 +205,7 @@ export default function DeliveriesContent() {
     setBatchReplaying(true);
     try {
       const result = await webhooksApi.batchReplay(token, Array.from(selectedIds));
-      toast(`Replayed ${result.replayed || selectedIds.size} deliveries`, 'success');
+      toast(t('batchReplaySuccess', { count: result.replayed || selectedIds.size }) || `Replayed ${result.replayed || selectedIds.size} deliveries`, 'success');
       setSelectedIds(new Set());
       refetch();
     } catch (err) {

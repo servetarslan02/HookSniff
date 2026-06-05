@@ -51,7 +51,7 @@ export function AdminRefundRequests() {
       const data = await api.get(`/admin/refund-requests${statusParam}`, token) as { requests?: RefundRequest[] };
       setRequests(data.requests || []);
     } catch (err: unknown) {
-      toast(getErrorMessage(err, 'Failed to load refund requests'), 'error');
+      toast(getErrorMessage(err, t('refundLoadFailed') || 'Failed to load refund requests'), 'error');
     } finally {
       setLoading(false);
     }
