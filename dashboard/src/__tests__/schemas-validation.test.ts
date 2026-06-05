@@ -111,9 +111,9 @@ describe('DeliverySchema', () => {
     }
   });
 
-  it('rejects invalid status', () => {
+  it('accepts any status string (backend may add new statuses)', () => {
     const result = DeliverySchema.safeParse({ ...validDelivery, status: 'invalid' });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it('requires attempt_count to be number', () => {
