@@ -79,13 +79,19 @@ pub fn clean_database_url(database_url: &str) -> String {
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
+    // Force UTF-8 client encoding to prevent double-encoding of non-ASCII characters
+    let url_with_encoding = if clean_url.contains('?') {
+        format!("{}&options=-c%20client_encoding%3DUTF8", clean_url)
+    } else {
+        format!("{}?options=-c%20client_encoding%3DUTF8", clean_url)
+    };
     let pool = PgPoolOptions::new()
         .max_connections(30)                              // Neon free tier: 100 max, 30 bizim için yeterli
         .min_connections(0)                               // Lazy: startup'ta bağlantı açma, ilk istekte aç
         .acquire_timeout(std::time::Duration::from_secs(15)) // 15sn: Neon cold start için yeterli
         .idle_timeout(std::time::Duration::from_secs(300))   // 5dk kullanılmayan bağlantıyı kapat
         .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile (memory leak önleme)
-        .connect(&clean_url)
+        .connect(&url_with_encoding)
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
@@ -97,10 +103,15 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
 /// Create a small dedicated pool for health checks (5 connections).
 pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
+    let url_with_encoding = if clean_url.contains('?') {
+        format!("{}&options=-c%20client_encoding%3DUTF8", clean_url)
+    } else {
+        format!("{}?options=-c%20client_encoding%3DUTF8", clean_url)
+    };
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(std::time::Duration::from_secs(10))
-        .connect(&clean_url)
+        .connect(&url_with_encoding)
         .await?;
     Ok(pool)
 }
