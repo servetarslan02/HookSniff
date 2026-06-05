@@ -20,6 +20,11 @@ vi.mock('@/i18n/navigation', () => ({
   Link: ({ children, ...props }: any) => React.createElement('a', props, children),
 }));
 
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/login',
+}));
+
 vi.mock('@/lib/store', () => ({
   useAuth: () => ({
     token: 'test-token',
