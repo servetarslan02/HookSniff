@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -64,13 +65,13 @@ describe('EndpointSettingsPage', () => {
 
   it('renders loading state', async () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    render(React.createElement(EndpointSettingsPage));
+    renderWithProviders(React.createElement(EndpointSettingsPage));
     expect(document.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   it('renders endpoint settings header', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText('Endpoint Settings').length).toBeGreaterThan(0);
     expect(screen.getAllByText('https://example.com/webhook').length).toBeGreaterThan(0);
@@ -78,7 +79,7 @@ describe('EndpointSettingsPage', () => {
 
   it('renders retry policy section', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText('Retry Policy').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Max Attempts').length).toBeGreaterThan(0);
@@ -87,7 +88,7 @@ describe('EndpointSettingsPage', () => {
 
   it('renders backoff options', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText('Exponential').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Linear').length).toBeGreaterThan(0);
@@ -96,21 +97,21 @@ describe('EndpointSettingsPage', () => {
 
   it('renders signature section', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText(/Signing Secret/).length).toBeGreaterThan(0);
   });
 
   it('renders test webhook section', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText(/Test Webhook/).length).toBeGreaterThan(0);
   });
 
   it('renders back button', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     const backBtns = screen.getAllByRole('button');
     expect(backBtns.length).toBeGreaterThan(0);
@@ -118,7 +119,7 @@ describe('EndpointSettingsPage', () => {
 
   it('navigates back when clicking back button', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     const backBtn = document.querySelector('button');
     if (backBtn) {
@@ -131,7 +132,7 @@ describe('EndpointSettingsPage', () => {
 
   it('renders delay preview after loading', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     // After loading, should show retry policy section
     expect(screen.getAllByText('Retry Policy').length).toBeGreaterThan(0);
@@ -140,7 +141,7 @@ describe('EndpointSettingsPage', () => {
   it('handles endpoint not found', async () => {
     mockApiFetch.mockResolvedValue([]);
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(mockToast).toHaveBeenCalledWith('Endpoint not found', 'error');
   });
@@ -148,14 +149,14 @@ describe('EndpointSettingsPage', () => {
   it('handles fetch error', async () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(mockToast).toHaveBeenCalled();
   });
 
   it('renders save button', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(screen.getAllByText(/Save Retry Policy/).length).toBeGreaterThan(0);
   });

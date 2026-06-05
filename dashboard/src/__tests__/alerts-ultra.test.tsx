@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -95,20 +96,20 @@ describe('AlertsPage — Ultra Coverage', () => {
   // 1. Renders without crashing
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AlertsPage));
+      renderWithProviders(React.createElement(AlertsPage));
     });
   });
 
   // 2. Renders alerts title
   it('renders alerts title', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('alerts.title');
   });
 
   // 3. Shows empty state when no alerts
   it('shows empty state when no alerts', async () => {
     mockAlertsList.mockResolvedValue([]);
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('No alert rules yet');
     });
@@ -116,7 +117,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 4. Renders alert list
   it('renders alert list with all alerts', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
       expect(container.textContent).toContain('Slow Endpoints');
@@ -126,7 +127,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 5. Each alert shows name
   it('each alert shows name', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const alertItems = container.querySelectorAll('.px-6.py-4');
       expect(alertItems.length).toBeGreaterThanOrEqual(3);
@@ -135,7 +136,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 6. Each alert shows condition label
   it('each alert shows condition label', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Failure Rate >');
       expect(container.textContent).toContain('Avg Latency >');
@@ -145,7 +146,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 7. Each alert shows threshold
   it('each alert shows threshold value', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       // failure_rate: 10%, latency: 5000ms, consecutive: 5
       expect(container.textContent).toContain('10');
@@ -156,7 +157,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 8. Each alert shows channels
   it('each alert shows channel icons', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('📧'); // email
       expect(container.textContent).toContain('💬'); // slack
@@ -166,7 +167,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 9. Create button opens form
   it('create button opens form', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -180,7 +181,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 10. Name input in create form
   it('name input accepts text', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -194,7 +195,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 11. Condition select/input
   it('condition select has correct options', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -208,7 +209,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 12. Threshold input
   it('threshold input accepts number', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -222,7 +223,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 13. Channel selection (email/webhook)
   it('channel toggle buttons work', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -245,7 +246,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 14. Submit creates alert
   it('submit creates alert with form data', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -268,7 +269,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 15. Cancel closes form
   it('cancel closes create form', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -284,7 +285,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 16. Delete button works
   it('delete button opens confirm dialog', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -297,7 +298,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 17. Delete confirmation calls API
   it('confirm delete calls API', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -310,7 +311,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // 18. Test button sends test alert
   it('test button sends test alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const testBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Test'
@@ -322,14 +323,14 @@ describe('AlertsPage — Ultra Coverage', () => {
   // 19. Loading state
   it('shows loading state', () => {
     mockAlertsList.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('common.loading');
   });
 
   // 20. Error handling on fetch failure
   it('handles fetch failure gracefully', async () => {
     mockAlertsList.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     // Should still render page with empty state
     await waitFor(() => {
       expect(container.textContent).toContain('alerts.title');
@@ -341,7 +342,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Test alert shows success toast
   it('shows success toast after test alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const testBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Test'
@@ -354,7 +355,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Cancel delete
   it('cancel delete closes dialog without calling API', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -370,7 +371,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Refreshes alerts after create
   it('refreshes alerts after successful create', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(mockAlertsList).toHaveBeenCalledTimes(1); });
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
@@ -391,7 +392,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Refreshes alerts after delete
   it('refreshes alerts after successful delete', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(mockAlertsList).toHaveBeenCalledTimes(1); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -406,7 +407,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Active/paused badges
   it('shows active and paused status badges', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('alerts.active');
       expect(container.textContent).toContain('alerts.paused');
@@ -415,7 +416,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Failure rate shows % suffix
   it('shows % suffix for failure_rate condition', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const alertItems = container.querySelectorAll('.px-6');
       const failureAlert = Array.from(alertItems).find(el =>
@@ -427,7 +428,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Latency shows ms suffix
   it('shows ms suffix for latency condition', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const alertItems = container.querySelectorAll('.px-6');
       const latencyAlert = Array.from(alertItems).find(el =>
@@ -439,7 +440,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Consecutive failures has no suffix
   it('shows no suffix for consecutive_failures condition', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const alertItems = container.querySelectorAll('.px-6');
       const consecAlert = Array.from(alertItems).find(el =>
@@ -453,7 +454,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Create with all channels
   it('creates alert with all three channels', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -486,7 +487,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Create with changed condition
   it('creates alert with changed condition and threshold', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -517,7 +518,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Disabled create when name empty
   it('disables create button when name is empty', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -530,7 +531,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Create form resets after successful create
   it('resets form after successful create', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -551,7 +552,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Test button for each alert
   it('renders test button for each alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const testBtns = Array.from(container.querySelectorAll('button')).filter(
         b => b.textContent === 'Test'
@@ -562,7 +563,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Delete button for each alert
   it('renders delete button for each alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
         b => b.textContent === 'Delete'
@@ -573,13 +574,13 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Description text
   it('renders description text', () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('Get notified when webhooks fail');
   });
 
   // Condition select changes value
   it('changing condition select updates form', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -593,7 +594,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Delete second alert
   it('deletes the correct alert when multiple exist', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('Slow Endpoints'); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -607,7 +608,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Test alert for second alert
   it('tests the correct alert when multiple exist', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('Slow Endpoints'); });
     const testBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Test'
@@ -619,7 +620,7 @@ describe('AlertsPage — Ultra Coverage', () => {
   // Handles create failure gracefully
   it('handles create failure gracefully', async () => {
     mockAlertsCreate.mockRejectedValue(new Error('Server error'));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -641,7 +642,7 @@ describe('AlertsPage — Ultra Coverage', () => {
   // Handles delete failure gracefully
   it('handles delete failure gracefully', async () => {
     mockAlertsDelete.mockRejectedValue(new Error('Server error'));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Delete'
@@ -658,7 +659,7 @@ describe('AlertsPage — Ultra Coverage', () => {
   // Handles test failure gracefully
   it('handles test failure gracefully', async () => {
     mockAlertsTest.mockRejectedValue(new Error('Server error'));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => { expect(container.textContent).toContain('High Failure Rate'); });
     const testBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'Test'
@@ -672,7 +673,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Default threshold value
   it('default threshold is 10', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -683,7 +684,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Default condition is failure_rate
   it('default condition is failure_rate', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );
@@ -694,7 +695,7 @@ describe('AlertsPage — Ultra Coverage', () => {
 
   // Default channels include email
   it('default channels include email', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('alerts.newAlert')
     );

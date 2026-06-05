@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -98,14 +99,14 @@ describe('SearchPage - Extended', () => {
   // ─── Render ───
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(SearchPage));
+      renderWithProviders(React.createElement(SearchPage));
     });
   });
 
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('search.title');
@@ -114,7 +115,7 @@ describe('SearchPage - Extended', () => {
   it('renders search placeholder', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]');
@@ -126,7 +127,7 @@ describe('SearchPage - Extended', () => {
   it('renders search input field', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]');
@@ -136,7 +137,7 @@ describe('SearchPage - Extended', () => {
   it('updates search query on typing', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -150,7 +151,7 @@ describe('SearchPage - Extended', () => {
   it('debounces search - does not call fetch immediately', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -166,7 +167,7 @@ describe('SearchPage - Extended', () => {
   it('fires search after debounce delay', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -187,7 +188,7 @@ describe('SearchPage - Extended', () => {
   it('cancels previous debounce on rapid typing', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -213,7 +214,7 @@ describe('SearchPage - Extended', () => {
   it('displays search results after search', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -232,7 +233,7 @@ describe('SearchPage - Extended', () => {
   it('displays result count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -251,7 +252,7 @@ describe('SearchPage - Extended', () => {
   it('renders table headers for results', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -276,7 +277,7 @@ describe('SearchPage - Extended', () => {
   it('displays truncated delivery IDs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -294,7 +295,7 @@ describe('SearchPage - Extended', () => {
   it('displays endpoint URLs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -312,7 +313,7 @@ describe('SearchPage - Extended', () => {
   it('displays response status codes in parentheses', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -331,7 +332,7 @@ describe('SearchPage - Extended', () => {
   it('displays attempt counts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -352,7 +353,7 @@ describe('SearchPage - Extended', () => {
   it('navigates to delivery detail on result row click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -380,7 +381,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -402,7 +403,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     // Advance past initial debounce
@@ -425,7 +426,7 @@ describe('SearchPage - Extended', () => {
     );
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -452,7 +453,7 @@ describe('SearchPage - Extended', () => {
   it('renders status filter dropdown', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const select = container!.querySelector('select');
@@ -468,7 +469,7 @@ describe('SearchPage - Extended', () => {
   it('filters by status when dropdown changes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const select = container!.querySelector('select')!;
@@ -488,7 +489,7 @@ describe('SearchPage - Extended', () => {
   it('includes both query and status in search params', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -513,7 +514,7 @@ describe('SearchPage - Extended', () => {
   it('renders Search button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const searchBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -525,7 +526,7 @@ describe('SearchPage - Extended', () => {
   it('triggers immediate search on form submit', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -559,7 +560,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -579,7 +580,7 @@ describe('SearchPage - Extended', () => {
   it('hides pagination when results fit in one page', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -610,7 +611,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -633,7 +634,7 @@ describe('SearchPage - Extended', () => {
     fetchSpy.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -658,7 +659,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -678,7 +679,7 @@ describe('SearchPage - Extended', () => {
   it('constructs correct API URL with query params', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -699,7 +700,7 @@ describe('SearchPage - Extended', () => {
   it('includes credentials in fetch request', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -731,7 +732,7 @@ describe('SearchPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SearchPage));
+      const result = renderWithProviders(React.createElement(SearchPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;

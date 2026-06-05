@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -62,13 +63,13 @@ describe('AdminUserDetailPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminUserDetailPage));
+      renderWithProviders(React.createElement(AdminUserDetailPage));
     });
   });
 
   it('fetches user detail on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminUserDetailPage));
+      renderWithProviders(React.createElement(AdminUserDetailPage));
     });
     expect(mockGetUserDetail).toHaveBeenCalledWith('test-token', 'user-123');
   });
@@ -76,7 +77,7 @@ describe('AdminUserDetailPage', () => {
   it('displays user detail title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Test User');
@@ -86,7 +87,7 @@ describe('AdminUserDetailPage', () => {
     mockGetUserDetail.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
@@ -95,7 +96,7 @@ describe('AdminUserDetailPage', () => {
   it('shows plan selector', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select');

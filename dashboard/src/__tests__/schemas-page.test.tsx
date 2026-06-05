@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -33,7 +34,7 @@ describe('SchemasPage', () => {
     const { apiFetch } = await import('@/lib/api');
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ schemas: [] });
     await act(async () => {
-      render(React.createElement(SchemasPage));
+      renderWithProviders(React.createElement(SchemasPage));
     });
   });
 
@@ -42,7 +43,7 @@ describe('SchemasPage', () => {
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ schemas: [] });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SchemasPage));
+      const result = renderWithProviders(React.createElement(SchemasPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Schemas');
@@ -53,7 +54,7 @@ describe('SchemasPage', () => {
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ schemas: [] });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SchemasPage));
+      const result = renderWithProviders(React.createElement(SchemasPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No schemas registered yet');

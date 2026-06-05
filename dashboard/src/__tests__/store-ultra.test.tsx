@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -47,7 +48,7 @@ function AuthConsumer() {
 }
 
 function renderWithAuth() {
-  return render(
+  return renderWithProviders(
     <AuthProvider>
       <AuthConsumer />
     </AuthProvider>
@@ -220,7 +221,7 @@ describe('store-ultra: AuthProvider', () => {
 
   it('useAuth throws outside AuthProvider', () => {
     function BadConsumer() { useAuth(); return null; }
-    expect(() => render(<BadConsumer />)).toThrow('useAuth must be used within AuthProvider');
+    expect(() => renderWithProviders(<BadConsumer />)).toThrow('useAuth must be used within AuthProvider');
   });
 
   it('persists user to localStorage on login', async () => {

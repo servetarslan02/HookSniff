@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -32,64 +33,64 @@ describe('ContactPage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(ContactPage));
+    renderWithProviders(React.createElement(ContactPage));
   });
 
   it('displays contact title', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     expect(container.textContent).toContain('Contact Us');
   });
 
   it('renders contact description', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     expect(container.textContent).toContain('Have a question or need help?');
   });
 
   it('renders contact info', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     expect(container.textContent).toContain('Use the form below');
   });
 
   it('renders contact form with inputs', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     expect(container.textContent).toContain('Send us a message');
     const inputs = container.querySelectorAll('input');
     expect(inputs.length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders name input', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     const nameInput = container.querySelector('input[type="text"]');
     expect(nameInput).toBeTruthy();
   });
 
   it('renders email input', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     const emailInput = container.querySelector('input[type="email"]');
     expect(emailInput).toBeTruthy();
   });
 
   it('renders subject select', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
   });
 
   it('renders message textarea', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     const textarea = container.querySelector('textarea');
     expect(textarea).toBeTruthy();
   });
 
   it('renders submit button', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     const button = container.querySelector('button[type="submit"]');
     expect(button).toBeTruthy();
     expect(button!.textContent).toContain('sendMessage');
   });
 
   it('renders contact info cards', () => {
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
     expect(container.textContent).toContain('Email');
     expect(container.textContent).toContain('Location');
     expect(container.textContent).toContain('Response Time');
@@ -97,7 +98,7 @@ describe('ContactPage', () => {
 
   it('submits form successfully', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
 
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
@@ -128,7 +129,7 @@ describe('ContactPage', () => {
 
   it('shows success state after submission', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
 
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
@@ -150,7 +151,7 @@ describe('ContactPage', () => {
 
   it('shows error state on fetch failure', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({}) });
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
 
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
@@ -172,7 +173,7 @@ describe('ContactPage', () => {
 
   it('shows error state on network failure', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
-    const { container } = render(React.createElement(ContactPage));
+    const { container } = renderWithProviders(React.createElement(ContactPage));
 
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;

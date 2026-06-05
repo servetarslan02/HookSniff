@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -63,7 +64,7 @@ const mockRules = [
 
 /** Render page, wait for endpoints, select ep1, wait for rules */
 async function renderWithRules() {
-  const result = render(React.createElement(TransformsPage));
+  const result = renderWithProviders(React.createElement(TransformsPage));
   const { container } = result;
   await waitFor(() => {
     const select = container.querySelector('select') as HTMLSelectElement;
@@ -90,37 +91,37 @@ describe('TransformsPage — Extended Coverage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(TransformsPage));
+    renderWithProviders(React.createElement(TransformsPage));
   });
 
   it('displays title', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Webhook Transforms');
   });
 
   it('displays description', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Filter, map, and enrich');
   });
 
   it('renders new rule button', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('+ New Rule');
   });
 
   it('renders endpoint selector', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
   });
 
   it('shows placeholder when no endpoint selected', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select an endpoint to manage transforms');
   });
 
   it('populates endpoint options', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
       const opts = Array.from(select.options).map((o) => o.value);
@@ -334,7 +335,7 @@ describe('TransformsPage — Extended Coverage', () => {
 
   it('shows loading state while fetching rules', async () => {
     mockTransformsList.mockReturnValue(new Promise(() => {}));
-    const result = render(React.createElement(TransformsPage));
+    const result = renderWithProviders(React.createElement(TransformsPage));
     const { container } = result;
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;

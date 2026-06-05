@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -87,7 +88,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays round-robin strategy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('round-robin');
@@ -96,7 +97,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays failover strategy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('failover');
@@ -105,7 +106,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays latency-based strategy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('latency-based');
@@ -118,7 +119,7 @@ describe('RoutingPage - Extended Tests', () => {
     }]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('round-robin');
@@ -128,7 +129,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays endpoint URLs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('https://api.example.com/webhook');
@@ -140,7 +141,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays fallback URL when present', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('https://fallback.example.com/hook');
@@ -151,7 +152,7 @@ describe('RoutingPage - Extended Tests', () => {
     mockApiFetch.mockResolvedValueOnce([mockEndpoints[0]]); // no fallback
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).not.toContain('Fallback:');
@@ -161,7 +162,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays healthy status for low failure streak', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Healthy');
@@ -170,7 +171,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays unhealthy status for high failure streak', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Unhealthy');
@@ -179,7 +180,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('applies badge-green class for healthy endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     const greenBadge = container!.querySelector('.badge-green');
@@ -189,7 +190,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('applies badge-red class for unhealthy endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     const redBadge = container!.querySelector('.badge-red');
@@ -203,7 +204,7 @@ describe('RoutingPage - Extended Tests', () => {
     }]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Unhealthy');
@@ -216,7 +217,7 @@ describe('RoutingPage - Extended Tests', () => {
     }]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Healthy');
@@ -226,7 +227,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays average response time', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('150ms avg');
@@ -239,7 +240,7 @@ describe('RoutingPage - Extended Tests', () => {
     mockApiFetch.mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No endpoints configured yet');
@@ -249,7 +250,7 @@ describe('RoutingPage - Extended Tests', () => {
     mockApiFetch.mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     const emptyState = container!.querySelector('.text-center.py-12');
@@ -259,13 +260,13 @@ describe('RoutingPage - Extended Tests', () => {
   // === Loading State ===
   it('shows loading initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(React.createElement(RoutingPage));
+    const { container } = renderWithProviders(React.createElement(RoutingPage));
     expect(container.textContent).toContain('Loading...');
   });
 
   it('loading has correct styling', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(RoutingPage));
+    const { container } = renderWithProviders(React.createElement(RoutingPage));
     const loadingDiv = container.querySelector('.text-gray-500');
     expect(loadingDiv).toBeTruthy();
     expect(loadingDiv!.textContent).toContain('Loading...');
@@ -274,7 +275,7 @@ describe('RoutingPage - Extended Tests', () => {
   // === API Call ===
   it('calls apiFetch with correct path and token', async () => {
     await act(async () => {
-      render(React.createElement(RoutingPage));
+      renderWithProviders(React.createElement(RoutingPage));
     });
     expect(mockApiFetch).toHaveBeenCalledWith('/endpoints', { token: 'test-token' });
   });
@@ -284,7 +285,7 @@ describe('RoutingPage - Extended Tests', () => {
     mockApiFetch.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     // Should show empty state since endpoints stays empty on error
@@ -295,7 +296,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays routing title with emoji', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('🔀');
@@ -305,7 +306,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays routing description', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('round-robin');
@@ -318,7 +319,7 @@ describe('RoutingPage - Extended Tests', () => {
     mockApiFetch.mockResolvedValueOnce([mockEndpoints[0]]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('https://api.example.com/webhook');
@@ -330,7 +331,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('renders all endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     // All 3 URLs should be present
@@ -343,7 +344,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('has max-w-6xl container', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     const mainDiv = container!.querySelector('.max-w-6xl');
@@ -353,7 +354,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('renders endpoint cards with border styling', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     const cards = container!.querySelectorAll('.rounded-xl');
@@ -368,7 +369,7 @@ describe('RoutingPage - Extended Tests', () => {
     }]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Healthy');
@@ -378,7 +379,7 @@ describe('RoutingPage - Extended Tests', () => {
   it('displays Strategy: label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Strategy:');

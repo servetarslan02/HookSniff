@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -70,7 +71,7 @@ async function renderPage(keys = mockKeys) {
   mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(keys) });
   let result: any;
   await act(async () => {
-    result = render(React.createElement(ApiKeysPage));
+    result = renderWithProviders(React.createElement(ApiKeysPage));
   });
   return result!;
 }
@@ -155,7 +156,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
 
     let result: any;
     await act(async () => {
-      result = render(React.createElement(ApiKeysPage));
+      result = renderWithProviders(React.createElement(ApiKeysPage));
     });
     const { container } = result;
 
@@ -180,7 +181,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_copy_feedback' }) });
 
     let result: any;
-    await act(async () => { result = render(React.createElement(ApiKeysPage)); });
+    await act(async () => { result = renderWithProviders(React.createElement(ApiKeysPage)); });
     const { container } = result;
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
@@ -292,7 +293,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_dismiss_test' }) });
 
     let result: any;
-    await act(async () => { result = render(React.createElement(ApiKeysPage)); });
+    await act(async () => { result = renderWithProviders(React.createElement(ApiKeysPage)); });
     const { container } = result;
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
@@ -312,7 +313,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_hide_me' }) });
 
     let result: any;
-    await act(async () => { result = render(React.createElement(ApiKeysPage)); });
+    await act(async () => { result = renderWithProviders(React.createElement(ApiKeysPage)); });
     const { container } = result;
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 
@@ -333,7 +334,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
     let result: any;
-    await act(async () => { result = render(React.createElement(ApiKeysPage)); });
+    await act(async () => { result = renderWithProviders(React.createElement(ApiKeysPage)); });
     const { container } = result;
 
     expect(container.textContent).toContain('apiKeys.loadingKeys');
@@ -369,7 +370,7 @@ describe('ApiKeysPage — Ultra Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_success' }) });
 
     let result: any;
-    await act(async () => { result = render(React.createElement(ApiKeysPage)); });
+    await act(async () => { result = renderWithProviders(React.createElement(ApiKeysPage)); });
     const { container } = result;
     await waitFor(() => { expect(container.textContent).toContain('Production Key'); });
 

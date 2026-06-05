@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -67,13 +68,13 @@ describe('LogsPage — Extended Coverage', () => {
   // === Render ===
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(LogsPage));
+      renderWithProviders(React.createElement(LogsPage));
     });
   });
 
   it('calls webhooksApi.list with token on mount', async () => {
     await act(async () => {
-      render(React.createElement(LogsPage));
+      renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(mockWebhooksList).toHaveBeenCalledWith('test-token', { page: 1, status: undefined });
@@ -83,7 +84,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Title ===
   it('displays page title', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('logs.title');
@@ -92,7 +93,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('displays subtitle text', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Full delivery history');
@@ -102,7 +103,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Log list rendering ===
   it('renders delivery IDs (truncated)', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001a');
@@ -111,7 +112,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders event names', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -122,7 +123,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders endpoint IDs (truncated)', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('ep_001a');
@@ -131,7 +132,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders attempt counts', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       // attempt_count values: 1, 3, 0
@@ -141,7 +142,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders response status codes', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('200');
@@ -151,7 +152,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders dash for null response status', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const dashes = container.querySelectorAll('.text-gray-400');
@@ -162,7 +163,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Status badge rendering ===
   it('renders status badges for each delivery', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const badges = container.querySelectorAll('[data-testid="status-badge"]');
@@ -172,7 +173,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders delivered status badge', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const badges = container.querySelectorAll('[data-testid="status-badge"]');
@@ -183,7 +184,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders failed status badge', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const badges = container.querySelectorAll('[data-testid="status-badge"]');
@@ -194,7 +195,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders pending status badge', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const badges = container.querySelectorAll('[data-testid="status-badge"]');
@@ -206,7 +207,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Response status color coding ===
   it('renders green for 2xx response', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const green = container.querySelector('.text-green-600');
@@ -217,7 +218,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('renders red for 5xx response', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const red = container.querySelector('.text-red-600');
@@ -229,7 +230,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Timestamp formatting ===
   it('formats timestamps in table rows', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       // toLocaleString with month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
@@ -247,14 +248,14 @@ describe('LogsPage — Extended Coverage', () => {
 
   // === Search functionality ===
   it('renders search input', () => {
-    const { container } = render(React.createElement(LogsPage));
+    const { container } = renderWithProviders(React.createElement(LogsPage));
     const input = container.querySelector('input[type="text"]');
     expect(input).toBeTruthy();
   });
 
   it('filters by search term matching event', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -274,7 +275,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('filters by search term matching id', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -293,7 +294,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('filters by search term matching endpoint_id', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -312,7 +313,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('is case-insensitive in search', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -330,7 +331,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows empty state when search has no matches', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -349,7 +350,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Filtering by status ===
   it('renders status filter tabs', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('All');
@@ -361,7 +362,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('sends status=delivered when Delivered tab clicked', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delivered');
@@ -383,7 +384,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('sends status=failed when Failed tab clicked', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Failed');
@@ -405,7 +406,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('sends status=pending when Pending tab clicked', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Pending');
@@ -427,7 +428,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('sends status=undefined when All tab clicked', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Failed');
@@ -455,7 +456,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('resets page to 1 when filter changes', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Failed');
@@ -476,7 +477,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows status counts in filter tabs', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       // Count badges show numbers for filtered statuses
@@ -492,7 +493,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Pagination ===
   it('does not show pagination when total <= perPage', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -517,7 +518,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(0, 20), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Previous');
@@ -539,7 +540,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(0, 20), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Showing 1–20 of 25');
@@ -561,7 +562,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(0, 20), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const prevBtn = Array.from(container.querySelectorAll('button')).find((b) =>
@@ -585,7 +586,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(0, 20), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Next');
@@ -620,7 +621,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(0, 20), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Next');
@@ -674,7 +675,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: manyDeliveries.slice(20, 25), total: 25 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Next');
@@ -701,7 +702,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Log detail expansion (modal) ===
   it('opens detail modal on row click', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -720,7 +721,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows all detail rows in modal', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -744,7 +745,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows full delivery ID in modal', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -763,7 +764,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows attempt timeline in modal', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('payment.completed');
@@ -784,7 +785,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('closes modal on close button click', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -815,7 +816,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('closes modal on backdrop click', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -845,7 +846,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('closes modal on Close button in footer', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -875,7 +876,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('shows formatted created_at in modal', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('del_001');
@@ -897,7 +898,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: [], total: 0 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('logs.noLogs');
@@ -908,7 +909,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockResolvedValue({ deliveries: [], total: 0 });
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📭');
@@ -919,14 +920,14 @@ describe('LogsPage — Extended Coverage', () => {
   it('shows loading state while fetching', () => {
     mockWebhooksList.mockReturnValue(new Promise(() => {})); // never resolves
 
-    const { container } = render(React.createElement(LogsPage));
+    const { container } = renderWithProviders(React.createElement(LogsPage));
     expect(container.textContent).toContain('Loading logs');
   });
 
   it('shows spinner in loading state', () => {
     mockWebhooksList.mockReturnValue(new Promise(() => {}));
 
-    const { container } = render(React.createElement(LogsPage));
+    const { container } = renderWithProviders(React.createElement(LogsPage));
     const spinner = container.querySelector('.animate-spin');
     expect(spinner).toBeTruthy();
   });
@@ -936,7 +937,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockRejectedValue(new Error('Network error'));
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Network error');
@@ -947,7 +948,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockRejectedValue(new Error('Fail'));
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('⚠️');
@@ -958,7 +959,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockRejectedValue(new Error('Fail'));
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Retry');
@@ -969,7 +970,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Fail'));
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Retry');
@@ -995,7 +996,7 @@ describe('LogsPage — Extended Coverage', () => {
     mockWebhooksList.mockRejectedValue('string error');
 
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Unknown error');
@@ -1005,7 +1006,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Refresh button ===
   it('renders refresh button', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Refresh');
@@ -1014,7 +1015,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('re-fetches data on refresh click', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
 
     await waitFor(() => {
@@ -1037,7 +1038,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Auto-refresh ===
   it('renders auto-refresh toggle button', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('common.autoRefresh');
@@ -1046,7 +1047,7 @@ describe('LogsPage — Extended Coverage', () => {
 
   it('toggles auto-refresh on click', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('common.autoRefresh');
@@ -1069,7 +1070,7 @@ describe('LogsPage — Extended Coverage', () => {
   it('auto-refreshes every 5 seconds when enabled', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(mockWebhooksList).toHaveBeenCalledTimes(1);
@@ -1106,7 +1107,7 @@ describe('LogsPage — Extended Coverage', () => {
   it('stops auto-refresh when toggled off', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(mockWebhooksList).toHaveBeenCalledTimes(1);
@@ -1178,7 +1179,7 @@ describe('LogsPage — Extended Coverage', () => {
     const { default: LogsPageNoToken } = await import('@/app/[locale]/[username]/logs/page');
 
     await act(async () => {
-      render(React.createElement(LogsPageNoToken));
+      renderWithProviders(React.createElement(LogsPageNoToken));
     });
 
     expect(mockWebhooksList).not.toHaveBeenCalled();
@@ -1187,7 +1188,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Table headers ===
   it('renders all table column headers', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const headers = container.querySelectorAll('th');
@@ -1203,7 +1204,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Attempt count indicator ===
   it('shows amber dot for deliveries with attempt_count > 1', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       const amberDots = container.querySelectorAll('.bg-amber-400');
@@ -1215,7 +1216,7 @@ describe('LogsPage — Extended Coverage', () => {
   // === Search clears and shows all ===
   it('shows all deliveries when search is cleared', async () => {
     const { container } = await act(async () => {
-      return render(React.createElement(LogsPage));
+      return renderWithProviders(React.createElement(LogsPage));
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');

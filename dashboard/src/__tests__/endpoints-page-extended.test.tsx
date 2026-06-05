@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -61,23 +62,23 @@ describe('EndpointsPage — Extended', () => {
 
   // === Render tests ===
   it('renders without crashing', async () => {
-    await act(async () => { render(React.createElement(EndpointsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointsPage)); });
   });
 
   it('displays endpoints title', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('endpoints.title');
   });
 
   it('fetches endpoints on mount', async () => {
-    await act(async () => { render(React.createElement(EndpointsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointsPage)); });
     expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
   });
 
   it('renders all endpoints', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('https://example.com/hook');
     expect(container!.textContent).toContain('https://staging.example.com/hook');
     expect(container!.textContent).toContain('https://dev.example.com/hook');
@@ -85,27 +86,27 @@ describe('EndpointsPage — Extended', () => {
 
   it('renders endpoint descriptions', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('Production');
     expect(container!.textContent).toContain('Staging');
   });
 
   it('shows active/inactive status', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('endpoints.active');
   });
 
   it('renders new endpoint button', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('New Endpoint');
   });
 
   // === Create endpoint tests ===
   it('shows create form when button clicked', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const createButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(createButton!); });
@@ -116,7 +117,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('creates new endpoint', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const createButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(createButton!); });
@@ -132,7 +133,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('creates endpoint with description', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const createButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(createButton!); });
@@ -153,7 +154,7 @@ describe('EndpointsPage — Extended', () => {
   it('handles create error', async () => {
     mockEndpointsCreate.mockRejectedValueOnce(new Error('URL already exists'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const createButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(createButton!); });
@@ -169,7 +170,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('cancels create form', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const createButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(createButton!); });
@@ -183,7 +184,7 @@ describe('EndpointsPage — Extended', () => {
   // === Delete endpoint tests ===
   it('shows delete confirmation', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const deleteButtons = Array.from(container!.querySelectorAll('button')).filter(b => b.title === 'endpoints.deleteTitle');
     await act(async () => { fireEvent.click(deleteButtons[0]); });
@@ -193,7 +194,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('deletes endpoint on confirm', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const deleteButtons = Array.from(container!.querySelectorAll('button')).filter(b => b.title === 'endpoints.deleteTitle');
     await act(async () => { fireEvent.click(deleteButtons[0]); });
@@ -206,7 +207,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('cancels delete on cancel', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const deleteButtons = Array.from(container!.querySelectorAll('button')).filter(b => b.title === 'endpoints.deleteTitle');
     await act(async () => { fireEvent.click(deleteButtons[0]); });
@@ -220,7 +221,7 @@ describe('EndpointsPage — Extended', () => {
   // === Bulk select tests ===
   it('renders select all checkbox when multiple endpoints', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const selectAll = container!.querySelector('input[type="checkbox"]');
     expect(selectAll).toBeTruthy();
@@ -228,7 +229,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('selects all endpoints', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const selectAll = container!.querySelector('input[type="checkbox"]') as HTMLInputElement;
     await act(async () => { fireEvent.click(selectAll); });
@@ -238,7 +239,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('deselects all endpoints', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const selectAll = container!.querySelector('input[type="checkbox"]') as HTMLInputElement;
     await act(async () => { fireEvent.click(selectAll); });
@@ -249,7 +250,7 @@ describe('EndpointsPage — Extended', () => {
 
   it('bulk deletes selected endpoints', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const selectAll = container!.querySelector('input[type="checkbox"]') as HTMLInputElement;
     await act(async () => { fireEvent.click(selectAll); });
@@ -265,7 +266,7 @@ describe('EndpointsPage — Extended', () => {
   it('shows empty state when no endpoints', async () => {
     mockEndpointsList.mockResolvedValueOnce([]);
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('No endpoints yet');
   });
 
@@ -273,14 +274,14 @@ describe('EndpointsPage — Extended', () => {
   it('shows loading state', async () => {
     mockEndpointsList.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   // === Navigation ===
   it('navigates to endpoint settings', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
 
     const settingsButtons = Array.from(container!.querySelectorAll('button')).filter(b => b.title === 'Settings');
     await act(async () => { fireEvent.click(settingsButtons[0]); });

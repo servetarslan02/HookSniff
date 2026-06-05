@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -46,7 +47,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   it('starts with loading state', () => {
     let container: HTMLElement;
     act(() => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -58,7 +59,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   it('sets isLoading to false after auth check', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -72,7 +73,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   it('has null user when not authenticated', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -86,7 +87,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   it('has null token when not authenticated', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -100,7 +101,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   // === Auth Me Verification ===
   it('calls /auth/me on mount', async () => {
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -131,7 +132,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -160,7 +161,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -183,7 +184,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
     });
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -206,7 +207,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -237,7 +238,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -294,7 +295,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <LoginErrorCatcher />
         </AuthProvider>
@@ -332,7 +333,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -368,7 +369,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -403,7 +404,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -437,7 +438,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -467,7 +468,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -495,7 +496,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -510,7 +511,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
   // === useAuth outside provider ===
   it('throws error when useAuth used outside AuthProvider', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(React.createElement(AuthConsumer))).toThrow('useAuth must be used within AuthProvider');
+    expect(() => renderWithProviders(React.createElement(AuthConsumer))).toThrow('useAuth must be used within AuthProvider');
     spy.mockRestore();
   });
 
@@ -525,7 +526,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -551,7 +552,7 @@ describe('AuthProvider + useAuth - Comprehensive', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      container = render(
+      container = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>

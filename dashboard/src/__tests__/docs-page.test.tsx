@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -24,21 +25,21 @@ describe('DocsPage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(DocsPage));
+    renderWithProviders(React.createElement(DocsPage));
   });
 
   it('displays docs title', () => {
-    const { container } = render(React.createElement(DocsPage));
+    const { container } = renderWithProviders(React.createElement(DocsPage));
     expect(container.textContent).toContain('docs.gettingStarted');
   });
 
   it('renders getting started section', () => {
-    const { container } = render(React.createElement(DocsPage));
+    const { container } = renderWithProviders(React.createElement(DocsPage));
     expect(container.textContent).toContain('docs.gettingStarted');
   });
 
   it('renders quickstart link card', () => {
-    const { container } = render(React.createElement(DocsPage));
+    const { container } = renderWithProviders(React.createElement(DocsPage));
     expect(container.textContent).toContain('Quickstart');
     expect(container.textContent).toContain('Send your first webhook');
   });

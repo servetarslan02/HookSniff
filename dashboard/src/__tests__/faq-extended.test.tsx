@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -37,7 +38,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Categories ===
   it('renders all five category tabs', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     expect(container.textContent).toContain('catGeneral');
     expect(container.textContent).toContain('catGettingStarted');
     expect(container.textContent).toContain('catBilling');
@@ -46,7 +47,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('renders category tab buttons', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const catButtons = buttons.filter(b =>
       b.textContent?.includes('catGeneral') ||
@@ -59,7 +60,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('default category is catGeneral', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // Default active category should show General questions
     expect(container.textContent).toContain('q1');
     expect(container.textContent).toContain('q2');
@@ -68,7 +69,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Category Selection ===
   it('switches to GettingStarted category on click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const gettingStartedBtn = buttons.find(b => b.textContent?.includes('catGettingStarted'));
 
@@ -81,7 +82,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('switches to Billing category on click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const billingBtn = buttons.find(b => b.textContent?.includes('catBilling'));
 
@@ -95,7 +96,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('switches to Technical category on click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const technicalBtn = buttons.find(b => b.textContent?.includes('catTechnical'));
 
@@ -110,7 +111,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('switches to Security category on click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const securityBtn = buttons.find(b => b.textContent?.includes('catSecurity'));
 
@@ -124,7 +125,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('hides previous category questions when switching', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // Default: catGeneral shows q1, q2, q3
     expect(container.textContent).toContain('q1');
 
@@ -142,7 +143,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Accordion Expand/Collapse ===
   it('accordion is collapsed by default', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // Answer should not be visible initially (the accordion content)
     // q1 answer is 'a1' — check that the answer div is not rendered
     const answerDivs = container.querySelectorAll('.border-t');
@@ -151,7 +152,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('expands accordion on click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // Find the first FAQ accordion button (q1)
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
@@ -166,7 +167,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('collapses accordion on second click', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
 
@@ -186,7 +187,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('can open multiple accordions', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
     const q2Button = buttons.find(b => b.textContent?.includes('q2'));
@@ -201,7 +202,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('accordion SVG rotates when open', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
 
@@ -214,7 +215,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('accordion SVG does not rotate when closed', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
 
@@ -224,7 +225,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Question/Answer Display ===
   it('displays question text for each FAQ', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // Default category is catGeneral: q1, q2, q3
     expect(container.textContent).toContain('q1');
     expect(container.textContent).toContain('q2');
@@ -232,7 +233,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('displays answer text when expanded', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const q1Button = buttons.find(b => b.textContent?.includes('q1'));
 
@@ -245,7 +246,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === All Categories Rendered ===
   it('renders correct number of questions for catGeneral (3)', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     // catGeneral has q1, q2, q3 — count accordion buttons (excluding category tabs)
     const buttons = Array.from(container.querySelectorAll('button'));
     const faqButtons = buttons.filter(b =>
@@ -255,7 +256,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('renders correct number of questions for catGettingStarted (2)', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = () => Array.from(container.querySelectorAll('button'));
     const gettingStartedBtn = buttons().find(b => b.textContent?.includes('catGettingStarted'));
     act(() => { fireEvent.click(gettingStartedBtn!); });
@@ -265,7 +266,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('renders correct number of questions for catBilling (3)', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = () => Array.from(container.querySelectorAll('button'));
     const billingBtn = buttons().find(b => b.textContent?.includes('catBilling'));
     act(() => { fireEvent.click(billingBtn!); });
@@ -275,7 +276,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('renders correct number of questions for catTechnical (4)', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = () => Array.from(container.querySelectorAll('button'));
     const technicalBtn = buttons().find(b => b.textContent?.includes('catTechnical'));
     act(() => { fireEvent.click(technicalBtn!); });
@@ -285,7 +286,7 @@ describe('FAQPage - Extended Tests', () => {
   });
 
   it('renders correct number of questions for catSecurity (3)', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = () => Array.from(container.querySelectorAll('button'));
     const securityBtn = buttons().find(b => b.textContent?.includes('catSecurity'));
     act(() => { fireEvent.click(securityBtn!); });
@@ -296,69 +297,69 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Navigation ===
   it('renders HookSniff branding', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     expect(container.textContent).toContain('HookSniff');
   });
 
   it('renders FAQ breadcrumb', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     expect(container.textContent).toContain('FAQ');
   });
 
   it('renders LanguageSwitcher', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     expect(container.textContent).toContain('LanguageSwitcher');
   });
 
   // === Still Have Questions Section ===
   it('renders still have questions section', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     expect(container.textContent).toContain('stillHaveQuestions');
     expect(container.textContent).toContain('cantFindAnswer');
     expect(container.textContent).toContain('contactSupport');
   });
 
   it('contact support links to /contact', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const contactLink = container.querySelector('a[href="/contact"]');
     expect(contactLink).toBeTruthy();
   });
 
   // === Responsive Layout ===
   it('has min-h-screen class', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const outerDiv = container.querySelector('.min-h-screen');
     expect(outerDiv).toBeTruthy();
   });
 
   it('has max-w-4xl content container', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const contentDiv = container.querySelector('.max-w-4xl');
     expect(contentDiv).toBeTruthy();
   });
 
   it('category tabs use flex-wrap for responsiveness', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const flexWrap = container.querySelector('.flex-wrap');
     expect(flexWrap).toBeTruthy();
   });
 
   // === Accordion Styling ===
   it('accordion has border styling', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const accordion = container.querySelector('.border.border-gray-200');
     expect(accordion).toBeTruthy();
   });
 
   it('accordion has rounded-sm corners', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const accordion = container.querySelector('.rounded-xl');
     expect(accordion).toBeTruthy();
   });
 
   // === Multiple category switches ===
   it('can switch between all categories sequentially', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = () => Array.from(container.querySelectorAll('button'));
 
     // Start with catGeneral
@@ -387,7 +388,7 @@ describe('FAQPage - Extended Tests', () => {
 
   // === Active category styling ===
   it('active category button has different styling', () => {
-    const { container } = render(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage));
     const buttons = Array.from(container.querySelectorAll('button'));
     const generalBtn = buttons.find(b => b.textContent?.includes('catGeneral'));
     // The default active category should have bg-brand-600 class

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -75,7 +76,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('shows loading state initially', () => {
     mockDeliveryTrend.mockReturnValue(new Promise(() => {}));
     mockSuccessRate.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(AnalyticsPage));
+    const { container } = renderWithProviders(React.createElement(AnalyticsPage));
     expect(container.textContent).toContain('common.loading');
   });
 
@@ -83,7 +84,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('analytics.title');
@@ -93,7 +94,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   // === Time Range Selector ===
   it('passes time range to API calls', async () => {
     await act(async () => {
-      render(React.createElement(AnalyticsPage));
+      renderWithProviders(React.createElement(AnalyticsPage));
     });
     expect(mockDeliveryTrend).toHaveBeenCalledWith('test-token', '7d');
     expect(mockSuccessRate).toHaveBeenCalledWith('test-token', '7d');
@@ -102,7 +103,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('re-fetches when time range changes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(mockDeliveryTrend).toHaveBeenCalledTimes(1);
@@ -115,7 +116,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('renders delivery trend chart', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('analytics.deliveryTrend');
@@ -126,7 +127,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('renders success rate chart', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('analytics.successRate');
@@ -138,7 +139,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('displays success rate percentage', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('93.9');
@@ -149,7 +150,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
   it('renders stat cards', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       const statCards = container.querySelectorAll('[data-testid="stat-card"]');
@@ -163,7 +164,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
     mockSuccessRate.mockRejectedValue(new Error('Error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('analytics.title');
@@ -196,7 +197,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
     }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/analytics/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockDeliveryTrend).not.toHaveBeenCalled();
   });
@@ -207,7 +208,7 @@ describe('AnalyticsPage - Ultra Coverage', () => {
     mockSuccessRate.mockResolvedValue({ range: '7d', successful: 0, failed: 0, pending: 0, success_rate: 0 });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AnalyticsPage)).container;
+      container = renderWithProviders(React.createElement(AnalyticsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('0.0');

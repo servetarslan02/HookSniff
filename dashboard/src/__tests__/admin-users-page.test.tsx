@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -73,13 +74,13 @@ describe('AdminUsersPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminUsersPage));
+      renderWithProviders(React.createElement(AdminUsersPage));
     });
   });
 
   it('fetches users on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminUsersPage));
+      renderWithProviders(React.createElement(AdminUsersPage));
     });
     expect(mockListUsers).toHaveBeenCalledWith('test-token', {
       page: 1,
@@ -92,7 +93,7 @@ describe('AdminUsersPage', () => {
   it('displays users title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('userManagement');
@@ -101,7 +102,7 @@ describe('AdminUsersPage', () => {
   it('shows search input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]');
@@ -112,7 +113,7 @@ describe('AdminUsersPage', () => {
   it('shows empty state when no users', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No users found.');

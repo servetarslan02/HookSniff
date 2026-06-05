@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -51,18 +52,18 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Render ===
   it('renders without crashing', () => {
-    render(React.createElement(ApiKeysPage));
+    renderWithProviders(React.createElement(ApiKeysPage));
   });
 
   it('displays title', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.title');
     });
   });
 
   it('displays subtitle', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.subtitle');
     });
@@ -71,55 +72,55 @@ describe('ApiKeysPage — Extended Coverage', () => {
   // === Loading state ===
   it('shows loading state initially', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {})); // Never resolves
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     expect(container.textContent).toContain('apiKeys.loadingKeys');
   });
 
   // === Key list ===
   it('renders key list after loading', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
   });
 
   it('renders key prefix', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('hk_live_abc');
     });
   });
 
   it('renders active status badge', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.active');
     });
   });
 
   it('renders inactive status badge', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.inactive');
     });
   });
 
   it('renders created date', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.createdDate');
     });
   });
 
   it('renders last used date when available', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.lastUsed');
     });
   });
 
   it('renders key count', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.keyCount:2');
     });
@@ -128,7 +129,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
   // === Empty state ===
   it('shows empty state when no keys', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([]) });
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('apiKeys.noKeys');
     });
@@ -136,18 +137,18 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Create key ===
   it('renders create key section', () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     expect(container.textContent).toContain('apiKeys.createNewKey');
   });
 
   it('renders key name input', () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     const input = container.querySelector('input[type="text"]');
     expect(input).toBeTruthy();
   });
 
   it('allows typing key name', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     const input = container.querySelector('input[type="text"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: 'My API Key' } });
@@ -160,7 +161,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) }) // initial fetch
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_new_12345' }) }); // create
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -185,7 +186,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_new_secret' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -209,7 +210,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_new_secret' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -234,7 +235,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_copy_me' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -268,7 +269,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_copy_me' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -300,7 +301,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_dismiss' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -335,7 +336,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({ error: { message: 'Limit reached' } }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -360,7 +361,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({ error: { message: 'Fail' } }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => { expect(container.textContent).toContain('Production'); });
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
@@ -381,7 +382,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Delete flow ===
   it('opens delete modal on delete click', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => { expect(container.textContent).toContain('Production'); });
 
     // Find delete buttons by the 🗑 icon
@@ -397,7 +398,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
   });
 
   it('closes delete modal on cancel', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
@@ -426,7 +427,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
@@ -455,7 +456,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Rotate flow ===
   it('opens rotate modal on rotate click', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
@@ -473,7 +474,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
   });
 
   it('closes rotate modal on cancel', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
@@ -502,7 +503,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_rotated_new' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
     });
@@ -536,7 +537,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -559,7 +560,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Key name input placeholder ===
   it('renders key name placeholder', () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     const input = container.querySelector('input[type="text"]') as HTMLInputElement;
     expect(input.placeholder).toBeTruthy();
   });
@@ -570,7 +571,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_named' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Production');
@@ -604,7 +605,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockKeys) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ key: 'hk_noname' }) });
 
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
 
     await waitFor(() => { expect(container.textContent).toContain('Production'); });
 
@@ -622,7 +623,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
 
   // === Rotate and delete button existence ===
   it('renders rotate button for each key', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       const rotateButtons = Array.from(container.querySelectorAll('button')).filter(
         (b) => b.textContent?.includes('🔄')
@@ -632,7 +633,7 @@ describe('ApiKeysPage — Extended Coverage', () => {
   });
 
   it('renders delete button for each key', async () => {
-    const { container } = render(React.createElement(ApiKeysPage));
+    const { container } = renderWithProviders(React.createElement(ApiKeysPage));
     await waitFor(() => {
       const deleteButtons = Array.from(container.querySelectorAll('button')).filter(
         (b) => b.textContent?.includes('🗑')

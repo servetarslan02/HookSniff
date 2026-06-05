@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -75,13 +76,13 @@ describe('EndpointSettingsPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
   });
 
   it('fetches endpoint on mount', async () => {
     await act(async () => {
-      render(React.createElement(EndpointSettingsPage));
+      renderWithProviders(React.createElement(EndpointSettingsPage));
     });
     expect(mockList).toHaveBeenCalledWith('test-token');
   });
@@ -89,7 +90,7 @@ describe('EndpointSettingsPage', () => {
   it('displays endpoint settings title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(EndpointSettingsPage));
+      const result = renderWithProviders(React.createElement(EndpointSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Endpoint Settings');
@@ -99,7 +100,7 @@ describe('EndpointSettingsPage', () => {
     mockList.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(EndpointSettingsPage));
+      const result = renderWithProviders(React.createElement(EndpointSettingsPage));
       container = result.container;
     });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
@@ -108,7 +109,7 @@ describe('EndpointSettingsPage', () => {
   it('renders retry policy section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(EndpointSettingsPage));
+      const result = renderWithProviders(React.createElement(EndpointSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Retry Policy');

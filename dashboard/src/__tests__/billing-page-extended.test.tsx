@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -93,7 +94,7 @@ async function renderPage() {
   const { default: BillingPage } = await import('@/app/[locale]/[username]/billing/page');
   let result: ReturnType<typeof render>;
   await act(async () => {
-    result = render(React.createElement(BillingPage));
+    result = renderWithProviders(React.createElement(BillingPage));
   });
   return result!;
 }

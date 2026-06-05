@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -50,38 +51,38 @@ describe('SearchPage', () => {
   });
 
   it('renders without crashing', async () => {
-    await act(async () => { render(React.createElement(SearchPage)); });
+    await act(async () => { renderWithProviders(React.createElement(SearchPage)); });
   });
 
   it('displays search title', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     expect(container!.textContent).toContain('search.title');
   });
 
   it('renders search input', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input[type="text"], input[type="search"], input:not([type])');
     expect(input).toBeTruthy();
   });
 
   it('renders search button', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const btns = Array.from(container!.querySelectorAll('button'));
     expect(btns.length).toBeGreaterThan(0);
   });
 
   it('shows initial empty state', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     expect(container!.textContent).toContain('search');
   });
 
   it('performs search on submit', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'order' } }); });
     const form = container!.querySelector('form');
@@ -98,7 +99,7 @@ describe('SearchPage', () => {
     let container: HTMLElement;
     // Trigger search
     mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve(mockResults) });
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'order' } }); });
     const form = container!.querySelector('form');
@@ -112,7 +113,7 @@ describe('SearchPage', () => {
 
   it('displays result statuses', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -125,7 +126,7 @@ describe('SearchPage', () => {
 
   it('displays result event types', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -138,7 +139,7 @@ describe('SearchPage', () => {
 
   it('displays result count', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -151,7 +152,7 @@ describe('SearchPage', () => {
   it('shows loading state during search', async () => {
     mockFetch.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -165,7 +166,7 @@ describe('SearchPage', () => {
       json: () => Promise.resolve({ deliveries: [], total: 0, page: 1, per_page: 20, query: 'nothing' }),
     });
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'nothing' } }); });
     const form = container!.querySelector('form');
@@ -176,7 +177,7 @@ describe('SearchPage', () => {
   it('handles search error gracefully', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -187,13 +188,13 @@ describe('SearchPage', () => {
 
   it('renders status filter', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     expect(container!.textContent).toContain('search.allStatuses');
   });
 
   it('displays truncated result IDs', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -205,7 +206,7 @@ describe('SearchPage', () => {
 
   it('displays endpoint URLs in results', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -217,7 +218,7 @@ describe('SearchPage', () => {
 
   it('displays attempt counts', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -229,7 +230,7 @@ describe('SearchPage', () => {
 
   it('displays response status codes', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');
@@ -242,7 +243,7 @@ describe('SearchPage', () => {
 
   it('updates input value on change', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'webhook test' } }); });
     expect(input.value).toBe('webhook test');
@@ -254,7 +255,7 @@ describe('SearchPage', () => {
       json: () => Promise.resolve({ deliveries: mockResults.deliveries, total: 50, page: 1, per_page: 20, query: 'test' }),
     });
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(SearchPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(SearchPage)).container; });
     const input = container!.querySelector('input') as HTMLInputElement;
     await act(async () => { fireEvent.change(input, { target: { value: 'test' } }); });
     const form = container!.querySelector('form');

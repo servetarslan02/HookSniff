@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -108,53 +109,53 @@ describe('NotificationsPage', () => {
   });
 
   it('renders without crashing', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container).toBeTruthy();
   });
 
   it('renders page title', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('title');
   });
 
   it('renders all notification items', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('Webhook delivery failed');
     expect(container.textContent).toContain('High failure rate detected');
     expect(container.textContent).toContain('System maintenance scheduled');
   });
 
   it('shows unread badge indicator', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const dots = container.querySelectorAll('.bg-brand-500');
     expect(dots.length).toBeGreaterThanOrEqual(2); // 2 unread notifications
   });
 
   it('shows unread count in header', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('2');
   });
 
   it('shows mark all read button when unread exist', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('markAllRead'));
     expect(btn).toBeTruthy();
   });
 
   it('shows mark read button only for unread notifications', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const markReadBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'markRead');
     expect(markReadBtns.length).toBe(2); // 2 unread
   });
 
   it('shows delete button for each notification', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'delete');
     expect(deleteBtns.length).toBe(3);
   });
 
   it('shows type filter buttons', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('all');
     expect(container.textContent).toContain('webhookFailed');
     expect(container.textContent).toContain('alerts');
@@ -163,7 +164,7 @@ describe('NotificationsPage', () => {
   });
 
   it('shows read/unread filter buttons', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const allBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'all');
     const unreadBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'unread');
     const readBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'read');
@@ -173,34 +174,34 @@ describe('NotificationsPage', () => {
   });
 
   it('shows relative time', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('5m ago');
     expect(container.textContent).toContain('1h ago');
     expect(container.textContent).toContain('1d ago');
   });
 
   it('shows formatted type badge', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('Webhook Failed');
     expect(container.textContent).toContain('Alert');
     expect(container.textContent).toContain('System');
   });
 
   it('shows view details link for notifications with link', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const links = container.querySelectorAll('a[href="/deliveries/del-123"]');
     expect(links.length).toBe(1);
   });
 
   it('does not show view details for notifications without link', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     // The alert and system notifications have no link
     const viewDetailsLinks = Array.from(container.querySelectorAll('a')).filter(a => a.textContent?.includes('viewDetails'));
     expect(viewDetailsLinks.length).toBe(1); // only webhook_failed has link
   });
 
   it('opens delete confirmation dialog', () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const deleteBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'delete')!;
     fireEvent.click(deleteBtn);
     expect(container.textContent).toContain('deleteNotification');
@@ -208,7 +209,7 @@ describe('NotificationsPage', () => {
   });
 
   it('calls delete mutation on confirm', async () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const deleteBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'delete')!;
     fireEvent.click(deleteBtn);
     const confirmBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Confirm')!;
@@ -219,7 +220,7 @@ describe('NotificationsPage', () => {
   });
 
   it('calls mark as read on click', async () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const markReadBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'markRead')!;
     fireEvent.click(markReadBtn);
     await waitFor(() => {
@@ -228,7 +229,7 @@ describe('NotificationsPage', () => {
   });
 
   it('calls mark all as read', async () => {
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     const markAllBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('markAllRead'))!;
     fireEvent.click(markAllBtn);
     await waitFor(() => {

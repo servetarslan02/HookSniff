@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -86,7 +87,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('does not show modal initially', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.querySelectorAll('tbody tr').length).toBe(5);
@@ -99,7 +100,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('confirm dialog is not visible initially', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.querySelectorAll('tbody tr').length).toBeGreaterThan(0);
@@ -112,7 +113,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('renders green text for 2xx response codes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       const greenCodes = container!.querySelectorAll('.text-green-600');
@@ -123,7 +124,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('renders red text for 4xx/5xx response codes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       const redCodes = container!.querySelectorAll('.text-red-600');
@@ -134,7 +135,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('shows dash for missing response_status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       const dashes = container!.querySelectorAll('.text-gray-400');
@@ -176,7 +177,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
 
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/deliveries/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockWebhooksList).not.toHaveBeenCalled();
   });
@@ -186,7 +187,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     mockWebhooksList.mockResolvedValueOnce({ deliveries: [], total: 0, page: 1, per_page: 20 });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.textContent).toContain('deliveries.empty');
@@ -197,7 +198,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Timeout'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.textContent).toContain('Timeout');
@@ -209,7 +210,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.textContent).toContain('Retry');
@@ -228,7 +229,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('search filters by partial event name', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.querySelectorAll('tbody tr').length).toBe(5);
@@ -246,7 +247,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('search is case insensitive', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     const input = container!.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -269,7 +270,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.textContent).toContain('Showing 1–20 of 45');
@@ -286,7 +287,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       const prevBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Previous');
@@ -298,7 +299,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('View Details button navigates to delivery detail', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.querySelectorAll('tbody tr').length).toBeGreaterThan(0);
@@ -315,7 +316,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('renders subtitle text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     expect(container!.textContent).toContain('deliveries.subtitle');
   });
@@ -324,7 +325,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('has correct search placeholder', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     const input = container!.querySelector('input[type="text"]');
     expect(input!.getAttribute('placeholder')).toBe('deliveries.searchPlaceholder');
@@ -334,7 +335,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
   it('All filter has active styling by default', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     const allBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'All');
     expect(allBtn!.className).toContain('bg-gray-900');
@@ -345,7 +346,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     mockWebhooksList.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     expect(container!.textContent).toContain('deliveries.loadingDeliveries');
   });
@@ -360,7 +361,7 @@ describe('DeliveriesPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(DeliveriesPage)).container;
+      container = renderWithProviders(React.createElement(DeliveriesPage)).container;
     });
     await waitFor(() => {
       expect(container!.textContent).toContain('—');

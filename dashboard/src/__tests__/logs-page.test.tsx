@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -59,13 +60,13 @@ describe('LogsPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(LogsPage));
+      renderWithProviders(React.createElement(LogsPage));
     });
   });
 
   it('fetches deliveries on mount', async () => {
     await act(async () => {
-      render(React.createElement(LogsPage));
+      renderWithProviders(React.createElement(LogsPage));
     });
     expect(mockWebhooksList).toHaveBeenCalledWith('test-token', expect.objectContaining({ page: 1 }));
   });
@@ -73,7 +74,7 @@ describe('LogsPage', () => {
   it('displays logs title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(LogsPage));
+      const result = renderWithProviders(React.createElement(LogsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('title');
@@ -82,7 +83,7 @@ describe('LogsPage', () => {
   it('shows filter buttons (all/delivered/failed/pending)', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(LogsPage));
+      const result = renderWithProviders(React.createElement(LogsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('All');
@@ -94,7 +95,7 @@ describe('LogsPage', () => {
   it('shows search input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(LogsPage));
+      const result = renderWithProviders(React.createElement(LogsPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]');
@@ -105,7 +106,7 @@ describe('LogsPage', () => {
     mockWebhooksList.mockResolvedValueOnce({ deliveries: [], total: 0 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(LogsPage));
+      const result = renderWithProviders(React.createElement(LogsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('noLogs');

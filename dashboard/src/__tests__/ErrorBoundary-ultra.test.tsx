@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -24,7 +25,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 1: Renders children when no error
   it('renders children when no error', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <div>Hello</div>
       </ErrorBoundary>
@@ -34,7 +35,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 2: Shows error UI when child throws
   it('shows error UI when child throws', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>
@@ -45,7 +46,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 3: Shows "Try again" button
   it('shows "Try again" button on error', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>
@@ -55,7 +56,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 4: Resets error state on "Try again" click
   it('resets error state when "Try again" clicked', () => {
-    const { getByText, queryByText } = render(
+    const { getByText, queryByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
@@ -71,7 +72,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 5: Shows custom fallback when provided
   it('renders custom fallback when provided', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary fallback={<div>Custom error UI</div>}>
         <ThrowingComponent />
       </ErrorBoundary>
@@ -81,7 +82,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 6: Shows error emoji
   it('shows error emoji', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>
@@ -94,7 +95,7 @@ describe('ErrorBoundary-ultra', () => {
     function SpecificError() {
       throw new Error('Specific error message');
     }
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <SpecificError />
       </ErrorBoundary>
@@ -104,7 +105,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 8: Handles multiple children without error
   it('handles multiple children without error', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <div>Child 1</div>
         <div>Child 2</div>
@@ -118,7 +119,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 9: Has glass-card styling on error
   it('has glass-card styling on error', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>
@@ -129,7 +130,7 @@ describe('ErrorBoundary-ultra', () => {
 
   // Test 10: Try again button has correct styling
   it('Try again button has brand styling', () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>

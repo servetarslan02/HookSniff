@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, act, fireEvent } from '@testing-library/react';
@@ -47,7 +48,7 @@ describe('Auth Store', () => {
   it('useAuth throws outside AuthProvider', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => {
-      render(<AuthConsumer />);
+      renderWithProviders(<AuthConsumer />);
     }).toThrow('useAuth must be used within AuthProvider');
     consoleSpy.mockRestore();
   });
@@ -58,7 +59,7 @@ describe('Auth Store', () => {
       status: 401,
     });
 
-    const { container } = render(
+    const { container } = renderWithProviders(
       <AuthProvider>
         <AuthConsumer />
       </AuthProvider>
@@ -76,7 +77,7 @@ describe('Auth Store', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(
+      const result = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -98,7 +99,7 @@ describe('Auth Store', () => {
     });
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -124,7 +125,7 @@ describe('Auth Store', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(
+      const result = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -147,7 +148,7 @@ describe('Auth Store', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(
+      const result = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -187,7 +188,7 @@ describe('Auth Store', () => {
     let authRef: ReturnType<typeof useAuth>;
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -222,7 +223,7 @@ describe('Auth Store', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(
+      const result = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -263,7 +264,7 @@ describe('Auth Store', () => {
     let authRef: ReturnType<typeof useAuth>;
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -283,7 +284,7 @@ describe('Auth Store', () => {
     });
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -29,14 +30,14 @@ describe('RateLimitingPage', () => {
 
   it('renders loading state initially', async () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    render(React.createElement(RateLimitingPage));
+    renderWithProviders(React.createElement(RateLimitingPage));
     expect(document.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   it('renders empty state when no data', async () => {
     mockApiFetch.mockResolvedValue([]);
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText(/Rate Limiting/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Auto Retry').length).toBeGreaterThan(0);
@@ -50,7 +51,7 @@ describe('RateLimitingPage', () => {
       { endpoint_id: 'ep_002', requests_per_second: 5, burst_size: 10, enabled: true },
     ]);
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText('Total Endpoints').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Avg Requests/sec').length).toBeGreaterThan(0);
@@ -63,7 +64,7 @@ describe('RateLimitingPage', () => {
       { endpoint_id: 'ep_002', requests_per_second: 5, burst_size: 10, enabled: true },
     ]);
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText('Per-Endpoint Limits').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Endpoint').length).toBeGreaterThan(0);
@@ -77,7 +78,7 @@ describe('RateLimitingPage', () => {
   it('renders How Rate Limiting Works section', async () => {
     mockApiFetch.mockResolvedValue([]);
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText('How Rate Limiting Works').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Token Bucket Algorithm').length).toBeGreaterThan(0);
@@ -89,7 +90,7 @@ describe('RateLimitingPage', () => {
   it('handles API error gracefully', async () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText(/Rate Limiting/).length).toBeGreaterThan(0);
   });
@@ -101,7 +102,7 @@ describe('RateLimitingPage', () => {
     }));
     const { default: Page } = await import('@/app/[locale]/[username]/rate-limiting/page');
     await act(async () => {
-      render(React.createElement(Page));
+      renderWithProviders(React.createElement(Page));
     });
     expect(screen.getAllByText(/Rate Limiting/).length).toBeGreaterThan(0);
   });
@@ -111,7 +112,7 @@ describe('RateLimitingPage', () => {
       { endpoint_id: 'ep_solo', requests_per_second: 15, burst_size: 30, enabled: true },
     ]);
     await act(async () => {
-      render(React.createElement(RateLimitingPage));
+      renderWithProviders(React.createElement(RateLimitingPage));
     });
     expect(screen.getAllByText('15.0').length).toBeGreaterThan(0);
   });
