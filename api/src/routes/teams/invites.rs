@@ -7,7 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
 use super::{TeamInvite, InviteRequest, AcceptInviteRequest};
@@ -23,7 +23,7 @@ pub async fn invite_member(
     require_team_admin(&pool, id, customer.id).await?;
 
     if !req.email.contains('@') {
-        return Err(AppError::BadRequest("Invalid email".into()));
+        return Err(AppError::coded(ErrorCode::InvalidEmail));
     }
 
     let role = req.role.as_deref().unwrap_or("viewer");

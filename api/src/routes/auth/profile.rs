@@ -5,7 +5,7 @@ use axum::Json;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::models::customer::{Customer, CustomerResponse, UpdateProfileRequest};
 
 // ── Profile ─────────────────────────────────────────────────
@@ -19,7 +19,7 @@ pub async fn update_profile(
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpdateProfileRequest>,
 ) -> Result<Json<CustomerResponse>, AppError> {
-    if req.name.trim().is_empty() { return Err(AppError::BadRequest("Name cannot be empty".into())); }
+    if req.name.trim().is_empty() { return Err(AppError::coded(ErrorCode::TitleRequired)); }
 
     let updated = sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING *")
         .bind(&req.name).bind(customer.id).fetch_one(&pool).await?;
@@ -44,8 +44,8 @@ pub async fn update_consent(
     Extension(customer): Extension<Customer>,
     Json(req): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let key = req.get("key").and_then(|v| v.as_str()).ok_or(AppError::BadRequest("Missing 'key' field".into()))?;
-    let value = req.get("value").and_then(|v| v.as_bool()).ok_or(AppError::BadRequest("Missing 'value' field".into()))?;
+    let key = req.get("key").and_then(|v| v.as_str()).ok_or(AppError::coded(ErrorCode::MissingField))?;
+    let value = req.get("value").and_then(|v| v.as_bool()).ok_or(AppError::coded(ErrorCode::MissingField))?;
 
     sqlx::query(
         r#"INSERT INTO customer_consents (id, customer_id, consents, created_at, updated_at)
