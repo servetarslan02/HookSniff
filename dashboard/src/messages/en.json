@@ -7340,7 +7340,8 @@
       },
       "status": {
         "recovered": "Resolved",
-        "pending": "Ongoing"
+        "pending": "Ongoing",
+        "success": "Resolved"
       },
       "action": {
         "auto_disable": "Endpoint temporarily disabled",
@@ -7365,7 +7366,14 @@
         "proactive_throttle": "Latency increasing, precaution taken before issues occur",
         "cascade_alert": "Multiple endpoints affected simultaneously"
       },
-      "reason": "Reason"
+      "reason": "Reason",
+      "reasonMap": {
+        "primaryTimeout": "Primary endpoint timed out",
+        "consecutiveFailures": "10 consecutive failures detected",
+        "repeatedFailures": "Repeated failures over time",
+        "highFailureRate": "Failure rate exceeded 50%",
+        "overload": "Server overload detected"
+      }
     },
     "predictions": {
       "title": "Future Predictions",
