@@ -110,7 +110,7 @@ mod billing_tests {
 
     #[test]
     fn max_events_per_day_all() {
-        assert_eq!(Plan::Developer.max_events_per_day(), 1_000);
+        assert_eq!(Plan::Developer.max_events_per_day(), 300);
         assert_eq!(Plan::Startup.max_events_per_day(), 30_000);
         assert_eq!(Plan::Pro.max_events_per_day(), 100_000);
         assert_eq!(Plan::Enterprise.max_events_per_day(), u64::MAX);
@@ -140,7 +140,7 @@ mod billing_tests {
 
     #[test]
     fn max_webhooks_per_day_all() {
-        assert_eq!(Plan::Developer.max_webhooks_per_day(), 1_000);
+        assert_eq!(Plan::Developer.max_webhooks_per_day(), 300);
         assert_eq!(Plan::Startup.max_webhooks_per_day(), 30_000);
         assert_eq!(Plan::Pro.max_webhooks_per_day(), 100_000);
         assert_eq!(Plan::Enterprise.max_webhooks_per_day(), u64::MAX);
@@ -150,20 +150,20 @@ mod billing_tests {
 
     #[test]
     fn max_requests_per_minute_all() {
-        assert_eq!(Plan::Developer.max_requests_per_minute(), 1_000);
-        assert_eq!(Plan::Startup.max_requests_per_minute(), 1_000);
-        assert_eq!(Plan::Pro.max_requests_per_minute(), 10_000);
-        assert_eq!(Plan::Enterprise.max_requests_per_minute(), u32::MAX);
+        assert_eq!(Plan::Developer.max_requests_per_minute(), 100);
+        assert_eq!(Plan::Startup.max_requests_per_minute(), 500);
+        assert_eq!(Plan::Pro.max_requests_per_minute(), 1_000);
+        assert_eq!(Plan::Enterprise.max_requests_per_minute(), 5_000);
     }
 
     // ── max_endpoints ──────────────────────────────────────────
 
     #[test]
     fn max_endpoints_all() {
-        assert_eq!(Plan::Developer.max_endpoints(), u32::MAX);
-        assert_eq!(Plan::Startup.max_endpoints(), u32::MAX);
-        assert_eq!(Plan::Pro.max_endpoints(), u32::MAX);
-        assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
+        assert_eq!(Plan::Developer.max_endpoints(), 5);
+        assert_eq!(Plan::Startup.max_endpoints(), 20);
+        assert_eq!(Plan::Pro.max_endpoints(), 50);
+        assert_eq!(Plan::Enterprise.max_endpoints(), 200);
     }
 
     // ── max_payload_bytes ──────────────────────────────────────
@@ -242,8 +242,9 @@ mod billing_tests {
     fn higher_tiers_have_higher_limits() {
         assert!(Plan::Startup.max_requests_per_minute() <= Plan::Pro.max_requests_per_minute());
         assert!(Plan::Pro.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute());
-        assert_eq!(Plan::Developer.max_endpoints(), u32::MAX);
-        assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
+        assert!(Plan::Developer.max_endpoints() < Plan::Startup.max_endpoints());
+        assert!(Plan::Startup.max_endpoints() < Plan::Pro.max_endpoints());
+        assert!(Plan::Pro.max_endpoints() < Plan::Enterprise.max_endpoints());
         assert!(Plan::Developer.max_webhooks_per_day() < Plan::Startup.max_webhooks_per_day());
         assert!(Plan::Startup.max_webhooks_per_day() < Plan::Pro.max_webhooks_per_day());
         assert!(Plan::Pro.max_webhooks_per_day() < Plan::Enterprise.max_webhooks_per_day());
