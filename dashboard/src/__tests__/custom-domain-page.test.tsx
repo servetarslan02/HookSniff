@@ -58,7 +58,8 @@ const TRANSLATIONS: Record<string, string> = {
 };
 
 vi.mock('next-intl', () => ({
-  useTranslations: (_ns?: string) => (key: string) => {
+  useTranslations: (_ns?: string)
+  useLocale: () => 'en', => (key: string) => {
     const fullKey = _ns ? `${_ns}.${key}` : key;
     return TRANSLATIONS[fullKey] ?? fullKey;
   },

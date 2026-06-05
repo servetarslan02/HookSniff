@@ -10,7 +10,8 @@ global.fetch = mockFetch;
 const mockTAdmin = (key: string) => `admin.${key}`;
 const mockTCommon = (key: string) => `common.${key}`;
 vi.mock('next-intl', () => ({
-  useTranslations: (ns?: string) => ns === 'common' ? mockTCommon : mockTAdmin,
+  useTranslations: (ns?: string)
+  useLocale: () => 'en', => ns === 'common' ? mockTCommon : mockTAdmin,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
