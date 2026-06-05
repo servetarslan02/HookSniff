@@ -54,6 +54,28 @@ impl ResendEmailClient {
         })
     }
 
+    /// Create from admin settings (DB-stored API key + sender).
+    /// Used as fallback when env var is not set.
+    pub fn from_settings(api_key: &str, sender: Option<&str>) -> Option<Self> {
+        if api_key.is_empty() {
+            return None;
+        }
+        let from_email = sender
+            .filter(|s| !s.is_empty())
+            .unwrap_or("onboarding@resend.dev");
+        let from_email = if from_email.contains('<') {
+            from_email.to_string()
+        } else {
+            format!("HookSniff <{}>", from_email)
+        };
+        tracing::info!("✅ Resend email client from DB settings (from={})", from_email);
+        Some(Self {
+            api_key: api_key.to_string(),
+            from_email,
+            client: crate::http_client::get_client().clone(),
+        })
+    }
+
     /// Send an email via Resend with exponential backoff retry.
     ///
     /// Retries up to 3 times on transient errors (network failures, 5xx responses).
