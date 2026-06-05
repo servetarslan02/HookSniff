@@ -3207,7 +3207,7 @@
     "dnsStepsTitle": "Bu kayıtlarla ne yapacaksınız:",
     "dnsStep1": "Domain sağlayıcınıza giriş yapın (Cloudflare, GoDaddy, Namecheap, vb.).",
     "dnsStep2": "Aşağıda gösterilen CNAME ve TXT kayıtlarını ekleyin.",
-    "dnsStep3": "Buraya geri dönün ve \"Domain Doğrula\" butonuna tıklayın (DNS güncellemesi için 5-30 dk bekleyin).",
+    "dnsStep3": "Buraya geri dönün ve \"Alan Adını Doğrula\" butonuna tıklayın (DNS güncellemesi için 5-30 dk bekleyin).",
     "verificationFailedFriendly": "DNS kayıtları henüz bulunamadı. Yeni eklediyseniz birkaç dakika bekleyip tekrar deneyin."
   },
   "signatureVerifier": {
