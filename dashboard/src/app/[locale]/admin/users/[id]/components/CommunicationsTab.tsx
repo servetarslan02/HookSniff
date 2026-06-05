@@ -25,13 +25,13 @@ export function CommunicationsTab({
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
           >
             <option value="">{t("allTypes") || "All Types"}</option>
-            <option value="email"><Mail size={16} strokeWidth={1.75} className="inline mr-1" /> Email</option>
-            <option value="impersonate"><User size={16} strokeWidth={1.75} className="inline mr-1" /> Impersonate</option>
-            <option value="plan_change"><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> Plan Change</option>
-            <option value="ban">Ban/Activate</option>
-            <option value="note"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> Note</option>
-            <option value="tag_added">Tag Added</option>
-            <option value="tag_removed">Tag Removed</option>
+            <option value="email"><Mail size={16} strokeWidth={1.75} className="inline mr-1" /> {t('emailCommType') || 'Email'}</option>
+            <option value="impersonate"><User size={16} strokeWidth={1.75} className="inline mr-1" /> {t('impersonateCommType') || 'Impersonate'}</option>
+            <option value="plan_change"><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('planChangeCommType') || 'Plan Change'}</option>
+            <option value="ban">{t('banCommType') || 'Ban/Activate'}</option>
+            <option value="note"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> {t('noteCommType') || 'Note'}</option>
+            <option value="tag_added">{t('tagAdded') || 'Tag Added'}</option>
+            <option value="tag_removed">{t('tagRemoved') || 'Tag Removed'}</option>
           </select>
         </div>
       </div>
