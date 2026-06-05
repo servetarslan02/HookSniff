@@ -20,6 +20,7 @@ pub async fn correlate_alerts(
         SELECT endpoint_id, customer_id, score, category
         FROM anomaly_scores
         WHERE score > $1 AND created_at > NOW() - ($2 || ' minutes')::INTERVAL
+          AND (category IS NULL OR category != 'security')
         ORDER BY score DESC
         "#
     )
