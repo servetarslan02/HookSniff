@@ -34,7 +34,7 @@ async function ProvidersContent({ locale }: { locale: string }) {
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t("guides")}</h1>
-          <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">Step-by-step guides for receiving webhooks from popular providers. Set up, verify, and process events in minutes.</p>
+          <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">{t('guidesDesc')}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-16">

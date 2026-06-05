@@ -4281,11 +4281,13 @@
     "quoteCloudSyncShort": "Free tier that actually works. We process 8K webhooks/month without paying a cent.",
     "quoteMedConnect": "GDPR compliance and EU data processing were non-negotiable. HookSniff checked every box.",
     "quoteBuildKit": "The webhook playground and 11 SDKs (in development) made integration a breeze. Our developers love it.",
-    "backToList": "Back to Customer Stories"
+    "backToList": "Back to Customer Stories",
+    "storyNotFound": "Story not found."
   },
   "providers": {
     "title": "Providers",
     "guides": "Webhook Provider Guides",
+    "guidesDesc": "Step-by-step guides for receiving webhooks from popular providers. Set up, verify, and process events in minutes.",
     "stripe": "Stripe",
     "github": "GitHub",
     "shopify": "Shopify",
