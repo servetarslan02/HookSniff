@@ -1,4 +1,4 @@
-//! GDPR data export/delete and bulk email.
+﻿//! GDPR data export/delete and bulk email.
 
 use axum::extract::{Extension, Path};
 use axum::Json;
@@ -381,16 +381,16 @@ pub async fn admin_bulk_email(
                         effective_email = crate::email::EmailProvider::Resend(client);
                         &effective_email
                     } else {
-                        return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY environment variable or configure it in Admin Settings.".into()));
+                        return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
                     }
                 } else {
-                    return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY environment variable or configure it in Admin Settings.".into()));
+                    return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
                 }
             } else {
-                return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY environment variable or configure it in Admin Settings.".into()));
+                return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
             }
         } else {
-            return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY environment variable or configure it in Admin Settings.".into()));
+            return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
         }
     };
 

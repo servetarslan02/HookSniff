@@ -346,16 +346,16 @@ pub async fn send_user_email(
                         effective_email = crate::email::EmailProvider::Resend(client);
                         &effective_email
                     } else {
-                        return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+                        return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
                     }
                 } else {
-                    return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+                    return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
                 }
             } else {
-                return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+                return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
             }
         } else {
-            return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+            return Err(AppError::coded(ErrorCode::EmailProviderNotConfigured));
         }
     };
 
