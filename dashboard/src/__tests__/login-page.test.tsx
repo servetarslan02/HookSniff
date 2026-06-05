@@ -28,8 +28,8 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/lib/store', () => ({
   useAuth: () => ({
     token: 'test-token',
-    login: mockLogin,
-    register: mockRegister,
+    login: (...args: any[]) => mockLogin(...args),
+    register: (...args: any[]) => mockRegister(...args),
   }),
 }));
 
@@ -54,8 +54,8 @@ const { default: LoginPage } = await import('@/app/[locale]/login/page');
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLogin.mockResolvedValue(undefined);
-    mockRegister.mockResolvedValue(undefined);
+    mockLogin.mockResolvedValue({ id: 'u1', email: 'test@test.com', is_admin: false });
+    mockRegister.mockResolvedValue({ id: 'u1', email: 'test@test.com', is_admin: false });
   });
 
   // === Render tests ===
@@ -350,12 +350,14 @@ describe('LoginPage', () => {
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
+    const consentCheckbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
     const form = container.querySelector('form')!;
 
     await act(async () => {
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
       fireEvent.change(emailInput, { target: { value: 'john@test.com' } });
       fireEvent.change(passwordInput, { target: { value: 'securepass123' } });
+      if (consentCheckbox) fireEvent.click(consentCheckbox);
     });
 
     await act(async () => {
@@ -375,11 +377,13 @@ describe('LoginPage', () => {
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
+    const consentCheckbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
     const form = container.querySelector('form')!;
 
     await act(async () => {
       fireEvent.change(emailInput, { target: { value: 'john@test.com' } });
       fireEvent.change(passwordInput, { target: { value: 'securepass123' } });
+      if (consentCheckbox) fireEvent.click(consentCheckbox);
     });
 
     await act(async () => {
@@ -399,11 +403,13 @@ describe('LoginPage', () => {
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
+    const consentCheckbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
     const form = container.querySelector('form')!;
 
     await act(async () => {
       fireEvent.change(emailInput, { target: { value: 'john@test.com' } });
       fireEvent.change(passwordInput, { target: { value: 'securepass123' } });
+      if (consentCheckbox) fireEvent.click(consentCheckbox);
     });
 
     await act(async () => {
