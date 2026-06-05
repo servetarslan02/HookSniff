@@ -67,7 +67,7 @@ export function SvixContent() {
 
         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('bottomLine')}</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">Both are solid webhook services. HookSniff is better for cost-conscious teams that need FIFO and broad SDK coverage. Svix is better for enterprises that need proven SOC 2 Type 2 compliance and a 99.99% SLA. Choose based on your priorities.</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('svixBottomLineDesc')}</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>
       </main>
