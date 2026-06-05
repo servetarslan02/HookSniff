@@ -313,12 +313,12 @@ pub async fn admin_api_latency(
             e.id as endpoint_id,
             e.url,
             COUNT(DISTINCT d.id) as total_deliveries,
-            AVG(da.duration_ms) as avg_latency_ms,
-            PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms) as p95_latency_ms,
+            AVG(da.duration_ms)::float8 as avg_latency_ms,
+            PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms)::float8 as p95_latency_ms,
             COUNT(CASE WHEN d.status = 'failed' THEN 1 END) as failed_count,
             CASE WHEN COUNT(DISTINCT d.id) > 0
-                THEN ROUND(COUNT(CASE WHEN d.status = 'failed' THEN 1 END)::numeric / COUNT(DISTINCT d.id) * 100, 1)
-                ELSE 0
+                THEN ROUND(COUNT(CASE WHEN d.status = 'failed' THEN 1 END)::numeric / COUNT(DISTINCT d.id) * 100, 1)::float8
+                ELSE 0::float8
             END as error_rate
         FROM endpoints e
         LEFT JOIN deliveries d ON d.endpoint_id = e.id
