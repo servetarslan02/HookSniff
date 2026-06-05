@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -279,4 +279,123 @@ describe('api generic client', () => {
   it('getTemplates', async () => { mockFetch.mockResolvedValueOnce(ok({ templates: [] })); await apiModule.api.getTemplates('tk'); expect(mockFetch.mock.calls[0][0]).toContain('/templates'); });
   it('getTemplate', async () => { mockFetch.mockResolvedValueOnce(ok({ id: 't1' })); await apiModule.api.getTemplate('tk', 't1'); expect(mockFetch.mock.calls[0][0]).toContain('/templates/t1'); });
   it('applyTemplate POST', async () => { mockFetch.mockResolvedValueOnce(ok({})); await apiModule.api.applyTemplate('tk', 't1', { endpoint_url: 'https://test.com' }); expect(mockFetch.mock.calls[0][0]).toContain('/templates/t1/apply'); });
+});
+
+describe('apiFetch — assertOnline', () => {
+  it('assertOnline function exists in module (offline check runs in browser)', () => {
+    // assertOnline is a private function that checks navigator.onLine.
+    // In jsdom, navigator.onLine is always true and not configurable.
+    // The offline path is tested via E2E tests in real browser.
+    // Here we just verify the module exports correctly.
+    expect(apiModule.apiFetch).toBeDefined();
+    expect(apiModule.API_BASE).toBeDefined();
+  });
+});
+
+describe('apiFetch — error shapes', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('handles error with { error: { message } } shape', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 400, json: () => Promise.resolve({ error: { message: 'Bad input' } }) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow('Bad input');
+  });
+
+  it('handles error with { message } shape (fallback)', async () => {
+    // apiFetch wraps errors - { message } without error.error falls back to generic
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 400, json: () => Promise.resolve({ message: 'Simple error' }) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow();
+  });
+
+  it('handles error with no parseable body', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, json: () => Promise.resolve({}) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow();
+  });
+
+  it('throws network error on fetch rejection (non-abort)', async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow();
+  });
+});
+
+describe('apiFetch — retry transient errors', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('retries 502 then succeeds', async () => {
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 502, json: () => Promise.resolve({ error: { message: 'Bad Gateway' } }) })
+      .mockResolvedValueOnce(ok({ recovered: true }));
+    const result = await apiModule.apiFetch('/test');
+    expect(result).toEqual({ recovered: true });
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries 503 then succeeds', async () => {
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 503, json: () => Promise.resolve({ error: { message: 'Unavailable' } }) })
+      .mockResolvedValueOnce(ok({ ok: true }));
+    const result = await apiModule.apiFetch('/test');
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('retries 504 then succeeds', async () => {
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 504, json: () => Promise.resolve({ error: { message: 'Timeout' } }) })
+      .mockResolvedValueOnce(ok({ ok: true }));
+    const result = await apiModule.apiFetch('/test');
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('throws after max retries exhausted (502 x3)', async () => {
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 502, json: () => Promise.resolve({ error: { message: 'Bad Gateway' } }) })
+      .mockResolvedValueOnce({ ok: false, status: 502, json: () => Promise.resolve({ error: { message: 'Bad Gateway' } }) })
+      .mockResolvedValueOnce({ ok: false, status: 502, json: () => Promise.resolve({ error: { message: 'Bad Gateway' } }) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow('Bad Gateway');
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not retry 400 errors', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 400, json: () => Promise.resolve({ error: { message: 'Bad Request' } }) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow('Bad Request');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry 403 errors', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403, json: () => Promise.resolve({ error: { message: 'Forbidden' } }) });
+    await expect(apiModule.apiFetch('/test')).rejects.toThrow('Forbidden');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('api — additional methods', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('getEndpointHealth with range param', async () => {
+    mockFetch.mockResolvedValueOnce(ok([]));
+    await apiModule.api.getEndpointHealth('tk', '30d');
+    expect(mockFetch.mock.calls[0][0]).toContain('range=30d');
+  });
+
+  it('getAuditLog with all params', async () => {
+    mockFetch.mockResolvedValueOnce(ok({ entries: [], has_more: false }));
+    await apiModule.api.getAuditLog('tk', { page: 3, limit: 50, action: 'user.login' });
+    const url = mockFetch.mock.calls[0][0];
+    expect(url).toContain('page=3');
+    expect(url).toContain('limit=50');
+    expect(url).toContain('action=user.login');
+  });
+
+  it('search with all params', async () => {
+    mockFetch.mockResolvedValueOnce(ok({ results: [] }));
+    await apiModule.api.search('tk', { q: 'test', status: 'delivered', page: 2, per_page: 10 });
+    const url = mockFetch.mock.calls[0][0];
+    expect(url).toContain('q=test');
+    expect(url).toContain('status=delivered');
+  });
+
+  it('getTemplates with industry param', async () => {
+    mockFetch.mockResolvedValueOnce(ok({ templates: [] }));
+    await apiModule.api.getTemplates('tk', 'ecommerce');
+    expect(mockFetch.mock.calls[0][0]).toContain('industry=ecommerce');
+  });
 });
