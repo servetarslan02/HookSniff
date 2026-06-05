@@ -1,4 +1,4 @@
-//! Customer Self-Service Portal API
+﻿//! Customer Self-Service Portal API
 //!
 //! Müşterilerin kendi webhook'larını, endpoint'lerini ve
 //! teslimatlarını yönetmesini sağlar.
@@ -73,7 +73,7 @@ async fn update_profile(
 ) -> Result<Json<ProfileResponse>, AppError> {
     if let Some(email) = &req.email {
         if !email.contains('@') {
-            return Err(AppError::BadRequest("Invalid email".into()));
+            return Err(AppError::coded(ErrorCode::InvalidEmail));
         }
         // SECURITY: Direct email change is not allowed — must use /auth/request-email-change
         // followed by /auth/confirm-email-change to prevent account takeover.
