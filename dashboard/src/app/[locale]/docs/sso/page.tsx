@@ -240,7 +240,7 @@ export default function SsoDocsPage() {
 
       {/* API Reference */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('apiReference') || 'API Reference'}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('ssoApiReference') || 'API Reference'}</h2>
         <div className="glass-card p-6">
           <div className="space-y-3 text-sm">
             {[
