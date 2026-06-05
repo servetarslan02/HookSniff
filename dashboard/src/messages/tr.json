@@ -94,6 +94,7 @@
     "failedToCreate": "Oluşturulamadı",
     "failedToLoadEndpoints": "Uç noktalar yüklenemedi",
     "failedToLoadTransforms": "Dönüşüm kuralları yüklenemedi",
+    "tryDifferentSearch": "Farklı bir arama terimi deneyin",
     "failedToDelete": "Silinemedi",
     "cancelFailed": "İptal başarısız",
     "upgradeFailed": "Yükseltme başarısız",
