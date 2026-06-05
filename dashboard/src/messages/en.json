@@ -2404,7 +2404,18 @@
     "clearCache": "Clear React Query Cache",
     "clearCacheDesc": "Force invalidate all cached data",
     "cacheCleared": "React Query cache cleared",
-    "refundLoadFailed": "Failed to load refund requests"
+    "refundLoadFailed": "Failed to load refund requests",
+    "failedDeliveriesCount": "{count} failed deliveries in the last hour",
+    "queueBacklog": "Queue Backlog",
+    "queueBacklogCount": "{count} deliveries pending",
+    "items": "items",
+    "dismissAll": "Dismiss All",
+    "allClear": "All clear",
+    "noAdminNotifications": "No admin notifications",
+    "justNow": "just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
   },
   "landing": {
     "nav": {
@@ -7568,6 +7579,8 @@
     "attemptDetails": "Full response bodies, status codes, timestamps"
   },
   "docsCustomDomain": {
+    "title": "Custom Domain",
+    "subtitle": "Use your own domain for the webhook portal. White-label your customers experience.",
     "howItWorks": "How it works:",
     "onlyUseDomains": "Only use domains you own and control.",
     "cloudflare": "Cloudflare:",
