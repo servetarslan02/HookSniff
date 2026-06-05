@@ -7588,7 +7588,27 @@
         "gradual": "Kademeli Değişim",
         "incremental": "Artan Değişim"
       },
-      "endpointLink": "Endpoint’i görüntüle"
+      "endpointLink": "Endpoint’i görüntüle",
+      "featureSuccessRate": "Başarı Oranı",
+      "featureAvgLatency": "Ortalama Gecikme",
+      "featureP95Latency": "P95 Gecikme",
+      "featureP99Latency": "P99 Gecikme",
+      "featureLatency": "Gecikme",
+      "featureDeliveryRate": "Teslimat Hızı",
+      "featureErrorRate": "Hata Oranı",
+      "featureVolume": "Trafik Miktarı",
+      "methodPageHinkley": "Ani değişim tespit edildi",
+      "methodAdwin": "Kademeli değişim tespit edildi",
+      "methodKsTest": "Dağılım kayması tespit edildi",
+      "methodStatTest": "İstatistiksel test",
+      "methodPValueVerySignificant": "Çok yüksek güvenilirlik",
+      "methodPValueSignificant": "Yüksek güvenilirlik",
+      "methodPValueModerate": "Orta güvenilirlik",
+      "actionRetrain": "Model yeniden eğitilecek",
+      "actionMonitor": "Yakından izleniyor",
+      "actionAlert": "Uyarı gönderildi",
+      "actionRollback": "Önceki modele dönülüyor",
+      "actionCollectingBaseline": "Referans verisi toplanıyor"
     },
     "modelMonitor": {
       "stats": {
