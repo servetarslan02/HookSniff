@@ -165,7 +165,7 @@ export default function TemplatesPage() {
 
        {/* Event Types */}
        <div>
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Event Types ({selectedTemplate.event_types.length})</h4>
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('eventTypes') || 'Event Types'} ({selectedTemplate.event_types.length})</h4>
         <div className="flex flex-wrap gap-1.5">
          {selectedTemplate.event_types.map((ev) => (
           <span key={ev} className="px-2 py-1 text-xs font-mono bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-slate-300 rounded border border-gray-200 dark:border-slate-700">{ev}</span>
@@ -176,7 +176,7 @@ export default function TemplatesPage() {
        {/* Agents */}
        {selectedTemplate.agents && selectedTemplate.agents.length > 0 && (
         <div>
-         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Agents</h4>
+         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('agents') || 'Agents'}</h4>
          <div className="space-y-2">
           {selectedTemplate.agents.map((agent) => (
            <div key={agent.agent_name} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
@@ -185,7 +185,7 @@ export default function TemplatesPage() {
              <p className="text-sm font-medium text-gray-900 dark:text-white">{agent.agent_name}</p>
              <p className="text-xs text-gray-500 dark:text-slate-400">{agent.description}</p>
              <span className={`text-xs mt-1 inline-block px-1.5 py-0.5 rounded ${agent.enabled_by_default ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
-              {agent.enabled_by_default ? 'Default ON' : 'Default OFF'}
+              {agent.enabled_by_default ? (t('defaultOn') || 'Default ON') : (t('defaultOff') || 'Default OFF')}
              </span>
             </div>
            </div>
@@ -197,7 +197,7 @@ export default function TemplatesPage() {
        {/* Tags */}
        {selectedTemplate.tags && selectedTemplate.tags.length > 0 && (
         <div>
-         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Tags</h4>
+         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('tags') || 'Tags'}</h4>
          <div className="flex flex-wrap gap-1.5">
           {selectedTemplate.tags.map((tag) => (
            <span key={tag} className="px-2 py-1 text-xs bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded-md">{tag}</span>
