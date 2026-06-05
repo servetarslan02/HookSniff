@@ -7,7 +7,6 @@ import { act, fireEvent, waitFor } from '@testing-library/react';
 // Mock next-intl
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
-,
   useLocale: () => 'en'
 }));
 
