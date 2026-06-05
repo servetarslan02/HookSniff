@@ -298,10 +298,15 @@ pub fn detect_injection_attempt(input: &str) -> Option<DetectionResult> {
         }
     }
 
-    // Path traversal
-    let traversal_patterns = ["../", "..\\", "/etc/passwd", "/etc/shadow", "c:\\"];
+    // Path traversal (expanded + encoded variants)
+    let traversal_patterns = [
+        "../", "..\\", "/etc/passwd", "/etc/shadow", "c:\\",
+        "/proc/self", "/dev/null", "/var/log", "/tmp/",
+        "..%2f", "..%5c", "%2e%2e", ".%2e/", "..%00",
+        "/wp-content/", "/wp-includes/", "/server-info",
+    ];
     for pattern in &traversal_patterns {
-        if lower.contains(pattern) {
+        if lower.contains(pattern) || decoded.contains(pattern) {
             return Some(DetectionResult {
                 should_log: true,
                 should_alert: false,
