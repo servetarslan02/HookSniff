@@ -12,7 +12,6 @@ export default async function ConvoyAlternativesPage({ params }: { params: Promi
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('alternatives');
-  const tc = await getTranslations('common');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
