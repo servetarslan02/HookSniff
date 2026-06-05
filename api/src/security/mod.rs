@@ -9,10 +9,13 @@
 //! - Zero trust verification
 
 pub mod auto_resolve;
+pub mod behavioral;
 pub mod compliance;
 pub mod ddos;
 pub mod incident_response;
+pub mod ip_reputation;
 pub mod threat_detector;
+pub mod waf;
 pub mod zero_trust;
 
 use sqlx::PgPool;
