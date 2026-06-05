@@ -1,4 +1,4 @@
-//! GDPR data export, account deletion, and email change handlers.
+﻿//! GDPR data export, account deletion, and email change handlers.
 
 use axum::extract::Extension;
 use axum::http::HeaderMap;
@@ -66,7 +66,7 @@ pub async fn delete_account(
         .ok_or_else(|| AppError::coded(ErrorCode::PasswordRequired))?;
     let hash = customer.password_hash.as_ref().ok_or(AppError::coded(ErrorCode::PasswordNotSet))?;
     if !jwt::verify_password_async(password.to_string(), hash.clone()).await? {
-        return Err(AppError::BadRequest("Invalid password".into()));
+        return Err(AppError::coded(ErrorCode::WrongPassword));
     }
 
     let mut tx = pool.begin().await?;
