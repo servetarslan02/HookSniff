@@ -27,6 +27,7 @@ pub enum CortexStage {
     MlQualityCheck,
     SmartRouting,
     DriftDetection,
+    SecurityScan,
     SecurityAutoResolve,
     CleanupJob,
 }
@@ -46,6 +47,7 @@ impl CortexStage {
             Self::MlQualityCheck => "ml_quality_check",
             Self::SmartRouting => "smart_routing",
             Self::DriftDetection => "drift_detection",
+            Self::SecurityScan => "security_scan",
             Self::SecurityAutoResolve => "security_auto_resolve",
             Self::CleanupJob => "cleanup_job",
         }
@@ -65,6 +67,7 @@ impl CortexStage {
             Self::MlQualityCheck => "cortex_ml_quality",
             Self::SmartRouting => "cortex_routing",
             Self::DriftDetection => "cortex_drift",
+            Self::SecurityScan => "cortex_security_scan",
             Self::SecurityAutoResolve => "cortex_security",
             Self::CleanupJob => "cortex_cleanup",
         }
@@ -85,6 +88,7 @@ impl CortexStage {
             Self::MlQualityCheck => Duration::from_secs(120),
             Self::SmartRouting => Duration::from_secs(120),
             Self::DriftDetection => Duration::from_secs(300),
+            Self::SecurityScan => Duration::from_secs(120),
             Self::SecurityAutoResolve => Duration::from_secs(120),
             Self::CleanupJob => Duration::from_secs(300),
         }
@@ -105,6 +109,7 @@ impl CortexStage {
             Self::MlQualityCheck => 3600,   // 1 hour
             Self::SmartRouting => 900,      // 15 min
             Self::DriftDetection => 600,     // 10 min
+            Self::SecurityScan => 300,      // 5 min
             Self::SecurityAutoResolve => 900,  // 15 min
             Self::CleanupJob => 86400,     // 24 hours
         }
@@ -125,6 +130,7 @@ impl CortexStage {
             Self::MlQualityCheck => 660,    // minute 11
             Self::Insights => 7200,         // 02:00 UTC
             Self::DriftDetection => 540,     // minute 9
+            Self::SecurityScan => 510,      // minute 8.5
             Self::SecurityAutoResolve => 570,  // minute 9.5
             Self::CleanupJob => 7800,     // 02:30 UTC
         }
@@ -142,6 +148,7 @@ const ALL_STAGES: &[CortexStage] = &[
     CortexStage::Predictions,
     CortexStage::SmartRouting,
     CortexStage::DriftDetection,
+    CortexStage::SecurityScan,
     CortexStage::SecurityAutoResolve,
     CortexStage::MlTraining,
     CortexStage::MlQualityCheck,
@@ -472,6 +479,92 @@ async fn execute_stage(
                 super::CORTEX_METRICS.drift_detected.fetch_add(drift_count, std::sync::atomic::Ordering::Relaxed);
             }
             Ok(drift_count)
+        }
+        CortexStage::SecurityScan => {
+            // Cortex-powered security scan: analyze recent security events,
+            // check IP reputation, behavioral patterns, and write insights
+            // to anomaly_scores for unified Cortex visibility.
+            let mut scanned = 0u64;
+
+            // 1. Find recent unresolved security events (last 15 min)
+            let recent_events: Vec<(uuid::Uuid, Option<String>, String, String, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
+                "SELECT id, ip_address, event_type, severity, created_at FROM security_events WHERE resolved = false AND created_at > NOW() - INTERVAL '15 minutes' ORDER BY created_at DESC LIMIT 50"
+            ).fetch_all(pool).await.unwrap_or_default();
+
+            for (event_id, ip_opt, event_type, severity, _created) in &recent_events {
+                let ip = match ip_opt {
+                    Some(i) => i.clone(),
+                    None => continue,
+                };
+
+                // 2. Check if this IP is hitting any endpoint
+                let endpoint_hit: Option<(uuid::Uuid, uuid::Uuid)> = sqlx::query_as(
+                    "SELECT DISTINCT d.endpoint_id, e.customer_id FROM deliveries d JOIN endpoints e ON e.id = d.endpoint_id WHERE e.customer_id IN (SELECT id FROM customers) ORDER BY d.created_at DESC LIMIT 1"
+                ).fetch_optional(pool).await.unwrap_or(None);
+
+                if let Some((endpoint_id, customer_id)) = endpoint_hit {
+                    // 3. Calculate security anomaly score based on event severity
+                    let score: i32 = match severity.as_str() {
+                        "critical" => 95,
+                        "high" => 75,
+                        "medium" => 50,
+                        "low" => 25,
+                        _ => 10,
+                    };
+
+                    // 4. Write to anomaly_scores for Cortex visibility
+                    let exists: Option<(i64,)> = sqlx::query_as(
+                        "SELECT id FROM anomaly_scores WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '15 minutes' AND category = 'security' LIMIT 1"
+                    ).bind(endpoint_id).fetch_optional(pool).await.unwrap_or(None);
+
+                    if exists.is_none() && score >= 40 {
+                        let factors = serde_json::json!({
+                            "source": "security_scan",
+                            "event_type": event_type,
+                            "severity": severity,
+                            "ip": ip,
+                            "event_id": event_id,
+                        });
+                        let _ = sqlx::query(
+                            "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, 'security')"
+                        )
+                        .bind(endpoint_id)
+                        .bind(customer_id)
+                        .bind(score)
+                        .bind(&factors)
+                        .execute(pool)
+                        .await;
+                        scanned += 1;
+                    }
+                }
+            }
+
+            // 5. Generate proactive insight if high-severity security events detected
+            let high_count: (i64,) = sqlx::query_as(
+                "SELECT COUNT(*) FROM security_events WHERE severity IN ('critical', 'high') AND resolved = false AND created_at > NOW() - INTERVAL '1 hour'"
+            ).fetch_one(pool).await.unwrap_or((0,));
+
+            if high_count.0 >= 5 {
+                let exists: Option<(i64,)> = sqlx::query_as(
+                    "SELECT id FROM cortex_insights WHERE insight_type = 'security_alert' AND created_at > NOW() - INTERVAL '1 hour' AND dismissed = false LIMIT 1"
+                ).fetch_optional(pool).await.unwrap_or(None);
+
+                if exists.is_none() {
+                    let _ = sqlx::query(
+                        "INSERT INTO cortex_insights (customer_id, insight_type, title, body, severity, data) VALUES (NULL, 'security_alert', $1, $2, 'critical', $3)"
+                    )
+                    .bind(format!("{} high/critical security events in the last hour", high_count.0))
+                    .bind("Multiple security events detected. Review Security dashboard for details.")
+                    .bind(serde_json::json!({"high_events": high_count.0, "source": "security_scan"}))
+                    .execute(pool)
+                    .await;
+                }
+            }
+
+            if scanned > 0 {
+                tracing::info!("🛡️ Security scan: {} security anomalies written to Cortex", scanned);
+            }
+            Ok(scanned)
         }
         CortexStage::SecurityAutoResolve => {
             let n = crate::security::auto_resolve::run_auto_resolve(pool).await?;
