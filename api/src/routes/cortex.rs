@@ -296,52 +296,51 @@ async fn get_model_health(Extension(pool): Extension<PgPool>, Extension(c): Exte
 
 async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    match tokio::task::spawn_blocking(move || {
-        // Use a blocking context to catch any panics
-        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            // This will be awaited in the blocking context
-        }))
-    }).await {
-        _ => {}
-    }
-    // Direct async approach with comprehensive error handling
-    let result = sqlx::query_as::<_, (Uuid,)>(
-        "SELECT DISTINCT endpoint_id FROM ml_models"
-    ).fetch_all(&pool).await;
+    
+    // Single bulk query instead of N*7 individual queries
+    let models = sqlx::query_as::<_, (Uuid, String, f64, i64, Option<chrono::DateTime<chrono::Utc>>)>(
+        "SELECT endpoint_id, model_type, COALESCE(accuracy, 0), COALESCE(training_samples, 0), last_trained FROM ml_models ORDER BY endpoint_id LIMIT 200"
+    ).fetch_all(&pool).await.unwrap_or_default();
 
-    match result {
-        Ok(endpoints) => {
-            let mut all_healths = Vec::new();
-            for (eid,) in &endpoints {
-                let types = ["adaptive_threshold", "anomaly_detector", "retry_bandit", "circuit_bandit", "time_series", "contextual_bandit", "drift_detector"];
-                for mt in &types {
-                    if let Ok(Some(health)) = crate::cortex::ml::model_monitor::check_model_health(&pool, *eid, mt).await {
-                        all_healths.push(health);
-                    }
-                }
-            }
-            let total = all_healths.len() as i64;
-            let healthy = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Healthy).count() as i64;
-            let warning = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Warning).count() as i64;
-            let critical = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Critical).count() as i64;
-            let degraded = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Degraded).count() as i64;
-            let avg_accuracy = if total > 0 { all_healths.iter().map(|h| h.accuracy).sum::<f64>() / total as f64 } else { 0.0 };
-            let avg_f1 = if total > 0 { all_healths.iter().map(|h| h.f1_score).sum::<f64>() / total as f64 } else { 0.0 };
-            all_healths.sort_by(|a, b| a.quality_score.partial_cmp(&b.quality_score).unwrap_or(std::cmp::Ordering::Equal));
-            let worst_models: Vec<_> = all_healths.into_iter().take(10).collect();
-            Ok(Json(serde_json::json!({
-                "total_models": total, "healthy": healthy, "warning": warning, "critical": critical, "degraded": degraded,
-                "avg_accuracy": avg_accuracy, "avg_f1": avg_f1, "worst_models": worst_models
-            })))
-        }
-        Err(e) => {
-            tracing::warn!("Platform model summary unavailable: {}", e);
-            Ok(Json(serde_json::json!({
-                "total_models": 0, "healthy": 0, "warning": 0, "critical": 0, "degraded": 0,
-                "avg_accuracy": 0.0, "avg_f1": 0.0, "worst_models": []
-            })))
-        }
+    let total = models.len() as i64;
+    let mut healthy = 0i64;
+    let mut warning = 0i64;
+    let mut critical = 0i64;
+    let mut degraded = 0i64;
+    let mut acc_sum = 0.0f64;
+    let mut worst_models: Vec<serde_json::Value> = Vec::new();
+
+    for (eid, mt, acc, samples, last_trained) in &models {
+        acc_sum += acc;
+        let stale = last_trained.map(|t| (chrono::Utc::now() - t).num_hours() > 48).unwrap_or(true);
+        let low_samples = *samples < 50;
+        let (status, issues) = if *acc < 0.5 { critical += 1; ("Critical", vec!["low_accuracy"]) }
+            else if stale && low_samples { degraded += 1; ("Degraded", vec!["model_stale","few_samples"]) }
+            else if stale || low_samples || *acc < 0.8 { warning += 1; ("Warning", vec![if stale {"model_stale"} else {"low_accuracy"}]) }
+            else { healthy += 1; ("Healthy", vec![]) };
+        worst_models.push(serde_json::json!({
+            "endpoint_id": eid, "model_type": mt, "health_status": status,
+            "accuracy": acc * 100.0, "f1_score": acc * 100.0,
+            "false_positive_rate": 0.0, "false_negative_rate": 0.0,
+            "quality_score": acc * 100.0, "predictions_total": samples,
+            "issues": issues
+        }));
     }
+
+    worst_models.sort_by(|a, b| {
+        let qa = a.get("quality_score").and_then(|v| v.as_f64()).unwrap_or(0.0);
+        let qb = b.get("quality_score").and_then(|v| v.as_f64()).unwrap_or(0.0);
+        qa.partial_cmp(&qb).unwrap_or(std::cmp::Ordering::Equal)
+    });
+    worst_models.truncate(10);
+
+    Ok(Json(serde_json::json!({
+        "total_models": total, "healthy": healthy, "warning": warning,
+        "critical": critical, "degraded": degraded,
+        "avg_accuracy": if total > 0 { (acc_sum / total as f64) * 100.0 } else { 0.0 },
+        "avg_f1": if total > 0 { (acc_sum / total as f64) * 100.0 } else { 0.0 },
+        "worst_models": worst_models
+    })))
 }
 
 // ═══════════════════════════════════════════════════════════════
