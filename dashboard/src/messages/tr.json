@@ -4288,6 +4288,7 @@
   "providers": {
     "title": "Sağlayıcılar",
     "guides": "Webhook Sağlayıcı Rehberleri",
+    "guidesDesc": "Popüler sağlayıcılardan webhook almak için adım adım kılavuzlar. Dakikalar içinde kurun, doğrulayın ve olayları işleyin.",
     "stripe": "Stripe",
     "github": "GitHub",
     "shopify": "Shopify",

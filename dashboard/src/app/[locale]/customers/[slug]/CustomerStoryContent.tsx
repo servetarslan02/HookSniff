@@ -14,6 +14,7 @@ const stories: Record<string, { company: string; logo: string; industry: string;
 export function CustomerStoryContent() {
   const params = useParams<{ slug: string }>();
   const t = useTranslations('customers');
+  const tc = useTranslations('common');
   const slug = params?.slug;
 
   const story = slug ? stories[slug] : null;
@@ -23,8 +24,8 @@ export function CustomerStoryContent() {
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
         <PublicNavbar />
         <main className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-gray-600 dark:text-slate-400">Story not found.</p>
-          <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline mt-4 inline-block">← Back to Customer Stories</Link>
+          <p className="text-gray-600 dark:text-slate-400">{t('storyNotFound') || 'Story not found.'}</p>
+          <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline mt-4 inline-block">← {t('backToList')}</Link>
         </main>
       </div>
     );
