@@ -55,24 +55,54 @@ export function AutoMLTab() {
         </div>
       ) : (
         <div className="space-y-2">
-          {trials.sort((a, b) => b.score - a.score).map((trial, i) => (
-            <div key={trial.id} className={`glass-card p-3 ${i === 0 ? 'border-l-4 border-emerald-500' : ''}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-gray-700 dark:text-slate-300">{trial.model_type}</span>
-                  {i === 0 && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t('best')}</span>}
+          {trials.sort((a, b) => b.score - a.score).map((trial, i) => {
+            // Translate model type
+            const modelKey = `modelTypes.${trial.model_type}`;
+            const modelName = t(modelKey) !== modelKey ? t(modelKey) : trial.model_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+            // Translate metric
+            const metricNames: Record<string, string> = { mae: t('metrics.mae') || 'Mean Absolute Error', mse: t('metrics.mse') || 'Mean Squared Error', rmse: t('metrics.rmse') || 'Root Mean Squared Error', r2: t('metrics.r2') || 'R² Score', accuracy: t('metrics.accuracy') || 'Accuracy' };
+            const metricName = metricNames[trial.metric] || trial.metric;
+
+            // Translate parameter names
+            const paramNames: Record<string, string> = {
+              max_depth: t('params.maxDepth') || 'Max Depth',
+              n_estimators: t('params.nEstimators') || 'Number of Trees',
+              learning_rate: t('params.learningRate') || 'Learning Rate',
+              min_samples_split: t('params.minSamplesSplit') || 'Min Samples to Split',
+              min_samples_leaf: t('params.minSamplesLeaf') || 'Min Samples per Leaf',
+              max_features: t('params.maxFeatures') || 'Max Features',
+              subsample: t('params.subsample') || 'Subsample Ratio',
+              colsample_bytree: t('params.colsampleBytree') || 'Column Sample Ratio',
+            };
+
+            // Lower score = better for error metrics (MAE, MSE, RMSE)
+            const isLowerBetter = ['mae', 'mse', 'rmse'].includes(trial.metric);
+            const scoreDisplay = isLowerBetter ? trial.score.toFixed(2) : (trial.score * 100).toFixed(1) + '%';
+
+            return (
+              <div key={trial.id} className={`glass-card p-3 ${i === 0 ? 'border-l-4 border-emerald-500' : ''}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{modelName}</span>
+                    {i === 0 && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t('best')}</span>}
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">{scoreDisplay}</span>
+                    <span className="text-xs text-gray-500 ml-1">{metricName}</span>
+                  </div>
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">{trial.score.toFixed(1)} {trial.metric}</span>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {Object.entries(trial.params).map(([k, v]) => (
+                    <span key={k} className="text-xs bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">
+                      <span className="text-gray-500 dark:text-slate-400">{paramNames[k] || k}:</span>{' '}
+                      <span className="font-medium text-gray-700 dark:text-slate-300">{typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(3)) : v}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {Object.entries(trial.params).map(([k, v]) => (
-                  <span key={k} className="text-xs bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">
-                    {k}: {typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(3)) : v}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

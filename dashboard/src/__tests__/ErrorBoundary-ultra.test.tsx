@@ -41,7 +41,7 @@ describe('ErrorBoundary-ultra', () => {
       </ErrorBoundary>
     );
     expect(getByText('Something went wrong')).toBeTruthy();
-    expect(getByText('Test error')).toBeTruthy();
+    expect(getByText(/unexpected error/)).toBeTruthy();
   });
 
   // Test 3: Shows "Try again" button
@@ -80,18 +80,18 @@ describe('ErrorBoundary-ultra', () => {
     expect(getByText('Custom error UI')).toBeTruthy();
   });
 
-  // Test 6: Shows error emoji
-  it('shows error emoji', () => {
-    const { getByText } = renderWithProviders(
+  // Test 6: Shows error content
+  it('shows error content', () => {
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>
     );
-    expect(getByText('💥')).toBeTruthy();
+    expect(container.textContent).toContain('Something went wrong');
   });
 
   // Test 7: Error message is displayed
-  it('displays the error message', () => {
+  it('displays generic error message', () => {
     function SpecificError() {
       throw new Error('Specific error message');
     }
@@ -100,7 +100,8 @@ describe('ErrorBoundary-ultra', () => {
         <SpecificError />
       </ErrorBoundary>
     );
-    expect(getByText('Specific error message')).toBeTruthy();
+    // ErrorBoundary now shows generic message, not specific error
+    expect(getByText('Something went wrong')).toBeTruthy();
   });
 
   // Test 8: Handles multiple children without error

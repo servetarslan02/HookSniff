@@ -5,7 +5,8 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 
 vi.mock('next-intl', () => ({
-  useTranslations: (ns?: string) => {
+  useTranslations: (ns?: string)
+  useLocale: () => 'en', => {
     const translations: Record<string, any> = {
       'landing.hero': {
         typewriter: ['Fast.', 'Reliable.', 'Secure.'],

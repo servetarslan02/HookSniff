@@ -40,7 +40,8 @@ const MOCK_VARIABLES = [
 ];
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: ()
+  useLocale: () => 'en', => (key: string) => key,
 }));
 
 vi.mock('@/i18n/navigation', () => ({

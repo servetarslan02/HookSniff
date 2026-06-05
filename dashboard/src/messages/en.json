@@ -7533,7 +7533,36 @@
       "title": "AutoML Optimization Trials",
       "empty": "No AutoML trials yet. Start an optimization from the API to find the best model parameters.",
       "best": "Best",
-      "trialCount": "{n} trial(s)"
+      "trialCount": "{n} trial(s)",
+      "modelTypes": {
+        "latency_predictor": "Latency Predictor",
+        "failure_predictor": "Failure Predictor",
+        "volume_forecaster": "Volume Forecaster",
+        "anomaly_detector": "Anomaly Detector",
+        "adaptive_threshold": "Smart Threshold",
+        "retry_bandit": "Smart Retry",
+        "circuit_bandit": "Circuit Strategy",
+        "time_series": "Time Series",
+        "contextual_bandit": "Contextual Strategy",
+        "drift_detector": "Drift Monitor"
+      },
+      "metrics": {
+        "mae": "Mean Absolute Error",
+        "mse": "Mean Squared Error",
+        "rmse": "Root Mean Squared Error",
+        "r2": "R² Score",
+        "accuracy": "Accuracy"
+      },
+      "params": {
+        "maxDepth": "Max Depth",
+        "nEstimators": "Number of Trees",
+        "learningRate": "Learning Rate",
+        "minSamplesSplit": "Min Samples to Split",
+        "minSamplesLeaf": "Min Samples per Leaf",
+        "maxFeatures": "Max Features",
+        "subsample": "Subsample Ratio",
+        "colsampleBytree": "Column Sample Ratio"
+      }
     },
     "securityPage": {
       "title": "Security Monitoring",
