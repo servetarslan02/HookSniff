@@ -127,14 +127,14 @@ describe('webhooksApi extended', () => {
     );
   });
 
-  it('batch sends POST to batch endpoint', async () => {
+  it('batchReplay sends POST with ids array', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ deliveries: [] }),
+      json: () => Promise.resolve({ replayed: 3 }),
     });
-    await webhooksApi.batch('token', { webhooks: [{ endpoint_id: 'ep1', data: {} }] });
+    await webhooksApi.batchReplay('token', ['d1', 'd2', 'd3']);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/webhooks/batch'),
+      expect.stringContaining('/webhooks/batch-replay'),
       expect.objectContaining({ method: 'POST' })
     );
   });
@@ -227,12 +227,12 @@ describe('teamsApi extended', () => {
     });
   });
 
-  it('get fetches single team', async () => {
+  it('getDetail fetches single team', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ id: 't1', name: 'Team 1' }),
     });
-    await teamsApi.get('token', 't1');
+    await teamsApi.getDetail('token', 't1');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/teams/t1'),
       expect.anything()
@@ -246,7 +246,7 @@ describe('teamsApi extended', () => {
     });
     await teamsApi.inviteMember('token', 't1', { email: 'new@test.com', role: 'member' });
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/teams/t1/members'),
+      expect.stringContaining('/teams/t1/invite'),
       expect.objectContaining({ method: 'POST' })
     );
   });

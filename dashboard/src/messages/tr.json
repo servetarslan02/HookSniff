@@ -418,7 +418,8 @@
     "viewDetails": "Detayları Gör",
     "replayConfirm": "{id}… teslimatı aynı endpoint'e tekrar oynatılsın mı?",
     "selectAll": "Tümünü seç",
-    "replayFailed": "Teslimat tekrar oynatılamadı. Lütfen tekrar deneyin."
+    "replayFailed": "Teslimat tekrar oynatılamadı. Lütfen tekrar deneyin.",
+    "batchReplaySuccess": "{count} teslimat yeniden oynatildi"
   },
   "logs": {
     "title": "Webhook Logları",
@@ -2393,7 +2394,22 @@
     "corsOrigins": "İzin Verilen CORS Kaynakları",
     "corsOriginsDesc": "İzin verilen kaynakların virgülle ayrılmış listesi. Varsayılan için boş bırakın.",
     "backupRetention": "Yedekleme Saklama Süresi (gün)",
-    "backupRetentionDesc": "Veritabanı yedeklerinin saklanacağı gün sayısı."
+    "backupRetentionDesc": "Veritabanı yedeklerinin saklanacağı gün sayısı.",
+    "ipBlocked": "IP engellendi",
+    "ipUnblocked": "IP engeli kaldirildi",
+    "unblockFailed": "IP engeli kaldirilamadi",
+    "resolveAllFailed": "Toplu cozumleme basarisiz",
+    "devToolsDesc": "Gelistirme ve hata ayiklama araclari. Sadece gelistirme modunda gorunur.",
+    "sentryTest": "Sentry Hata Testi",
+    "sentryTestDesc": "Sentry entegrasyonunu dogrulamak icin test hatasi gonderin",
+    "sentryTestSent": "Test hatasi Sentryye gonderildi",
+    "sentryNotAvailable": "Sentry bu ortamda kullanilamiyor",
+    "wsStatus": "WebSocket Durumu",
+    "wsStatusDesc": "WebSocket baglanti durumunu kontrol edin",
+    "clearCache": "React Query Onbellek Temizle",
+    "clearCacheDesc": "Tum onbellek alinan verileri zorla gecersiz kil",
+    "cacheCleared": "React Query onbellegi temizlendi",
+    "refundLoadFailed": "Iade talepleri yuklenemedi"
   },
   "landing": {
     "nav": {
@@ -6194,7 +6210,8 @@
       "new": "Yeni",
       "inactive": "Pasif",
       "error": "Hata"
-    }
+    },
+    "testSentWithId": "Test gonderildi: {id}"
   },
   "docsDashboard": {
     "title": "Panel Rehberi",
@@ -7588,6 +7605,10 @@
     "domainVerificationDesc": "Kullanicilari e-posta alani adiyla otomatik eslestirmek icin DNS TXT kaydiyla alan adi sahipligini dogrulayin:",
     "addDnsRecord": "Bu TXT kaydini DNS'inize ekleyin:",
     "afterAddingRecord": "Kaydi ekledikten sonra SSO ayarlarinda Alan Adini Dogrula'ya tiklayin. DNS yayilmasi 48 saat surebilir.",
-    "autoTeamJoin": "Otomatik Ekip Katilimi"
+    "autoTeamJoin": "Otomatik Ekip Katilimi",
+    "roleAdmin": "Admin",
+    "roleViewer": "Görüntüleyici",
+    "roleAnalyst": "Analist",
+    "roleDeveloper": "Geliştirici"
   }
 }

@@ -37,7 +37,7 @@ export function NotesTab({
          try {
           await removeTagMutation.mutateAsync({ userId: id, tag: tag.tag });
           toast(t("tagRemoved") || "Tag removed", "success");
-         } catch { toast(t("tagRemoveFailed") || "Failed", "error"); }
+         } catch { toast(t("tagRemoveFailed") || "Failed to remove tag", "error"); }
         }}
         className="ml-1 text-brand-500 hover:text-red-500 transition"
        ><X size={18} strokeWidth={1.75} /></button>

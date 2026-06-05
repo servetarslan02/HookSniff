@@ -36,7 +36,15 @@ export function ProactiveTab({ token }: { token: string | null }) {
   useEffect(() => {
     if (!token) return;
     apiFetch<any>('/cortex/proactive/status', { token })
-      .then((d) => setInsights(d.proactive_insights || []))
+      .then((d) => {
+        const raw = d.proactive_insights || [];
+        // API returns arrays [id, customer_id, insight_type, title, severity, data, created_at]
+        const mapped = raw.map((r: any) => Array.isArray(r) ? {
+          id: r[0], customer_id: r[1], insight_type: r[2], title: r[3],
+          severity: r[4], data: r[5], created_at: r[6], description: '', action_url: null, dismissed: false,
+        } : r);
+        setInsights(mapped);
+      })
       .catch((err) => { console.error('[ProactiveTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
