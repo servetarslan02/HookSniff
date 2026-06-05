@@ -4397,7 +4397,25 @@
     "criticalDays": "Kritik (7 gün)",
     "highDays": "Yüksek (7 gün)",
     "securityEvents": "Güvenlik Olayları",
-    "eventTypes": "Olay Tipleri (30 gün)",
+    "eventTypes": {
+      "brute_force_login": "Kaba Kuvvet Girişimi",
+      "brute_force_api": "Kaba Kuvvet API",
+      "credential_stuffing": "Kimlik Bilgisi Doldurma",
+      "password_spray": "Şifre Püskürtme",
+      "sql_injection_attempt": "SQL Enjeksiyonu",
+      "xss_attempt": "XSS Saldırısı",
+      "path_traversal_attempt": "Yol Geçişi Saldırısı",
+      "scanner_detected": "Tarayıcı Tespit Edildi",
+      "suspicious_user_agent": "Şüpheci Kullanıcı Aracı",
+      "disabled_account_login": "Devre Dışı Hesap Girişi",
+      "password_reset_abuse": "Şifre Sıfırlama Kötüeye Kullanımı",
+      "account_enumeration": "Hesap Numaralandırma",
+      "rate_limit_exceeded": "Hız Limiti Aşıldı",
+      "unusual_location": "Olağdışı Konum",
+      "login_new_device": "Yeni Cihaz Girişi",
+      "threat_detected": "Tehdit Tespit Edildi",
+      "blocked_ip_access": "Engellenmiş IP Erişimi"
+    },
     "topIps": "En Çok Olay Olan IP'ler (7 gün)",
     "allSeverity": "Tüm Severity",
     "allStatus": "Tüm Durum",
@@ -4427,7 +4445,25 @@
     "resolveAllConfirm": "çözülmemiş olay var. Tümünü çözmek istediğinize emin misiniz?",
     "cancel": "İptal",
     "topIpsTitle": "En Çok Olay Olan IP'ler (7 gün)",
-    "eventId": "Olay ID"
+    "eventId": "Olay ID",
+    "severityDesc": {
+      "critical": "Acil müdahale gerekli — hesap veya veri risk altında",
+      "high": "Muhtemel zararlı aktivite — hemen inceleyin",
+      "medium": "Şüpheci aktivite — uygun olduğunda inceleyin",
+      "low": "Bilgilendirme — acil aksiyon gerekmez"
+    },
+    "relativeTime": {
+      "justNow": "az önce",
+      "minutesAgo": "{n}dk önce",
+      "hoursAgo": "{n}s önce",
+      "daysAgo": "{n}g önce"
+    },
+    "blockReasons": {
+      "brute_force": "Kaba kuvvet saldırısı nedeniyle engellendi",
+      "abuse": "API kötüye kullanımı nedeniyle engellendi",
+      "manual": "Yönetici tarafından manuel engellendi",
+      "auto": "Güvenlik sistemi tarafından otomatik engellendi"
+    }
   },
   "startups": {
     "title": "Girişimler",
