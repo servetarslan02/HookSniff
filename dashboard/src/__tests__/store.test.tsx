@@ -161,4 +161,150 @@ describe('Auth Store', () => {
 
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_user');
   });
+
+  it('calls register endpoint on register', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        token: 'jwt-new',
+        customer: { id: '2', email: 'reg@test.com', name: 'Reg', plan: 'free' },
+      }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await act(async () => {
+      await authRef.register('reg@test.com', 'pass123', 'Reg');
+    });
+
+    const registerCall = mockFetch.mock.calls.find(
+      (c: any[]) => c[0]?.includes('/auth/register')
+    );
+    expect(registerCall).toBeTruthy();
+    expect(registerCall![1].method).toBe('POST');
+    const body = JSON.parse(registerCall![1].body);
+    expect(body.email).toBe('reg@test.com');
+    expect(body.name).toBe('Reg');
+  });
+
+  it('throws on failed register', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 409,
+      json: () => Promise.resolve({ error: { message: 'Email already exists' } }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await expect(authRef.register('dup@test.com', 'pass')).rejects.toThrow('Email already exists');
+  });
+
+  it('setApiKey stores key in state', async () => {
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    act(() => {
+      authRef.setApiKey('sk_test_123');
+    });
+
+    expect(authRef.apiKey).toBe('sk_test_123');
+  });
+
+  it('login stores token in localStorage', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        token: 'jwt-stored',
+        customer: { id: '3', email: 'stored@test.com', plan: 'pro' },
+      }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await act(async () => {
+      await authRef.login('stored@test.com', 'pass');
+    });
+
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('hooksniff_token', 'jwt-stored');
+  });
+
+  it('verify2fa calls 2FA endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        token: 'jwt-2fa',
+        customer: { id: '4', email: '2fa@test.com', plan: 'pro' },
+      }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await act(async () => {
+      await authRef.verify2fa('temp-token', '123456');
+    });
+
+    const twoFaCall = mockFetch.mock.calls.find(
+      (c: any[]) => c[0]?.includes('/auth/2fa/verify') || c[0]?.includes('/2fa')
+    );
+    expect(twoFaCall).toBeTruthy();
+  });
+
+  it('logout clears token from localStorage', async () => {
+    let container: HTMLElement;
+    await act(async () => {
+      const result = renderWithProviders(
+        <AuthProvider><AuthConsumer /></AuthProvider>,
+        { withIntl: false }
+      );
+      container = result.container;
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    await act(async () => {
+      const logoutBtn = Array.from(container!.querySelectorAll('button')).find(
+        b => b.textContent === 'Logout'
+      )!;
+      fireEvent.click(logoutBtn);
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_token');
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_user');
+  });
 });
