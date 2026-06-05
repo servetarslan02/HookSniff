@@ -92,7 +92,7 @@ export default function AdminAlertsPage() {
           id: editingId,
           data: { name: formName.trim(), condition: formCondition, threshold, channels: formChannels },
         });
-        toast(t('alertUpdated') || t('alertUpdated'), 'success');
+        toast(t('alertUpdated') || 'Alert updated', 'success');
       } else {
         await createMutation.mutateAsync({
           name: formName.trim(),
@@ -100,11 +100,11 @@ export default function AdminAlertsPage() {
           threshold,
           channels: formChannels,
         });
-        toast(t('alertCreated') || t('alertCreated'), 'success');
+        toast(t('alertCreated') || 'Alert created', 'success');
       }
       resetForm();
     } catch {
-      toast(t('alertSaveFailed') || t('alertSaveFailed'), 'error');
+      toast(t('alertSaveFailed') || 'Failed to save alert', 'error');
     } finally {
       setSaving(false);
     }
@@ -312,11 +312,15 @@ export default function AdminAlertsPage() {
                       }`}>
                         {alert.is_active ? (t('active') || 'Active') : (t('inactive') || 'Inactive')}
                       </span>
-                      {!alert.customer_id && (
+                      {!alert.customer_id ? (
                         <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">
                           <Globe size={12} strokeWidth={1.75} className="inline mr-0.5" />{t('platform') || 'Platform'}
                         </span>
-                      )}
+                      ) : alert.customer_email ? (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
+                          {alert.customer_email}
+                        </span>
+                      ) : null}
                     </div>
                     <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                       {cond?.label || alert.condition} {t('threshold') || 'threshold'}: {alert.threshold}
