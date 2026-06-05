@@ -9,7 +9,7 @@ const DEFAULT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:300
 const apiBase = DEFAULT_API_URL.endsWith('/v1') ? DEFAULT_API_URL : `${DEFAULT_API_URL}/v1`;
 export const API_BASE = typeof window !== 'undefined' ? apiBase : apiBase;
 
-const REQUEST_TIMEOUT_MS = 10_000;
+const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
 const RETRY_BASE_DELAY_MS = 1_000;
 

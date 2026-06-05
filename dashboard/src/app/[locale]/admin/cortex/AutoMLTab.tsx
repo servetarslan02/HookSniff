@@ -67,7 +67,7 @@ export function AutoMLTab() {
               <div className="mt-1 flex flex-wrap gap-2">
                 {Object.entries(trial.params).map(([k, v]) => (
                   <span key={k} className="text-xs bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">
-                    {k}: {typeof v === 'number' ? v.toFixed(3) : v}
+                    {k}: {typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(3)) : v}
                   </span>
                 ))}
               </div>
