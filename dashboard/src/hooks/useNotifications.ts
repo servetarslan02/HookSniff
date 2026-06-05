@@ -41,7 +41,7 @@ export function useMarkNotificationAsRead() {
       queryClient.setQueriesData<NotificationListResponse>(
         { queryKey: ['notifications'] },
         (old) => {
-          if (!old) return old;
+          if (!old || !Array.isArray(old.notifications)) return old;
           return {
             ...old,
             notifications: old.notifications.map((n) =>
@@ -79,7 +79,7 @@ export function useMarkAllNotificationsAsRead() {
       queryClient.setQueriesData<NotificationListResponse>(
         { queryKey: ['notifications'] },
         (old) => {
-          if (!old) return old;
+          if (!old || !Array.isArray(old.notifications)) return old;
           return {
             ...old,
             notifications: old.notifications.map((n) => ({ ...n, read: true })),
@@ -115,7 +115,7 @@ export function useDeleteNotification() {
       queryClient.setQueriesData<NotificationListResponse>(
         { queryKey: ['notifications'] },
         (old) => {
-          if (!old) return old;
+          if (!old || !Array.isArray(old.notifications)) return old;
           return {
             ...old,
             notifications: old.notifications.filter((n) => n.id !== id),

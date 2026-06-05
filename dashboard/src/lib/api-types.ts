@@ -500,6 +500,7 @@ export interface AlertRuleAdmin {
   channels: string[];
   is_active: boolean;
   customer_id?: string | null;
+  customer_email?: string | null;
   created_at: string;
 }
 

@@ -221,8 +221,9 @@ async fn update_alert(
     .bind(req.is_active)
     .bind(id)
     .bind(customer.id)
-    .fetch_one(&pool)
-    .await?;
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
 
     let channels: Vec<String> = alert
         .4
