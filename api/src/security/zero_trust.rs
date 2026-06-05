@@ -10,6 +10,7 @@ pub struct ZtVerification {
     pub allowed: bool,
     pub reason: String,
     pub risk_score: f64,
+    pub is_admin: bool,
 }
 
 /// Verify request against Zero Trust policies
@@ -40,6 +41,7 @@ pub async fn verify_request(
             allowed: false,
             reason: "Account disabled".to_string(),
             risk_score: 1.0,
+            is_admin: false,
         };
     }
 
@@ -49,6 +51,7 @@ pub async fn verify_request(
             allowed: true,
             reason: "Admin verified".to_string(),
             risk_score: 0.0,
+            is_admin: true,
         };
     }
 
@@ -82,6 +85,7 @@ pub async fn verify_request(
                 allowed: false,
                 reason: "IP is blocked".to_string(),
                 risk_score: 1.0,
+                is_admin: false,
             };
         }
     }
@@ -95,6 +99,7 @@ pub async fn verify_request(
                 allowed: false,
                 reason: "Admin access required".to_string(),
                 risk_score: 1.0,
+                is_admin: false,
             };
         }
     }
@@ -106,6 +111,7 @@ pub async fn verify_request(
                 allowed: false,
                 reason: format!("Risk score too high for {}: {}", method, risk_score),
                 risk_score,
+                is_admin: false,
             };
         }
     }
@@ -114,5 +120,6 @@ pub async fn verify_request(
         allowed: risk_score < 0.7,
         reason: if reasons.is_empty() { "Verified".to_string() } else { reasons.join("; ") },
         risk_score,
+        is_admin: false,
     }
 }
