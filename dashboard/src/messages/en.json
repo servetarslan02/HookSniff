@@ -7324,7 +7324,14 @@
         "shouldMonitor": "Not severe but should be monitored",
         "noConcern": "Not concerning",
         "latencyIncreased": "Latency increased by {v}ms",
-        "srDropped": "Success rate dropped below {v}%"
+        "srDropped": "Success rate dropped below {v}%",
+        "latencyDesc": "Latency {current} (baseline: {baseline})",
+        "failureRateDesc": "Failure rate {current} (baseline: {baseline})",
+        "volumeDesc": "Traffic {direction}: {current} (baseline: {baseline})",
+        "timeoutDesc": "Timeout rate increased to {current}",
+        "errorPatternDesc": "New error pattern detected ({deviation} deviation)",
+        "spike": "spike",
+        "drop": "drop"
       },
       "detectedBy": {
         "ml": "🧠 Detected by ML",
