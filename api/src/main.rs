@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
 
     let pool = db::create_pool(&db_url).await?;
 
-    let (health_pool, rate_limiter, cache_layer, readonly_pool) = tokio::join!(
+    let (health_pool, rate_limiter, cache_layer) = tokio::join!(
         async {
             match db::create_health_pool(&db_url).await {
                 Ok(p) => {
@@ -328,7 +328,8 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(health_pool))
-        .layer(axum::Extension(pool.clone()));
+        .layer(axum::Extension(pool.clone()))
+        .layer(axum::Extension(readonly_pool));
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
     let addr = format!("0.0.0.0:{}", cfg.port);
