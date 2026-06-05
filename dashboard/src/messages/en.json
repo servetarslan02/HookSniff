@@ -7716,7 +7716,8 @@
     "roleAdmin": "Admin",
     "roleViewer": "Viewer",
     "roleAnalyst": "Analyst",
-    "roleDeveloper": "Developer"
+    "roleDeveloper": "Developer",
+    "ssoApiReference": "API Reference"
   },
   "docsQuickstartPage": {
     "createApiKey": "Create API Key",
