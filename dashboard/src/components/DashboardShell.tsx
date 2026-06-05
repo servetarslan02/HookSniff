@@ -317,7 +317,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     onClick={() => setProfileOpen(false)}
                   >
                     <ExternalLink size={16} strokeWidth={1.75} className="text-gray-400" />
-                    API Reference
+                    {tc('apiReference') || 'API Reference'}
                   </a>
                   <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
                   <button

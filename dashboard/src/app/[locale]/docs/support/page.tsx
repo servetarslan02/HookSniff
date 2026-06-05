@@ -60,7 +60,7 @@ async function SupportPageContent(params: Promise<{ locale: string }>) {
           {t('emailDesc')}
         </p>
         <p className="text-gray-600 dark:text-slate-400">
-          <a href="mailto:support@hooksniff.com" className="text-brand-600 hover:text-brand-700">support@hooksniff.com</a>
+          <a href="mailto:servetarslan02@gmail.com" className="text-brand-600 hover:text-brand-700">servetarslan02@gmail.com</a>
         </p>
       </section>
 

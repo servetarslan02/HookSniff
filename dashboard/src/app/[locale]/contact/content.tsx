@@ -42,7 +42,7 @@ export function ContactPageContent() {
   };
 
   const infoCards = [
-    { icon: Mail, label: t('contact.email'), value: 'support@hooksniff.dev', color: 'from-brand-500 to-purple-600' },
+    { icon: Mail, label: t('contact.email'), value: 'servetarslan02@gmail.com', color: 'from-brand-500 to-purple-600' },
     { icon: MapPin, label: t('contact.location'), value: t('contact.locationValue'), color: 'from-emerald-500 to-teal-600' },
     { icon: Clock, label: t('contact.responseTime'), value: t('contact.responseTimeValue'), color: 'from-amber-500 to-orange-600' },
   ];
