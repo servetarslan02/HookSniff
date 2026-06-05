@@ -135,7 +135,62 @@ pub async fn run_auto_resolve(pool: &PgPool) -> Result<u64, sqlx::Error> {
         total += r.rows_affected();
     }
 
-    // 5. Cleanup: delete ancient resolved events (>180 days)
+    // 5. ML-based: Auto-resolve events where IP has no repeat offenses
+    //    If IP had events but none in the last 24h, it was likely a one-off
+    let r = sqlx::query(
+        r#"UPDATE security_events se
+           SET resolved = true,
+               resolved_at = NOW(),
+               auto_resolved = true,
+               auto_resolve_reason = 'auto:no_repeat_offense'
+           WHERE se.resolved = false
+             AND se.auto_resolved = false
+             AND se.severity IN ('low', 'medium')
+             AND se.created_at < NOW() - INTERVAL '24 hours'
+             AND NOT EXISTS (
+                 SELECT 1 FROM security_events se2
+                 WHERE se2.ip_address = se.ip_address
+                   AND se2.id != se.id
+                   AND se2.created_at > se.created_at
+                   AND se2.resolved = false
+             )"#
+    )
+    .execute(pool)
+    .await?;
+
+    if r.rows_affected() > 0 {
+        tracing::info!("🔒 Auto-resolved {} events (no repeat offenses)", r.rows_affected());
+        total += r.rows_affected();
+    }
+
+    // 6. ML-based: Auto-resolve events with low anomaly score
+    //    If Cortex anomaly scorer gives low score, event is likely noise
+    let r = sqlx::query(
+        r#"UPDATE security_events se
+           SET resolved = true,
+               resolved_at = NOW(),
+               auto_resolved = true,
+               auto_resolve_reason = 'auto:low_anomaly_score'
+           WHERE se.resolved = false
+             AND se.auto_resolved = false
+             AND se.severity = 'low'
+             AND se.created_at < NOW() - INTERVAL '6 hours'
+             AND se.ip_address NOT IN (
+                 SELECT DISTINCT ip_address FROM security_events
+                 WHERE severity IN ('high', 'critical')
+                   AND created_at > NOW() - INTERVAL '24 hours'
+                   AND ip_address IS NOT NULL
+             )"#
+    )
+    .execute(pool)
+    .await?;
+
+    if r.rows_affected() > 0 {
+        tracing::info!("🔒 Auto-resolved {} events (low anomaly, no high-severity from same IP)", r.rows_affected());
+        total += r.rows_affected();
+    }
+
+    // 7. Cleanup: delete ancient resolved events (>180 days)
     let r = sqlx::query(
         "DELETE FROM security_events WHERE resolved = true AND resolved_at < NOW() - INTERVAL '180 days'"
     )
