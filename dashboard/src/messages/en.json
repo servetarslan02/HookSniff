@@ -7375,14 +7375,14 @@
       },
       "endpointLink": "View endpoint",
       "steps": {
-        "checkEndpoint": "Check endpoint delivery history for patterns",
-        "checkServer": "Check your server response times and logs",
-        "checkErrors": "Check error messages in delivery logs",
-        "checkTraffic": "Check if traffic spike is expected",
-        "checkCapacity": "Verify server can handle the traffic",
-        "increaseTimeout": "Consider increasing timeout in endpoint settings",
-        "checkLogs": "Check server logs for the new error pattern",
-        "checkDeploy": "Check if a recent deploy caused the issue"
+        "checkEndpoint": "Cortex detected this anomaly automatically from delivery patterns",
+        "checkServer": "If this persists, Cortex will trigger circuit breaker or fallback",
+        "checkErrors": "Error patterns are being tracked for trend analysis",
+        "checkTraffic": "Traffic anomalies trigger automatic rate limiting if needed",
+        "checkCapacity": "Cortex monitors capacity and will alert if threshold exceeded",
+        "increaseTimeout": "Timeout adjustments are applied automatically by Cortex healing",
+        "checkLogs": "Cortex analyzes error patterns without manual log review",
+        "checkDeploy": "Cortex detects deploy-related performance changes automatically"
       }
     },
     "healing": {
@@ -7516,24 +7516,24 @@
         "rateLimitRisk": "Consider increasing rate limit or reducing requests",
         "stressDetection": "Check server resources",
         "cascadeRisk": "Fix the main endpoint, others may also be affected",
-        "degradation": "This endpoint's success rate is declining. Take action before it hits the anomaly threshold."
+        "degradation": "Cortex is monitoring this endpoint. If the trend continues, automatic healing actions will be triggered (circuit breaker, fallback URL, retry slowdown)."
       },
       "steps": {
-        "checkEndpoint": "Open the endpoint detail page and check recent deliveries",
-        "checkServer": "Check your server logs for errors or slowdowns",
-        "enableFallback": "Enable a fallback URL in endpoint settings",
-        "upgradePlan": "Consider upgrading your plan for higher limits",
-        "reduceTraffic": "Review and reduce unnecessary webhook traffic",
-        "checkResources": "Check server CPU, memory, and disk usage",
-        "scaleUp": "Consider scaling up your server resources",
-        "fixMainEndpoint": "Fix the main endpoint first — others depend on it",
-        "checkDependents": "Check dependent endpoints for cascading failures",
-        "openEndpoint": "Open the affected endpoint and check recent delivery history",
-        "checkServerLogs": "Check your server logs for errors or timeouts",
-        "checkRecentDeploy": "Check if a recent code deployment caused the issue"
+        "checkEndpoint": "Cortex is monitoring this endpoint and tracking all deliveries",
+        "checkServer": "If failure rate exceeds threshold, Cortex will auto-disable the endpoint",
+        "enableFallback": "Fallback URL will be activated automatically if configured",
+        "upgradePlan": "Rate limit exceeded — consider upgrading plan for higher limits",
+        "reduceTraffic": "Cortex will apply proactive throttling to protect your server",
+        "checkResources": "Cortex monitors server health metrics continuously",
+        "scaleUp": "Auto-scaling recommendations will appear if traffic pattern changes",
+        "fixMainEndpoint": "Cortex will attempt circuit breaker and fallback URL automatically",
+        "checkDependents": "Cascade risk monitoring is active across all endpoints",
+        "openEndpoint": "Cortex is tracking this endpoint — no manual action needed",
+        "checkServerLogs": "Cortex detects anomalies automatically from delivery patterns",
+        "checkRecentDeploy": "Cortex compares current behavior against baseline automatically"
       },
       "endpointLink": "View endpoint",
-      "nextSteps": "What to do:"
+      "nextSteps": "Cortex Response:"
     },
     "drift": {
       "title": "Drift Detection Events",
