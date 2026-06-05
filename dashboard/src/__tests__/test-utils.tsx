@@ -8,7 +8,15 @@
 import React, { type ReactElement } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { NextIntlClientProvider } from 'next-intl';
+
+// Try to import NextIntlClientProvider — may be mocked out by test files
+let NextIntlClientProvider: React.ComponentType<any> | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  NextIntlClientProvider = require('next-intl').NextIntlClientProvider;
+} catch {
+  // Not available (mocked out)
+}
 
 // Common messages for tests — maps i18n keys to readable values
 const testMessages: Record<string, any> = {
@@ -105,11 +113,14 @@ export function renderWithProviders(
   { queryClient = createTestQueryClient(), locale = 'en', messages = testMessages, withIntl = true, ...renderOptions }: ExtendedRenderOptions = {}
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
-    const content = withIntl ? (
-      <NextIntlClientProvider locale={locale} messages={messages}>
-        {children}
-      </NextIntlClientProvider>
-    ) : children;
+    let content = children;
+    if (withIntl && NextIntlClientProvider) {
+      content = (
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      );
+    }
 
     return (
       <QueryClientProvider client={queryClient}>
