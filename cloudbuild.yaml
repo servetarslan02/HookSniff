@@ -111,7 +111,7 @@ steps:
       - '--no-allow-unauthenticated'
       - '--memory=1Gi'
       - '--cpu=1'
-      - '--min-instances=1'
+      - '--min-instances=0'
       - '--max-instances=4'
       - '--timeout=300'
       - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,WEBHOOK_FORMAT=standard,RATE_LIMIT_STORE=redis,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app,USE_REDIS_QUEUE=true'
