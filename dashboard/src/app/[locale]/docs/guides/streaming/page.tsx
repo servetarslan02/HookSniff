@@ -162,7 +162,7 @@ try {
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
               {[
-                ['Developer (Free)', '100', '100'],
+                ['Developer (Free)', '100', '300'],
                 ['Startup ($24/mo)', '500', '30,000'],
                 ['Pro ($49/mo)', '1,000', '100,000'],
                 ['Enterprise', 'Custom', 'Unlimited'],
