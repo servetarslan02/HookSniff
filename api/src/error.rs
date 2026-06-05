@@ -156,6 +156,21 @@ pub enum ErrorCode {
     InvalidJwt,
     InvalidDateFormat,
 
+    // Email
+    EmailProviderNotConfigured,
+    EmailSendFailed,
+
+    // Webhook
+    InvalidWebhookSignature,
+    WebhookSignatureExpired,
+
+    // Validation
+    EndpointIdRequired,
+    InvalidUserId,
+    InvalidEmail,
+    InvalidPassword,
+    MissingField,
+
     // Conflict
     Conflict,
 }
@@ -309,6 +324,21 @@ impl ErrorCode {
             ErrorCode::InvalidIpAddress => "INVALID_IP_ADDRESS",
             ErrorCode::InvalidJwt => "INVALID_JWT",
             ErrorCode::InvalidDateFormat => "INVALID_DATE_FORMAT",
+
+            // Email
+            ErrorCode::EmailProviderNotConfigured => "EMAIL_PROVIDER_NOT_CONFIGURED",
+            ErrorCode::EmailSendFailed => "EMAIL_SEND_FAILED",
+
+            // Webhook
+            ErrorCode::InvalidWebhookSignature => "INVALID_WEBHOOK_SIGNATURE",
+            ErrorCode::WebhookSignatureExpired => "WEBHOOK_SIGNATURE_EXPIRED",
+
+            // Validation
+            ErrorCode::EndpointIdRequired => "ENDPOINT_ID_REQUIRED",
+            ErrorCode::InvalidUserId => "INVALID_USER_ID",
+            ErrorCode::InvalidEmail => "INVALID_EMAIL",
+            ErrorCode::InvalidPassword => "INVALID_PASSWORD",
+            ErrorCode::MissingField => "MISSING_FIELD",
 
             // Conflict
             ErrorCode::Conflict => "CONFLICT",
