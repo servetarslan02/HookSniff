@@ -29,21 +29,21 @@ describe('FAQPage', () => {
   });
 
   it('renders without crashing', () => {
-    renderWithProviders(React.createElement(FAQPage));
+    renderWithProviders(React.createElement(FAQPage), { withIntl: false });
   });
 
   it('displays FAQ title', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     expect(container.textContent).toContain('faqTitle');
   });
 
   it('displays FAQ subtitle', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     expect(container.textContent).toContain('faqSubtitle');
   });
 
   it('renders FAQ category tabs', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     expect(container.textContent).toContain('catGeneral');
     expect(container.textContent).toContain('catGettingStarted');
     expect(container.textContent).toContain('catBilling');
@@ -52,21 +52,21 @@ describe('FAQPage', () => {
   });
 
   it('renders FAQ questions for default category', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     expect(container.textContent).toContain('q1');
     expect(container.textContent).toContain('q2');
     expect(container.textContent).toContain('q3');
   });
 
   it('renders still have questions section', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     expect(container.textContent).toContain('stillHaveQuestions');
     expect(container.textContent).toContain('cantFindAnswer');
     expect(container.textContent).toContain('contactSupport');
   });
 
   it('renders FAQ accordion buttons', () => {
-    const { container } = renderWithProviders(React.createElement(FAQPage));
+    const { container } = renderWithProviders(React.createElement(FAQPage), { withIntl: false });
     const buttons = container.querySelectorAll('button');
     // Should have category tab buttons + FAQ accordion buttons
     expect(buttons.length).toBeGreaterThanOrEqual(5);

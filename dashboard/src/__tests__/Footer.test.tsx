@@ -31,17 +31,17 @@ vi.mock('@/i18n/navigation', () => ({
 
 describe('Footer', () => {
   it('renders without crashing', () => {
-    const { container } = renderWithProviders(<Footer />);
+    const { container } = renderWithProviders(<Footer />, { withIntl: false });
     expect(container.querySelector('footer')).toBeTruthy();
   });
 
   it('renders the hook emoji', () => {
-    const { container } = renderWithProviders(<Footer />);
+    const { container } = renderWithProviders(<Footer />, { withIntl: false });
     expect(container.textContent).toContain('🪝');
   });
 
   it('renders footer links', () => {
-    const { container } = renderWithProviders(<Footer />);
+    const { container } = renderWithProviders(<Footer />, { withIntl: false });
     const text = container.textContent!;
     expect(text).toContain('GitHub');
     expect(text).toContain('Docs');
@@ -54,12 +54,12 @@ describe('Footer', () => {
   });
 
   it('renders copyright text', () => {
-    const { container } = renderWithProviders(<Footer />);
+    const { container } = renderWithProviders(<Footer />, { withIntl: false });
     expect(container.textContent).toContain('© 2024 HookSniff');
   });
 
   it('renders as a footer element', () => {
-    const { container } = renderWithProviders(<Footer />);
+    const { container } = renderWithProviders(<Footer />, { withIntl: false });
     expect(container.querySelector('footer')).toBeTruthy();
   });
 });

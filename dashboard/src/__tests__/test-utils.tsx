@@ -10,8 +10,48 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NextIntlClientProvider } from 'next-intl';
 
-// Minimal messages for tests — just return key as value
-const testMessages: Record<string, any> = {};
+// Common messages for tests — maps i18n keys to readable values
+const testMessages: Record<string, any> = {
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  processing: 'Processing...',
+  save: 'Save',
+  delete: 'Delete',
+  edit: 'Edit',
+  create: 'Create',
+  close: 'Close',
+  loading: 'Loading...',
+  retry: 'Retry',
+  search: 'Search',
+  filter: 'Filter',
+  reset: 'Reset',
+  submit: 'Submit',
+  back: 'Back',
+  next: 'Next',
+  yes: 'Yes',
+  no: 'No',
+  ok: 'OK',
+  error: 'Error',
+  success: 'Success',
+  warning: 'Warning',
+  info: 'Info',
+  sending: 'Sending...',
+  sendMessage: 'Send Message',
+  common: {
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    processing: 'Processing...',
+    save: 'Save',
+    delete: 'Delete',
+    edit: 'Edit',
+    create: 'Create',
+    close: 'Close',
+    loading: 'Loading...',
+    retry: 'Retry',
+    search: 'Search',
+    redirecting: 'Redirecting to login...',
+  },
+};
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -32,6 +72,8 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient;
   locale?: string;
   messages?: Record<string, any>;
+  /** Set to false to skip NextIntlClientProvider wrapping (for tests that mock next-intl themselves) */
+  withIntl?: boolean;
 }
 
 /**
@@ -39,14 +81,18 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
  */
 export function renderWithProviders(
   ui: ReactElement,
-  { queryClient = createTestQueryClient(), locale = 'en', messages = testMessages, ...renderOptions }: ExtendedRenderOptions = {}
+  { queryClient = createTestQueryClient(), locale = 'en', messages = testMessages, withIntl = true, ...renderOptions }: ExtendedRenderOptions = {}
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
+    const content = withIntl ? (
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        {children}
+      </NextIntlClientProvider>
+    ) : children;
+
     return (
       <QueryClientProvider client={queryClient}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        {content}
       </QueryClientProvider>
     );
   }
