@@ -14,7 +14,6 @@ const stories: Record<string, { company: string; logo: string; industry: string;
 export function CustomerStoryContent() {
   const params = useParams<{ slug: string }>();
   const t = useTranslations('customers');
-  const tc = useTranslations('common');
   const slug = params?.slug;
 
   const story = slug ? stories[slug] : null;
