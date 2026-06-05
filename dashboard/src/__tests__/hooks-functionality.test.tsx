@@ -173,6 +173,16 @@ describe('useWebhooks', () => {
     const { result } = renderHook(() => useWebhooks({ page: 2, status: 'failed' }), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
+
+  it('calls webhooksApi.list with token', async () => {
+    const { webhooksApi } = await import('@/lib/api');
+    vi.mocked(webhooksApi.list).mockClear();
+    const { useWebhooks } = await import('@/hooks/useWebhooks');
+    renderHook(() => useWebhooks(), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(webhooksApi.list).toHaveBeenCalledWith('test-token', undefined);
+    });
+  });
 });
 
 describe('useDeliveryDetail', () => {
@@ -207,6 +217,17 @@ describe('useReplayDelivery', () => {
     const { result } = renderHook(() => useReplayDelivery(), { wrapper: createWrapper() });
     expect(result.current.mutate).toBeDefined();
   });
+
+  it('calls webhooksApi.replay on mutate', async () => {
+    const { webhooksApi } = await import('@/lib/api');
+    vi.mocked(webhooksApi.replay).mockClear();
+    const { useReplayDelivery } = await import('@/hooks/useWebhooks');
+    const { result } = renderHook(() => useReplayDelivery(), { wrapper: createWrapper() });
+    result.current.mutate('d1');
+    await waitFor(() => {
+      expect(webhooksApi.replay).toHaveBeenCalledWith('test-token', 'd1');
+    });
+  });
 });
 
 describe('useEndpoints', () => {
@@ -215,6 +236,16 @@ describe('useEndpoints', () => {
     const { result } = renderHook(() => useEndpoints(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toBeDefined();
+  });
+
+  it('calls endpointsApi.list with token', async () => {
+    const { endpointsApi } = await import('@/lib/api');
+    vi.mocked(endpointsApi.list).mockClear();
+    const { useEndpoints } = await import('@/hooks/useEndpoints');
+    renderHook(() => useEndpoints(), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(endpointsApi.list).toHaveBeenCalledWith('test-token');
+    });
   });
 });
 
@@ -337,6 +368,16 @@ describe('useAlerts', () => {
     const { result } = renderHook(() => useAlerts(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
+
+  it('calls alertsApi.list with token', async () => {
+    const { alertsApi } = await import('@/lib/api');
+    vi.mocked(alertsApi.list).mockClear();
+    const { useAlerts } = await import('@/hooks/useAlerts');
+    renderHook(() => useAlerts(), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(alertsApi.list).toHaveBeenCalledWith('test-token');
+    });
+  });
 });
 
 describe('useBroadcasts', () => {
@@ -345,6 +386,16 @@ describe('useBroadcasts', () => {
     const { result } = renderHook(() => useBroadcasts(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
+
+  it('calls broadcastsApi.listActive with token', async () => {
+    const { broadcastsApi } = await import('@/lib/api');
+    vi.mocked(broadcastsApi.listActive).mockClear();
+    const { useBroadcasts } = await import('@/hooks/useBroadcasts');
+    renderHook(() => useBroadcasts(), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(broadcastsApi.listActive).toHaveBeenCalledWith('test-token', undefined);
+    });
+  });
 });
 
 describe('useNotifications', () => {
@@ -352,6 +403,16 @@ describe('useNotifications', () => {
     const { useNotifications } = await import('@/hooks/useNotifications');
     const { result } = renderHook(() => useNotifications(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it('calls notificationsApi.list with token', async () => {
+    const { notificationsApi } = await import('@/lib/api');
+    vi.mocked(notificationsApi.list).mockClear();
+    const { useNotifications } = await import('@/hooks/useNotifications');
+    renderHook(() => useNotifications(), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(notificationsApi.list).toHaveBeenCalledWith('test-token', undefined);
+    });
   });
 });
 
@@ -388,6 +449,16 @@ describe('useAnalytics', () => {
     const { useLatencyTrend } = await import('@/hooks/useAnalytics');
     const { result } = renderHook(() => useLatencyTrend('24h'), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it('calls analyticsApi.deliveryTrend with token and range', async () => {
+    const { analyticsApi } = await import('@/lib/api');
+    vi.mocked(analyticsApi.deliveryTrend).mockClear();
+    const { useDeliveryTrend } = await import('@/hooks/useAnalytics');
+    renderHook(() => useDeliveryTrend('30d'), { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(analyticsApi.deliveryTrend).toHaveBeenCalledWith('test-token', '30d');
+    });
   });
 });
 
@@ -461,6 +532,17 @@ describe('useTeams (extended)', () => {
     expect(result.current.mutate).toBeDefined();
   });
 
+  it('useCreateTeam calls teamsApi.create on mutate', async () => {
+    const { teamsApi } = await import('@/lib/api');
+    vi.mocked(teamsApi.create).mockClear();
+    const { useCreateTeam } = await import('@/hooks/useTeams');
+    const { result } = renderHook(() => useCreateTeam(), { wrapper: createWrapper() });
+    result.current.mutate({ name: 'New Team' });
+    await waitFor(() => {
+      expect(teamsApi.create).toHaveBeenCalledWith('test-token', { name: 'New Team' });
+    });
+  });
+
   it('useUpdateTeam returns mutation', async () => {
     const { useUpdateTeam } = await import('@/hooks/useTeams');
     const { result } = renderHook(() => useUpdateTeam(), { wrapper: createWrapper() });
@@ -495,6 +577,17 @@ describe('useTeams (extended)', () => {
     const { useDeleteTeam } = await import('@/hooks/useTeams');
     const { result } = renderHook(() => useDeleteTeam(), { wrapper: createWrapper() });
     expect(result.current.mutate).toBeDefined();
+  });
+
+  it('useDeleteTeam calls teamsApi.delete on mutate', async () => {
+    const { teamsApi } = await import('@/lib/api');
+    vi.mocked(teamsApi.delete).mockClear();
+    const { useDeleteTeam } = await import('@/hooks/useTeams');
+    const { result } = renderHook(() => useDeleteTeam(), { wrapper: createWrapper() });
+    result.current.mutate('t1');
+    await waitFor(() => {
+      expect(teamsApi.delete).toHaveBeenCalledWith('test-token', 't1');
+    });
   });
 
   it('useLeaveTeam returns mutation', async () => {
