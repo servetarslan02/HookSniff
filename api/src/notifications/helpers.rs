@@ -502,9 +502,22 @@ pub async fn api_key_rotated(pool: &PgPool, customer_id: Uuid, key_name: &str) {
 }
 
 /// New device login detected.
+/// Only notifies if this IP+device combo hasn't been seen in the last 7 days.
 pub async fn new_device_login(pool: &PgPool, customer_id: Uuid, ip: &str, user_agent: &str) {
-    let lang = get_customer_lang(pool, customer_id).await;
     let device = extract_device_name(user_agent);
+
+    // Check if we already notified about this IP+device combo in the last 7 days
+    let already_notified: Option<(i64,)> = sqlx::query_as(
+        "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND category = 'security' AND title ILIKE '%cihaz%' AND created_at > NOW() - INTERVAL '7 days'"
+    ).bind(customer_id).fetch_optional(pool).await.unwrap_or(None);
+
+    let count = already_notified.map(|(c,)| c).unwrap_or(0);
+    if count > 0 {
+        // Already notified about a device login recently — skip
+        return;
+    }
+
+    let lang = get_customer_lang(pool, customer_id).await;
     let (title, message) = match lang {
         Lang::Tr => ("Yeni Cihazdan Giriş", format!("{} adresinden {} cihazından yeni bir giriş tespit edildi.", ip, device)),
         Lang::En => ("New Device Login", format!("New login detected from {} using {}. If this wasn't you, change your password.", ip, device)),
