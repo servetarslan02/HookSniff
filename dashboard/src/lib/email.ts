@@ -25,9 +25,9 @@ const GMAIL_API_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/s
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SCOPES = 'https://www.googleapis.com/auth/gmail.send';
 
-// ─── Helpers ───
+// ─── Helpers (exported for testing) ───
 
-function base64urlEncode(data: string | ArrayBuffer): string {
+export function base64urlEncode(data: string | ArrayBuffer): string {
   const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : new Uint8Array(data);
   let binary = '';
   for (let i = 0; i < bytes.length; i++) {
@@ -36,7 +36,7 @@ function base64urlEncode(data: string | ArrayBuffer): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function base64urlDecode(str: string): ArrayBuffer {
+export function base64urlDecode(str: string): ArrayBuffer {
   const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
   const padded = base64 + '==='.slice((base64.length + 3) % 4);
   const binary = atob(padded);
@@ -85,7 +85,7 @@ async function signJwt(privateKey: CryptoKey, header: object, payload: object): 
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-async function getServiceAccount(): Promise<ServiceAccountKey> {
+export async function getServiceAccount(): Promise<ServiceAccountKey> {
   const saJson = process.env.GCP_SA_JSON;
   if (!saJson) {
     throw new Error('GCP_SA_JSON environment variable is not set');
@@ -142,7 +142,7 @@ async function getAccessToken(): Promise<string> {
 
 // ─── Core Send ───
 
-function buildRawMime(to: string, from: string, subject: string, html: string): string {
+export function buildRawMime(to: string, from: string, subject: string, html: string): string {
   const boundary = 'boundary_hooksniff_email';
   const mime = [
     `From: ${from}`,
