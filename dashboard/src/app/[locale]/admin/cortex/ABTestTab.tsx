@@ -159,12 +159,6 @@ export function ABTestTab() {
                     <div className="text-xs text-gray-400 mt-2">{splitB}% {t('traffic')}</div>
                   </div>
                 </div>
-
-                {abtest.winner && (
-                  <div className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                    🏆 {t('winner', {v: abtest.winner === 'variant_a' ? `A (${variantA.label})` : `B (${variantB.label})`})}
-                  </div>
-                )}
               </div>
             );
           })}
