@@ -34,6 +34,7 @@ pub async fn run_healing(
           AND a.created_at > NOW() - INTERVAL '3 hours'
           AND e.is_active = true
           AND e.auto_disabled = false
+          AND (a.category IS NULL OR a.category != 'security')
         ORDER BY a.endpoint_id, a.created_at DESC
         "#
     )
@@ -49,6 +50,7 @@ pub async fn run_healing(
             WHERE endpoint_id = $1
               AND score > $2
               AND created_at > NOW() - INTERVAL '3 hours'
+              AND (category IS NULL OR category != 'security')
             "#
         )
         .bind(endpoint_id)
@@ -186,6 +188,7 @@ pub async fn run_healing(
             FROM anomaly_scores a
             JOIN endpoints e ON e.id = a.endpoint_id
             WHERE a.score > $1 AND a.created_at > NOW() - INTERVAL '1 hour'
+            AND (a.category IS NULL OR a.category != 'security')
             GROUP BY e.customer_id
         ),
         customer_total AS (
