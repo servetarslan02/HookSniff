@@ -7,7 +7,6 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
-use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
