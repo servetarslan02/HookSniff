@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -63,62 +64,62 @@ describe('EndpointsPage', () => {
   });
 
   it('renders without crashing', async () => {
-    await act(async () => { render(React.createElement(EndpointsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointsPage)); });
   });
 
   it('fetches endpoints on mount', async () => {
-    await act(async () => { render(React.createElement(EndpointsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointsPage)); });
     expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
   });
 
   it('displays endpoints title', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('endpoints.title');
   });
 
   it('displays endpoint URLs', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('https://example.com');
     expect(container!.textContent).toContain('https://other.com');
   });
 
   it('displays endpoint descriptions', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('Test endpoint');
   });
 
   it('displays active/inactive status', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('endpoints.active');
     expect(container!.textContent).toContain('endpoints.inactive');
   });
 
   it('displays truncated endpoint IDs', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('ep1-1234-567…');
   });
 
   it('shows empty state when no endpoints', async () => {
     mockEndpointsList.mockResolvedValueOnce([]);
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('No endpoints yet');
   });
 
   it('shows loading state initially', () => {
     mockEndpointsList.mockReturnValue(new Promise(() => {})); // Never resolves
-    const { container } = render(React.createElement(EndpointsPage));
+    const { container } = renderWithProviders(React.createElement(EndpointsPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   it('shows create form when button clicked', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(btn!); });
     expect(container!.textContent).toContain('endpoints.create');
@@ -126,7 +127,7 @@ describe('EndpointsPage', () => {
 
   it('fills and submits create form', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(btn!); });
 
@@ -144,7 +145,7 @@ describe('EndpointsPage', () => {
 
   it('adds new endpoint to list after creation', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(btn!); });
 
@@ -159,7 +160,7 @@ describe('EndpointsPage', () => {
   it('shows error on create failure', async () => {
     mockEndpointsCreate.mockRejectedValueOnce(new Error('URL already exists'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(btn!); });
 
@@ -173,7 +174,7 @@ describe('EndpointsPage', () => {
 
   it('cancels create form', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     await act(async () => { fireEvent.click(btn!); });
     expect(container!.textContent).toContain('endpoints.create');
@@ -185,7 +186,7 @@ describe('EndpointsPage', () => {
 
   it('opens delete confirm dialog', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const deleteBtns = container!.querySelectorAll('button[title]');
     const deleteBtn = Array.from(deleteBtns).find(b => b.getAttribute('title')?.includes('delete'));
     if (deleteBtn) {
@@ -196,7 +197,7 @@ describe('EndpointsPage', () => {
 
   it('navigates to endpoint detail on settings click', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const settingsBtns = container!.querySelectorAll('button[title="Settings"]');
     if (settingsBtns.length > 0) {
       await act(async () => { fireEvent.click(settingsBtns[0]); });
@@ -206,14 +207,14 @@ describe('EndpointsPage', () => {
 
   it('renders New Endpoint button', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     const btn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('New Endpoint'));
     expect(btn).toBeTruthy();
   });
 
   it('renders subtitle text', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointsPage)).container; });
     expect(container!.textContent).toContain('endpoints.subtitle');
   });
 });

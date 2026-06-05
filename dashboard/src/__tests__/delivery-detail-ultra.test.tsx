@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -130,7 +131,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // 1. Renders without crashing
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(DeliveryDetailPage));
+      renderWithProviders(React.createElement(DeliveryDetailPage));
     });
   });
 
@@ -140,7 +141,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
     mockWebhooksGetAttempts.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
@@ -148,7 +149,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 3. Renders delivery status badge with correct status
   it('renders delivery status badge', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const badge = container.querySelector('[data-testid="status-badge"]');
       expect(badge).toBeTruthy();
@@ -158,7 +159,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 4. Renders event type
   it('renders event type', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('payment.completed');
     });
@@ -166,7 +167,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 5. Renders endpoint URL
   it('renders endpoint URL', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('https://api.example.com/webhook');
     });
@@ -174,7 +175,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 6. Renders created timestamp
   it('renders created timestamp', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Created');
       // toLocaleString output should be present
@@ -184,7 +185,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 7. Renders attempt timeline section
   it('renders attempt timeline', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Attempt Timeline');
       expect(container.textContent).toContain('3 attempts');
@@ -193,7 +194,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 8. Each attempt shows status
   it('each attempt shows status badge', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const badges = container.querySelectorAll('[data-testid="status-badge"]');
       // 1 for delivery + 3 for attempts = 4
@@ -203,7 +204,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 9. Each attempt shows response code
   it('each attempt shows response code', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('HTTP 502');
       expect(container.textContent).toContain('HTTP 503');
@@ -213,7 +214,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 10. Each attempt shows duration
   it('each attempt shows duration in ms', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('5230ms');
       expect(container.textContent).toContain('10050ms');
@@ -223,7 +224,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 11. Replay button renders
   it('renders replay button', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -231,7 +232,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 12. Clicking replay calls API
   it('clicking replay calls API after confirmation', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -246,7 +247,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 13. Replay success shows toast
   it('shows success toast after replay', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Replay Webhook'); });
     const replayBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Replay Webhook')
@@ -262,7 +263,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // 14. Replay failure shows error toast
   it('shows error toast on replay failure', async () => {
     mockWebhooksReplay.mockRejectedValue(new Error('Replay failed'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Replay Webhook'); });
     const replayBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Replay Webhook')
@@ -277,7 +278,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 15. Copy headers button works (expand headers, then copy)
   it('copy headers button copies formatted headers', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Headers'); });
     // Expand headers
     const headersBtn = Array.from(container.querySelectorAll('button')).find(
@@ -295,7 +296,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 16. Copy payload button works
   it('copy payload button copies formatted body', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -312,7 +313,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 17. Copy response body button works (expand attempt, copy response)
   it('copy response body button works in expanded attempt', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #3'); });
     // Click on attempt #3 (the delivered one) to expand
     const attempt3 = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
@@ -328,7 +329,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 18. Shows "Copied!" feedback (checkmark icon)
   it('shows copied feedback after clipboard write', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Delivery ID'); });
     // Find the copy button next to Delivery ID
     const copyButtons = container.querySelectorAll('button[title="Copy"]');
@@ -344,7 +345,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // 19. Handles delivery not found (null delivery, no error)
   it('handles delivery not found (null delivery)', async () => {
     mockWebhooksGet.mockResolvedValue(null);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).not.toContain('Delivery Details');
     });
@@ -353,7 +354,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // 20. Shows error on fetch failure
   it('shows error on fetch failure', async () => {
     mockWebhooksGet.mockRejectedValue(new Error('Network timeout'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Failed to load delivery');
       expect(container.textContent).toContain('Network timeout');
@@ -362,7 +363,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 21. Attempt count displays correctly
   it('displays attempt count in overview card', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Attempts');
       expect(container.textContent).toContain('3');
@@ -371,7 +372,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 22. Status colors — response code < 300 is emerald
   it('renders emerald color for 2xx response code', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const emeraldCodes = container.querySelectorAll('.text-emerald-600, .dark\\:text-emerald-400');
       // The delivery.response_status=200 should use emerald
@@ -383,7 +384,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 23. Back button/link renders
   it('renders back button with correct title', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const backBtn = container.querySelector('button[title="Back to deliveries"]');
       expect(backBtn).toBeTruthy();
@@ -392,7 +393,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // 24. Duration is formatted (ms)
   it('formats duration with ms suffix', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('5230ms');
       expect(container.textContent).toContain('10050ms');
@@ -404,7 +405,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   it('renders attempts sorted by attempt_number', async () => {
     // Pass attempts in reverse order to verify sorting
     mockWebhooksGetAttempts.mockResolvedValue([mockAttempts[2], mockAttempts[0], mockAttempts[1]]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const text = container.textContent!;
       const idx1 = text.indexOf('Attempt #1');
@@ -419,7 +420,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Request headers count display
   it('displays header count in request headers toggle', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('(3 headers)');
     });
@@ -427,7 +428,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Shows request headers formatted when expanded
   it('shows formatted headers when expanded', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Headers'); });
     const headersBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Headers')
@@ -440,7 +441,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Shows formatted request body when expanded (JSON string)
   it('shows formatted JSON request body when expanded', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -453,7 +454,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Expand attempt shows error message
   it('expanded attempt shows error message', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt1 = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')
@@ -465,7 +466,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Expand attempt shows response headers
   it('expanded attempt shows response headers', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt1 = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')
@@ -477,7 +478,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Expand attempt shows response body
   it('expanded attempt shows response body', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #3'); });
     const attempt3 = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #3')
@@ -489,7 +490,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Collapse attempt on second click
   it('collapses attempt on second click', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt1 = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')
@@ -511,7 +512,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
       created_at: '2024-03-15T14:30:01Z',
       duration_ms: 50,
     }]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')
@@ -523,7 +524,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // getAttempts failure is handled gracefully
   it('handles getAttempts failure gracefully', async () => {
     mockWebhooksGetAttempts.mockRejectedValue(new Error('timeout'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery Details');
       expect(container.textContent).toContain('No attempt data available');
@@ -533,7 +534,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Handles non-Error throws for replay
   it('handles non-Error throw on replay', async () => {
     mockWebhooksReplay.mockRejectedValue('string error');
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Replay Webhook'); });
     const replayBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Replay Webhook')
@@ -549,7 +550,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Clipboard write failure shows error toast
   it('shows error toast when clipboard write fails', async () => {
     (navigator.clipboard.writeText as any).mockRejectedValueOnce(new Error('not allowed'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Delivery ID'); });
     const copyButtons = container.querySelectorAll('button[title="Copy"]');
     await act(async () => { fireEvent.click(copyButtons[0]); });
@@ -561,7 +562,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Delivery with no endpoint_url
   it('hides endpoint URL row when not provided', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, endpoint_url: undefined });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).not.toContain('Endpoint URL');
       expect(container.textContent).toContain('Delivery Details');
@@ -571,7 +572,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Delivery with no updated_at
   it('hides updated row when not provided', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, updated_at: undefined });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).not.toContain('Updated');
       expect(container.textContent).toContain('Created');
@@ -581,7 +582,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Delivery with null event shows dash
   it('shows dash for null event', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, event: null });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       // Event card should show '—'
       const eventCards = container.querySelectorAll('.glass-card');
@@ -593,7 +594,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Delivery with no response_status shows dash in overview
   it('shows dash in response card when no response_status', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, response_status: undefined });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Response');
       // Should show em dash
@@ -603,7 +604,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Delivery with error_message shows error section
   it('shows error section when delivery has error_message', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, error_message: 'Endpoint returned 410 Gone' });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Error');
       expect(container.textContent).toContain('Endpoint returned 410 Gone');
@@ -616,7 +617,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
       ...mockDelivery,
       request_body: { key: 'value', nested: { a: 1 } },
     });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -629,7 +630,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Empty attempts renders empty state text
   it('shows empty attempt state when attempts array is empty', async () => {
     mockWebhooksGetAttempts.mockResolvedValue([]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('No attempt data available');
       expect(container.textContent).toContain('Attempts will appear here');
@@ -639,7 +640,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // 1 attempt renders singular text
   it('shows singular "attempt" for single attempt', async () => {
     mockWebhooksGetAttempts.mockResolvedValue([mockAttempts[0]]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('1 attempt');
       expect(container.textContent).not.toContain('1 attempts');
@@ -649,7 +650,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Replay loading state keeps dialog visible
   it('shows loading state during replay', async () => {
     mockWebhooksReplay.mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Replay Webhook'); });
     const replayBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Replay Webhook')
@@ -663,7 +664,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Cancel replay dialog
   it('cancels replay when cancel clicked', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Replay Webhook'); });
     const replayBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Replay Webhook')
@@ -679,7 +680,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Back button navigates to deliveries list
   it('back button navigates to deliveries list', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery Details');
     });
@@ -691,7 +692,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Back to deliveries button on error page
   it('back to deliveries button on error page navigates correctly', async () => {
     mockWebhooksGet.mockRejectedValue(new Error('fail'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Back to Deliveries'); });
     const backBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Back to Deliveries')
@@ -702,7 +703,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Delivery ID display
   it('displays delivery ID in header and detail row', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('del_ultra_123');
       expect(container.textContent).toContain('Delivery ID');
@@ -711,7 +712,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Endpoint ID display
   it('displays endpoint ID', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Endpoint ID');
       expect(container.textContent).toContain('ep_001');
@@ -720,7 +721,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
 
   // Last Response row appears
   it('shows Last Response row when response_status present', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Last Response');
       expect(container.textContent).toContain('200');
@@ -738,7 +739,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
       duration_ms: 50,
       response_body: 'plain text response',
     }]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')
@@ -753,7 +754,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
       ...mockDelivery,
       request_body: 'not json at all',
     });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -765,7 +766,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Null request_headers shows "No headers captured"
   it('shows "No headers captured" when request_headers is null', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, request_headers: null });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Headers'); });
     const headersBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Headers')
@@ -777,7 +778,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Null request_body shows "No payload captured"
   it('shows "No payload captured" when request_body is null', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, request_body: null });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -789,7 +790,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
   // Request body with undefined (no copy button)
   it('hides copy payload button when request_body is undefined', async () => {
     mockWebhooksGet.mockResolvedValue({ ...mockDelivery, request_body: undefined });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Request Body'); });
     const bodyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Request Body')
@@ -810,7 +811,7 @@ describe('DeliveryDetailPage — Ultra Coverage', () => {
       response_headers: {},
       response_body: '{"ok":true}',
     }]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => { expect(container.textContent).toContain('Attempt #1'); });
     const attempt = Array.from(container.querySelectorAll('div.cursor-pointer')).find(
       d => d.textContent?.includes('Attempt #1')

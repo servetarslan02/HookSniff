@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -24,16 +25,16 @@ describe('ApiReferencePage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(ApiReferencePage));
+    renderWithProviders(React.createElement(ApiReferencePage));
   });
 
   it('displays API reference title', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.apiReference');
   });
 
   it('renders endpoint sections', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.endpointsApi');
     expect(container.textContent).toContain('/endpoints');
     expect(container.textContent).toContain('docs.listEndpoints');
@@ -42,7 +43,7 @@ describe('ApiReferencePage', () => {
   });
 
   it('renders webhooks API section', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.webhooksApi');
     expect(container.textContent).toContain('/webhooks');
     expect(container.textContent).toContain('docs.sendWebhookApi');
@@ -51,28 +52,28 @@ describe('ApiReferencePage', () => {
   });
 
   it('renders stats API section', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.statsApi');
     expect(container.textContent).toContain('/stats');
     expect(container.textContent).toContain('docs.getStatsApi');
   });
 
   it('renders code examples with request and response blocks', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     const codeBlocks = container.querySelectorAll('pre');
     // Should have multiple pre blocks for request/response JSON examples
     expect(codeBlocks.length).toBeGreaterThanOrEqual(6);
   });
 
   it('renders HTTP method badges', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('GET');
     expect(container.textContent).toContain('POST');
     expect(container.textContent).toContain('DELETE');
   });
 
   it('renders error codes section', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.errorCodes');
     expect(container.textContent).toContain('400');
     expect(container.textContent).toContain('401');
@@ -82,7 +83,7 @@ describe('ApiReferencePage', () => {
   });
 
   it('renders error format section', () => {
-    const { container } = render(React.createElement(ApiReferencePage));
+    const { container } = renderWithProviders(React.createElement(ApiReferencePage));
     expect(container.textContent).toContain('docs.errorFormat');
   });
 });

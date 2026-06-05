@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -57,42 +58,42 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(TransformsPage));
+    renderWithProviders(React.createElement(TransformsPage));
   });
 
   it('displays title', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Webhook Transforms');
   });
 
   it('displays description', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Filter, map, and enrich');
   });
 
   it('renders new rule button', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('New Rule');
   });
 
   it('renders endpoint selector', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
   });
 
   it('shows choose endpoint placeholder', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Choose an endpoint');
   });
 
   it('shows select endpoint message when no endpoint chosen', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select an endpoint to manage transforms');
   });
 
   it('opens create form on new rule click', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -101,7 +102,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('create form has filter include input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -111,7 +112,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('can type filter include', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -122,7 +123,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('can type filter exclude', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -133,7 +134,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('can type map source and target', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -148,7 +149,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('can type enrich key and value', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -163,7 +164,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('toggles create form visibility', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -174,7 +175,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('does not create rule when no endpoint selected', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -189,7 +190,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders label for filter include', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -198,7 +199,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders label for filter exclude', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -207,7 +208,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders label for map from/to', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -217,7 +218,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders label for enrich', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -227,7 +228,7 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders create button in form', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );
@@ -239,12 +240,12 @@ describe('TransformsPage — Ultra Coverage', () => {
   });
 
   it('renders select label', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select Endpoint');
   });
 
   it('renders new rule button with plus icon', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const newRuleBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('New Rule')
     );

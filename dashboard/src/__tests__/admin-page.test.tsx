@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -85,13 +86,13 @@ describe('AdminOverviewPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminOverviewPage));
+      renderWithProviders(React.createElement(AdminOverviewPage));
     });
   });
 
   it('fetches admin stats on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminOverviewPage));
+      renderWithProviders(React.createElement(AdminOverviewPage));
     });
     expect(mockGetStats).toHaveBeenCalledWith('test-token');
   });
@@ -99,7 +100,7 @@ describe('AdminOverviewPage', () => {
   it('displays admin overview title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage));
       container = result.container;
     });
     // After loading, the page shows hardcoded "Admin Overview"
@@ -110,7 +111,7 @@ describe('AdminOverviewPage', () => {
     mockGetStats.mockReturnValueOnce(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('loadingDashboard');
@@ -119,7 +120,7 @@ describe('AdminOverviewPage', () => {
   it('shows stat cards after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage));
       container = result.container;
     });
     const statCards = container!.querySelectorAll('[data-testid="stat-card"]');

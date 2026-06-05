@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { render, act, fireEvent } from '@testing-library/react';
@@ -18,7 +19,7 @@ function ToastTrigger() {
 
 describe('Toast', () => {
   it('renders children without crashing', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <div>child</div>
       </ToastProvider>
@@ -27,7 +28,7 @@ describe('Toast', () => {
   });
 
   it('shows success toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -42,7 +43,7 @@ describe('Toast', () => {
   });
 
   it('shows error toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -57,7 +58,7 @@ describe('Toast', () => {
   });
 
   it('shows info toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -72,7 +73,7 @@ describe('Toast', () => {
   });
 
   it('applies correct class for success toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -90,7 +91,7 @@ describe('Toast', () => {
   });
 
   it('applies correct class for error toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -108,7 +109,7 @@ describe('Toast', () => {
   });
 
   it('applies correct class for info toast', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -127,7 +128,7 @@ describe('Toast', () => {
 
   it('removes toast after timeout', async () => {
     vi.useFakeTimers();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ToastProvider>
         <ToastTrigger />
       </ToastProvider>
@@ -150,7 +151,7 @@ describe('Toast', () => {
   it('throws when useToast used outside ToastProvider', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => {
-      render(<ToastTrigger />);
+      renderWithProviders(<ToastTrigger />);
     }).toThrow('useToast must be used within ToastProvider');
     consoleSpy.mockRestore();
   });

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -114,13 +115,13 @@ describe('DeliveryDetailPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(DeliveryDetailPage));
+      renderWithProviders(React.createElement(DeliveryDetailPage));
     });
   });
 
   it('fetches delivery detail on mount', async () => {
     await act(async () => {
-      render(React.createElement(DeliveryDetailPage));
+      renderWithProviders(React.createElement(DeliveryDetailPage));
     });
     expect(mockGet).toHaveBeenCalledWith('test-token', 'delivery-123');
     expect(mockGetAttempts).toHaveBeenCalledWith('test-token', 'delivery-123');
@@ -131,7 +132,7 @@ describe('DeliveryDetailPage', () => {
     mockGetAttempts.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
@@ -140,7 +141,7 @@ describe('DeliveryDetailPage', () => {
   it('displays delivery details after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Delivery Details');
@@ -152,7 +153,7 @@ describe('DeliveryDetailPage', () => {
   it('displays overview cards with status, event, attempts, response', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Status');
@@ -164,7 +165,7 @@ describe('DeliveryDetailPage', () => {
   it('renders replay button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Replay Webhook');
@@ -173,7 +174,7 @@ describe('DeliveryDetailPage', () => {
   it('opens replay confirmation dialog on replay click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const replayBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Replay Webhook'));
@@ -186,7 +187,7 @@ describe('DeliveryDetailPage', () => {
   it('calls replay API when confirmed', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // Click replay button to open dialog
@@ -206,7 +207,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Failed to load delivery');
@@ -219,7 +220,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockRejectedValue('unknown error');
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Failed to load delivery');
@@ -229,7 +230,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockRejectedValueOnce(new Error('fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     mockGet.mockResolvedValue(mockDelivery);
@@ -243,7 +244,7 @@ describe('DeliveryDetailPage', () => {
   it('renders delivery information section with detail rows', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Delivery Information');
@@ -258,7 +259,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, error_message: 'Timeout after 30s' });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Timeout after 30s');
@@ -267,7 +268,7 @@ describe('DeliveryDetailPage', () => {
   it('renders request details section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Request Details');
@@ -278,7 +279,7 @@ describe('DeliveryDetailPage', () => {
   it('toggles request headers visibility', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // Headers should be hidden initially
@@ -294,7 +295,7 @@ describe('DeliveryDetailPage', () => {
   it('toggles request body visibility', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const bodyBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Request Body'));
@@ -307,7 +308,7 @@ describe('DeliveryDetailPage', () => {
   it('renders attempt timeline', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Attempt Timeline');
@@ -320,7 +321,7 @@ describe('DeliveryDetailPage', () => {
     mockGetAttempts.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No attempt data available');
@@ -329,7 +330,7 @@ describe('DeliveryDetailPage', () => {
   it('expands attempt details on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // Click on first attempt to expand
@@ -349,7 +350,7 @@ describe('DeliveryDetailPage', () => {
   it('collapses expanded attempt on second click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const attempt1 = Array.from(container!.querySelectorAll('div')).find(d =>
@@ -371,7 +372,7 @@ describe('DeliveryDetailPage', () => {
     mockGetAttempts.mockRejectedValue(new Error('fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // Should still render delivery detail even if attempts fail
@@ -382,7 +383,7 @@ describe('DeliveryDetailPage', () => {
   it('renders back button in header', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const backBtn = container!.querySelector('button[title="Back to deliveries"]');
@@ -400,7 +401,7 @@ describe('DeliveryDetailPage', () => {
     }]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const attempt = Array.from(container!.querySelectorAll('div')).find(d =>
@@ -418,7 +419,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, endpoint_url: undefined });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).not.toContain('Endpoint URL');
@@ -428,7 +429,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, response_status: undefined });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('—');
@@ -438,7 +439,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, request_body: '{"key": "value"}' });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const bodyBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Request Body'));
@@ -452,7 +453,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, request_headers: null });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const headersBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Request Headers'));
@@ -466,7 +467,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, request_body: null });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const bodyBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Request Body'));
@@ -480,7 +481,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // When delivery is null, the component returns null (renders nothing meaningful)
@@ -491,7 +492,7 @@ describe('DeliveryDetailPage', () => {
     mockReplay.mockReturnValue(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const replayBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Replay Webhook'));
@@ -510,7 +511,7 @@ describe('DeliveryDetailPage', () => {
     mockReplay.mockRejectedValue(new Error('Replay failed'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     const replayBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Replay Webhook'));
@@ -527,7 +528,7 @@ describe('DeliveryDetailPage', () => {
   it('shows attempt duration and timestamp', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('1200ms');
@@ -537,7 +538,7 @@ describe('DeliveryDetailPage', () => {
   it('shows HTTP status codes in attempt timeline', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('HTTP 500');
@@ -548,7 +549,7 @@ describe('DeliveryDetailPage', () => {
     mockGet.mockResolvedValue({ ...mockDelivery, event: null });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveryDetailPage));
+      const result = renderWithProviders(React.createElement(DeliveryDetailPage));
       container = result.container;
     });
     // Should show dash for empty event

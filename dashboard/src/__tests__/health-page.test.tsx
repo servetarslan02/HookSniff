@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -48,13 +49,13 @@ describe('HealthPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(HealthPage));
+      renderWithProviders(React.createElement(HealthPage));
     });
   });
 
   it('fetches endpoint health data on mount', async () => {
     await act(async () => {
-      render(React.createElement(HealthPage));
+      renderWithProviders(React.createElement(HealthPage));
     });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/endpoint-health'),
@@ -65,7 +66,7 @@ describe('HealthPage', () => {
   it('displays health title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(HealthPage));
+      const result = renderWithProviders(React.createElement(HealthPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('title');
@@ -74,7 +75,7 @@ describe('HealthPage', () => {
   it('shows summary cards with healthy/degraded/unhealthy counts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(HealthPage));
+      const result = renderWithProviders(React.createElement(HealthPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Healthy');
@@ -89,7 +90,7 @@ describe('HealthPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(HealthPage));
+      const result = renderWithProviders(React.createElement(HealthPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No endpoints yet');

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -111,70 +112,70 @@ describe('EnvironmentsPage', () => {
   });
 
   it('renders without crashing', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container).toBeTruthy();
   });
 
   it('renders page title', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('title');
   });
 
   it('renders environment cards', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('Production');
     expect(container.textContent).toContain('Staging');
   });
 
   it('shows slug for each environment', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('production');
     expect(container.textContent).toContain('staging');
   });
 
   it('shows default badge for default environment', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('default');
   });
 
   it('shows variable count', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('3');
     expect(container.textContent).toContain('0');
   });
 
   it('shows description when present', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     expect(container.textContent).toContain('Live environment');
   });
 
   it('renders new environment button', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('newEnvironment'));
     expect(btn).toBeTruthy();
   });
 
   it('opens create modal on button click', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('newEnvironment'))!;
     fireEvent.click(btn);
     expect(container.textContent).toContain('createEnvironment');
   });
 
   it('shows edit button for each environment', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const editBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent?.includes('edit'));
     expect(editBtns.length).toBe(2);
   });
 
   it('shows delete button for each environment', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const deleteBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'delete');
     expect(deleteBtns.length).toBe(2);
   });
 
   it('opens delete confirmation on delete click', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const deleteBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'delete')!;
     fireEvent.click(deleteBtn);
     expect(container.textContent).toContain('confirmDeleteTitle');
@@ -182,21 +183,21 @@ describe('EnvironmentsPage', () => {
   });
 
   it('shows edit modal with pre-filled data', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const editBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('edit'))!;
     fireEvent.click(editBtn);
     expect(container.textContent).toContain('editEnvironment');
   });
 
   it('opens variables panel on variable count click', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const varBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('variables'))!;
     fireEvent.click(varBtn);
     expect(container.textContent).toContain('addVariable');
   });
 
   it('shows variables in panel', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const varBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('variables'))!;
     fireEvent.click(varBtn);
     expect(container.textContent).toContain('API_KEY');
@@ -204,7 +205,7 @@ describe('EnvironmentsPage', () => {
   });
 
   it('shows secret indicator for secret variables', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const varBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('variables'))!;
     fireEvent.click(varBtn);
     // Secret value should be hidden
@@ -212,7 +213,7 @@ describe('EnvironmentsPage', () => {
   });
 
   it('shows color dot for each environment', () => {
-    const { container } = render(React.createElement(EnvironmentsPage));
+    const { container } = renderWithProviders(React.createElement(EnvironmentsPage));
     const dots = container.querySelectorAll('[style*="background-color"]');
     expect(dots.length).toBeGreaterThanOrEqual(2);
   });

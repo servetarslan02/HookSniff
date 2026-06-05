@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -53,24 +54,24 @@ describe('SearchPage - Ultra Coverage', () => {
 
   // === Initial State ===
   it('renders page title', () => {
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     expect(container.textContent).toContain('search.title');
   });
 
   it('renders description text', () => {
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     expect(container.textContent).toContain('Search and filter your webhook delivery logs');
   });
 
   it('renders search input', () => {
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     const input = container.querySelector('input[type="text"]');
     expect(input).toBeTruthy();
     expect(input!.getAttribute('placeholder')).toBe('search.searchPlaceholder');
   });
 
   it('renders status filter select', () => {
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
     const options = Array.from(select!.querySelectorAll('option'));
@@ -78,7 +79,7 @@ describe('SearchPage - Ultra Coverage', () => {
   });
 
   it('renders search button', () => {
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Search');
     expect(btn).toBeTruthy();
     expect(btn!.getAttribute('type')).toBe('submit');
@@ -87,7 +88,7 @@ describe('SearchPage - Ultra Coverage', () => {
   // === Empty State ===
   it('shows searching text during initial fetch', () => {
     mockFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(SearchPage));
+    const { container } = renderWithProviders(React.createElement(SearchPage));
     expect(container.textContent).toContain('search.searching');
   });
 
@@ -95,7 +96,7 @@ describe('SearchPage - Ultra Coverage', () => {
     mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ deliveries: [], total: 0, page: 1, per_page: 20, query: 'nothing' }) });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -111,7 +112,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('calls search API on mount via debounce', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     // Initial search fires after debounce
     await act(async () => {
@@ -125,7 +126,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('debounces search input changes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     // Wait for initial search
     await act(async () => {
@@ -150,7 +151,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('calls search API with correct params', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -168,7 +169,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('includes status filter in search params', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const select = container.querySelector('select')!;
     await act(async () => {
@@ -185,7 +186,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders search results', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -201,7 +202,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders result count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -216,7 +217,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders truncated delivery IDs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -231,7 +232,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders endpoint URLs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -246,7 +247,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders status badges', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -262,7 +263,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders attempt count with response status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -279,7 +280,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('navigates to delivery detail on row click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -310,7 +311,7 @@ describe('SearchPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -337,7 +338,7 @@ describe('SearchPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -354,7 +355,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('triggers immediate search on form submit', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -373,7 +374,7 @@ describe('SearchPage - Ultra Coverage', () => {
   it('renders table headers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -397,7 +398,7 @@ describe('SearchPage - Ultra Coverage', () => {
     mockFetch.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -412,7 +413,7 @@ describe('SearchPage - Ultra Coverage', () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SearchPage)).container;
+      container = renderWithProviders(React.createElement(SearchPage)).container;
     });
     const input = container.querySelector('input[type="text"]')!;
     await act(async () => {
@@ -432,7 +433,7 @@ describe('SearchPage - Ultra Coverage', () => {
     vi.doMock('@/components/StatusBadge', () => ({ StatusBadge: ({ status }: any) => React.createElement('span', null, status) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/search/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockFetch).not.toHaveBeenCalled();
   });

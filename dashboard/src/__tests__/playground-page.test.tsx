@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -76,46 +77,46 @@ describe('PlaygroundPage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(PlaygroundPage));
+    renderWithProviders(React.createElement(PlaygroundPage));
   });
 
   it('displays playground title', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.title');
   });
 
   it('renders request section', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.request');
   });
 
   it('renders response inspector', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.responseInspector');
   });
 
   it('renders cURL command section', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.curlCommand');
   });
 
   it('renders AI payload generator', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('AI Payload Generator');
   });
 
   it('renders quick presets', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.quickPresets');
   });
 
   it('renders send request button', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.sendRequest');
   });
 
   it('renders method selector with all methods', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
     const options = select!.querySelectorAll('option');
@@ -128,27 +129,27 @@ describe('PlaygroundPage', () => {
   });
 
   it('changes method selector', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = container.querySelector('select')!;
     fireEvent.change(select, { target: { value: 'GET' } });
     expect(select.value).toBe('GET');
   });
 
   it('changes path input', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const pathInput = container.querySelector('input[type="text"]')! as HTMLInputElement;
     fireEvent.change(pathInput, { target: { value: '/v1/custom' } });
     expect(pathInput.value).toBe('/v1/custom');
   });
 
   it('shows body textarea for non-GET methods', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const textarea = container.querySelector('textarea');
     expect(textarea).toBeTruthy();
   });
 
   it('hides body textarea when method is GET', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = container.querySelector('select')!;
     fireEvent.change(select, { target: { value: 'GET' } });
     const textarea = container.querySelector('textarea');
@@ -156,14 +157,14 @@ describe('PlaygroundPage', () => {
   });
 
   it('changes body textarea', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const textarea = container.querySelector('textarea')!;
     fireEvent.change(textarea, { target: { value: '{"test": true}' } });
     expect(textarea.value).toBe('{"test": true}');
   });
 
   it('sends request successfully', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -185,7 +186,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ success: true }),
       headers: new Map([['content-type', 'application/json']]),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -200,7 +201,7 @@ describe('PlaygroundPage', () => {
 
   it('handles request error gracefully', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network failure'));
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -215,7 +216,7 @@ describe('PlaygroundPage', () => {
   it('shows loading spinner during request', async () => {
     let resolveFetch: any;
     mockFetch.mockReturnValueOnce(new Promise(r => { resolveFetch = r; }));
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -238,7 +239,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('sends GET request without body', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = container.querySelector('select')!;
     fireEvent.change(select, { target: { value: 'GET' } });
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
@@ -256,7 +257,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('clicks a preset and updates path/method', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const presetBtns = Array.from(container.querySelectorAll('button')).filter(
       b => b.textContent === 'List Endpoints' || b.textContent === 'List Deliveries' || b.textContent === 'Get Stats'
     );
@@ -267,7 +268,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('selects AI payload generator event and fills body', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const aiBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'order.created'
     );
@@ -281,7 +282,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates different AI payloads for different events', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const paymentBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'payment.failed'
     );
@@ -294,7 +295,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates payment.succeeded payload', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const btn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'payment.succeeded'
     );
@@ -306,7 +307,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates user.registered payload', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const btn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'user.registered'
     );
@@ -318,7 +319,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates user.updated payload', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const btn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'user.updated'
     );
@@ -330,7 +331,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates invoice.created payload', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const btn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'invoice.created'
     );
@@ -342,7 +343,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('generates order.completed payload', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const btn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'order.completed'
     );
@@ -354,7 +355,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('copies curl command to clipboard', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const copyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Copy')
     );
@@ -367,7 +368,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('displays curl command in pre block', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const preBlocks = container.querySelectorAll('pre');
     const curlPre = Array.from(preBlocks).find(p => p.textContent?.includes('curl'));
     expect(curlPre).toBeTruthy();
@@ -375,7 +376,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('updates curl command when method changes', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = container.querySelector('select')!;
     fireEvent.change(select, { target: { value: 'DELETE' } });
     const preBlocks = container.querySelectorAll('pre');
@@ -384,12 +385,12 @@ describe('PlaygroundPage', () => {
   });
 
   it('shows empty history initially', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.noRequests');
   });
 
   it('saves request to history after send', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -416,7 +417,7 @@ describe('PlaygroundPage', () => {
       duration_ms: 150,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(historyEntry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('Request History');
   });
 
@@ -432,7 +433,7 @@ describe('PlaygroundPage', () => {
       duration_ms: 150,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(historyEntry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const historyBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('/saved-path')
     );
@@ -456,7 +457,7 @@ describe('PlaygroundPage', () => {
       duration_ms: 100,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(historyEntry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const clearBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent === 'Clear'
     );
@@ -480,13 +481,13 @@ describe('PlaygroundPage', () => {
       duration_ms: 200,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(historyEntry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('POST');
     expect(container.textContent).toContain('/webhooks');
   });
 
   it('shows ResponseInspector empty state', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.sendToInspect');
   });
 
@@ -497,7 +498,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ data: 'test' }),
       headers: new Map([['x-request-id', 'abc123']]),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     // Send request first
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
@@ -524,7 +525,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ hello: 'world' }),
       headers: new Map([['content-type', 'application/json']]),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -545,7 +546,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ created: true }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -564,7 +565,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ error: 'Not found' }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -584,7 +585,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({ error: 'Server error' }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -604,7 +605,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.resolve({}),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;
@@ -617,19 +618,19 @@ describe('PlaygroundPage', () => {
   });
 
   it('renders live request viewer section', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.liveViewer');
   });
 
   it('renders preset buttons for all endpoints', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('List Endpoints');
     expect(container.textContent).toContain('List Deliveries');
     expect(container.textContent).toContain('Get Stats');
   });
 
   it('renders all AI payload generator buttons', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const eventTypes = ['order.created', 'order.completed', 'payment.failed', 'payment.succeeded', 'user.registered', 'user.updated', 'invoice.created'];
     eventTypes.forEach(et => {
       expect(container.textContent).toContain(et);
@@ -643,7 +644,7 @@ describe('PlaygroundPage', () => {
       json: () => Promise.reject(new Error('Invalid JSON')),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('playground.sendRequest')
     )!;

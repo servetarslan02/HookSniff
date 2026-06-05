@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
@@ -21,7 +22,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('renders children when there is no error', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <div>Safe content</div>
       </ErrorBoundary>
@@ -30,7 +31,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('renders default error UI when child throws', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
@@ -41,7 +42,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('renders custom fallback when provided', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary fallback={<div>Custom error fallback</div>}>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
@@ -50,7 +51,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('recovers when Try again is clicked', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
@@ -68,7 +69,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('renders error icon emoji', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>

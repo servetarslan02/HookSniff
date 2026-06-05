@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -64,7 +65,7 @@ describe('SSO Page', () => {
   });
 
   it('renders SSO configuration form for enterprise plan', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       React.createElement('div', null, 'SSO Page Test')
     );
     expect(container.textContent).toBe('SSO Page Test');

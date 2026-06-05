@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -58,7 +59,7 @@ function setupInitialFetch(keys = mockKeys) {
 async function renderPage() {
   let container: HTMLElement;
   await act(async () => {
-    const result = render(React.createElement(ApiKeysPage));
+    const result = renderWithProviders(React.createElement(ApiKeysPage));
     container = result.container;
   });
   return container!;
@@ -171,7 +172,7 @@ describe('ApiKeysPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(ApiKeysPage));
+      const result = renderWithProviders(React.createElement(ApiKeysPage));
       container = result.container;
     });
 

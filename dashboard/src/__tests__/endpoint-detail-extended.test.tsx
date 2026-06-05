@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -72,30 +73,30 @@ describe('EndpointSettingsPage', () => {
 
   // === Render tests ===
   it('renders without crashing', async () => {
-    await act(async () => { render(React.createElement(EndpointSettingsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointSettingsPage)); });
   });
 
   it('displays endpoint URL', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('https://example.com/webhook');
   });
 
   it('displays Endpoint Settings title', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Endpoint Settings');
   });
 
   it('fetches endpoint on mount', async () => {
-    await act(async () => { render(React.createElement(EndpointSettingsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointSettingsPage)); });
     expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
   });
 
   // === Retry Policy tests ===
   it('renders retry policy section', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Retry Policy');
     expect(container!.textContent).toContain('Max Attempts');
     expect(container!.textContent).toContain('Backoff Strategy');
@@ -103,14 +104,14 @@ describe('EndpointSettingsPage', () => {
 
   it('loads retry policy from endpoint', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     const numberInput = container!.querySelector('input[type="number"]') as HTMLInputElement;
     expect(numberInput.value).toBe('5');
   });
 
   it('renders backoff options', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Exponential');
     expect(container!.textContent).toContain('Linear');
     expect(container!.textContent).toContain('Fixed');
@@ -118,13 +119,13 @@ describe('EndpointSettingsPage', () => {
 
   it('renders retry schedule preview', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Retry Schedule Preview');
   });
 
   it('saves retry policy', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const saveButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Save Retry Policy'));
     await act(async () => { fireEvent.click(saveButton!); });
@@ -139,7 +140,7 @@ describe('EndpointSettingsPage', () => {
   it('handles save retry policy error', async () => {
     mockUpdateRetryPolicy.mockRejectedValueOnce(new Error('Save failed'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const saveButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Save Retry Policy'));
     await act(async () => { fireEvent.click(saveButton!); });
@@ -150,21 +151,21 @@ describe('EndpointSettingsPage', () => {
   // === Signing Secret tests ===
   it('renders signing secret section', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Signing Secret');
     expect(container!.textContent).toContain('Rotate Secret');
   });
 
   it('shows masked signing secret', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('whsec_abc12');
     expect(container!.textContent).toContain('*');
   });
 
   it('shows rotate confirmation modal', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const rotateButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Rotate Secret'));
     await act(async () => { fireEvent.click(rotateButton!); });
@@ -175,7 +176,7 @@ describe('EndpointSettingsPage', () => {
 
   it('rotates signing secret', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     // Click the first "Rotate Secret" button (in the card, not modal)
     const buttons = container!.querySelectorAll('button');
@@ -195,7 +196,7 @@ describe('EndpointSettingsPage', () => {
   it('handles rotate secret error', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false });
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const buttons = container!.querySelectorAll('button');
     const rotateBtn = Array.from(buttons).find(b => b.textContent?.trim() === 'Rotate Secret');
@@ -210,7 +211,7 @@ describe('EndpointSettingsPage', () => {
 
   it('cancels rotate modal', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const rotateButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Rotate Secret') && !b.textContent?.includes('?'));
     await act(async () => { fireEvent.click(rotateButton!); });
@@ -224,7 +225,7 @@ describe('EndpointSettingsPage', () => {
   // === Rate Limit tests ===
   it('renders rate limit info', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Rate Limits');
     expect(container!.textContent).toContain('API Requests');
     expect(container!.textContent).toContain('Avg Response');
@@ -233,7 +234,7 @@ describe('EndpointSettingsPage', () => {
 
   it('displays avg response time', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('45');
     expect(container!.textContent).toContain('ms');
   });
@@ -241,7 +242,7 @@ describe('EndpointSettingsPage', () => {
   // === Test Webhook tests ===
   it('renders test webhook section', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.textContent).toContain('Test Webhook');
     expect(container!.textContent).toContain('Send Test Webhook');
   });
@@ -249,7 +250,7 @@ describe('EndpointSettingsPage', () => {
   it('sends test webhook', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const testButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Send Test Webhook'));
     await act(async () => { fireEvent.click(testButton!); });
@@ -263,7 +264,7 @@ describe('EndpointSettingsPage', () => {
   it('handles test webhook error', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false });
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
 
     const testButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Send Test Webhook'));
     await act(async () => { fireEvent.click(testButton!); });
@@ -274,7 +275,7 @@ describe('EndpointSettingsPage', () => {
   // === Navigation tests ===
   it('renders back button', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     const backButton = container!.querySelector('svg');
     expect(backButton).toBeTruthy();
   });
@@ -282,7 +283,7 @@ describe('EndpointSettingsPage', () => {
   // === Endpoint not found ===
   it('redirects when endpoint not found', async () => {
     mockEndpointsList.mockResolvedValueOnce([]);
-    await act(async () => { render(React.createElement(EndpointSettingsPage)); });
+    await act(async () => { renderWithProviders(React.createElement(EndpointSettingsPage)); });
     expect(mockToast).toHaveBeenCalledWith('Endpoint not found', 'error');
     expect(mockPush).toHaveBeenCalledWith('/dashboard/endpoints');
   });
@@ -291,7 +292,7 @@ describe('EndpointSettingsPage', () => {
   it('shows loading state', async () => {
     mockEndpointsList.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
   });
 
@@ -299,7 +300,7 @@ describe('EndpointSettingsPage', () => {
   it('uses defaults when no retry policy', async () => {
     mockEndpointsList.mockResolvedValueOnce([{ ...mockEndpoint, retry_policy: null }]);
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(EndpointSettingsPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(EndpointSettingsPage)).container; });
     const numberInput = container!.querySelector('input[type="number"]') as HTMLInputElement;
     expect(numberInput.value).toBe('5');
   });

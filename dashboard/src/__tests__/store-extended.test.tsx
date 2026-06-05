@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, act, fireEvent } from '@testing-library/react';
@@ -64,7 +65,7 @@ describe('AuthProvider - Login Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -94,7 +95,7 @@ describe('AuthProvider - Login Flow', () => {
     let container: HTMLElement;
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -124,7 +125,7 @@ describe('AuthProvider - Login Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -151,7 +152,7 @@ describe('AuthProvider - Login Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -171,7 +172,7 @@ describe('AuthProvider - Login Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -191,7 +192,7 @@ describe('AuthProvider - Login Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -221,7 +222,7 @@ describe('AuthProvider - Register Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -252,7 +253,7 @@ describe('AuthProvider - Register Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -278,7 +279,7 @@ describe('AuthProvider - Register Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -298,7 +299,7 @@ describe('AuthProvider - Register Flow', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -325,7 +326,7 @@ describe('AuthProvider - Logout Flow', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -355,7 +356,7 @@ describe('AuthProvider - Logout Flow', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -382,7 +383,7 @@ describe('AuthProvider - Logout Flow', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -411,7 +412,7 @@ describe('AuthProvider - Logout Flow', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -447,7 +448,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 401 });
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -470,7 +471,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -494,7 +495,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -515,7 +516,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
     });
 
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -535,7 +536,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -558,7 +559,7 @@ describe('AuthProvider - Token Refresh / Session Verification', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -585,7 +586,7 @@ describe('AuthProvider - API Key Management', () => {
     let container: HTMLElement;
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -606,7 +607,7 @@ describe('AuthProvider - API Key Management', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -638,7 +639,7 @@ describe('AuthProvider - API Key Management', () => {
     let container: HTMLElement;
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -683,7 +684,7 @@ describe('AuthProvider - Plan Changes', () => {
     let container: HTMLElement;
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -710,7 +711,7 @@ describe('AuthProvider - Plan Changes', () => {
     let container: HTMLElement;
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -735,7 +736,7 @@ describe('AuthProvider - Plan Changes', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -758,7 +759,7 @@ describe('AuthProvider - Plan Changes', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -789,7 +790,7 @@ describe('AuthProvider - Error Handling on Auth Failures', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -808,7 +809,7 @@ describe('AuthProvider - Error Handling on Auth Failures', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -826,7 +827,7 @@ describe('AuthProvider - Error Handling on Auth Failures', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -844,7 +845,7 @@ describe('AuthProvider - Error Handling on Auth Failures', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const r = render(
+      const r = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
@@ -870,7 +871,7 @@ describe('AuthProvider - Error Handling on Auth Failures', () => {
 
     let authRef: ReturnType<typeof useAuth>;
     await act(async () => {
-      render(
+      renderWithProviders(
         <AuthProvider>
           <AuthConsumer onReady={(a) => { authRef = a; }} />
         </AuthProvider>
@@ -891,7 +892,7 @@ describe('useAuth hook', () => {
   it('throws when used outside AuthProvider', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => {
-      render(<AuthConsumer />);
+      renderWithProviders(<AuthConsumer />);
     }).toThrow('useAuth must be used within AuthProvider');
     consoleSpy.mockRestore();
   });

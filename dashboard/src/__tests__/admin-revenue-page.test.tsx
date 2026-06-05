@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -85,13 +86,13 @@ describe('AdminRevenuePage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminRevenuePage));
+      renderWithProviders(React.createElement(AdminRevenuePage));
     });
   });
 
   it('fetches revenue on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminRevenuePage));
+      renderWithProviders(React.createElement(AdminRevenuePage));
     });
     expect(mockGetRevenue).toHaveBeenCalledWith('test-token');
   });
@@ -99,7 +100,7 @@ describe('AdminRevenuePage', () => {
   it('displays revenue title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminRevenuePage));
+      const result = renderWithProviders(React.createElement(AdminRevenuePage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Revenue Dashboard');
@@ -109,7 +110,7 @@ describe('AdminRevenuePage', () => {
     mockGetRevenue.mockReturnValueOnce(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminRevenuePage));
+      const result = renderWithProviders(React.createElement(AdminRevenuePage));
       container = result.container;
     });
     expect(container!.textContent).toContain('revenue');

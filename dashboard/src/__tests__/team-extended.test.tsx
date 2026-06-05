@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -71,22 +72,22 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Render ===
   it('renders without crashing', () => {
-    render(React.createElement(TeamPage));
+    renderWithProviders(React.createElement(TeamPage));
   });
 
   it('displays title', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('team.title');
   });
 
   it('renders create team button', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('+ Create Team');
   });
 
   // === Team list ===
   it('renders team list', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
       expect(container.textContent).toContain('Marketing');
@@ -94,28 +95,28 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders team description', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Dev team');
     });
   });
 
   it('renders member count', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('3 members');
     });
   });
 
   it('renders your teams section', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('team.yourTeams');
   });
 
   // === Empty state ===
   it('shows empty state when no teams', async () => {
     mockTeamsList.mockResolvedValue([]);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('team.noTeams');
     });
@@ -123,7 +124,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Select team ===
   it('shows team detail when team is selected', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -142,7 +143,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders members after selecting team', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -162,7 +163,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders member role', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -182,13 +183,13 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('shows placeholder when no team selected', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('Select a team to view details');
   });
 
   it('shows empty members message', async () => {
     mockTeamsListMembers.mockResolvedValue([]);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -208,7 +209,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Invite button ===
   it('renders invite button when team selected', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -228,7 +229,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Create team modal ===
   it('opens create team modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -242,7 +243,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders team name input in modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -256,7 +257,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders description input in modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -270,7 +271,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('closes create modal on cancel', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -292,7 +293,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('creates team on submit', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -323,7 +324,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('shows success toast after creating team', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -353,7 +354,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   it('shows error toast on create failure', async () => {
     mockTeamsCreate.mockRejectedValue(new Error('Create failed'));
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
 
     const createButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('+ Create Team')
@@ -383,7 +384,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Invite modal ===
   it('opens invite modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -412,7 +413,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders email input in invite modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -437,7 +438,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('renders role select in invite modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -462,7 +463,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('invites member', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -504,7 +505,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Remove member ===
   it('renders remove button for each member', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -526,7 +527,7 @@ describe('TeamPage — Extended Coverage', () => {
   });
 
   it('removes member on click', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -556,7 +557,7 @@ describe('TeamPage — Extended Coverage', () => {
 
   // === Role change ===
   it('changes member role', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -584,13 +585,13 @@ describe('TeamPage — Extended Coverage', () => {
   // === Loading state ===
   it('shows loading state', () => {
     mockTeamsList.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('Loading teams');
   });
 
   // === Selected team highlighting ===
   it('shows selected team description', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });

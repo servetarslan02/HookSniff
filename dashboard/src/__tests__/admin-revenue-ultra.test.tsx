@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -72,7 +73,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading state initially', () => {
     mockGetRevenue.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(AdminRevenuePage));
+    const { container } = renderWithProviders(React.createElement(AdminRevenuePage));
     expect(container.textContent).toContain('common.loading');
   });
 
@@ -80,7 +81,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Revenue Dashboard');
@@ -90,7 +91,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Financial metrics');
@@ -101,7 +102,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders MRR stat card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.mrr');
@@ -112,7 +113,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders total revenue stat card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.totalRevenueLabel');
@@ -124,7 +125,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders churn rate stat card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.churnRate');
@@ -136,7 +137,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders monthly revenue chart', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.monthlyRevenue');
@@ -147,7 +148,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders revenue by plan section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.revenueByPlan');
@@ -159,7 +160,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders plan names in breakdown', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Free');
@@ -171,7 +172,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders plan revenue values', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('$0'); // free
@@ -183,7 +184,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   it('renders user counts per plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('500 users');
@@ -197,7 +198,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
     mockGetRevenue.mockResolvedValue({ ...MOCK_REVENUE, revenue_by_plan: [] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin.noRevenue');
@@ -208,7 +209,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
     mockGetRevenue.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('$0');
@@ -220,7 +221,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
     mockGetRevenue.mockRejectedValue(new Error('Unauthorized'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AdminRevenuePage)).container;
+      container = renderWithProviders(React.createElement(AdminRevenuePage)).container;
     });
     await waitFor(() => {
       // Should still render with default values
@@ -252,7 +253,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
     }));
     const { default: PageNoToken } = await import('@/app/[locale]/admin/revenue/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockGetRevenue).not.toHaveBeenCalled();
   });
@@ -260,7 +261,7 @@ describe('AdminRevenuePage - Ultra Coverage', () => {
   // === API Call ===
   it('calls adminApi.getRevenue with token', async () => {
     await act(async () => {
-      render(React.createElement(AdminRevenuePage));
+      renderWithProviders(React.createElement(AdminRevenuePage));
     });
     await waitFor(() => {
       expect(mockGetRevenue).toHaveBeenCalledWith('test-token');

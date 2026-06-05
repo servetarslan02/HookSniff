@@ -104,26 +104,26 @@ export default function AdminBroadcastsPage() {
     },
     onSuccess: (action) => {
       qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] });
-      toast(`Broadcast ${action}`, 'success');
+      toast(action === 'created' ? (t('broadcastCreated') || 'Broadcast created') : (t('broadcastUpdated') || 'Broadcast updated'), 'success');
       resetForm();
     },
-    onError: () => toast('Failed to save broadcast', 'error'),
+    onError: () => toast(t('broadcastFailed') || 'Failed to save broadcast', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteBroadcast(token!, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] });
-      toast('Broadcast deleted', 'success');
+      toast(t('broadcastDeleted') || 'Broadcast deleted', 'success');
       setDeleteTarget(null);
     },
-    onError: () => toast('Failed to delete broadcast', 'error'),
+    onError: () => toast(t('broadcastFailed') || 'Failed to delete broadcast', 'error'),
   });
 
   const toggleMutation = useMutation({
     mutationFn: (b: Broadcast) => adminApi.updateBroadcast(token!, b.id, { is_active: !b.is_active }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }),
-    onError: () => toast('Failed to update broadcast', 'error'),
+    onError: () => toast(t('broadcastFailed') || 'Failed to update broadcast', 'error'),
   });
 
   const resetForm = () => {
@@ -225,16 +225,16 @@ export default function AdminBroadcastsPage() {
           onChange={(e) => setFilterActive(e.target.value)}
           className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
         >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="all">{t('allStatuses') || 'All Status'}</option>
+          <option value="active">{t('active') || 'Active'}</option>
+          <option value="inactive">{t('inactive') || 'Inactive'}</option>
         </select>
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
           className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
         >
-          <option value="all">All Types</option>
+          <option value="all">{t('allTypes') || 'All Types'}</option>
           {BROADCAST_TYPES.map(bt => (
             <option key={bt.value} value={bt.value}>{bt.label}</option>
           ))}
@@ -256,7 +256,7 @@ export default function AdminBroadcastsPage() {
           <div className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Title *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastTitle') || 'Title'} *</label>
               <input
                 type="text"
                 value={form.title}
@@ -268,7 +268,7 @@ export default function AdminBroadcastsPage() {
 
             {/* Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Message *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastMessage') || 'Message'} *</label>
               <textarea
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -281,7 +281,7 @@ export default function AdminBroadcastsPage() {
             {/* Type + Severity */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastType') || 'Type'}</label>
                 <select
                   value={form.broadcast_type}
                   onChange={(e) => setForm({ ...form, broadcast_type: e.target.value })}
@@ -293,7 +293,7 @@ export default function AdminBroadcastsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Severity</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastPriority') || 'Severity'}</label>
                 <select
                   value={form.severity}
                   onChange={(e) => setForm({ ...form, severity: e.target.value })}
@@ -309,7 +309,7 @@ export default function AdminBroadcastsPage() {
             {/* Link + Link Text */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastLink') || 'Link (optional)'}</label>
                 <input
                   type="url"
                   value={form.link}
@@ -319,7 +319,7 @@ export default function AdminBroadcastsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link Text</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastLinkText') || 'Link Text'}</label>
                 <input
                   type="text"
                   value={form.link_text}
@@ -332,7 +332,7 @@ export default function AdminBroadcastsPage() {
 
             {/* Target Plan */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Target Plan</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('broadcastTargetPlan') || 'Target Plan'}</label>
               <select
                 value={form.target_plan}
                 onChange={(e) => setForm({ ...form, target_plan: e.target.value })}
@@ -349,7 +349,7 @@ export default function AdminBroadcastsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                   <Calendar size={14} strokeWidth={1.75} className="inline mr-1" />
-                  Starts At (optional)
+                  {t('broadcastStartDate') || 'Starts At (optional)'}
                 </label>
                 <input
                   type="datetime-local"
@@ -361,7 +361,7 @@ export default function AdminBroadcastsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                   <Calendar size={14} strokeWidth={1.75} className="inline mr-1" />
-                  Expires At (optional)
+                  {t('broadcastEndDate') || 'Expires At (optional)'}
                 </label>
                 <input
                   type="datetime-local"
@@ -378,14 +378,14 @@ export default function AdminBroadcastsPage() {
                 onClick={resetForm}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors"
               >
-                Cancel
+                {t('broadcastCancel') || 'Cancel'}
               </button>
               <button
                 onClick={handleSave}
                 disabled={saveMutation.isPending || !form.title.trim() || !form.message.trim()}
                 className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
-                {saveMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
+                {saveMutation.isPending ? (t('broadcastSaving') || 'Saving...') : editingId ? (t('broadcastUpdate') || 'Update') : (t('broadcastCreate') || 'Create')}
               </button>
             </div>
           </div>
@@ -405,8 +405,8 @@ export default function AdminBroadcastsPage() {
       ) : broadcasts.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-slate-400 text-sm">No broadcasts yet</p>
-          <p className="text-gray-400 dark:text-slate-500 text-xs mt-1">Create your first broadcast announcement above</p>
+          <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noBroadcasts') || 'No broadcasts yet'}</p>
+          <p className="text-gray-400 dark:text-slate-500 text-xs mt-1">{t('noBroadcastsDesc') || 'Create your first broadcast announcement above'}</p>
         </div>
       ) : (
         <VirtualList
@@ -446,21 +446,21 @@ export default function AdminBroadcastsPage() {
                   <button
                     onClick={() => handleToggleActive(b)}
                     className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    title={b.is_active ? 'Deactivate' : 'Activate'}
+                    title={b.is_active ? (t('broadcastDeactivated') || 'Deactivate') : (t('broadcastActivated') || 'Activate')}
                   >
                     {b.is_active ? <Eye size={16} strokeWidth={1.75} /> : <EyeOff size={16} strokeWidth={1.75} />}
                   </button>
                   <button
                     onClick={() => handleEdit(b)}
                     className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    title="Edit"
+                    title={t('editBroadcast') || 'Edit'}
                   >
                     <Pencil size={16} strokeWidth={1.75} />
                   </button>
                   <button
                     onClick={() => setDeleteTarget(b.id)}
                     className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    title="Delete"
+                    title={t('broadcastDelete') || 'Delete'}
                   >
                     <Trash2 size={16} strokeWidth={1.75} />
                   </button>
@@ -474,10 +474,10 @@ export default function AdminBroadcastsPage() {
       {/* Delete Confirmation */}
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Delete Broadcast"
-        message="Are you sure you want to delete this broadcast? This action cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title={t('broadcastDeleteConfirmTitle') || 'Delete Broadcast'}
+        message={t('broadcastDeleteConfirm') || 'Are you sure you want to delete this broadcast? This action cannot be undone.'}
+        confirmLabel={t('broadcastDelete') || 'Delete'}
+        cancelLabel={t('broadcastCancel') || 'Cancel'}
         variant="danger"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}

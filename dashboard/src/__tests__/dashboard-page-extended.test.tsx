@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -146,7 +147,7 @@ describe('DashboardOverview - Extended', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     // Should render skeleton shimmer cards
@@ -156,7 +157,7 @@ describe('DashboardOverview - Extended', () => {
   it('hides skeleton after data loads', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -168,7 +169,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders all six stat cards', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -184,7 +185,7 @@ describe('DashboardOverview - Extended', () => {
   it('displays correct stats labels', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -201,7 +202,7 @@ describe('DashboardOverview - Extended', () => {
   it('shows success rate as percentage value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -211,14 +212,14 @@ describe('DashboardOverview - Extended', () => {
 
   it('fetches stats with correct token', async () => {
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     expect(mockStatsApiGet).toHaveBeenCalledWith('test-token');
   });
 
   it('fetches deliveries with page 1', async () => {
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     expect(mockWebhooksApiList).toHaveBeenCalledWith('test-token', { page: 1 });
   });
@@ -227,7 +228,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders time range selector buttons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -240,7 +241,7 @@ describe('DashboardOverview - Extended', () => {
   it('changes time range when button clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -262,7 +263,7 @@ describe('DashboardOverview - Extended', () => {
 
   it('defaults to 24h time range', async () => {
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     // Default analytics calls should be with '24h'
     expect(mockAnalyticsApiDeliveryTrend).toHaveBeenCalledWith('test-token', '24h');
@@ -273,7 +274,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders delivery trend chart', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -285,7 +286,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders success rate donut chart', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -300,7 +301,7 @@ describe('DashboardOverview - Extended', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     // Chart loading shows "loadingChart" text
@@ -311,7 +312,7 @@ describe('DashboardOverview - Extended', () => {
     mockAnalyticsApiDeliveryTrend.mockResolvedValueOnce({ range: '24h', buckets: [] });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -323,7 +324,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders recent deliveries table', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -336,7 +337,7 @@ describe('DashboardOverview - Extended', () => {
   it('displays delivery IDs truncated', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -347,7 +348,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders table headers for recent deliveries', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -364,7 +365,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders status badges for deliveries', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -376,7 +377,7 @@ describe('DashboardOverview - Extended', () => {
   it('shows "viewAll" link to deliveries page', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -405,7 +406,7 @@ describe('DashboardOverview - Extended', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -424,7 +425,7 @@ describe('DashboardOverview - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -436,7 +437,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders activity feed section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -447,7 +448,7 @@ describe('DashboardOverview - Extended', () => {
   it('shows auto-refresh indicator', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -465,7 +466,7 @@ describe('DashboardOverview - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -476,7 +477,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders activity feed items with event names', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -489,7 +490,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders onboarding wizard and setup checklist', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     expect(container!.querySelectorAll('[data-testid="onboarding-wizard"]').length).toBe(1);
@@ -501,7 +502,7 @@ describe('DashboardOverview - Extended', () => {
     mockStatsApiGet.mockRejectedValueOnce(new Error('Stats error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     // Should still render (no crash), with default 0 values
@@ -514,7 +515,7 @@ describe('DashboardOverview - Extended', () => {
     mockWebhooksApiList.mockRejectedValueOnce(new Error('List error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -528,7 +529,7 @@ describe('DashboardOverview - Extended', () => {
     mockAnalyticsApiSuccessRate.mockRejectedValueOnce(new Error('Rate error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     // Should still render charts area
@@ -540,7 +541,7 @@ describe('DashboardOverview - Extended', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -560,7 +561,7 @@ describe('DashboardOverview - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -572,7 +573,7 @@ describe('DashboardOverview - Extended', () => {
   it('refetches analytics when switching to 30d', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     await waitFor(() => {
@@ -594,7 +595,7 @@ describe('DashboardOverview - Extended', () => {
   it('cleans up effect on unmount', async () => {
     let unmount: () => void;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       unmount = result.unmount;
     });
     // Should not throw on unmount

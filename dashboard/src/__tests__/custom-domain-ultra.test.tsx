@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -34,44 +35,44 @@ describe('CustomDomainPage - Ultra Coverage', () => {
 
   // === Page Header ===
   it('renders page header with Globe icon', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.querySelector('svg')).toBeTruthy();
     expect(container.textContent).toContain('Custom Domain');
   });
 
   it('renders description text', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('Use your own domain');
     expect(container.textContent).toContain('White-label');
   });
 
   // === Add Domain Section ===
   it('renders add domain section', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('Add Domain');
   });
 
   it('renders domain input', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]');
     expect(input).toBeTruthy();
     expect(input!.getAttribute('placeholder')).toBe('webhooks.yourcompany.com');
   });
 
   it('renders Add Domain button', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
     expect(btn).toBeTruthy();
   });
 
   it('disables Add Domain button when input empty', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
     expect(btn).toHaveProperty('disabled', true);
   });
 
   it('enables Add Domain button when domain entered', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -80,21 +81,21 @@ describe('CustomDomainPage - Ultra Coverage', () => {
 
   // === Domain Input Sanitization ===
   it('converts domain to lowercase', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'WEBHOOKS.Example.COM' } });
     expect(input.value).toBe('webhooks.example.com');
   });
 
   it('strips invalid characters from domain', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'web hooks@exa!mple.com' } });
     expect(input.value).toBe('webhooksexample.com');
   });
 
   it('allows dots and hyphens in domain', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'my-webhooks.example-site.com' } });
     expect(input.value).toBe('my-webhooks.example-site.com');
@@ -108,7 +109,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -131,7 +132,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -154,7 +155,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -168,7 +169,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
 
   it('shows error toast on add domain failure', async () => {
     mockApiFetch.mockRejectedValue(new Error('Domain already exists'));
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -187,7 +188,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -210,7 +211,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -230,7 +231,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
       cname_target: 'cname.hooksniff.dev',
       txt_record: 'hs-verify-abc123',
     });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -247,7 +248,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
     mockApiFetch
       .mockResolvedValueOnce({ id: 'dom_123', cname_target: 'cname.hooksniff.dev', txt_record: 'hs-verify-abc123' })
       .mockResolvedValueOnce({ verified: true, message: 'Domain verified!' });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const addBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -270,7 +271,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
     mockApiFetch
       .mockResolvedValueOnce({ id: 'dom_123', cname_target: 'cname.hooksniff.dev', txt_record: 'hs-verify-abc123' })
       .mockResolvedValueOnce({ verified: true, message: 'Domain verified!' });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const addBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -294,7 +295,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
     mockApiFetch
       .mockResolvedValueOnce({ id: 'dom_123', cname_target: 'cname.hooksniff.dev', txt_record: 'hs-verify-abc123' })
       .mockResolvedValueOnce({ verified: false, issues: ['CNAME not found', 'TXT record mismatch'] });
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const addBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');
@@ -316,7 +317,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
 
   // === How It Works ===
   it('renders how it works section', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('How it works');
     expect(container.textContent).toContain('Add your domain');
     expect(container.textContent).toContain('Add DNS records');
@@ -324,7 +325,7 @@ describe('CustomDomainPage - Ultra Coverage', () => {
   });
 
   it('renders step numbers', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('1');
     expect(container.textContent).toContain('2');
     expect(container.textContent).toContain('3');
@@ -332,14 +333,14 @@ describe('CustomDomainPage - Ultra Coverage', () => {
 
   // === No DNS records initially ===
   it('does not show DNS records section initially', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).not.toContain('DNS Records');
   });
 
   // === Saving state ===
   it('shows saving state during add domain', async () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Add Domain');

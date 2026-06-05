@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -78,34 +79,34 @@ describe('BillingPage', () => {
   });
 
   it('renders without crashing', async () => {
-    await act(async () => { render(React.createElement(BillingPage)); });
+    await act(async () => { renderWithProviders(React.createElement(BillingPage)); });
   });
 
   it('displays billing title', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.title');
   });
 
   it('fetches usage data on mount', async () => {
-    await act(async () => { render(React.createElement(BillingPage)); });
+    await act(async () => { renderWithProviders(React.createElement(BillingPage)); });
     expect(mockGetUsage).toHaveBeenCalledWith('test-token');
   });
 
   it('fetches invoices on mount', async () => {
-    await act(async () => { render(React.createElement(BillingPage)); });
+    await act(async () => { renderWithProviders(React.createElement(BillingPage)); });
     expect(mockGetInvoices).toHaveBeenCalledWith('test-token');
   });
 
   it('displays current plan section', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.currentPlan');
   });
 
   it('displays plan prices', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('$0');
     expect(container!.textContent).toContain('$29');
     expect(container!.textContent).toContain('$99');
@@ -113,7 +114,7 @@ describe('BillingPage', () => {
 
   it('displays plan features', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('100 requests/min');
     expect(container!.textContent).toContain('1,000 requests/min');
     expect(container!.textContent).toContain('10,000 requests/min');
@@ -121,13 +122,13 @@ describe('BillingPage', () => {
 
   it('displays invoice history section', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.invoiceHistory');
   });
 
   it('displays invoice details', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('inv-1234');
     expect(container!.textContent).toContain('Pro');
     expect(container!.textContent).toContain('$29.00');
@@ -135,7 +136,7 @@ describe('BillingPage', () => {
 
   it('displays invoice status badges', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('Paid');
     expect(container!.textContent).toContain('Pending');
   });
@@ -143,40 +144,40 @@ describe('BillingPage', () => {
   it('shows empty invoice state', async () => {
     mockGetInvoices.mockResolvedValueOnce([]);
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('No invoices yet');
   });
 
   it('shows loading invoices state', async () => {
     mockGetInvoices.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('Loading invoices');
   });
 
   it('displays usage chart data', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     // The chart should render with the usage count
     expect(container!.querySelector('svg')).toBeTruthy();
   });
 
   it('shows invoice count', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('2');
     expect(container!.textContent).toContain('billing.invoices');
   });
 
   it('displays invoice dates', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('2024');
   });
 
   it('renders table headers for invoices', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('Invoice');
     expect(container!.textContent).toContain('Date');
     expect(container!.textContent).toContain('Plan');
@@ -186,13 +187,13 @@ describe('BillingPage', () => {
 
   it('renders popular badge for pro plan', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.mostPopular');
   });
 
   it('displays plan limits', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('plans.freeLimit');
     expect(container!.textContent).toContain('plans.proLimit');
     expect(container!.textContent).toContain('plans.businessLimit');
@@ -200,7 +201,7 @@ describe('BillingPage', () => {
 
   it('shows current plan indicator for free plan', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     // Free plan should be marked as current
     expect(container!.textContent).toContain('billing.plans.free');
     expect(container!.textContent).toContain('$0');
@@ -208,7 +209,7 @@ describe('BillingPage', () => {
 
   it('renders upgrade buttons for non-current plans', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     // Pro and Business should have upgrade buttons
     const buttons = Array.from(container!.querySelectorAll('button'));
     const upgradeBtns = buttons.filter(b => b.textContent?.includes('Upgrade') || b.textContent?.includes('upgrade'));
@@ -218,20 +219,20 @@ describe('BillingPage', () => {
   it('handles usage fetch error gracefully', async () => {
     mockGetUsage.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.title');
   });
 
   it('handles invoice fetch error gracefully', async () => {
     mockGetInvoices.mockRejectedValueOnce(new Error('API error'));
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     expect(container!.textContent).toContain('billing.invoiceHistory');
   });
 
   it('renders 3 plan cards', async () => {
     let container: HTMLElement;
-    await act(async () => { container = render(React.createElement(BillingPage)).container; });
+    await act(async () => { container = renderWithProviders(React.createElement(BillingPage)).container; });
     const cards = container!.querySelectorAll('.glass-card');
     // Should have at least 3 plan cards + invoice section
     expect(cards.length).toBeGreaterThanOrEqual(3);

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -33,7 +34,7 @@ describe('RoutingPage', () => {
     const { apiFetch } = await import('@/lib/api');
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
     await act(async () => {
-      render(React.createElement(RoutingPage));
+      renderWithProviders(React.createElement(RoutingPage));
     });
   });
 
@@ -42,7 +43,7 @@ describe('RoutingPage', () => {
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Routing');
@@ -53,7 +54,7 @@ describe('RoutingPage', () => {
     (apiFetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(RoutingPage));
+      const result = renderWithProviders(React.createElement(RoutingPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No endpoints configured yet');
