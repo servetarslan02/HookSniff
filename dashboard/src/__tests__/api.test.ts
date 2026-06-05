@@ -155,6 +155,25 @@ describe('apiFetch core', () => {
   });
 });
 
+describe('stopProactiveRefresh', () => {
+  it('can be called without error when nothing running', () => {
+    expect(() => apiModule.stopProactiveRefresh()).not.toThrow();
+  });
+});
+
+describe('setTokenRefreshCallback', () => {
+  it('can be called with a callback', () => {
+    expect(() => apiModule.setTokenRefreshCallback(vi.fn())).not.toThrow();
+  });
+});
+
+describe('API_BASE', () => {
+  it('is exported and is a string', () => {
+    expect(typeof apiModule.API_BASE).toBe('string');
+    expect(apiModule.API_BASE.length).toBeGreaterThan(0);
+  });
+});
+
 describe('applicationsApi', () => {
   beforeEach(() => { vi.clearAllMocks(); });
   it('list', async () => { mockFetch.mockResolvedValueOnce(ok([])); await apiModule.applicationsApi.list('tk'); expect(mockFetch.mock.calls[0][0]).toContain('/applications'); });
