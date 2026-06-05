@@ -266,16 +266,17 @@ export type WsEvent = z.infer<typeof WsEventSchema>;
 // ── System Health Schema ──
 export const SystemHealthSchema = z.object({
   status: z.string().optional(),
+  _cache: z.string().optional(),
   database: z.object({
     status: z.string(),
     latency_ms: z.number().nullish(),
-    error: z.string().optional(),
+    error: z.string().nullish(),
   }).optional(),
   redis: z.object({
     status: z.string(),
     latency_ms: z.number().nullish(),
-    note: z.string().optional(),
-    error: z.string().optional(),
+    note: z.string().nullish(),
+    error: z.string().nullish(),
   }).optional(),
   api: z.object({
     status: z.string(),
@@ -290,46 +291,46 @@ export const SystemHealthSchema = z.object({
     database: z.object({
       status: z.string(),
       latency_ms: z.number().nullish(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
     queue: z.object({
       status: z.string(),
       latency_ms: z.number().nullish(),
       pending_count: z.number().nullish(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
     redis: z.object({
       status: z.string(),
       latency_ms: z.number().nullish(),
-      note: z.string().optional(),
-      error: z.string().optional(),
+      note: z.string().nullish(),
+      error: z.string().nullish(),
     }).optional(),
     last_delivery: z.object({
       status: z.string(),
       last_delivered_at: z.string().nullish(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
     db_size: z.object({
       status: z.string(),
       size: z.string().nullish(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
     recent_errors: z.object({
       status: z.string(),
       errors: z.array(z.object({
         id: z.string(),
-        event: z.string().optional(),
-        error: z.string().optional(),
+        event: z.string().nullish(),
+        error: z.string().nullish(),
         created_at: z.string(),
       })).optional(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
     queue_detail: z.object({
       status: z.string(),
       pending: z.number().nullish(),
       processing: z.number().nullish(),
       failed_last_hour: z.number().nullish(),
-      error: z.string().optional(),
+      error: z.string().nullish(),
     }).optional(),
   }).optional(),
 });
