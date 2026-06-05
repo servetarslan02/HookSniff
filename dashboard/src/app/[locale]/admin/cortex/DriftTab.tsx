@@ -79,6 +79,14 @@ export function DriftTab() {
                 <p><strong>{t('affected')}</strong> {Array.isArray(ev.features_affected) ? ev.features_affected.join(', ') || '—' : String(ev.features_affected)}</p>
                 <p><strong>{t('detected')}</strong> {Array.isArray(ev.detected_by) ? ev.detected_by.join(', ') : typeof ev.detected_by === 'object' ? Object.entries(ev.detected_by).map(([k,v]) => `${k}: ${v}`).join(', ') : String(ev.detected_by)}</p>
                 <p><strong>{t('action')}</strong> <span className="capitalize">{ev.recommended_action.replace(/_/g, ' ')}</span></p>
+                {ev.endpoint_id && (
+                  <p className="mt-1 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                    <ExternalLink size={11} />
+                    <PrefetchLink href={`/endpoints/${ev.endpoint_id}`} className="hover:underline">
+                      {t('endpointLink') || 'View endpoint'}: {ev.endpoint_id.substring(0, 8)}...
+                    </PrefetchLink>
+                  </p>
+                )}
               </div>
             </div>
           ))}

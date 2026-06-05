@@ -7363,6 +7363,17 @@
       "detectedBy": {
         "ml": "🧠 ML tarafından tespit edildi",
         "formula": "📊 Formül ile tespit edildi"
+      },
+      "endpointLink": "Endpoint’i görüntüle",
+      "steps": {
+        "checkEndpoint": "Endpoint teslimat geçmişinde kalıpları kontrol edin",
+        "checkServer": "Sunucu yanıt sürelerini ve loglarını kontrol edin",
+        "checkErrors": "Teslimat loglarındaki hata mesajlarını kontrol edin",
+        "checkTraffic": "Trafik artışının beklenip beklenmediğini kontrol edin",
+        "checkCapacity": "Sunucunun trafiği kaldırabileceğini doğrulayın",
+        "increaseTimeout": "Endpoint ayarlarında zaman aşımını artırmayı düşünün",
+        "checkLogs": "Sunucu loglarında yeni hata kalıbını kontrol edin",
+        "checkDeploy": "Son deploy’un soruna neden olup olmadığını kontrol edin"
       }
     },
     "healing": {
@@ -7408,7 +7419,8 @@
         "repeatedFailures": "Zamana yayılan tekrarlayan hatalar",
         "highFailureRate": "Hata oranı %50'yi aştı",
         "overload": "Sunucu aşırı yük tespit edildi"
-      }
+      },
+      "endpointLink": "Endpoint’i görüntüle"
     },
     "predictions": {
       "title": "Gelecek Tahminleri",
@@ -7439,7 +7451,8 @@
         "timeSeries": "Zaman serisi",
         "trend": "Trend analizi"
       },
-      "probability": "Olasılık"
+      "probability": "Olasılık",
+      "endpointLink": "Endpoint’i görüntüle"
     },
     "mlQuality": {
       "title": "ML Model Kalitesi",
@@ -7529,7 +7542,8 @@
         "sudden": "Ani Değişim",
         "gradual": "Kademeli Değişim",
         "incremental": "Artan Değişim"
-      }
+      },
+      "endpointLink": "Endpoint’i görüntüle"
     },
     "modelMonitor": {
       "stats": {
