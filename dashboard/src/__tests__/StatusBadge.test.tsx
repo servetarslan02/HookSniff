@@ -7,7 +7,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 describe('StatusBadge', () => {
   it('renders with status text', () => {
     renderWithProviders(<StatusBadge status="delivered" />);
-    expect(screen.getByText('delivered')).toBeTruthy();
+    expect(screen.getByText('Delivered')).toBeTruthy();
   });
 
   it('renders delivered status with correct classes', () => {
