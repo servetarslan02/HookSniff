@@ -7322,7 +7322,9 @@
         "performanceDropped": "Performance severely degraded",
         "errorRateHigh": "Error rate higher than normal",
         "shouldMonitor": "Not severe but should be monitored",
-        "noConcern": "Not concerning"
+        "noConcern": "Not concerning",
+        "latencyIncreased": "Latency increased by {v}ms",
+        "srDropped": "Success rate dropped below {v}%"
       },
       "detectedBy": {
         "ml": "🧠 Detected by ML",
@@ -7368,7 +7370,8 @@
         "timeout_adjust": "Server responding slowly, extended wait time",
         "proactive_throttle": "Latency increasing, precaution taken before issues occur",
         "cascade_alert": "Multiple endpoints affected simultaneously"
-      }
+      },
+      "reason": "Reason"
     },
     "predictions": {
       "title": "Future Predictions",
@@ -7383,7 +7386,12 @@
         "low": "Small risk",
         "minimal": "Low risk"
       },
-      "detail": {},
+      "detail": {
+        "high": "Predicted probability {v}% — attention needed",
+        "low": "Predicted probability {v}% — low risk",
+        "medium": "Predicted probability {v}% — monitor closely",
+        "minimal": "Predicted probability {v}% — minimal risk"
+      },
       "advice": {
         "high": "Take action now: check endpoint or switch to backup URL",
         "medium": "It is recommended to check your endpoint",
@@ -7393,7 +7401,8 @@
       "method": {
         "timeSeries": "🧠 Time series analysis",
         "trend": "📊 Trend analysis"
-      }
+      },
+      "probability": "Probability"
     },
     "mlQuality": {
       "title": "ML Model Quality",
@@ -7411,12 +7420,18 @@
         "low": "Low quality",
         "critical": "Critical quality"
       },
-      "detail": {},
+      "detail": {
+        "critical": "Accuracy {acc}% — urgent intervention needed",
+        "excellent": "Accuracy {acc}%, avg error {err}%",
+        "good": "Accuracy {acc}% — acceptable",
+        "low": "Accuracy {acc}% — improvement needed"
+      },
       "metric": {
         "accuracy": "Accuracy",
         "avgError": "Avg Error",
         "predictionCount": "Prediction Count"
-      }
+      },
+      "modelSummary": "Model Summary"
     },
     "proactive": {
       "title": "Proactive Protection",
@@ -7431,7 +7446,12 @@
         "description": "Cortex detected everything is normal.",
         "info": "🛡️ Proactive analysis runs every 15 minutes"
       },
-      "detail": {},
+      "detail": {
+        "cascadeRisk": "{v} endpoints may be affected",
+        "latencyTrend": "Latency trending {v}",
+        "rateLimitRisk": "Rate limit usage at {v}%",
+        "stressDetection": "Stress detected: {v}"
+      },
       "advice": {
         "latencyTrend": "Check the endpoint, server may be slowing down",
         "rateLimitRisk": "Consider increasing rate limit or reducing requests",
@@ -7445,7 +7465,8 @@
       "severity": "Severity",
       "affected": "Affected:",
       "detected": "Detected:",
-      "action": "Action:"
+      "action": "Action:",
+      "eventCount": "{n} events"
     },
     "modelMonitor": {
       "stats": {
@@ -7494,7 +7515,8 @@
         "completed": "Completed",
         "cancelled": "Cancelled",
         "pending": "Pending"
-      }
+      },
+      "testCount": "{n} tests"
     },
     "autoML": {
       "title": "AutoML Optimization Trials",

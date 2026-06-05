@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
 
     let pool = db::create_pool(&db_url).await?;
 
-    let (health_pool, rate_limiter, cache_layer) = tokio::join!(
+    let (health_pool, rate_limiter, cache_layer, readonly_pool) = tokio::join!(
         async {
             match db::create_health_pool(&db_url).await {
                 Ok(p) => {
@@ -84,6 +84,18 @@ async fn main() -> Result<()> {
             }
         }
     );
+
+    // Create read-only pool for analytics/health queries
+    let readonly_pool = match db::create_readonly_pool(&db_url).await {
+        Ok(p) => {
+            tracing::info!("✅ Read-only pool created for analytics");
+            Some(p)
+        }
+        Err(e) => {
+            tracing::warn!("Read-only pool creation failed ({e}), using main pool for analytics");
+            None
+        }
+    };
 
     routes::health::set_health_checks_ready();
 
