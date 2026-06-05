@@ -208,10 +208,11 @@ DELETE /v1/custom-domains/:id`}
   );
 }
 
-export default function CustomDomainDocsPage() {
+export default async function CustomDomainDocsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
-      <CustomDomainDocsContent />
+      <CustomDomainDocsContent locale={locale} />
     </Suspense>
   );
 }

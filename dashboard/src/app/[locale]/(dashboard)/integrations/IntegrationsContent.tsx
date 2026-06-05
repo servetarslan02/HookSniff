@@ -149,7 +149,7 @@ export default function IntegrationsContent() {
     mutationFn: (id: string) => integrationsApi.test(token!, id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['integration-events'] });
-      toast(`${t('testSent')}: ${data.event_id}`, 'success');
+      toast(t('testSentWithId', { id: data.event_id }) || `${t('testSent')}: ${data.event_id}`, 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });

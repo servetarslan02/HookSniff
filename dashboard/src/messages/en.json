@@ -416,7 +416,8 @@
     "viewDetails": "View Details",
     "replayConfirm": "Replay delivery {id}… to the same endpoint?",
     "selectAll": "Select all",
-    "replayFailed": "Failed to replay the delivery. Please try again."
+    "replayFailed": "Failed to replay the delivery. Please try again.",
+    "batchReplaySuccess": "Replayed {count} deliveries"
   },
   "logs": {
     "title": "Webhook Logs",
@@ -2388,7 +2389,22 @@
     "corsOrigins": "Allowed CORS Origins",
     "corsOriginsDesc": "Comma-separated list of allowed origins. Leave empty for default.",
     "backupRetention": "Backup Retention (days)",
-    "backupRetentionDesc": "Number of days to keep database backups."
+    "backupRetentionDesc": "Number of days to keep database backups.",
+    "ipBlocked": "IP blocked",
+    "ipUnblocked": "IP unblocked",
+    "unblockFailed": "Failed to remove IP block",
+    "resolveAllFailed": "Bulk resolve failed",
+    "devToolsDesc": "Development and debugging tools. Only visible in dev mode.",
+    "sentryTest": "Sentry Error Test",
+    "sentryTestDesc": "Throw a test error to verify Sentry integration",
+    "sentryTestSent": "Test error sent to Sentry",
+    "sentryNotAvailable": "Sentry not available in this environment",
+    "wsStatus": "WebSocket Status",
+    "wsStatusDesc": "Check WebSocket connection state",
+    "clearCache": "Clear React Query Cache",
+    "clearCacheDesc": "Force invalidate all cached data",
+    "cacheCleared": "React Query cache cleared",
+    "refundLoadFailed": "Failed to load refund requests"
   },
   "landing": {
     "nav": {
@@ -6189,7 +6205,8 @@
       "new": "New",
       "inactive": "Inactive",
       "error": "Error"
-    }
+    },
+    "testSentWithId": "Test sent: {id}"
   },
   "docsDashboard": {
     "title": "Dashboard Guide",
@@ -7682,7 +7699,11 @@
     "deleteConfig": "Delete SSO config",
     "testConnection": "Test SSO connection",
     "initiateLogin": "Initiate SSO login",
-    "listProviders": "List SSO providers for domain"
+    "listProviders": "List SSO providers for domain",
+    "roleAdmin": "Admin",
+    "roleViewer": "Viewer",
+    "roleAnalyst": "Analyst",
+    "roleDeveloper": "Developer"
   },
   "docsQuickstartPage": {
     "createApiKey": "Create API Key",

@@ -11,7 +11,7 @@ interface DriftEvent {
   drift_type: string;
   severity: number;
   features_affected: string[];
-  detected_by: string[];
+  detected_by: string[] | Record<string, unknown>;
   recommended_action: string;
   created_at: string;
 }
@@ -71,8 +71,8 @@ export function DriftTab() {
                 <time className="text-xs text-gray-500">{new Date(ev.created_at).toLocaleString()}</time>
               </div>
               <div className="mt-2 text-sm text-gray-600 dark:text-slate-400">
-                <p><strong>{t('affected')}</strong> {ev.features_affected.join(', ') || '—'}</p>
-                <p><strong>{t('detected')}</strong> {ev.detected_by.join(', ')}</p>
+                <p><strong>{t('affected')}</strong> {Array.isArray(ev.features_affected) ? ev.features_affected.join(', ') || '—' : String(ev.features_affected)}</p>
+                <p><strong>{t('detected')}</strong> {Array.isArray(ev.detected_by) ? ev.detected_by.join(', ') : typeof ev.detected_by === 'object' ? Object.entries(ev.detected_by).map(([k,v]) => `${k}: ${v}`).join(', ') : String(ev.detected_by)}</p>
                 <p><strong>{t('action')}</strong> <span className="capitalize">{ev.recommended_action.replace(/_/g, ' ')}</span></p>
               </div>
             </div>

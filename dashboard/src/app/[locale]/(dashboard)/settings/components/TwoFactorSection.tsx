@@ -199,7 +199,7 @@ export function TwoFactorSection() {
                       type="button"
                       onClick={() => {
                         navigator.clipboard.writeText(secret);
-                        toast(t('secretCopied') || 'Kopyalandı', 'success');
+                        toast(t('secretCopied') || 'Secret copied', 'success');
                       }}
                       className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-200 dark:bg-slate-600 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition"
                     >
