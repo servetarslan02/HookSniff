@@ -179,7 +179,7 @@ export default function PortalPage() {
                 {dataExpiresInDays !== null && dataExpiresInDays > 0
                   ? `${dataExpiresInDays} ${tb('days')} ${tb('remaining') || 'remaining'}`
                   : dataExpiresInDays === 0
-                  : (tb('dataExpired') || 'Expired')
+                  ? (tb('dataExpired') || 'Expired')
                   : `${retentionDays ?? '—'} ${tb('days')}`
                 }
               </span>
