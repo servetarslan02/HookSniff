@@ -7343,10 +7343,7 @@
         "pending": "Ongoing"
       },
       "action": {
-        "auto_disable": {
-          "recovered": "Endpoint reopened",
-          "disabled": "Endpoint temporarily closed"
-        },
+        "auto_disable": "Endpoint temporarily disabled",
         "circuit_tighten": "Firewall tightened",
         "retry_slowdown": "Retry slowed down",
         "rate_limit_reduce": "Rate limit reduced",
@@ -7358,10 +7355,7 @@
         "unknown": "Unknown action"
       },
       "detail": {
-        "auto_disable": {
-          "recovered": "Endpoint is healthy again, auto-reopened",
-          "disabled": "Temporarily disabled due to too many errors"
-        },
+        "auto_disable": "Endpoint automatically disabled due to repeated failures",
         "circuit_tighten": "Increased protection sensitivity due to high error rate",
         "retry_slowdown": "Server is struggling, increased interval between retries",
         "rate_limit_reduce": "Reduced request count to protect server",
@@ -7388,8 +7382,8 @@
       },
       "detail": {
         "high": "Predicted probability {v}% — attention needed",
-        "low": "Predicted probability {v}% — low risk",
         "medium": "Predicted probability {v}% — monitor closely",
+        "low": "Predicted probability {v}% — low risk",
         "minimal": "Predicted probability {v}% — minimal risk"
       },
       "advice": {
@@ -7528,7 +7522,7 @@
     },
     "autoML": {
       "title": "AutoML Optimization Trials",
-      "empty": "No AutoML trials yet. Start an optimization from the API.",
+      "empty": "No AutoML trials yet. Start an optimization from the API to find the best model parameters.",
       "best": "Best",
       "trialCount": "{n} trial(s)"
     },
