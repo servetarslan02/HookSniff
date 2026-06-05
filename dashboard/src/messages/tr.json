@@ -2336,7 +2336,14 @@
     "couponCreatedSynced": "Kupon oluşturuldu ve Polar.sh ile senkronize edildi",
     "couponCreatedSyncFailed": "Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.",
     "couponUpdatedSynced": "Kupon güncellendi ve Polar.sh ile senkronize edildi",
-    "features": "Özellikler"
+    "features": "Özellikler",
+    "emailSettings": "E-posta Ayarları",
+    "securitySettings": "Güvenlik Ayarları",
+    "backupSettings": "Yedekleme Ayarları",
+    "emailNotifications": "E-posta Bildirimleri",
+    "slackNotifications": "Slack Bildirimleri",
+    "webhookNotifications": "Webhook Bildirimleri",
+    "devTools": "Geliştirici Araçları"
   },
   "landing": {
     "nav": {
