@@ -201,7 +201,7 @@ pub async fn test_redis_down_scenario(pool: &PgPool) -> ChaosResult {
 
     // Son anomali sayıları
     let anomaly_count: i64 = sqlx::query_scalar(
-        "SELECT COUNT(*) FROM anomaly_scores WHERE created_at > NOW() - INTERVAL '1 hour'"
+        "SELECT COUNT(*) FROM anomaly_scores WHERE created_at > NOW() - INTERVAL '1 hour' AND (category IS NULL OR category != 'security')"
     ).fetch_one(pool).await.unwrap_or(0);
     observations.push(format!("Anomalies (1h): {}", anomaly_count));
 
@@ -257,7 +257,7 @@ pub async fn test_error_burst_scenario(pool: &PgPool, endpoint_id: uuid::Uuid) -
 
     // Son anomaliler
     let anomaly_count: i64 = sqlx::query_scalar(
-        "SELECT COUNT(*) FROM anomaly_scores WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '1 hour'"
+        "SELECT COUNT(*) FROM anomaly_scores WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '1 hour' AND (category IS NULL OR category != 'security')"
     ).bind(endpoint_id).fetch_one(pool).await.unwrap_or(0);
     observations.push(format!("Anomalies (1h): {}", anomaly_count));
 
