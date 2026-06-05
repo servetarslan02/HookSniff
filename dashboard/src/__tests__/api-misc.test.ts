@@ -48,6 +48,23 @@ describe('ssoApi', () => {
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/sso/config'), expect.objectContaining({ method: 'DELETE' }));
   });
 
+  it('testSso with teamId sends POST with team_id param', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ valid: true }) });
+    await ssoApi.testSso('token', 'team-123');
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('team_id=team-123'), expect.objectContaining({ method: 'POST' }));
+  });
+
+  it('deleteSso with teamId sends DELETE with team_id param', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ deleted: true }) });
+    await ssoApi.deleteSso('token', 'team-456');
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('team_id=team-456'), expect.objectContaining({ method: 'DELETE' }));
+  });
+
+  it('getLoginUrl encodes special characters', () => {
+    const url = ssoApi.getLoginUrl('user+tag@example.com');
+    expect(url).toContain(encodeURIComponent('user+tag@example.com'));
+  });
+
   it('getLoginUrl returns URL string', () => {
     const url = ssoApi.getLoginUrl('test@example.com');
     expect(url).toContain('/v1/sso/login');
