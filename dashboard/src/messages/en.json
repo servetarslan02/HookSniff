@@ -7329,6 +7329,17 @@
       "detectedBy": {
         "ml": "🧠 Detected by ML",
         "formula": "📊 Detected by formula"
+      },
+      "endpointLink": "View endpoint",
+      "steps": {
+        "checkEndpoint": "Check endpoint delivery history for patterns",
+        "checkServer": "Check your server response times and logs",
+        "checkErrors": "Check error messages in delivery logs",
+        "checkTraffic": "Check if traffic spike is expected",
+        "checkCapacity": "Verify server can handle the traffic",
+        "increaseTimeout": "Consider increasing timeout in endpoint settings",
+        "checkLogs": "Check server logs for the new error pattern",
+        "checkDeploy": "Check if a recent deploy caused the issue"
       }
     },
     "healing": {
@@ -7373,7 +7384,8 @@
         "repeatedFailures": "Repeated failures over time",
         "highFailureRate": "Failure rate exceeded 50%",
         "overload": "Server overload detected"
-      }
+      },
+      "endpointLink": "View endpoint"
     },
     "predictions": {
       "title": "Future Predictions",
@@ -7404,7 +7416,8 @@
         "timeSeries": "🧠 Time series analysis",
         "trend": "📊 Trend analysis"
       },
-      "probability": "Probability"
+      "probability": "Probability",
+      "endpointLink": "View endpoint"
     },
     "mlQuality": {
       "title": "ML Model Quality",
@@ -7494,7 +7507,8 @@
         "sudden": "Sudden",
         "gradual": "Gradual",
         "incremental": "Incremental"
-      }
+      },
+      "endpointLink": "View endpoint"
     },
     "modelMonitor": {
       "stats": {
