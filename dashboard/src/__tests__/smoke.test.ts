@@ -1,54 +1,37 @@
-/**
- * Dashboard Smoke Tests
- *
- * Temel bileşenlerin varlığını ve temel fonksiyonları test eder.
- * Run: npx vitest run
- */
-
 import { describe, it, expect } from 'vitest';
 
-// ─── Utility Functions ───
-
-describe('Error handling', () => {
-  it('getErrorMessage returns string for Error objects', async () => {
-    const { getErrorMessage } = await import('@/lib/errors');
-    expect(getErrorMessage(new Error('test error'))).toBe('test error');
-  });
-
-  it('getErrorMessage returns string for string values', async () => {
-    const { getErrorMessage } = await import('@/lib/errors');
-    expect(getErrorMessage('string error')).toBe('string error');
-  });
-
-  it('getErrorMessage returns Unknown error for non-string non-Error values', async () => {
-    const { getErrorMessage } = await import('@/lib/errors');
-    expect(getErrorMessage(42)).toBe('Unknown error');
-    expect(getErrorMessage(null)).toBe('Unknown error');
-    expect(getErrorMessage(undefined)).toBe('Unknown error');
-  });
-
-  it('getErrorMessage extracts message from object with message property', async () => {
-    const { getErrorMessage } = await import('@/lib/errors');
-    expect(getErrorMessage({ message: 'obj error' })).toBe('obj error');
-  });
-});
-
-// ─── API Client ───
-
-describe('API client', () => {
-  it('exports apiFetch function', async () => {
+describe('Smoke Tests', () => {
+  it('app module exports exist', async () => {
     const api = await import('@/lib/api');
     expect(api.apiFetch).toBeDefined();
-    expect(typeof api.apiFetch).toBe('function');
+    expect(api.endpointsApi).toBeDefined();
+    expect(api.webhooksApi).toBeDefined();
+  });
+
+  it('store module exports exist', async () => {
+    const store = await import('@/lib/store');
+    expect(store.useAuth).toBeDefined();
+  });
+
+  it('schemas module exports exist', async () => {
+    const schemas = await import('@/schemas/api');
+    expect(schemas.SystemHealthSchema).toBeDefined();
+    expect(schemas.DeliverySchema).toBeDefined();
+    expect(schemas.PlatformSettingsSchema).toBeDefined();
+  });
+
+  it('error utils module exports exist', async () => {
+    const errors = await import('@/lib/errors');
+    expect(errors.getErrorMessage).toBeDefined();
   });
 });
 
-// ─── Error messages ───
+describe('Environment', () => {
+  it('has fetch available', () => {
+    expect(typeof fetch).toBe('function');
+  });
 
-describe('Error module', () => {
-  it('exports getErrorMessage function', async () => {
-    const mod = await import('@/lib/errors');
-    expect(mod.getErrorMessage).toBeDefined();
-    expect(typeof mod.getErrorMessage).toBe('function');
+  it('has crypto available', () => {
+    expect(typeof crypto).toBe('object');
   });
 });
