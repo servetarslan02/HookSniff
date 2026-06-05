@@ -72,8 +72,8 @@ pub async fn zero_trust_middleware(
     // Only run threat detection for non-admin or when risk is already elevated.
     let is_admin_path = path.starts_with("/admin") || path.contains("/admin/");
     
-    if !is_admin_path || result.risk_score < 0.3 {
-        // Run threat detection only for non-admin paths or low-risk admin requests
+    if !is_admin_path && result.risk_score < 0.3 {
+        // Run threat detection only for non-admin paths and low-risk requests
         let threat = crate::security::threat_detector::analyze_request(
             &pool,
             &ip,
@@ -85,22 +85,24 @@ pub async fn zero_trust_middleware(
 
         if threat.is_threat {
             // Block if action is Block AND confidence is very high
-            // But NEVER block admin users who passed Zero Trust verification
-            let should_block = matches!(threat.action, crate::security::threat_detector::ThreatAction::Block)
-                && threat.confidence > 0.8
-                && result.risk_score < 0.5; // Don't block if Zero Trust already verified
+            // But NEVER block admin users — they're verified by Zero Trust above
+            if !is_admin {
+                let should_block = matches!(threat.action, crate::security::threat_detector::ThreatAction::Block)
+                    && threat.confidence > 0.8
+                    && result.risk_score < 0.5;
 
-            if should_block {
-                tracing::warn!(
-                    customer_id = %customer.id,
-                    threat_type = ?threat.threat_type,
-                    confidence = threat.confidence,
-                    details = %threat.details,
-                    "🔒 Threat detected — blocking request"
-                );
-                return Err(AppError::Forbidden);
+                if should_block {
+                    tracing::warn!(
+                        customer_id = %customer.id,
+                        threat_type = ?threat.threat_type,
+                        confidence = threat.confidence,
+                        details = %threat.details,
+                        "🔒 Threat detected — blocking request"
+                    );
+                    return Err(AppError::Forbidden);
+                }
             }
-            // Lower severity or admin: warn + continue
+            // Admin or lower severity: warn + continue
             tracing::warn!(
                 customer_id = %customer.id,
                 threat_type = ?threat.threat_type,

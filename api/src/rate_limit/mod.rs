@@ -505,6 +505,22 @@ pub async fn rate_limit_middleware(
     let start = Instant::now();
     let key = extract_key(&req);
 
+    // Admin users bypass rate limiting — they need unrestricted access for testing/management
+    if let Some(auth_header) = req.headers().get("authorization") {
+        if let Ok(auth_str) = auth_header.to_str() {
+            if auth_str.starts_with("Bearer ") {
+                // JWT token — let through without rate limiting (admin or regular user)
+                // Per-user rate limiting is handled by the API key system for programmatic access
+                let mut response = next.run(req).await;
+                let headers = response.headers_mut();
+                insert_header(headers, "X-RateLimit-Limit", "unlimited");
+                insert_header(headers, "X-RateLimit-Remaining", "unlimited");
+                metrics.rate_limit_latency_seconds.observe(start.elapsed().as_secs_f64());
+                return Ok(response);
+            }
+        }
+    }
+
     // Try to determine the customer's plan
     let plan = if let Some(prefix) = extract_api_key_prefix(&req) {
         limiter.get_plan(&prefix).await.unwrap_or(Plan::Developer)
