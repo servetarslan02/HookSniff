@@ -124,6 +124,8 @@
     "placeholderEmail": "you@example.com",
     "noData": "No data",
     "unlimited": "Unlimited",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
     "statusLabels": {
       "delivered": "Delivered",
       "success": "Success",
