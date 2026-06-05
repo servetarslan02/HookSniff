@@ -8,11 +8,8 @@ import { AuthProvider } from '@/lib/store';
 import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ReactQueryProvider } from '@/components/ReactQueryProvider';
-import { CookieConsent } from '@/components/CookieConsent';
-import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 import { ViewTransition } from '@/components/ViewTransition';
-import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
-import { TanStackDBProvider } from '@/components/TanStackDBProvider';
+import { LazyProviders } from '@/components/LazyProviders';
 import { Suspense } from 'react';
 
 const inter = Inter({
@@ -181,18 +178,15 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <AuthProvider>
               <ReactQueryProvider>
-                <TanStackDBProvider>
+                <LazyProviders>
                 <ToastProvider>
                   <Suspense>
                     <ViewTransition>
                   {children}
                   </ViewTransition>
                   </Suspense>
-                  <CookieConsent />
-                  <AnalyticsWrapper />
-                  <ServiceWorkerRegister />
                 </ToastProvider>
-                </TanStackDBProvider>
+                </LazyProviders>
               </ReactQueryProvider>
             </AuthProvider>
           </ThemeProvider>

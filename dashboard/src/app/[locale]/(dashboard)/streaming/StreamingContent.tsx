@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/store';
-import { streamApi } from '@/lib/api';
+import { streamApi, API_BASE } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -178,8 +178,7 @@ export function StreamingContent() {
     setIsLive(true);
     setLiveEvents([]);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-    const url = `${baseUrl}/v1/stream/channels/${channelId}/subscribe`;
+    const url = `${API_BASE}/stream/channels/${channelId}/subscribe`;
     const es = new EventSource(url, { withCredentials: true });
     esRef.current = es;
 
