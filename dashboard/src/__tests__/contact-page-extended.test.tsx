@@ -8,8 +8,8 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 vi.mock('next-intl', () => ({
-  useTranslations: ()
-  useLocale: () => 'en', => (key: string) => key,
+  useTranslations: () => (key: string) => key,
+  useLocale: () => 'en',
 }));
 
 vi.mock('@/i18n/navigation', () => ({
