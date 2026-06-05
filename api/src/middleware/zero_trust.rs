@@ -36,7 +36,46 @@ pub async fn zero_trust_middleware(
         .to_string();
 
     let path = request.uri().path();
+    let query = request.uri().query().unwrap_or("");
     let method = request.method().as_str();
+
+    // WAF scan: check path + query for injection attempts
+    if !result.is_admin {
+        let waf_input = format!("{}?{}", path, query);
+        if let Some(waf_result) = crate::security::waf::analyze_request(&waf_input) {
+            if waf_result.confidence >= 0.7 {
+                tracing::warn!(
+                    customer_id = %customer.id,
+                    attack_type = %waf_result.attack_type,
+                    confidence = waf_result.confidence,
+                    payload = %waf_result.payload_snippet,
+                    "🛡️ WAF blocked attack"
+                );
+                // Log to security_events
+                let _ = sqlx::query(
+                    "INSERT INTO security_events (event_type, severity, customer_id, ip_address, user_agent, details)
+                     VALUES ($1, $2, $3, $4, $5, $6)"
+                )
+                .bind(format!("waf_{}", waf_result.attack_type))
+                .bind(&waf_result.severity)
+                .bind(customer.id)
+                .bind(&ip)
+                .bind(&ua)
+                .bind(serde_json::json!({
+                    "attack_type": waf_result.attack_type,
+                    "confidence": waf_result.confidence,
+                    "matched_rules": waf_result.matched_rules,
+                    "payload": waf_result.payload_snippet,
+                    "decoded": waf_result.decoded_payload,
+                    "path": path,
+                    "query": query,
+                }))
+                .execute(&pool)
+                .await;
+                return Err(AppError::Forbidden);
+            }
+        }
+    }
 
     let result = zero_trust::verify_request(
         &pool,
