@@ -1,5 +1,4 @@
-// @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   SystemHealthSchema,
   QueueStatusSchema,
@@ -34,9 +33,9 @@ describe('SystemHealthSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('accepts minimal health response', () => {
-    const result = SystemHealthSchema.safeParse({ status: 'healthy' });
-    expect(result.success).toBe(true);
+  it('accepts minimal response', () => {
+    expect(SystemHealthSchema.safeParse({}).success).toBe(true);
+    expect(SystemHealthSchema.safeParse({ status: 'healthy' }).success).toBe(true);
   });
 
   it('handles null error fields in recent_errors', () => {
@@ -62,8 +61,7 @@ describe('QueueStatusSchema', () => {
   });
 
   it('rejects missing required fields', () => {
-    const result = QueueStatusSchema.safeParse({ pending: 5 });
-    expect(result.success).toBe(false);
+    expect(QueueStatusSchema.safeParse({ pending: 5 }).success).toBe(false);
   });
 });
 
@@ -81,8 +79,13 @@ describe('FailedDeliveriesResponseSchema', () => {
   });
 
   it('accepts empty deliveries', () => {
-    const result = FailedDeliveriesResponseSchema.safeParse({ deliveries: [], count: 0 });
-    expect(result.success).toBe(true);
+    expect(FailedDeliveriesResponseSchema.safeParse({ deliveries: [], count: 0 }).success).toBe(true);
+  });
+});
+
+describe('DeadLettersResponseSchema', () => {
+  it('accepts valid response', () => {
+    expect(DeadLettersResponseSchema.safeParse({ dead_letters: [], count: 0 }).success).toBe(true);
   });
 });
 
@@ -90,7 +93,7 @@ describe('RateLimitViolationsResponseSchema', () => {
   it('accepts valid violations', () => {
     const result = RateLimitViolationsResponseSchema.safeParse({
       violations: [{
-        id: 'v1', customer_email: 'test@test.com', ip: '1.2.3.4',
+        id: 'v1', customer_email: 't@t.com', ip: '1.2.3.4',
         requests_count: 150, limit_per_window: 100, window_seconds: 60,
         created_at: '2024-01-01',
       }],
@@ -111,35 +114,65 @@ describe('ApiLatencyResponseSchema', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it('accepts empty endpoints', () => {
+    expect(ApiLatencyResponseSchema.safeParse({ endpoints: [], period: '24h' }).success).toBe(true);
+  });
+});
+
+describe('DeliverySchema', () => {
+  it('accepts valid delivery', () => {
+    const result = DeliverySchema.safeParse({
+      id: 'd1', endpoint_id: 'ep1', event: 'test', status: 'delivered',
+      attempt_count: 1, response_status: 200, created_at: '2024-01-01',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('handles null response_status', () => {
+    const result = DeliverySchema.safeParse({
+      id: 'd1', endpoint_id: 'ep1', event: null, status: 'pending',
+      attempt_count: 0, response_status: null, created_at: '2024-01-01',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts any status string', () => {
+    expect(DeliverySchema.safeParse({
+      id: 'd1', endpoint_id: 'ep1', status: 'custom_status',
+      attempt_count: 0, created_at: '2024-01-01',
+    }).success).toBe(true);
+  });
+});
+
+describe('DeliveryListResponseSchema', () => {
+  it('accepts valid list response', () => {
+    expect(DeliveryListResponseSchema.safeParse({
+      deliveries: [{
+        id: 'd1', endpoint_id: 'ep1', status: 'delivered',
+        attempt_count: 1, created_at: '2024-01-01',
+      }],
+      total: 1, page: 1, per_page: 25,
+    }).success).toBe(true);
+  });
 });
 
 describe('PlatformSettingsSchema', () => {
-  it('accepts valid settings with defaults', () => {
+  it('rejects incomplete data', () => {
+    expect(PlatformSettingsSchema.safeParse({ default_plan: 'free' }).success).toBe(false);
+  });
+
+  it('accepts full settings', () => {
     const result = PlatformSettingsSchema.safeParse({
       default_plan: 'developer',
-      max_endpoints_free: 5,
-      max_endpoints_startup: 20,
-      max_endpoints_pro: 50,
-      max_endpoints_enterprise: 200,
-      max_webhooks_free: 1000,
-      max_webhooks_startup: 10000,
-      max_webhooks_pro: 50000,
-      max_webhooks_enterprise: 500000,
-      rate_limit_free: 100,
-      rate_limit_startup: 500,
-      rate_limit_pro: 1000,
-      rate_limit_enterprise: 5000,
-      retention_days_free: 7,
-      retention_days_startup: 14,
-      retention_days_pro: 180,
-      retention_days_enterprise: 365,
+      max_endpoints_free: 5, max_endpoints_startup: 20, max_endpoints_pro: 50, max_endpoints_enterprise: 200,
+      max_webhooks_free: 1000, max_webhooks_startup: 10000, max_webhooks_pro: 50000, max_webhooks_enterprise: 500000,
+      rate_limit_free: 100, rate_limit_startup: 500, rate_limit_pro: 1000, rate_limit_enterprise: 5000,
+      retention_days_free: 7, retention_days_startup: 14, retention_days_pro: 180, retention_days_enterprise: 365,
       retry_max_attempts: 3,
       maintenance_mode: false,
       signup_enabled: true,
-      plan_price_startup: 14,
-      plan_price_pro: 29,
-      plan_price_enterprise: 99,
-      plan_price_business: 99,
+      plan_price_startup: 14, plan_price_pro: 29, plan_price_enterprise: 99, plan_price_business: 99,
       backup_retention_days: 30,
       global_rate_limit: 1000,
     });
