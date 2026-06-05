@@ -9,6 +9,8 @@ global.fetch = mockFetch;
 
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
+,
+  useLocale: () => 'en'
 }));
 
 vi.mock('@/i18n/navigation', () => ({
