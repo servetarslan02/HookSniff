@@ -77,11 +77,35 @@ export function DriftTab() {
   const formatDetectedBy = (detected: string[] | Record<string, unknown>): string => {
     if (Array.isArray(detected)) return detected.map(m => translateMethod(m)).join(', ');
     if (typeof detected === 'object' && detected !== null) {
-      return Object.entries(detected).map(([k, v]) => {
-        if (k === 'p_value') return `${t('methodStatTest') || 'Statistical test'}: %${((v as number) * 100).toFixed(1)} confidence`;
-        if (k === 'method') return translateMethod(String(v));
-        return `${translateMethod(k)}: ${v}`;
-      }).join(' · ');
+      const entries = Object.entries(detected);
+      // If has method + p_value, combine them into one readable sentence
+      const methodEntry = entries.find(([k]) => k === 'method');
+      const pValueEntry = entries.find(([k]) => k === 'p_value');
+      const otherEntries = entries.filter(([k]) => k !== 'method' && k !== 'p_value');
+
+      const parts: string[] = [];
+      if (methodEntry) {
+        const methodName = translateMethod(String(methodEntry[1]));
+        if (pValueEntry) {
+          const p = parseFloat(String(pValueEntry[1]));
+          const confPct = ((1 - p) * 100).toFixed(0);
+          let confLabel = '';
+          if (p < 0.01) confLabel = t('methodPValueVerySignificant') || 'Very high confidence';
+          else if (p < 0.05) confLabel = t('methodPValueSignificant') || 'High confidence';
+          else confLabel = t('methodPValueModerate') || 'Moderate confidence';
+          parts.push(`${methodName} · ${confLabel} (%${confPct})`);
+        } else {
+          parts.push(methodName);
+        }
+      } else if (pValueEntry) {
+        const p = parseFloat(String(pValueEntry[1]));
+        const confPct = ((1 - p) * 100).toFixed(0);
+        parts.push(`${t('methodStatTest') || 'Statistical test'}: %${confPct}`);
+      }
+      for (const [k, v] of otherEntries) {
+        parts.push(`${translateMethod(k)}: ${v}`);
+      }
+      return parts.join(' · ');
     }
     return translateMethod(String(detected));
   };
