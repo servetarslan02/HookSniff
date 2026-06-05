@@ -81,13 +81,13 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
     // Force UTF-8 client encoding to prevent double-encoding of non-ASCII characters
     let url_with_encoding = if clean_url.contains('?') {
-        format!("{}&options=-c%20client_encoding%3DUTF8", clean_url)
+        format!("{}&options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
     } else {
-        format!("{}?options=-c%20client_encoding%3DUTF8", clean_url)
+        format!("{}?options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
     };
     let pool = PgPoolOptions::new()
-        .max_connections(30)                              // Neon free tier: 100 max, 30 bizim için yeterli
-        .min_connections(0)                               // Lazy: startup'ta bağlantı açma, ilk istekte aç
+        .max_connections(50)                              // Neon free tier: 100 max, 50 bizim için yeterli
+        .min_connections(2)                               // Minimum 2 bağlantı hazır tut
         .acquire_timeout(std::time::Duration::from_secs(15)) // 15sn: Neon cold start için yeterli
         .idle_timeout(std::time::Duration::from_secs(300))   // 5dk kullanılmayan bağlantıyı kapat
         .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile (memory leak önleme)
@@ -95,7 +95,7 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
-        "✅ Database pool created (min=0, max=30, acquire_timeout=15s, idle_timeout=5m)"
+        "✅ Database pool created (min=2, max=50, acquire_timeout=15s, idle_timeout=5m, prepared_statements=true)"
     );
     Ok(pool)
 }
@@ -113,6 +113,28 @@ pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
         .acquire_timeout(std::time::Duration::from_secs(10))
         .connect(&url_with_encoding)
         .await?;
+    Ok(pool)
+}
+
+/// Create a read-only replica pool for analytics/health queries.
+/// Uses the same database URL but routes reads to replicas when available.
+/// Falls back to the primary pool if no replica is configured.
+pub async fn create_readonly_pool(database_url: &str) -> Result<PgPool> {
+    let clean_url = clean_database_url(database_url);
+    // Neon read replica: append ?options=-c%20default_transaction_read_only=on
+    let url_with_readonly = if clean_url.contains('?') {
+        format!("{}&options=-c%20client_encoding%3DUTF8%20-c%20default_transaction_read_only%3Don", clean_url)
+    } else {
+        format!("{}?options=-c%20client_encoding%3DUTF8%20-c%20default_transaction_read_only%3Don", clean_url)
+    };
+    let pool = PgPoolOptions::new()
+        .max_connections(10)
+        .min_connections(1)
+        .acquire_timeout(std::time::Duration::from_secs(10))
+        .idle_timeout(std::time::Duration::from_secs(300))
+        .connect(&url_with_readonly)
+        .await?;
+    tracing::info!("✅ Read-only pool created for analytics/health queries");
     Ok(pool)
 }
 

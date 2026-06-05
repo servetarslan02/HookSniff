@@ -49,6 +49,10 @@ pub const PLAN_TTL: Duration = Duration::from_secs(60);
 /// API key validation TTL: 30 seconds
 pub const API_KEY_TTL: Duration = Duration::from_secs(30);
 
+/// Stale-while-revalidate window: serve stale data for up to 2x TTL
+/// while refreshing in background. This prevents cache stampedes.
+pub const SWR_MULTIPLIER: u64 = 2;
+
 // ──────────────────────────────────────────────────────────────
 // CacheLayer — generic Redis caching layer
 // ──────────────────────────────────────────────────────────────
@@ -103,7 +107,52 @@ impl CacheLayer {
         }
     }
 
+    /// Stale-while-revalidate: returns cached data even if expired,
+    /// as long as it's within the SWR window (2x TTL).
+    /// Returns (value, is_stale) — if stale, caller should refresh in background.
+    pub async fn get_swr<T: DeserializeOwned>(
+        &self,
+        resource: &str,
+        id: &str,
+    ) -> (Option<T>, bool) {
+        let key = cache_key(resource, id);
+        let stale_key = format!("{}:stale", key);
+        let mut conn = self.conn.clone();
+
+        // Try fresh cache first
+        let fresh: Option<String> = redis::cmd("GET")
+            .arg(&key)
+            .query_async(&mut conn)
+            .await
+            .unwrap_or(None);
+
+        if let Some(s) = fresh {
+            if let Ok(val) = serde_json::from_str::<T>(&s) {
+                CACHE_HITS.fetch_add(1, Ordering::Relaxed);
+                return (Some(val), false);
+            }
+        }
+
+        // Try stale cache
+        let stale: Option<String> = redis::cmd("GET")
+            .arg(&stale_key)
+            .query_async(&mut conn)
+            .await
+            .unwrap_or(None);
+
+        if let Some(s) = stale {
+            if let Ok(val) = serde_json::from_str::<T>(&s) {
+                CACHE_HITS.fetch_add(1, Ordering::Relaxed);
+                return (Some(val), true);
+            }
+        }
+
+        CACHE_MISSES.fetch_add(1, Ordering::Relaxed);
+        (None, false)
+    }
+
     /// Set a cached value with the default TTL.
+    /// Also stores a stale copy with 2x TTL for SWR.
     pub async fn set<T: Serialize + Send>(
         &self,
         resource: &str,
@@ -114,6 +163,7 @@ impl CacheLayer {
     }
 
     /// Set a cached value with an explicit TTL.
+    /// Also stores a stale copy with SWR_MULTIPLIER x TTL for SWR.
     pub async fn set_with_ttl<T: Serialize + Send>(
         &self,
         resource: &str,
@@ -122,6 +172,7 @@ impl CacheLayer {
         ttl: Duration,
     ) {
         let key = cache_key(resource, id);
+        let stale_key = format!("{}:stale", key);
         let mut conn = self.conn.clone();
         let json = match serde_json::to_string(value) {
             Ok(j) => j,
@@ -130,6 +181,8 @@ impl CacheLayer {
                 return;
             }
         };
+
+        // Set fresh cache
         let _: Result<(), _> = redis::cmd("SETEX")
             .arg(&key)
             .arg(ttl.as_secs())
@@ -137,6 +190,16 @@ impl CacheLayer {
             .query_async(&mut conn)
             .await
             .map_err(|e| tracing::warn!("Cache SET failed for key {key}: {e}"));
+
+        // Set stale cache with longer TTL for SWR
+        let stale_ttl = ttl.as_secs() * SWR_MULTIPLIER;
+        let _: Result<(), _> = redis::cmd("SETEX")
+            .arg(&stale_key)
+            .arg(stale_ttl)
+            .arg(&json)
+            .query_async(&mut conn)
+            .await
+            .map_err(|e| tracing::warn!("Cache SET stale failed for key {stale_key}: {e}"));
     }
 
     /// Invalidate (delete) a specific cache entry.

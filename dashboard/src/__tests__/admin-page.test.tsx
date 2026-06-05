@@ -13,7 +13,13 @@ vi.mock('next-intl', () => ({
 
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/admin',
   Link: ({ children, ...props }: any) => React.createElement('a', props, children),
+}));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/admin',
 }));
 
 vi.mock('@/lib/store', () => ({
@@ -30,11 +36,13 @@ const mockGetStats = vi.fn().mockResolvedValue({
   total_deliveries: 1000,
   total_revenue: 5000,
   active_users_today: 3,
+  active_endpoints: 45,
   users_by_plan: [
     { plan: 'free', count: 7 },
     { plan: 'pro', count: 3 },
   ],
   recent_signups: [],
+  trends: { users: 5, endpoints: 10, deliveries: 100, revenue: 500, total_users_yesterday: 8, total_deliveries_yesterday: 900, revenue_yesterday: 4500, active_users_yesterday: 2, active_webhooks: 40 },
 });
 
 vi.mock('@/lib/api', () => ({
@@ -76,11 +84,13 @@ describe('AdminOverviewPage', () => {
       total_deliveries: 1000,
       total_revenue: 5000,
       active_users_today: 3,
+      active_endpoints: 45,
       users_by_plan: [
         { plan: 'free', count: 7 },
         { plan: 'pro', count: 3 },
       ],
       recent_signups: [],
+      trends: { users: 5, endpoints: 10, deliveries: 100, revenue: 500 },
     });
   });
 
