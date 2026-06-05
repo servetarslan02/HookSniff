@@ -315,18 +315,18 @@ async fn analyst_dashboard(
     };
 
     // Top 5 failing endpoints
-    let failing_endpoints: Vec<(String, String, i64)> = sqlx::query_as(
-        "SELECT e.name, e.url, COUNT(*) as fail_count \
+    let failing_endpoints: Vec<(Option<String>, String, i64)> = sqlx::query_as(
+        "SELECT e.description, e.url, COUNT(*) as fail_count \
          FROM deliveries d JOIN endpoints e ON d.endpoint_id = e.id \
          WHERE d.customer_id = $1 AND d.status = 'failed' AND d.created_at >= now() - INTERVAL '7 days' \
-         GROUP BY e.name, e.url ORDER BY fail_count DESC LIMIT 5"
+         GROUP BY e.description, e.url ORDER BY fail_count DESC LIMIT 5"
     )
     .bind(customer.id)
     .fetch_all(&pool)
     .await?;
 
     // Top 5 event types
-    let top_events: Vec<(String, i64)> = sqlx::query_as(
+    let top_events: Vec<(Option<String>, i64)> = sqlx::query_as(
         "SELECT event_type, COUNT(*) as cnt \
          FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '7 days' \
          GROUP BY event_type ORDER BY cnt DESC LIMIT 5"
@@ -366,10 +366,10 @@ async fn analyst_dashboard(
             "total": success.2,
         },
         "top_failing_endpoints": failing_endpoints.iter().map(|(name, url, count)| {
-            serde_json::json!({"name": name, "url": url, "fail_count": count})
+            serde_json::json!({"name": name.as_deref().unwrap_or("Unnamed"), "url": url, "fail_count": count})
         }).collect::<Vec<_>>(),
         "top_event_types": top_events.iter().map(|(event, count)| {
-            serde_json::json!({"event": event, "count": count})
+            serde_json::json!({"event": event.as_deref().unwrap_or("unknown"), "count": count})
         }).collect::<Vec<_>>(),
         "avg_latency_24h_ms": latency.0,
         "active_endpoints": active_endpoints.0,
