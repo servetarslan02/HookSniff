@@ -7592,12 +7592,21 @@
       "worstModels": "Worst Models",
       "error": "Failed to load model data. The Cortex ML service may be starting up.",
       "modelTypes": {
-        "adaptive_threshold": "Smart Threshold",
-        "anomaly_detector": "Anomaly Detection",
-        "retry_bandit": "Smart Retry",
+        "adaptive_threshold": "Adaptive Threshold",
+        "anomaly_detector": "Anomaly Detector",
+        "retry_bandit": "Retry Strategy",
         "latency_predictor": "Latency Predictor",
         "pattern_classifier": "Pattern Classifier",
-        "drift_detector": "Drift Monitor"
+        "drift_detector": "Drift Detector",
+        "circuit_bandit": "Circuit Breaker",
+        "time_series": "Time Series",
+        "ts_latency": "Latency Forecast",
+        "ts_success_rate": "Success Rate Forecast",
+        "healing_bandit": "Healing Strategy",
+        "contextual_bandit": "Smart Strategy",
+        "throttle_bandit": "Throttle Strategy",
+        "failure_predictor": "Failure Predictor",
+        "volume_forecaster": "Volume Forecaster"
       },
       "healthStatuses": {
         "healthy": "Healthy",
@@ -7606,8 +7615,8 @@
         "degraded": "Degraded",
         "stale": "Outdated",
         "Healthy": "Healthy",
-        "Warning": "Needs Attention",
-        "Critical": "Critical Issue",
+        "Warning": "Warning",
+        "Critical": "Critical",
         "Degraded": "Degraded"
       },
       "issues": {
