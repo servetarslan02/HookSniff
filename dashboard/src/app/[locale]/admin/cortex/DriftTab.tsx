@@ -65,7 +65,7 @@ export function DriftTab() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{getTypeIcon(ev.drift_type)}</span>
                   <div>
-                    <span className="font-medium text-gray-900 dark:text-white capitalize">{ev.drift_type} Drift</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{getTypeIcon(ev.drift_type)}</span>
                     <span className={`ml-2 text-xs px-2 py-1 rounded-full ${getColor(ev.severity)}`}>
                       {(ev.severity * 100).toFixed(0)}% {t('severity')}
                     </span>

@@ -5,12 +5,34 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Brain, Clock, Info } from '@/components/icons';
 
-function describePrediction(probability: number, _factors: any, t: any): { title: string; detail: string; severity: string; advice: string } {
+function describePrediction(probability: number, factors: any, t: any): { title: string; detail: string; severity: string; advice: string } {
   const pct = Math.round(probability * 100);
-  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), severity: 'high', advice: t('advice.high') };
-  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), severity: 'medium', advice: t('advice.medium') };
-  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), severity: 'low', advice: t('advice.low') };
-  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), severity: 'minimal', advice: t('advice.minimal') };
+  const currentSr = factors?.current_sr ? Math.round(factors.current_sr * 100) : null;
+  const trendSlope = factors?.trend_slope;
+  const method = factors?.method;
+  const hours = factors?.hours_analyzed;
+
+  // Build meaningful detail
+  let detail = t('detail.minimal', {v: pct});
+  if (pct >= 70) detail = t('detail.high', {v: pct});
+  else if (pct >= 40) detail = t('detail.medium', {v: pct});
+  else if (pct >= 20) detail = t('detail.low', {v: pct});
+
+  // Add context from factors
+  const contextParts = [];
+  if (currentSr !== null) contextParts.push(`Success rate: ${currentSr}%`);
+  if (trendSlope !== null && trendSlope !== undefined) {
+    contextParts.push(trendSlope < 0 ? '📉 Declining trend' : '📈 Improving trend');
+  }
+  if (hours) contextParts.push(`${hours}h analyzed`);
+  if (method) contextParts.push(`Method: ${method}`);
+
+  if (contextParts.length > 0) detail += ` (${contextParts.join(' · ')})`;
+
+  if (pct >= 70) return { title: t('severity.high'), detail, severity: 'high', advice: t('advice.high') };
+  if (pct >= 40) return { title: t('severity.medium'), detail, severity: 'medium', advice: t('advice.medium') };
+  if (pct >= 20) return { title: t('severity.low'), detail, severity: 'low', advice: t('advice.low') };
+  return { title: t('severity.minimal'), detail, severity: 'minimal', advice: t('advice.minimal') };
 }
 
 export function PredictionsTab({ token }: { token: string | null }) {

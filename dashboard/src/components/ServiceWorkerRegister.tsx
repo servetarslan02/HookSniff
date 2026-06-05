@@ -12,6 +12,12 @@ export function ServiceWorkerRegister() {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
 
+  // Track the SW version that was dismissed so "Later" persists across reloads
+  const [dismissedVersion, setDismissedVersion] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try { return localStorage.getItem('sw_dismissed_version'); } catch { return null; }
+  });
+
   useEffect(() => {
     if (
       typeof window === 'undefined' ||
@@ -49,8 +55,13 @@ export function ServiceWorkerRegister() {
               newWorker.state === 'installed' &&
               navigator.serviceWorker.controller
             ) {
-              // New content available
-              if (isMounted) setShowUpdate(true);
+              // Get the SW script URL as a version identifier
+              const swUrl = newWorker.scriptURL;
+              // Only show prompt if user hasn't dismissed this exact version
+              const storedDismissed = localStorage.getItem('sw_dismissed_version');
+              if (storedDismissed !== swUrl && isMounted) {
+                setShowUpdate(true);
+              }
             }
           });
         });
@@ -77,6 +88,15 @@ export function ServiceWorkerRegister() {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       window.location.reload();
     });
+  }
+
+  // Dismiss and persist so this version doesn't prompt again
+  function dismissUpdate() {
+    if (registration?.waiting) {
+      const swUrl = registration.waiting.scriptURL;
+      try { localStorage.setItem('sw_dismissed_version', swUrl); } catch {}
+    }
+    setShowUpdate(false);
   }
 
   if (!showUpdate) return null;
@@ -110,7 +130,7 @@ export function ServiceWorkerRegister() {
             </p>
           </div>
           <button
-            onClick={() => setShowUpdate(false)}
+            onClick={dismissUpdate}
             className="shrink-0 text-gray-500 hover:text-gray-300 transition-colors"
             aria-label="Dismiss"
           >
@@ -135,7 +155,7 @@ export function ServiceWorkerRegister() {
             Update now
           </button>
           <button
-            onClick={() => setShowUpdate(false)}
+            onClick={dismissUpdate}
             className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
           >
             Later

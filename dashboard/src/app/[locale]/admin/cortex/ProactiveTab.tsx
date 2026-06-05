@@ -11,19 +11,37 @@ function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: s
   const severity = insight.severity;
   const data = (insight as any).data || {};
 
+  const sevLabel = severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok';
+
+  // Use the title from API (already descriptive) as fallback
+  const apiTitle = (insight as any).title || '';
+
   const base = {
-    title: (insight as any).title || type.replace(/_/g, ' '),
-    detail: data.description || data.detail || '',
-    severity: severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok',
-    advice: data.advice || data.recommendation || '',
+    title: apiTitle || type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+    detail: '',
+    severity: sevLabel,
+    advice: '',
   };
 
-  if (type === 'proactive_latency_trend') return { ...base, detail: t('detail.latencyTrend', {v: data.trend || 'yükseliş trendi'}), advice: base.advice || t('advice.latencyTrend') };
-  if (type === 'proactive_rate_limit_risk') return { ...base, detail: t('detail.rateLimitRisk', {v: data.usage_pct || '?'}), advice: base.advice || t('advice.rateLimitRisk') };
-  if (type === 'proactive_stress_detection') return { ...base, detail: t('detail.stressDetection', {v: data.metric || 'genel'}), advice: base.advice || t('advice.stressDetection') };
-  if (type === 'proactive_cascade_risk') return { ...base, detail: t('detail.cascadeRisk', {v: data.affected_endpoints || '?'}), advice: base.advice || t('advice.cascadeRisk') };
+  if (type === 'proactive_latency_trend') return { ...base, detail: t('detail.latencyTrend', {v: data.trend || 'increasing'}), advice: t('advice.latencyTrend') };
+  if (type === 'proactive_rate_limit_risk') return { ...base, detail: t('detail.rateLimitRisk', {v: data.usage_pct || '?'}), advice: t('advice.rateLimitRisk') };
+  if (type === 'proactive_stress_detection') return { ...base, detail: t('detail.stressDetection', {v: data.metric || 'general'}), advice: t('advice.stressDetection') };
+  if (type === 'proactive_cascade_risk') return { ...base, detail: t('detail.cascadeRisk', {v: data.affected_endpoints || '?'}), advice: t('advice.cascadeRisk') };
+  if (type === 'proactive_degradation') {
+    const dropPct = data.drop_pct ? Math.round(data.drop_pct) : null;
+    const recentSr = data.recent_sr ? Math.round(data.recent_sr) : null;
+    const olderSr = data.older_sr ? Math.round(data.older_sr) : null;
+    const hoursToAnomaly = data.hours_to_anomaly ? Math.round(data.hours_to_anomaly) : null;
+    return {
+      ...base,
+      title: t('detail.degradationTitle') || 'Endpoint Performance Declining',
+      detail: `${olderSr}% → ${recentSr}% (${dropPct}% drop${hoursToAnomaly ? `, ~${hoursToAnomaly}h to threshold` : ''})`,
+      advice: t('advice.latencyTrend'),
+    };
+  }
 
-  return base;
+  // Generic fallback — use API title which is already descriptive
+  return { ...base, detail: base.title, advice: '' };
 }
 
 export function ProactiveTab({ token }: { token: string | null }) {

@@ -7452,7 +7452,8 @@
         "cascadeRisk": "{v} endpoints may be affected",
         "latencyTrend": "Latency trending {v}",
         "rateLimitRisk": "Rate limit usage at {v}%",
-        "stressDetection": "Stress detected: {v}"
+        "stressDetection": "Stress detected: {v}",
+        "degradationTitle": "Endpoint Performance Declining"
       },
       "advice": {
         "latencyTrend": "Check the endpoint, server may be slowing down",
