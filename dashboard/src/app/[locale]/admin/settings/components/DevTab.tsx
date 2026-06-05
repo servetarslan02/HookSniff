@@ -3,26 +3,28 @@
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { FlaskConical } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 
 export default function DevTab() {
   const { toast } = useToast();
+  const t = useTranslations('admin');
   const queryClient = useQueryClient();
 
   return (
     <div className="space-y-6">
       {/* Dev Tools — Sentry Test */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4"><FlaskConical size={16} strokeWidth={1.75} className="inline mr-1" /> Dev Tools</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4"><FlaskConical size={16} strokeWidth={1.75} className="inline mr-1" /> {t('devTools') || 'Dev Tools'}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-          Development and debugging tools. Only visible in dev mode.
+          {t('devToolsDesc') || 'Development and debugging tools. Only visible in dev mode.'}
         </p>
 
         <div className="space-y-4">
           {/* Sentry Error Test */}
           <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
             <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">Sentry Error Test</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Throw a test error to verify Sentry integration</p>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('sentryTest') || 'Sentry Error Test'}</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400">{t('sentryTestDesc') || 'Throw a test error to verify Sentry integration'}</p>
             </div>
             <button
               type="button"
@@ -32,9 +34,9 @@ export default function DevTab() {
                 } catch (e) {
                   import('@sentry/nextjs').then((Sentry) => {
                     Sentry.captureException(e);
-                    toast('Test error sent to Sentry', 'success');
+                    toast(t('sentryTestSent') || 'Test error sent to Sentry', 'success');
                   }).catch(() => {
-                    toast('Sentry not available in this environment', 'error');
+                    toast(t('sentryNotAvailable') || 'Sentry not available in this environment', 'error');
                   });
                 }
               }}
@@ -47,8 +49,8 @@ export default function DevTab() {
           {/* WS Connection Test */}
           <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
             <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">WebSocket Status</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Check WebSocket connection state</p>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('wsStatus') || 'WebSocket Status'}</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400">{t('wsStatusDesc') || 'Check WebSocket connection state'}</p>
             </div>
             <button
               type="button"
@@ -66,14 +68,14 @@ export default function DevTab() {
           {/* Cache Clear */}
           <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
             <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">Clear React Query Cache</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Force invalidate all cached data</p>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('clearCache') || 'Clear React Query Cache'}</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400">{t('clearCacheDesc') || 'Force invalidate all cached data'}</p>
             </div>
             <button
               type="button"
               onClick={() => {
                 queryClient.clear();
-                toast('React Query cache cleared', 'success');
+                toast(t('cacheCleared') || 'React Query cache cleared', 'success');
               }}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
             >

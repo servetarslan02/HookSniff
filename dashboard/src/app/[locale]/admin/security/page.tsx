@@ -159,7 +159,7 @@ export default function AdminSecurityPage() {
       toast(`${data.resolved_count} ${t('eventsResolved')}`, 'success');
       setResolveAllTarget(false);
     },
-    onError: () => toast('Toplu çözümleme başarısız', 'error'),
+    onError: () => toast(t('resolveAllFailed') || 'Bulk resolve failed', 'error'),
   });
 
   const blockMutation = useMutation({
@@ -167,7 +167,7 @@ export default function AdminSecurityPage() {
       adminApi.blockIp(token!, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'ip-blocklist'] });
-      toast('IP blocked', 'success');
+      toast(t('ipBlocked') || 'IP blocked', 'success');
       setBlockForm(emptyBlockForm);
       setShowBlockForm(false);
     },
@@ -178,10 +178,10 @@ export default function AdminSecurityPage() {
     mutationFn: (id: string) => adminApi.unblockIp(token!, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'ip-blocklist'] });
-      toast('IP unblocked', 'success');
+      toast(t('ipUnblocked') || 'IP unblocked', 'success');
       setUnblockTarget(null);
     },
-    onError: () => toast('Failed to remove', 'error'),
+    onError: () => toast(t('unblockFailed') || 'Failed to remove IP block', 'error'),
   });
 
   // ── Handlers ──

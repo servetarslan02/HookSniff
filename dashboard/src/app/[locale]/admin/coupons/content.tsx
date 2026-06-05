@@ -59,7 +59,7 @@ export default function CouponsContent() {
       const data = await apiFetch<Coupon[]>('/admin/coupons', { token });
       setCoupons(data);
     } catch {
-      toast(t('couponsLoadFailed') || t('couponsLoadFailed'), 'error');
+      toast(t('couponsLoadFailed') || 'Failed to load coupons', 'error');
     } finally {
       setLoading(false);
     }
@@ -90,19 +90,19 @@ export default function CouponsContent() {
       if (form.type === 'polar' && result?.id) {
         try {
           await apiFetch(`/admin/coupons/${result.id}/sync`, { method: 'POST', token });
-          toast(t('couponCreatedSynced') || t('couponCreatedSynced'), 'success');
+          toast(t('couponCreatedSynced') || 'Coupon created and synced with Polar.sh', 'success');
         } catch {
-          toast(t('couponCreatedSyncFailed') || t('couponCreatedSyncFailed'), 'error');
+          toast(t('couponCreatedSyncFailed') || 'Coupon created but Polar sync failed', 'error');
         }
       } else {
-        toast(t('couponCreated') || t('couponCreated'), 'success');
+        toast(t('couponCreated') || 'Coupon created', 'success');
       }
 
       setShowCreate(false);
       setForm(INITIAL_FORM);
       fetchCoupons();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (t('couponCreateFailed') || t('couponCreateFailed'));
+      const msg = err instanceof Error ? err.message : (t('couponCreateFailed') || 'Failed to create coupon');
       toast(msg, 'error');
     } finally {
       setCreating(false);
@@ -145,19 +145,19 @@ export default function CouponsContent() {
       if (editTarget.type === 'polar' && !editTarget.polar_discount_id) {
         try {
           await apiFetch(`/admin/coupons/${editTarget.id}/sync`, { method: 'POST', token });
-          toast(t('couponUpdatedSynced') || t('couponUpdatedSynced'), 'success');
+          toast(t('couponUpdatedSynced') || 'Coupon updated and synced', 'success');
         } catch {
-          toast(t('couponUpdated') || t('couponUpdated'), 'success');
+          toast(t('couponUpdated') || 'Coupon updated', 'success');
         }
       } else {
-        toast(t('couponUpdated') || t('couponUpdated'), 'success');
+        toast(t('couponUpdated') || 'Coupon updated', 'success');
       }
 
       setEditTarget(null);
       setForm(INITIAL_FORM);
       fetchCoupons();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (t('couponUpdateFailed') || t('couponUpdateFailed'));
+      const msg = err instanceof Error ? err.message : (t('couponUpdateFailed') || 'Failed to update coupon');
       toast(msg, 'error');
     } finally {
       setCreating(false);
@@ -170,10 +170,10 @@ export default function CouponsContent() {
     setSyncing(id);
     try {
       await apiFetch(`/admin/coupons/${id}/sync`, { method: 'POST', token });
-      toast(t('couponSynced') || 'Polar.sh ile senkronize edildi', 'success');
+      toast(t('couponSynced') || 'Synced with Polar.sh', 'success');
       fetchCoupons();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (t('couponSyncFailed') || 'Senkronizasyon başarısız');
+      const msg = err instanceof Error ? err.message : (t('couponSyncFailed') || 'Sync failed');
       toast(msg, 'error');
     } finally {
       setSyncing(null);
@@ -186,10 +186,10 @@ export default function CouponsContent() {
     setToggling(id);
     try {
       await apiFetch(`/admin/coupons/${id}`, { method: 'PUT', token, body: { is_active: !isActive } });
-      toast(isActive ? (t('couponDeactivated') || t('couponDeactivated')) : (t('couponActivated') || t('couponActivated')), 'success');
+      toast(isActive ? (t('couponDeactivated') || 'Coupon deactivated') : (t('couponActivated') || 'Coupon activated'), 'success');
       fetchCoupons();
     } catch {
-      toast(t('couponToggleFailed') || t('couponToggleFailed'), 'error');
+      toast(t('couponToggleFailed') || 'Failed to toggle coupon', 'error');
     } finally {
       setToggling(null);
     }
@@ -200,11 +200,11 @@ export default function CouponsContent() {
     if (!token || !deleteTarget) return;
     try {
       await apiFetch(`/admin/coupons/${deleteTarget}`, { method: 'DELETE', token });
-      toast(t('couponDeleted') || t('couponDeleted'), 'success');
+      toast(t('couponDeleted') || 'Coupon deleted', 'success');
       setDeleteTarget(null);
       fetchCoupons();
     } catch {
-      toast(t('couponDeleteFailed') || t('couponDeleteFailed'), 'error');
+      toast(t('couponDeleteFailed') || 'Failed to delete coupon', 'error');
     }
   };
 
@@ -220,7 +220,7 @@ export default function CouponsContent() {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    toast(t('codeCopied') || 'Kod kopyalandı', 'success');
+    toast(t('codeCopied') || 'Code copied', 'success');
   };
 
   // ── Generate Random Code ──
