@@ -307,4 +307,144 @@ describe('Auth Store', () => {
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_token');
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_user');
   });
+
+  it('login throws structured 2FA error when requires_2fa', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ requires_2fa: true, temp_token: 'temp-xyz' }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    let caughtError: any;
+    await act(async () => {
+      try {
+        await authRef.login('2fa@test.com', 'pass');
+      } catch (e) { caughtError = e; }
+    });
+
+    expect(caughtError).toBeDefined();
+    expect(caughtError.requires2fa).toBe(true);
+    expect(caughtError.tempToken).toBe('temp-xyz');
+  });
+
+  it('login saves refresh_token to localStorage', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        token: 'jwt-rt',
+        refresh_token: 'rt-abc',
+        customer: { id: '5', email: 'rt@test.com', plan: 'pro' },
+      }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await act(async () => {
+      await authRef.login('rt@test.com', 'pass');
+    });
+
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('hooksniff_refresh', 'rt-abc');
+  });
+
+  it('register returns minimal user when no customer in response (email verification)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ message: 'Check your email' }),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    let result: any;
+    await act(async () => {
+      result = await authRef.register('verify@test.com', 'pass', 'Verify');
+    });
+
+    expect(result.email).toBe('verify@test.com');
+    expect(result.id).toBe('');
+    expect(result.plan).toBe('developer');
+  });
+
+  it('logout clears refresh_token from localStorage', async () => {
+    let container: HTMLElement;
+    await act(async () => {
+      const result = renderWithProviders(
+        <AuthProvider><AuthConsumer /></AuthProvider>,
+        { withIntl: false }
+      );
+      container = result.container;
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    await act(async () => {
+      const logoutBtn = Array.from(container!.querySelectorAll('button')).find(
+        b => b.textContent === 'Logout'
+      )!;
+      fireEvent.click(logoutBtn);
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('hooksniff_refresh');
+  });
+
+  it('login throws generic error when error.message missing', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: () => Promise.resolve({}),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await expect(authRef.login('bad@test.com', 'wrong')).rejects.toThrow('Login failed');
+  });
+
+  it('register throws generic error when error.message missing', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({}),
+    });
+
+    let authRef: any;
+    await act(async () => {
+      renderWithProviders(
+        <AuthProvider><AuthConsumer onReady={a => { authRef = a; }} /></AuthProvider>,
+        { withIntl: false }
+      );
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await expect(authRef.register('bad@test.com', 'pass')).rejects.toThrow('Registration failed');
+  });
 });
