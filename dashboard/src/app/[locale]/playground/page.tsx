@@ -5,6 +5,7 @@ import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { useTranslations } from 'next-intl';
 import PublicNavbar from '@/components/PublicNavbar';
 import { FlaskConical, ShieldCheck, Lightbulb, Lock, Zap, AlertTriangle } from '@/components/icons';
+import { useAuth } from '@/lib/store';
 
 const FETCH_TIMEOUT_MS = 15_000;
 
@@ -39,6 +40,7 @@ const samplePayloads = [
 export default function PublicPlaygroundPage() {
   const t = useTranslations('playgroundPublic');
   const tc = useTranslations('common');
+  const { user } = useAuth();
 
   const [state, setState] = useState<'idle' | 'generating' | 'ready' | 'error'>('idle');
   const [token, setToken] = useState('');
@@ -336,13 +338,15 @@ export default function PublicPlaygroundPage() {
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-              <p className="text-gray-600 dark:text-slate-400 mb-4">{t('likeSignup')}</p>
-              <Link href="/register" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
-                {t('startFree')}
-              </Link>
-            </div>
+            {/* CTA — only show to non-authenticated users */}
+            {!user && (
+              <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+                <p className="text-gray-600 dark:text-slate-400 mb-4">{t('likeSignup')}</p>
+                <Link href="/register" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
+                  {t('startFree')}
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </main>
