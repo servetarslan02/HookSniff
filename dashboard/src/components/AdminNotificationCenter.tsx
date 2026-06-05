@@ -23,6 +23,13 @@ export function AdminNotificationCenter() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [broadcasts, setBroadcasts] = useState<UserBroadcast[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set();
+    try {
+      const stored = localStorage.getItem('admin_notif_dismissed');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchAdminNotifications = useCallback(async () => {
@@ -110,7 +117,29 @@ export function AdminNotificationCenter() {
     }
   };
 
-  const totalCount = notifications.length + broadcasts.length;
+  const handleDismissNotification = (id: string) => {
+    setDismissedIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem('admin_notif_dismissed', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  const handleDismissAll = () => {
+    const allIds = [...notifications.map(n => n.id), ...broadcasts.map(b => `b-${b.id}`)];
+    setDismissedIds((prev) => {
+      const next = new Set(prev);
+      allIds.forEach(id => next.add(id));
+      try { localStorage.setItem('admin_notif_dismissed', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+    broadcasts.forEach(b => handleDismissBroadcast(b.id));
+  };
+
+  const visibleNotifications = notifications.filter(n => !dismissedIds.has(n.id));
+  const visibleBroadcasts = broadcasts.filter(b => !dismissedIds.has(`b-${b.id}`));
+  const totalCount = visibleNotifications.length + visibleBroadcasts.length;
 
   const severityColors: Record<string, string> = {
     critical: 'border-l-red-500 bg-red-50/30 dark:bg-red-500/5',
@@ -179,10 +208,19 @@ export function AdminNotificationCenter() {
             <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500 uppercase tracking-wider">
               {totalCount} adet
             </span>
+            {totalCount > 0 && (
+              <button
+                type="button"
+                onClick={handleDismissAll}
+                className="text-[10px] text-gray-400 hover:text-red-500 dark:hover:text-red-400 font-medium transition"
+              >
+                Dismiss All
+              </button>
+            )}
           </div>
           <div className="max-h-80 overflow-y-auto">
             {/* Broadcasts */}
-            {broadcasts.map((b) => (
+            {visibleBroadcasts.map((b) => (
               <div
                 key={`b-${b.id}`}
                 className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-l-3 ${
@@ -208,7 +246,7 @@ export function AdminNotificationCenter() {
             ))}
 
             {/* Admin notifications */}
-            {notifications.map((n) => (
+            {visibleNotifications.map((n) => (
               <div
                 key={n.id}
                 className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-l-3 ${severityColors[n.severity] || 'border-l-gray-400'} cursor-pointer`}
@@ -231,11 +269,19 @@ export function AdminNotificationCenter() {
                     <p className="text-[11px] text-gray-500 dark:text-slate-500 mt-0.5">{n.message}</p>
                     <p className="text-[10px] text-gray-400 dark:text-slate-600 mt-1">{relativeTime(n.time)}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleDismissNotification(n.id); }}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 shrink-0 mt-0.5"
+                    aria-label="Dismiss"
+                  >
+                    <XCircle size={14} strokeWidth={1.75} />
+                  </button>
                 </div>
               </div>
             ))}
 
-            {notifications.length === 0 && broadcasts.length === 0 && (
+            {visibleNotifications.length === 0 && visibleBroadcasts.length === 0 && (
               <div className="p-6 text-center">
                 <CheckCircle2 size={32} strokeWidth={1.5} className="text-green-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 dark:text-slate-400">All clear</p>
