@@ -9,10 +9,10 @@ export function Hook0Content() {
   const t = useTranslations('alternatives');
   return (
     <div>
-      <PublicNavbar pageTitle="HookSniff vs Hook0" />
+      <PublicNavbar pageTitle={t('hook0Title')} />
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Hook0</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('hook0Title')}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">{t('hook0Desc')}</p>
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden mb-12">
@@ -45,9 +45,9 @@ export function Hook0Content() {
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>More SDKs:</strong> 11 SDKs (in development) vs Hook0&apos;s 4</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + Schema Registry:</strong> Ordered delivery and payload validation</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Managed cloud:</strong> Production-ready without self-hosting overhead</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hook0SdkDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hook0FifoDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('managedCloudDesc')}</li>
             </ul>
           </div>
 
@@ -59,7 +59,7 @@ export function Hook0Content() {
 
         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('bottomLine')}</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">Both are open-source and self-hostable. HookSniff has more features (FIFO, schema registry, broader SDKs). Hook0 is a simpler, European-built alternative that may be a better fit if you value minimalism and GDPR-native design.</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('hook0BottomLineDesc')}</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>
       </main>

@@ -24,10 +24,10 @@ export function HookdeckContent() {
 
   return (
     <div>
-      <PublicNavbar pageTitle="HookSniff vs Hookdeck" />
+      <PublicNavbar pageTitle={t('hookdeckTitle')} />
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Hookdeck</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('hookdeckTitle')}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">{t('hookdeckDesc')}</p>
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden mb-12">
@@ -52,9 +52,9 @@ export function HookdeckContent() {
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source & self-hosted:</strong> MIT licensed. Hookdeck is closed-source and cloud-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Fixed pricing:</strong> $24/mo flat vs Hookdeck&apos;s usage-based billing that can be unpredictable.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + Schema Registry:</strong> Ordered delivery and payload validation that Hookdeck doesn&apos;t offer.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hookdeckOssDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hookdeckPricingDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hook0FifoDesc')}</li>
             </ul>
           </div>
 
@@ -66,7 +66,7 @@ export function HookdeckContent() {
 
         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('bottomLine')}</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">Both are capable webhook platforms. HookSniff is better for teams that want open-source, self-hosting, and predictable pricing. Hookdeck is better for teams that need advanced routing, the highest SLA (99.999%), and SOC 2 Type 2 certification.</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('hookdeckBottomLineDesc')}</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>
       </main>

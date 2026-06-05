@@ -46,9 +46,9 @@ export function ConvoyContent() {
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>11 SDKs (in development):</strong> Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift. Convoy is Go-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Managed cloud:</strong> Deploy in minutes. Convoy requires self-hosting.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + CloudEvents:</strong> Ordered delivery and standard event format. Convoy has neither.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('sdkCountDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('managedCloudDesc')}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('fifoCloudEventsDesc')}</li>
             </ul>
           </div>
 
@@ -59,8 +59,8 @@ export function ConvoyContent() {
         </div>
 
         <div className="p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> Note on Convoy</h2>
-          <p className="text-sm text-gray-600 dark:text-slate-400">Convoy&apos;s GitHub repository is no longer actively maintained. If you&apos;re currently using Convoy, consider migrating to an actively maintained alternative. HookSniff, Svix, and Hook0 are all good options depending on your needs.</p>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('noteOnConvoy') || 'Note on Convoy'}</h2>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('noteOnConvoyDesc') || 'Convoy is no longer actively maintained. Consider migrating to an actively maintained alternative.'}</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>
       </main>

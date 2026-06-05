@@ -237,7 +237,7 @@ export default function AdminSettingsPage() {
   { key: 'general', icon: <Settings size={16} strokeWidth={1.75} />, label: t('general') || 'General' },
   { key: 'email', icon: <Mail size={16} strokeWidth={1.75} />, label: t('emailSecurity') || 'Email & Security' },
   { key: 'alerts', icon: <AlertTriangle size={16} strokeWidth={1.75} />, label: t('alertsRetry') || 'Alerts & Retry' },
-  { key: 'dev', icon: <FlaskConical size={16} strokeWidth={1.75} />, label: 'Dev Tools' },
+  { key: 'dev', icon: <FlaskConical size={16} strokeWidth={1.75} />, label: t('devTools') || 'Dev Tools' },
  ] as const;
 
  return (
