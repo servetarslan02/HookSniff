@@ -6,7 +6,8 @@ import Footer from '@/components/Footer';
 
 // Mock next-intl
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => {
+  useTranslations: () => (key: string) => {,
+  useLocale: () => 'en',
     const map: Record<string, string> = {
       github: 'GitHub',
       docs: 'Docs',
