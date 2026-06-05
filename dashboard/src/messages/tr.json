@@ -7374,7 +7374,9 @@
       },
       "status": {
         "recovered": "Çözüldü",
-        "pending": "Devam Ediyor"
+        "pending": "Devam Ediyor",
+        "success": "Başarılı",
+        "disabled": "Devre dışı"
       },
       "reason": "Neden",
       "action": {
@@ -7399,6 +7401,13 @@
         "timeout_adjust": "Sunucu yavaş yanıt veriyor, bekleme süresi uzatıldı",
         "proactive_throttle": "Gecikme artıyor, sorunlar ortaya çıkmadan önlem alındı",
         "cascade_alert": "Birden fazla endpoint aynı anda etkilendi"
+      },
+      "reasonMap": {
+        "primaryTimeout": "Ana endpoint zaman aşımı",
+        "consecutiveFailures": "10 ardışık hata tespit edildi",
+        "repeatedFailures": "Zamana yayılan tekrarlayan hatalar",
+        "highFailureRate": "Hata oranı %50'yi aştı",
+        "overload": "Sunucu aşırı yük tespit edildi"
       }
     },
     "predictions": {
