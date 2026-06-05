@@ -76,8 +76,11 @@ describe('useAnalytics', () => {
   });
 
   it('hooks are disabled without token', () => {
-    vi.mocked(await import('@/lib/store')).useAuth = () => ({ token: null, user: null });
+    const mod = require('@/lib/store');
+    const orig = mod.useAuth;
+    mod.useAuth = () => ({ token: null, user: null });
     const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
     expect(result.current.isFetching).toBe(false);
+    mod.useAuth = orig;
   });
 });
