@@ -22,7 +22,7 @@ vi.mock('@/lib/store', () => ({
 import { AuthGuard } from '@/components/AuthGuard';
 
 function renderWithAuth(ui: React.ReactNode) {
-  return renderWithProviders(<AuthGuard>{ui}</AuthGuard>);
+  return renderWithProviders(<AuthGuard>{ui}</AuthGuard>, { withIntl: false });
 }
 
 describe('AuthGuard', () => {

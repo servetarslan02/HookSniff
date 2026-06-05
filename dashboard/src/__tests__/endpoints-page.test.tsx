@@ -91,29 +91,29 @@ describe('EndpointsContent', () => {
   });
 
   it('renders the endpoints page with title', () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     expect(container.textContent).toContain('endpoints.title');
   });
 
   it('renders endpoint URLs from data', () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     expect(container.textContent).toContain('https://example.com/webhook');
     expect(container.textContent).toContain('https://staging.example.com/hook');
   });
 
   it('shows active/inactive status for endpoints', () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     expect(container.textContent).toContain('ep_1');
     expect(container.textContent).toContain('ep_2');
   });
 
   it('renders endpoint descriptions when available', () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     expect(container.textContent).toContain('Production endpoint');
   });
 
   it('shows create endpoint form when button clicked', async () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('endpoints.create') || b.textContent?.includes('Create')
     );
@@ -127,7 +127,7 @@ describe('EndpointsContent', () => {
   });
 
   it('shows both endpoints in the list', () => {
-    const { container } = renderWithProviders(React.createElement(EndpointsContent));
+    const { container } = renderWithProviders(React.createElement(EndpointsContent), { withIntl: false });
     expect(container.textContent).toContain('ep_1');
     expect(container.textContent).toContain('ep_2');
   });
