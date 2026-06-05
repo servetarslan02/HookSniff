@@ -140,7 +140,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
                     {/* Actionable steps */}
                     {info.steps && info.steps.length > 0 && (
                       <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">{t('nextSteps') || 'What to do:'}</p>
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">{t('nextSteps') || 'Cortex Response:'}</p>
                         <ol className="text-xs text-blue-600 dark:text-blue-400 space-y-0.5">
                           {info.steps.map((step, si) => (
                             <li key={si} className="flex items-start gap-1"><ArrowRight size={10} className="mt-0.5 flex-shrink-0" /> {step}</li>
