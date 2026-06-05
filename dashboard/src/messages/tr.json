@@ -7566,10 +7566,10 @@
         "drift_detector": "Sapma İzleyici"
       },
       "healthStatuses": {
-        "Healthy": "Sağlıklı",
+        "Healthy": "Saglikli",
         "Warning": "Dikkat Gerekli",
         "Critical": "Kritik Sorun",
-        "Degraded": "Bozulmuş",
+        "Degraded": "Bozulmus",
         "stale": "Güncel Değil"
       },
       "issues": {

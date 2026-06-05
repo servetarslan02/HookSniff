@@ -7534,7 +7534,11 @@
         "warning": "Needs Attention",
         "critical": "Critical Issue",
         "degraded": "Degraded",
-        "stale": "Outdated"
+        "stale": "Outdated",
+        "Healthy": "Healthy",
+        "Warning": "Needs Attention",
+        "Critical": "Critical Issue",
+        "Degraded": "Degraded"
       },
       "issues": {
         "model_stale": "Model outdated ({value})",
