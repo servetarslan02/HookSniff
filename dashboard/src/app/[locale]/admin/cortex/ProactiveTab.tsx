@@ -3,30 +3,25 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
-import { Clock, Info, Shield } from '@/components/icons';
+import { Clock, Info, Shield, ExternalLink, ArrowRight } from '@/components/icons';
 import { ProactiveInsight } from './types';
+import { useAuth } from '@/lib/store';
+import { PrefetchLink } from '@/components/PrefetchLink';
 
-function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; severity: string; advice: string } {
+function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; severity: string; advice: string; steps: string[] } {
   const type = insight.insight_type;
   const severity = insight.severity;
   const data = (insight as any).data || {};
 
   const sevLabel = severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : severity === 'info' ? 'info' : 'ok';
+  const apiTitle = (insight as any).title || type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
 
-  // Use the title from API (already descriptive) as fallback
-  const apiTitle = (insight as any).title || '';
+  const base = { title: apiTitle, detail: '', severity: sevLabel, advice: '', steps: [] as string[] };
 
-  const base = {
-    title: apiTitle || type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
-    detail: '',
-    severity: sevLabel,
-    advice: '',
-  };
-
-  if (type === 'proactive_latency_trend') return { ...base, detail: t('detail.latencyTrend', {v: data.trend || 'increasing'}), advice: t('advice.latencyTrend') };
-  if (type === 'proactive_rate_limit_risk') return { ...base, detail: t('detail.rateLimitRisk', {v: data.usage_pct || '?'}), advice: t('advice.rateLimitRisk') };
-  if (type === 'proactive_stress_detection') return { ...base, detail: t('detail.stressDetection', {v: data.metric || 'general'}), advice: t('advice.stressDetection') };
-  if (type === 'proactive_cascade_risk') return { ...base, detail: t('detail.cascadeRisk', {v: data.affected_endpoints || '?'}), advice: t('advice.cascadeRisk') };
+  if (type === 'proactive_latency_trend') return { ...base, detail: t('detail.latencyTrend', {v: data.trend || 'increasing'}), advice: t('advice.latencyTrend'), steps: [t('steps.checkEndpoint'), t('steps.checkServer'), t('steps.enableFallback')] };
+  if (type === 'proactive_rate_limit_risk') return { ...base, detail: t('detail.rateLimitRisk', {v: data.usage_pct || '?'}), advice: t('advice.rateLimitRisk'), steps: [t('steps.upgradePlan'), t('steps.reduceTraffic')] };
+  if (type === 'proactive_stress_detection') return { ...base, detail: t('detail.stressDetection', {v: data.metric || 'general'}), advice: t('advice.stressDetection'), steps: [t('steps.checkResources'), t('steps.scaleUp')] };
+  if (type === 'proactive_cascade_risk') return { ...base, detail: t('detail.cascadeRisk', {v: data.affected_endpoints || '?'}), advice: t('advice.cascadeRisk'), steps: [t('steps.fixMainEndpoint'), t('steps.checkDependents')] };
   if (type === 'proactive_degradation') {
     const dropPct = data.drop_pct ? Math.round(data.drop_pct) : null;
     const recentSr = data.recent_sr ? Math.round(data.recent_sr) : null;
@@ -36,12 +31,17 @@ function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: s
       ...base,
       title: t('detail.degradationTitle') || 'Endpoint Performance Declining',
       detail: `${olderSr}% → ${recentSr}% (${dropPct}% drop${hoursToAnomaly ? `, ~${hoursToAnomaly}h to threshold` : ''})`,
-      advice: t('advice.latencyTrend'),
+      advice: t('advice.degradation'),
+      steps: [
+        t('steps.openEndpoint'),
+        t('steps.checkServerLogs'),
+        t('steps.checkRecentDeploy'),
+        t('steps.enableFallback'),
+      ],
     };
   }
 
-  // Generic fallback — use API title which is already descriptive
-  return { ...base, detail: base.title, advice: '' };
+  return { ...base, detail: base.title, advice: '', steps: [] };
 }
 
 export function ProactiveTab({ token }: { token: string | null }) {
@@ -129,7 +129,27 @@ export function ProactiveTab({ token }: { token: string | null }) {
                       </span>
                     </div>
                     {info.detail && <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>}
-                    {info.advice && (
+                    {/* Show endpoint link if available */}
+                    {(insight as any).data?.endpoint_id && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                        <ExternalLink size={11} />
+                        <PrefetchLink href={`/endpoints/${(insight as any).data.endpoint_id}`} className="hover:underline">
+                          {t('endpointLink') || 'View endpoint'}: {(insight as any).data.endpoint_id.substring(0, 8)}...
+                        </PrefetchLink>
+                      </p>
+                    )}
+                    {/* Actionable steps */}
+                    {info.steps && info.steps.length > 0 && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">{t('nextSteps') || 'What to do:'}</p>
+                        <ol className="text-xs text-blue-600 dark:text-blue-400 space-y-0.5">
+                          {info.steps.map((step, si) => (
+                            <li key={si} className="flex items-start gap-1"><ArrowRight size={10} className="mt-0.5 flex-shrink-0" /> {step}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                    {info.advice && (!info.steps || info.steps.length === 0) && (
                       <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1"><Info size={12} /> {info.advice}</p>
                       </div>

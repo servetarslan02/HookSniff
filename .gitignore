@@ -84,3 +84,6 @@ gcp-config.json
 
 # Secrets
 secrets/
+
+zrok-bin/
+.cleanup/
