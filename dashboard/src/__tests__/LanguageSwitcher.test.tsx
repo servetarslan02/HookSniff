@@ -10,6 +10,7 @@ let mockLocale = 'en';
 
 vi.mock('next-intl', () => ({
   useLocale: () => mockLocale,
+  useTranslations: (ns?: string) => (key: string) => ns ? `${ns}.${key}` : key,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
