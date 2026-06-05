@@ -5,19 +5,25 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { CheckCircle2, Clock } from '@/components/icons';
 
-function describeAnomaly(score: number, factors: any, t: any): { title: string; detail: string; severity: string } {
-  const sr = factors?.sr || factors?.success_rate;
-  const latency = factors?.latency || factors?.latency_ms;
+function describeAnomaly(score: number, factors: any, category: string, t: any): { title: string; detail: string; severity: string } {
+  const current = factors?.current;
+  const baseline = factors?.baseline;
+  const deviation = factors?.deviation;
 
-  if (score >= 80) {
-    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), severity: 'critical' };
-  }
-  if (score >= 60) {
-    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), severity: 'major' };
-  }
-  if (score >= 40) {
-    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), severity: 'minor' };
-  }
+  // Category-specific descriptions
+  const categoryDesc: Record<string, string> = {
+    latency: `Latency ${current ? `${Math.round(current)}ms` : 'increased'} (baseline: ${baseline ? `${Math.round(baseline)}ms` : 'normal'})`,
+    failure_rate: `Failure rate ${current ? `${Math.round(current)}%` : 'high'} (baseline: ${baseline ? `${Math.round(baseline)}%` : 'normal'})`,
+    volume: `Traffic volume ${current > baseline ? 'spike' : 'drop'}: ${current ? Math.round(current) : '?'} (baseline: ${baseline ? Math.round(baseline) : '?'})`,
+    timeout: `Timeout rate increased${current ? ` to ${Math.round(current)}%` : ''}`,
+    error_pattern: `New error pattern detected${deviation ? ` (${Math.round(deviation)}% deviation)` : ''}`,
+  };
+
+  const detail = categoryDesc[category] || t('detail.performanceDropped');
+
+  if (score >= 80) return { title: t('severity.critical'), detail, severity: 'critical' };
+  if (score >= 60) return { title: t('severity.major'), detail, severity: 'major' };
+  if (score >= 40) return { title: t('severity.minor'), detail, severity: 'minor' };
   return { title: t('severity.normal'), detail: t('detail.noConcern'), severity: 'normal' };
 }
 
@@ -59,8 +65,9 @@ export function AnomaliesTab({ token }: { token: string | null }) {
           {anomalies.slice(0, 20).map((a: any, i: number) => {
             const score = a[3] || 0;
             const factors = a[4] || {};
+            const category = a[5] || '';
             const ts = a[6];
-            const info = describeAnomaly(score, factors, t);
+            const info = describeAnomaly(score, factors, category, t);
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -81,6 +88,11 @@ export function AnomaliesTab({ token }: { token: string | null }) {
                       }`}>
                         {tc('score')}: {score}
                       </span>
+                      {category && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                          {category.replace(/_/g, ' ')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
                     <div className="flex items-center gap-4 mt-2">
