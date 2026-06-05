@@ -7487,7 +7487,8 @@
         "latencyTrend": "Gecikme artma trendinde — sunucu yavaşlıyor olabilir",
         "rateLimitRisk": "Hız sınırı kullanımı %{v} — limite yaklaşıyor",
         "stressDetection": "Stres tespit edildi: {v}",
-        "cascadeRisk": "{v} endpoint etkilenebilir"
+        "cascadeRisk": "{v} endpoint etkilenebilir",
+        "degradationTitle": "Endpoint Performansı Düşüyor"
       },
       "advice": {
         "latencyTrend": "Endpoint'i kontrol edin, sunucu yavaşlıyor olabilir",
