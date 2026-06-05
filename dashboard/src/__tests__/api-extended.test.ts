@@ -11,7 +11,7 @@ const {
   adminApi,
   teamsApi,
   notificationsApi,
-  billingApi,
+  billingApiExtended,
   analyticsApi,
   api,
 } = await import('../lib/api');
@@ -134,7 +134,7 @@ describe('webhooksApi extended', () => {
     });
     await webhooksApi.batchReplay('token', ['d1', 'd2', 'd3']);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/webhooks/batch-replay'),
+      expect.stringContaining('/webhooks/batch/replay'),
       expect.objectContaining({ method: 'POST' })
     );
   });
@@ -352,7 +352,7 @@ describe('billingApi', () => {
       ok: true,
       json: () => Promise.resolve([]),
     });
-    await billingApi.getInvoices('token');
+    await billingApiExtended.getInvoices('token');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/billing/invoices'),
       expect.anything()
