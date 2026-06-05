@@ -66,6 +66,37 @@ const nextConfig = {
   // Rewrites removed — Next.js API routes proxy to backend directly
   // This avoids Vercel edge DNS_HOSTNAME_RESOLVED_PRIVATE issues
   // Compression is handled by Vercel's edge network automatically
+  webpack(config, { isServer }) {
+    // Client-side only: extract lucide-react + recharts into shared vendor chunks
+    // to prevent icon/chart code from being duplicated across 177+ page chunks
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          lucide: {
+            test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
+            name: 'lucide-icons',
+            chunks: 'all',
+            priority: 20,
+          },
+          recharts: {
+            test: /[\\/]node_modules[\\/]recharts[\\/]/,
+            name: 'vendor-recharts',
+            chunks: 'all',
+            priority: 20,
+          },
+          radix: {
+            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+            name: 'vendor-radix',
+            chunks: 'all',
+            priority: 15,
+          },
+        },
+      };
+    }
+    return config;
+  },
 };
 
 // Bundle analyzer â€” ANALYZE=true npm run build
