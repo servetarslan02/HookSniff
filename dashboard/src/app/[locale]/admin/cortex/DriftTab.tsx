@@ -37,8 +37,11 @@ export function DriftTab() {
     severity > 0.4 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
     'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
 
-  const getTypeIcon = (type: string) =>
-    type === 'sudden' ? 'Sudden' : type === 'gradual' ? 'Gradual' : type === 'incremental' ? 'Incremental' : 'Unknown';
+  const getTypeIcon = (type: string) => {
+    const key = `typeLabels.${type}`;
+    const translated = t(key);
+    return translated !== key ? translated : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
@@ -60,7 +63,7 @@ export function DriftTab() {
             <div key={ev.id} className={`glass-card p-4 border-l-4 ${ev.severity > 0.7 ? 'border-red-500' : ev.severity > 0.4 ? 'border-yellow-500' : 'border-green-500'}`}>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{getTypeIcon(ev.drift_type)}</span>
+                  <span className="text-sm font-medium">{getTypeIcon(ev.drift_type)}</span>
                   <div>
                     <span className="font-medium text-gray-900 dark:text-white capitalize">{ev.drift_type} Drift</span>
                     <span className={`ml-2 text-xs px-2 py-1 rounded-full ${getColor(ev.severity)}`}>
