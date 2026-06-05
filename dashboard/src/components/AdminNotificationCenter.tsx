@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 import { adminApi, broadcastsApi, type UserBroadcast } from '@/lib/api';
 import { AlertTriangle, Bell, Shield, Users, DollarSign, XCircle, Megaphone, Wrench, Sparkles, Radio, CheckCircle2, Clock } from '@/components/icons';
 
@@ -20,6 +21,7 @@ interface AdminNotification {
 export function AdminNotificationCenter() {
   const { token } = useAuth();
   const router = useRouter();
+  const t = useTranslations('admin');
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [broadcasts, setBroadcasts] = useState<UserBroadcast[]>([]);
@@ -65,8 +67,8 @@ export function AdminNotificationCenter() {
             id: 'queue-failed',
             type: 'system',
             severity: queueData.failed_last_hour > 10 ? 'critical' : 'high',
-            title: 'Failed Deliveries',
-            message: `Son 1 saatte ${queueData.failed_last_hour} failed deliveries`,
+            title: t('failedDeliveries') || 'Failed Deliveries',
+            message: t('failedDeliveriesCount', { count: queueData.failed_last_hour }) || `${queueData.failed_last_hour} failed deliveries in the last hour`,
             time: new Date().toISOString(),
             link: '/admin/system',
           });
@@ -76,8 +78,8 @@ export function AdminNotificationCenter() {
             id: 'queue-backlog',
             type: 'system',
             severity: 'medium',
-            title: 'Queue Backlog',
-            message: `${queueData.pending} deliveries pending`,
+            title: t('queueBacklog') || 'Queue Backlog',
+            message: t('queueBacklogCount', { count: queueData.pending }) || `${queueData.pending} deliveries pending`,
             time: new Date().toISOString(),
             link: '/admin/system',
           });
@@ -174,11 +176,11 @@ export function AdminNotificationCenter() {
   const relativeTime = (dateStr: string) => {
     const diff = Math.max(0, Date.now() - new Date(dateStr).getTime());
     const mins = Math.floor(diff / 60_000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins}m ago`;
+    if (mins < 1) return t('justNow') || 'just now';
+    if (mins < 60) return t('minutesAgo', { n: mins }) || `${mins}m ago`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+    if (hours < 24) return t('hoursAgo', { n: hours }) || `${hours}h ago`;
+    return t('daysAgo', { n: Math.floor(hours / 24) }) || `${Math.floor(hours / 24)}d ago`;
   };
 
   return (
@@ -206,7 +208,7 @@ export function AdminNotificationCenter() {
               Admin Notifications
             </h3>
             <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-              {totalCount} adet
+              {totalCount} {t('items') || 'items'}
             </span>
             {totalCount > 0 && (
               <button
@@ -214,7 +216,7 @@ export function AdminNotificationCenter() {
                 onClick={handleDismissAll}
                 className="text-[10px] text-gray-400 hover:text-red-500 dark:hover:text-red-400 font-medium transition"
               >
-                Dismiss All
+                {t('dismissAll') || 'Dismiss All'}
               </button>
             )}
           </div>
@@ -236,7 +238,7 @@ export function AdminNotificationCenter() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400">{b.broadcast_type}</span>
-                      {b.severity === 'critical' && <span className="px-1 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 rounded">KRİTİK</span>}
+                      {b.severity === 'critical' && <span className="px-1 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 rounded">{t('critical') || 'CRITICAL'}</span>}
                     </div>
                     <p className="text-xs font-semibold text-gray-900 dark:text-white mt-0.5 truncate">{b.title}</p>
                     <p className="text-[11px] text-gray-500 dark:text-slate-500 mt-0.5 line-clamp-1">{b.message}</p>
@@ -284,8 +286,8 @@ export function AdminNotificationCenter() {
             {visibleNotifications.length === 0 && visibleBroadcasts.length === 0 && (
               <div className="p-6 text-center">
                 <CheckCircle2 size={32} strokeWidth={1.5} className="text-green-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 dark:text-slate-400">All clear</p>
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">No admin notifications</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('allClear') || 'All clear'}</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('noAdminNotifications') || 'No admin notifications'}</p>
               </div>
             )}
           </div>
@@ -318,7 +320,7 @@ function getSecurityLabel(eventType: string): string {
     disabled_account_login: 'Disabled Account Login',
     rate_limit_exceeded: 'Rate Limit Exceeded',
   };
-  return labels[eventType] || eventType;
+  return labels[eventType] || eventType.replace(/_/g, ' ');
 }
 
 export default AdminNotificationCenter;
