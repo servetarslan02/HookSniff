@@ -27,19 +27,19 @@ stop: ## Tüm servisleri durdur
 # ── SDK Testler ──
 
 test: ## Tüm SDK testlerini çalıştır
-	@bash run-tests.sh all
+	@bash scripts/run-tests.sh all
 
 test-go: ## Go SDK testleri
-	@bash run-tests.sh go
+	@bash scripts/run-tests.sh go
 
 test-rust: ## Rust SDK testleri
-	@bash run-tests.sh rust
+	@bash scripts/run-tests.sh rust
 
 test-node: ## Node.js SDK testleri
-	@bash run-tests.sh node
+	@bash scripts/run-tests.sh node
 
 test-python: ## Python SDK testleri
-	@bash run-tests.sh python
+	@bash scripts/run-tests.sh python
 
 restart: ## Yeniden başlat
 	docker compose restart
@@ -252,33 +252,33 @@ deploy-stop: ## Production compose durdur
 # ── Local CI/CD (GitHub Actions yerine) ──
 
 ci: ## Local CI — tümünü çalıştır (lint + test + build + security)
-	@bash local-ci.sh all
+	@bash scripts/local-ci.sh all
 
 ci-test: ## SDK testlerini çalıştır
-	@bash local-sdk-test.sh all
+	@bash scripts/local-sdk-test.sh all
 
 ci-publish: ## SDK publish dry-run
-	@bash local-sdk-publish.sh dry-run all
+	@bash scripts/local-sdk-publish.sh dry-run all
 
 ci-publish-live: ## SDK publish — gerçekten yükle (TOKEN'lar gerekli)
-	@bash local-sdk-publish.sh publish $(SDK)
+	@bash scripts/local-sdk-publish.sh publish $(SDK)
 
 ci-security: ## Güvenlik taraması
-	@bash local-ci.sh security
+	@bash scripts/local-ci.sh security
 
 # ── OpenAPI Codegen ──
 
 codegen: ## Tüm SDK'lar için type/model üret
-	python3 openapi-codegen.py all
+	python3 scripts/openapi-codegen.py all
 
 codegen-validate: ## OpenAPI spec doğrula
-	python3 openapi-codegen.py validate
+	python3 scripts/openapi-codegen.py validate
 
 codegen-node: ## Node.js types üret
-	python3 openapi-codegen.py node
+	python3 scripts/openapi-codegen.py node
 
 codegen-python: ## Python models üret
-	python3 openapi-codegen.py python
+	python3 scripts/openapi-codegen.py python
 
 codegen-go: ## Go structs üret
-	python3 openapi-codegen.py go
+	python3 scripts/openapi-codegen.py go

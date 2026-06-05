@@ -87,3 +87,12 @@ secrets/
 
 zrok-bin/
 .cleanup/
+
+.wrangler/
+coverage-output.txt
+playwright-report/
+all-migrations.sql
+
+build-result.txt
+build-refund.txt
+vitest-results.json

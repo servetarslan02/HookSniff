@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
+import { ExternalLink } from '@/components/icons';
+import { PrefetchLink } from '@/components/PrefetchLink';
 
 interface DriftEvent {
   id: number;

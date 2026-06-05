@@ -291,12 +291,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     </div>
                   </div>
                   <a
-                    href="/settings-section"
+                    href="/account"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
                   >
                     <Settings size={16} strokeWidth={1.75} className="text-gray-400" />
-                    {t('settingsSection')}
+                    {t('settingsSection') || t('account')}
                   </a>
                   <a
                     href="https://hooksniff.vercel.app/docs"
