@@ -7608,7 +7608,12 @@
       "actionMonitor": "Yakından izleniyor",
       "actionAlert": "Uyarı gönderildi",
       "actionRollback": "Önceki modele dönülüyor",
-      "actionCollectingBaseline": "Referans verisi toplanıyor"
+      "actionCollectingBaseline": "Referans verisi toplanıyor",
+      "featureFailureRate": "Hata Oranı",
+      "featurePayloadSize": "Payload Boyutu",
+      "actionResetModel": "Model sıfırlanıp yeniden eğitilecek",
+      "actionUpdateBaseline": "Referans tabanı güncelleniyor",
+      "actionReevaluate": "Model eşikleri yeniden değerlendiriliyor"
     },
     "modelMonitor": {
       "stats": {

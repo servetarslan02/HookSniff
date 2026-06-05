@@ -7573,7 +7573,12 @@
       "actionMonitor": "Closely monitoring",
       "actionAlert": "Alert sent",
       "actionRollback": "Reverting to previous model",
-      "actionCollectingBaseline": "Collecting reference data"
+      "actionCollectingBaseline": "Collecting reference data",
+      "featureFailureRate": "Failure Rate",
+      "featurePayloadSize": "Payload Size",
+      "actionResetModel": "Model will be reset and retrained",
+      "actionUpdateBaseline": "Updating reference baseline",
+      "actionReevaluate": "Re-evaluating model thresholds"
     },
     "modelMonitor": {
       "stats": {
