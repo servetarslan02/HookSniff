@@ -89,16 +89,16 @@ Webhooks are the backbone of modern integrations, but building reliable webhook 
 
 | Component | Technology | Hosting |
 |---|---|---|
-| **API** | Rust (Axum 0.8, sqlx 0.8) | Google Cloud Run |
-| **Worker** | Rust (Tokio) | Google Cloud Run |
-| **Database** | PostgreSQL 16 | Neon (serverless) |
-| **Cache / Queue** | Redis | Upstash (serverless) |
-| **Dashboard** | Next.js 16, React, TypeScript, Tailwind | Vercel |
-| **CDN/DNS** | Cloudflare | Cloudflare Free |
-| **Monitoring** | Grafana + OpenTelemetry | Grafana Cloud |
+| **API** | Rust (Axum 0.8, sqlx 0.8) | 
+| **Worker** | Rust (Tokio) | 
+| **Database** | PostgreSQL 16 | 
+| **Cache / Queue** | Redis | 
+| **Dashboard** | Next.js 16, React, TypeScript, Tailwind | 
+| **CDN/DNS** | Cloudflare | 
+| **Monitoring** | Grafana + OpenTelemetry | 
 | **Storage** | Cloudflare R2 | S3-compatible |
 | **Email** | Resend + Gmail API | Service Account |
-| **Billing** | Polar.sh + iyzico | Per-transaction |
+| **Billing** | Polar.sh | Per-transaction |
 
 ## Quick Start
 
@@ -204,9 +204,9 @@ HookSniff/
 
 | Plan | Price | Webhooks/mo | Endpoints | Payload | Retention | Rate/min |
 |------|-------|-------------|-----------|---------|-----------|----------|
-| Free | $0 | 10,000 | 5 | 256 KB | 7 days | 100 |
-| Pro | $49/mo | 50,000 | 50 | 1 MB | 30 days | 1,000 |
-| Business | $149/mo | 500,000 | 500 | 5 MB | 90 days | 10,000 |
+| Free | $0 | 300 | 5 | 256 KB | 7 days | 100 |
+| Pro | $49/mo | 30,000 | 50 | 1 MB | 30 days | 1,000 |
+| Business | $149/mo | 100,000 | 500 | 5 MB | 90 days | 10,000 |
 | Enterprise | Custom | Unlimited | Unlimited | 10 MB | 365 days | Unlimited |
 
 **Turkey pricing**: Pro ₺149/mo, Business ₺449/mo (via iyzico)
