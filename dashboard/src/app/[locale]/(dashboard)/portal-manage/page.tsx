@@ -177,9 +177,9 @@ export default function PortalPage() {
               <span className="text-gray-600 dark:text-slate-400">{tb('dataRetention')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {dataExpiresInDays !== null && dataExpiresInDays > 0
-                  ? `${dataExpiresInDays} ${tb('days')} ${tb('remaining') || 'kaldı'}`
+                  ? `${dataExpiresInDays} ${tb('days')} ${tb('remaining') || 'remaining'}`
                   : dataExpiresInDays === 0
-                  ? (tb('dataExpired') || 'Süresi doldu')
+                  : (tb('dataExpired') || 'Expired')
                   : `${retentionDays ?? '—'} ${tb('days')}`
                 }
               </span>
