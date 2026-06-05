@@ -218,19 +218,44 @@ pub async fn detect_brute_force(
 
 // ── Input Sanitization Detection ──────────────────────────
 
+/// Decode common encoding bypasses before scanning
+fn decode_for_scan(input: &str) -> String {
+    let mut s = input.to_lowercase();
+    // URL decode (single + double pass)
+    s = s.replace("%27", "'").replace("%22", "\"").replace("%3c", "<").replace("%3e", ">");
+    s = s.replace("%28", "(").replace("%29", ")").replace("%3b", ";").replace("%2f", "/");
+    s = s.replace("%5c", "\\").replace("%00", "").replace("%0a", "\n").replace("%0d", "\r");
+    // Double URL decode
+    s = s.replace("%2527", "'").replace("%2522", "\"").replace("%253c", "<").replace("%253e", ">");
+    // HTML entity decode
+    s = s.replace("&#39;", "'").replace("&quot;", "\"").replace("&lt;", "<").replace("&gt;", ">");
+    s = s.replace("&#x27;", "'").replace("&#x2f;", "/").replace("&#x5c;", "\\");
+    // Unicode bypass
+    s = s.replace("\\u0027", "'").replace("\\u0022", "\"").replace("\\u003c", "<").replace("\\u003e", ">");
+    // Null byte + whitespace normalization
+    s = s.replace("\t", " ").replace("\n", " ").replace("\r", " ");
+    s
+}
+
 /// Check for injection attempts in user input.
+/// Decodes URL encoding, HTML entities, Unicode, and double encoding before scanning.
 pub fn detect_injection_attempt(input: &str) -> Option<DetectionResult> {
     let lower = input.to_lowercase();
+    let decoded = decode_for_scan(input);
 
-    // SQL injection patterns
+    // SQL injection patterns (expanded)
     let sql_patterns = [
         "' or '1'='1", "' or 1=1", "'; drop table", "'; delete from",
-        "union select", "' union", "/*", "*/", "xp_cmdshell",
+        "union select", "' union", "xp_cmdshell",
         "exec(", "execute(", "insert into", "update.*set",
+        "1=1--", "'--", "' #", "sleep(", "benchmark(",
+        "load_file(", "into outfile", "into dumpfile",
+        "information_schema", "pg_sleep", "waitfor delay",
+        "convert(", "cast(", "char(", "concat(", "group_concat",
     ];
 
     for pattern in &sql_patterns {
-        if lower.contains(pattern) {
+        if lower.contains(pattern) || decoded.contains(pattern) {
             return Some(DetectionResult {
                 should_log: true,
                 should_alert: true,
@@ -246,14 +271,18 @@ pub fn detect_injection_attempt(input: &str) -> Option<DetectionResult> {
         }
     }
 
-    // XSS patterns
+    // XSS patterns (expanded)
     let xss_patterns = [
         "<script", "javascript:", "onerror=", "onload=", "onclick=",
         "onmouseover=", "onfocus=", "onblur=", "eval(", "document.cookie",
+        "<img", "<svg", "<iframe", "<object", "<embed", "<link",
+        "expression(", "url(", "@import", "vbscript:", "data:text",
+        "<body", "<input", "<meta", "<marquee", "<details",
+        "alert(", "confirm(", "prompt(", "fromcharcode",
     ];
 
     for pattern in &xss_patterns {
-        if lower.contains(pattern) {
+        if lower.contains(pattern) || decoded.contains(pattern) {
             return Some(DetectionResult {
                 should_log: true,
                 should_alert: false,

@@ -86,7 +86,7 @@ pub async fn zero_trust_middleware(
         if threat.is_threat {
             // Block if action is Block AND confidence is very high
             // But NEVER block admin users — they're verified by Zero Trust above
-            if !is_admin {
+            if !result.is_admin {
                 let should_block = matches!(threat.action, crate::security::threat_detector::ThreatAction::Block)
                     && threat.confidence > 0.8
                     && result.risk_score < 0.5;
