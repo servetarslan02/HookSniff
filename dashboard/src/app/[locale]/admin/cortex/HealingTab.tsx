@@ -6,19 +6,37 @@ import { apiFetch } from '@/lib/api';
 import { Clock, ShieldCheck } from '@/components/icons';
 
 function describeHealingAction(actionType: string, reason: string, outcome: string, t: any): { title: string; detail: string; severity: string; actionSeverity: string } {
-  const isRecovered = outcome === 'recovered';
+  const isRecovered = outcome === 'recovered' || outcome === 'success';
+
+  // Translate common reasons
+  const reasonMap: Record<string, string> = {
+    'Primary timeout': t('reasonMap.primaryTimeout'),
+    '10 consecutive failures': t('reasonMap.consecutiveFailures'),
+    'Repeated failures': t('reasonMap.repeatedFailures'),
+    '50% failure rate': t('reasonMap.highFailureRate'),
+    'Overload': t('reasonMap.overload'),
+  };
+  const translatedReason = reasonMap[reason] || reason;
+
+  // Map action types (API uses different names than i18n keys)
+  const actionAliases: Record<string, string> = {
+    'fallback_url': 'fallback_url_switch',
+    'circuit_break': 'circuit_tighten',
+  };
+  const normalizedType = actionAliases[actionType] || actionType;
+
   const actions: Record<string, { title: string; detail: string; severity: string }> = {
     'auto_disable': { title: isRecovered ? t('action.auto_disable.recovered') : t('action.auto_disable.disabled'), detail: isRecovered ? t('detail.auto_disable.recovered') : t('detail.auto_disable.disabled'), severity: isRecovered ? 'ok' : 'disabled' },
-    'circuit_tighten': { title: t('action.circuit_tighten'), detail: t('detail.circuit_tighten'), severity: 'shield' },
-    'retry_slowdown': { title: t('action.retry_slowdown'), detail: t('detail.retry_slowdown'), severity: 'slowdown' },
-    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: t('detail.rate_limit_reduce'), severity: 'throttle' },
-    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: t('detail.fallback_url_switch'), severity: 'switch' },
-    'retry_increase': { title: t('action.retry_increase'), detail: t('detail.retry_increase'), severity: 'retry' },
-    'timeout_adjust': { title: t('action.timeout_adjust'), detail: t('detail.timeout_adjust'), severity: 'timeout' },
+    'circuit_tighten': { title: t('action.circuit_tighten'), detail: `${t('detail.circuit_tighten')} — ${translatedReason}`, severity: 'shield' },
+    'retry_slowdown': { title: t('action.retry_slowdown'), detail: `${t('detail.retry_slowdown')} — ${translatedReason}`, severity: 'slowdown' },
+    'rate_limit_reduce': { title: t('action.rate_limit_reduce'), detail: `${t('detail.rate_limit_reduce')} — ${translatedReason}`, severity: 'throttle' },
+    'fallback_url_switch': { title: t('action.fallback_url_switch'), detail: `${t('detail.fallback_url_switch')} — ${translatedReason}`, severity: 'switch' },
+    'retry_increase': { title: t('action.retry_increase'), detail: `${t('detail.retry_increase')} — ${translatedReason}`, severity: 'retry' },
+    'timeout_adjust': { title: t('action.timeout_adjust'), detail: `${t('detail.timeout_adjust')} — ${translatedReason}`, severity: 'timeout' },
     'proactive_throttle': { title: t('action.proactive_throttle'), detail: t('detail.proactive_throttle'), severity: 'throttle' },
     'cascade_alert': { title: t('action.cascade_alert'), detail: t('detail.cascade_alert'), severity: 'alert' },
   };
-  const info = actions[actionType] || { title: actionType.replace(/_/g, ' '), detail: reason || t('action.unknown'), severity: 'config' };
+  const info = actions[normalizedType] || { title: normalizedType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), detail: translatedReason || t('action.unknown'), severity: 'config' };
   return { ...info, actionSeverity: isRecovered ? 'ok' : 'action' };
 }
 
@@ -77,11 +95,11 @@ export function HealingTab({ token }: { token: string | null }) {
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        outcome === 'recovered' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                        outcome === 'recovered' || outcome === 'success' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
                         outcome === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
                       }`}>
-                        {outcome === 'recovered' ? t('status.recovered') : outcome === 'pending' ? t('status.pending') : outcome}
+                        {outcome === 'recovered' || outcome === 'success' ? t('status.recovered') : outcome === 'pending' ? t('status.pending') : outcome}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
