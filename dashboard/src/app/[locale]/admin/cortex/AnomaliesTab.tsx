@@ -11,13 +11,13 @@ function describeAnomaly(score: number, factors: any, category: string, t: any):
   const baseline = factors?.baseline;
   const deviation = factors?.deviation;
 
-  // Category-specific descriptions
+  // Category-specific descriptions using i18n
   const categoryDesc: Record<string, string> = {
-    latency: `Latency ${current ? `${Math.round(current)}ms` : 'increased'} (baseline: ${baseline ? `${Math.round(baseline)}ms` : 'normal'})`,
-    failure_rate: `Failure rate ${current ? `${Math.round(current)}%` : 'high'} (baseline: ${baseline ? `${Math.round(baseline)}%` : 'normal'})`,
-    volume: `Traffic volume ${current > baseline ? 'spike' : 'drop'}: ${current ? Math.round(current) : '?'} (baseline: ${baseline ? Math.round(baseline) : '?'})`,
-    timeout: `Timeout rate increased${current ? ` to ${Math.round(current)}%` : ''}`,
-    error_pattern: `New error pattern detected${deviation ? ` (${Math.round(deviation)}% deviation)` : ''}`,
+    latency: t('detail.latencyDesc', { current: current ? `${Math.round(current)}ms` : '?', baseline: baseline ? `${Math.round(baseline)}ms` : '?' }) || `Latency ${current ? `${Math.round(current)}ms` : 'increased'} (baseline: ${baseline ? `${Math.round(baseline)}ms` : 'normal'})`,
+    failure_rate: t('detail.failureRateDesc', { current: current ? `${Math.round(current)}%` : '?', baseline: baseline ? `${Math.round(baseline)}%` : '?' }) || `Failure rate ${current ? `${Math.round(current)}%` : 'high'} (baseline: ${baseline ? `${Math.round(baseline)}%` : 'normal'})`,
+    volume: t('detail.volumeDesc', { direction: current > baseline ? (t('detail.spike') || 'spike') : (t('detail.drop') || 'drop'), current: current ? Math.round(current) : '?', baseline: baseline ? Math.round(baseline) : '?' }) || `Traffic ${current > baseline ? 'spike' : 'drop'}: ${current ? Math.round(current) : '?'} (baseline: ${baseline ? Math.round(baseline) : '?'})`,
+    timeout: t('detail.timeoutDesc', { current: current ? `${Math.round(current)}%` : '' }) || `Timeout rate increased${current ? ` to ${Math.round(current)}%` : ''}`,
+    error_pattern: t('detail.errorPatternDesc', { deviation: deviation ? `${Math.round(deviation)}%` : '' }) || `New error pattern detected${deviation ? ` (${Math.round(deviation)}% deviation)` : ''}`,
   };
 
   const detail = categoryDesc[category] || t('detail.performanceDropped');

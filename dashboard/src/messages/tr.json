@@ -7358,7 +7358,14 @@
         "shouldMonitor": "Ciddi değil ama izlenmeli",
         "noConcern": "Endişe verici değil",
         "latencyIncreased": "Gecikme {v}ms arttı",
-        "srDropped": "Başarı oranı %{v} altına düştü"
+        "srDropped": "Başarı oranı %{v} altına düştü",
+        "latencyDesc": "Gecikme {current} (referans: {baseline})",
+        "failureRateDesc": "Hata oranı {current} (referans: {baseline})",
+        "volumeDesc": "Trafik {direction}: {current} (referans: {baseline})",
+        "timeoutDesc": "Zaman aşımı oranı {current}'a yükseldi",
+        "errorPatternDesc": "Yeni hata kalıbı tespit edildi ({deviation} sapma)",
+        "spike": "artış",
+        "drop": "düşüş"
       },
       "detectedBy": {
         "ml": "🧠 ML tarafından tespit edildi",
