@@ -21,7 +21,7 @@ export function useAdminStats() {
     queryKey: ['admin', 'stats'],
     queryFn: validated(() => adminApi.getStats(token!), AdminStatsSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -33,7 +33,7 @@ export function useAdminRevenue() {
     queryKey: ['admin', 'revenue'],
     queryFn: validated(() => adminApi.getRevenue(token!), RevenueSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -45,7 +45,7 @@ export function useAdminRevenueMetrics() {
     queryKey: ['admin', 'revenue-metrics'],
     queryFn: validated(() => adminApi.getRevenueMetrics(token!), RevenueMetricsSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -56,7 +56,7 @@ export function useAdminRevenueCohorts(months?: number) {
     queryKey: ['admin', 'revenue-cohorts', months ?? 12],
     queryFn: validated(() => adminApi.getRevenueCohorts(token!, months ?? 12), RevenueCohortsResponseSchema),
     enabled: !!token && months !== undefined,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -67,7 +67,7 @@ export function useAdminRefunds(params?: { per_page?: number }) {
     queryKey: ['admin', 'refunds', params],
     queryFn: validated(() => adminApi.getAllRefunds(token!, params), RefundsResponseSchema),
     enabled: !!token && !!params,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -81,6 +81,6 @@ export function useAdminChurn(enabled = true) {
       return data?.users ?? [];
     },
     enabled: !!token && enabled,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }

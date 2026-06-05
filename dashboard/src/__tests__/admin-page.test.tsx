@@ -90,7 +90,7 @@ describe('AdminOverviewPage', () => {
         { plan: 'pro', count: 3 },
       ],
       recent_signups: [],
-      trends: { users: 5, endpoints: 10, deliveries: 100, revenue: 500 },
+      trends: { users: 5, endpoints: 10, deliveries: 100, revenue: 500, total_users_yesterday: 8, total_deliveries_yesterday: 900, revenue_yesterday: 4500, active_users_yesterday: 2, active_webhooks: 40 },
     });
   });
 
@@ -113,8 +113,7 @@ describe('AdminOverviewPage', () => {
       const result = renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
       container = result.container;
     });
-    // After loading, the page shows hardcoded "Admin Overview"
-    expect(container!.textContent).toContain('Admin Overview');
+    expect(container!.textContent).toContain('admin.overviewTitle');
   });
 
   it('shows loading state initially', async () => {
@@ -124,7 +123,7 @@ describe('AdminOverviewPage', () => {
       const result = renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
       container = result.container;
     });
-    expect(container!.textContent).toContain('loadingDashboard');
+    expect(container!.textContent).toContain('admin.');
   });
 
   it('shows stat cards after loading', async () => {
