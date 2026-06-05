@@ -92,11 +92,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         ];
       case '/custom-domain':
         return [
-          { queryKey: ['custom-domain'], queryFn: () => apiFetch('/custom-domain', { token }), staleTime: 60_000 },
+          { queryKey: ['custom-domains'], queryFn: () => apiFetch('/custom-domains', { token }), staleTime: 60_000 },
         ];
       case '/routing-config':
         return [
-          { queryKey: ['routing-rules'], queryFn: () => apiFetch('/routing/rules', { token }), staleTime: 30_000 },
           { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
         ];
       case '/account':
