@@ -8,6 +8,10 @@
 import React, { type ReactElement } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NextIntlClientProvider } from 'next-intl';
+
+// Minimal messages for tests — just return key as value
+const testMessages: Record<string, any> = {};
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -26,19 +30,23 @@ function createTestQueryClient() {
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient;
+  locale?: string;
+  messages?: Record<string, any>;
 }
 
 /**
- * Render a component wrapped with QueryClientProvider (and any future global providers).
+ * Render a component wrapped with QueryClientProvider + NextIntlClientProvider.
  */
 export function renderWithProviders(
   ui: ReactElement,
-  { queryClient = createTestQueryClient(), ...renderOptions }: ExtendedRenderOptions = {}
+  { queryClient = createTestQueryClient(), locale = 'en', messages = testMessages, ...renderOptions }: ExtendedRenderOptions = {}
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </QueryClientProvider>
     );
   }
