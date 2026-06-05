@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 
 interface ModelHealth {
   endpoint_id: string;
@@ -65,17 +66,11 @@ export function ModelMonitorTab() {
   const t = useTranslations('cortex.modelMonitor');
   const tc = useTranslations('cortex.common');
   const { token } = useAuth();
-  const [summary, setSummary] = useState<PlatformSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<PlatformSummary>('/cortex/models/platform-summary', { token })
-      .then(setSummary)
-      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.status === 503 ? t('error') : err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data: summary, loading, error } = useCachedFetch<PlatformSummary>(
+    'modelMonitor',
+    () => apiFetch<PlatformSummary>('/cortex/models/platform-summary', { token: token! }),
+    [token]
+  );
 
   const getStatusColor = (s: string) =>
     s === 'healthy' ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' :

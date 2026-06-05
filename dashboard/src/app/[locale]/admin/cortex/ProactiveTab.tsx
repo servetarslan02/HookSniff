@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Clock, Info, Shield, ExternalLink, ArrowRight } from '@/components/icons';
@@ -49,9 +49,11 @@ export function ProactiveTab({ token }: { token: string | null }) {
   const [insights, setInsights] = useState<ProactiveInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || fetchedRef.current) return;
+    fetchedRef.current = true;
     apiFetch<any>('/cortex/proactive/status', { token })
       .then((d) => {
         const raw = d.proactive_insights || [];

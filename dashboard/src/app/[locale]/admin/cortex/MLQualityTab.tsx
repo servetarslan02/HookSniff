@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 import { RefreshCw, Target } from '@/components/icons';
 
 interface ModelQuality {
@@ -25,25 +26,18 @@ function describeQuality(score: number, accuracy: number, avgError: number, t: a
 export function MLQualityTab({ token }: { token: string | null }) {
   const t = useTranslations('cortex.mlQuality');
   const tc = useTranslations('cortex.common');
-  const [models, setModels] = useState<ModelQuality[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error, refetch } = useCachedFetch<any>(
+    'mlQuality',
+    () => apiFetch<any>('/cortex/ml/quality', { token: token! }),
+    [token]
+  );
+  const models = data?.models || [];
   const [resetting, setResetting] = useState(false);
-
-  const fetchQuality = () => {
-    if (!token) return;
-    apiFetch<any>('/cortex/ml/quality', { token })
-      .then((d) => setModels(d.models || []))
-      .catch((err) => { console.error('[MLQualityTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => { fetchQuality(); }, [token]);
 
   const handleReset = async () => {
     if (!token || resetting) return;
     setResetting(true);
-    try { await apiFetch<any>('/cortex/ml/quality/reset', { token, method: 'POST' }); fetchQuality(); }
+    try { await apiFetch<any>('/cortex/ml/quality/reset', { token, method: 'POST' }); refetch(); }
     catch (e) { console.error('Failed to reset ML models', e); }
     finally { setResetting(false); }
   };

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 
 interface AbTest {
   id: number;
@@ -87,17 +87,12 @@ export function ABTestTab() {
   const t = useTranslations('cortex.abTest');
   const tc = useTranslations('cortex.common');
   const { token } = useAuth();
-  const [tests, setTests] = useState<AbTest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<{ ab_tests: AbTest[] }>('/cortex/ab-tests', { token })
-      .then(d => setTests(d.ab_tests ?? []))
-      .catch((err) => { console.error('[ABTestTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data, loading, error } = useCachedFetch<any>(
+    'abTests',
+    () => apiFetch<any>('/cortex/ab-tests', { token: token! }),
+    [token]
+  );
+  const tests: AbTest[] = data?.ab_tests ?? [];
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;

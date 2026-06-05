@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 import { Brain, Clock, Info, ExternalLink } from '@/components/icons';
 import { PrefetchLink } from '@/components/PrefetchLink';
 
@@ -39,17 +40,12 @@ function describePrediction(probability: number, factors: any, t: any): { title:
 export function PredictionsTab({ token }: { token: string | null }) {
   const t = useTranslations('cortex.predictions');
   const tc = useTranslations('cortex.common');
-  const [predictions, setPredictions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<any>('/cortex/predictions', { token })
-      .then((d) => setPredictions(d.predictions || []))
-      .catch((err) => { console.error('[PredictionsTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data, loading, error } = useCachedFetch<any>(
+    'predictions',
+    () => apiFetch<any>('/cortex/predictions', { token: token! }),
+    [token]
+  );
+  const predictions = data?.predictions || [];
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
