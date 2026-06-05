@@ -7724,6 +7724,22 @@
         "volume_forecaster": "Trafik Tahmincisi",
         "latency_predictor": "Gecikme Tahmincisi",
         "drift_detector": "Sapma Dedektörü"
+      },
+      "paramNames": {
+        "s": "Strateji",
+        "ms": "Zaman Aşımı (ms)",
+        "strategy": "Strateji",
+        "threshold": "Eşik",
+        "rpm": "İstek/dk",
+        "rate": "Hız",
+        "timeout": "Zaman Aşımı",
+        "maxAttempts": "Maks Deneme",
+        "delay": "Gecikme",
+        "multiplier": "Çarpan",
+        "value": "Değer",
+        "window": "Pencere",
+        "size": "Boyut",
+        "limit": "Limit"
       }
     },
     "autoML": {
