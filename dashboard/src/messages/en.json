@@ -7688,6 +7688,22 @@
         "volume_forecaster": "Volume Forecaster",
         "latency_predictor": "Latency Predictor",
         "drift_detector": "Drift Detector"
+      },
+      "paramNames": {
+        "s": "Strategy",
+        "ms": "Timeout (ms)",
+        "strategy": "Strategy",
+        "threshold": "Threshold",
+        "rpm": "Requests/min",
+        "rate": "Rate",
+        "timeout": "Timeout",
+        "maxAttempts": "Max Attempts",
+        "delay": "Delay",
+        "multiplier": "Multiplier",
+        "value": "Value",
+        "window": "Window",
+        "size": "Size",
+        "limit": "Limit"
       }
     },
     "autoML": {
