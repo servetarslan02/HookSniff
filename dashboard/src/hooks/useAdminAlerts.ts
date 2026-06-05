@@ -15,7 +15,7 @@ export function useAdminAlerts() {
       return Array.isArray(data) ? data : [];
     },
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 

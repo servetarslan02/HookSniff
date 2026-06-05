@@ -24,7 +24,7 @@ export function useDashboardStats() {
     queryKey: ['stats'],
     queryFn: validated(() => statsApi.get(token!), StatsResponseSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -39,7 +39,7 @@ export function useDeliveryTrend(range = '24h') {
       DeliveryTrendSchema
     ),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -54,7 +54,7 @@ export function useSuccessRate(range = '24h') {
       SuccessRateSchema
     ),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -69,7 +69,7 @@ export function useEndpointHealth(range = '24h') {
       EndpointHealthSchema.array()
     ),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     refetchInterval: 30_000,
     placeholderData: (previousData) => previousData,
   });
@@ -85,7 +85,7 @@ export function useLatencyTrend(range = '24h') {
       LatencyTrendSchema
     ),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (prev) => prev,
   });
 }

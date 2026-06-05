@@ -20,7 +20,7 @@ export function useNotifications(params?: {
         read: params?.read,
       }),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }

@@ -59,7 +59,7 @@ export function useAdminUsers(params?: {
       AdminUsersResponseSchema
     ),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -78,7 +78,7 @@ export function useAdminAuditLogs(params?: {
       AuditLogResponseSchema
     ),
     enabled: !!token && !!params,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 

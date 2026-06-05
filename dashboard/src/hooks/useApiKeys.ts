@@ -13,7 +13,7 @@ export function useApiKeys() {
     queryKey: ['api-keys'],
     queryFn: validated(() => api.getApiKeys(token!), ApiKeySchema.array()),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }

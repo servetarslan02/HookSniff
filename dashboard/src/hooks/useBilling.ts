@@ -32,7 +32,7 @@ export function useBillingUsage() {
     queryKey: ['billing', 'usage'],
     queryFn: validated(() => billingApiExtended.getUsage(token!), BillingUsageSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -43,7 +43,7 @@ export function useBillingInvoices() {
     queryKey: ['billing', 'invoices'],
     queryFn: validated(() => billingApiExtended.getInvoices(token!), InvoiceSchema.array()),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -54,7 +54,7 @@ export function useBillingSubscription() {
     queryKey: ['billing', 'subscription'],
     queryFn: validated(() => billingApiExtended.getSubscription(token!), BillingSubscriptionSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -65,6 +65,6 @@ export function useOverageSettings() {
     queryKey: ['billing', 'overage'],
     queryFn: validated(() => billingApiExtended.getOverageSettings(token!), OverageSettingsSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
