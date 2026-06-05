@@ -98,13 +98,13 @@ export default function PortalCustomizationPage() {
         <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm flex items-start gap-3">
           <AlertTriangle size={18} className="flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-medium">{t('portalLoadFailed') || 'Portal ayarları yüklenemedi'}</p>
+            <p className="font-medium">{t('portalLoadFailed') || 'Portal settings could not be loaded'}</p>
             <p className="text-xs mt-1 opacity-80">
-              {configError?.message || t('portalLoadFailedDesc') || 'Varsayılan ayarlarla devam edebilirsiniz. Kaydetmeyi deneyin.'}
+              {configError?.message || t('portalLoadFailedDesc') || 'You can continue with default settings. Try saving.'}
             </p>
             <button type="button" onClick={handleRetry}
               className="text-xs font-medium mt-2 px-3 py-1.5 rounded-lg bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 dark:hover:bg-amber-500/30 transition">
-              ↻ {t('retry') || 'Tekrar Dene'}
+              ↻ {t('retry') || 'Retry'}
             </button>
           </div>
         </div>
