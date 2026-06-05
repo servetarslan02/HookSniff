@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
+import { useCachedFetch } from './useCortexCache';
 import { ExternalLink } from '@/components/icons';
 import { PrefetchLink } from '@/components/PrefetchLink';
 
@@ -22,17 +23,12 @@ export function DriftTab() {
   const t = useTranslations('cortex.drift');
   const tc = useTranslations('cortex.common');
   const { token } = useAuth();
-  const [events, setEvents] = useState<DriftEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<{ drift_events: DriftEvent[] }>('/cortex/drift/events', { token })
-      .then(d => setEvents(d.drift_events ?? []))
-      .catch((err) => { console.error('[DriftTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data, loading, error } = useCachedFetch<any>(
+    'drift',
+    () => apiFetch<any>('/cortex/drift/events', { token: token! }),
+    [token]
+  );
+  const events: DriftEvent[] = data?.drift_events ?? [];
 
   const getColor = (severity: number) =>
     severity > 0.7 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
