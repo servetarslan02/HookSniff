@@ -9,6 +9,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    setupFiles: ['src/__tests__/setup-providers.ts'],
   },
   resolve: {
     alias: {
