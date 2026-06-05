@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 
 use super::{Team, TeamMember};
 
@@ -26,7 +26,7 @@ pub fn validate_role(role: &str) -> Result<(), AppError> {
     if VALID_ROLES.contains(&role) {
         Ok(())
     } else {
-        Err(AppError::BadRequest("Invalid role. Must be one of: admin, developer, analyst, viewer".into()))
+        Err(AppError::coded(ErrorCode::InvalidRole))
     }
 }
 
