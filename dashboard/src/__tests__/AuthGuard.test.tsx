@@ -33,27 +33,22 @@ describe('AuthGuard', () => {
   });
 
   // === Loading State ===
-  it('shows loading spinner when isLoading is true', () => {
+  // AuthGuard renders children optimistically during loading (token from localStorage)
+  it('renders children while loading (optimistic)', () => {
     mockUseAuth.mockReturnValue({ token: null, isLoading: true });
     const { container } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).toContain('Loading...');
-    expect(container.querySelector('.animate-spin')).toBeTruthy();
-  });
-
-  it('does not render children while loading', () => {
-    mockUseAuth.mockReturnValue({ token: null, isLoading: true });
-    const { container } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).not.toContain('Protected Content');
+    expect(container.textContent).toContain('Protected Content');
   });
 
   // === No Token (Redirecting) ===
   it('shows redirecting message when not loading and no token', () => {
     mockUseAuth.mockReturnValue({ token: null, isLoading: false });
     const { container } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).toContain('Redirecting to login...');
+    expect(container.textContent).toContain('redirecting');
+    expect(container.querySelector('.animate-spin')).toBeTruthy();
   });
 
-  it('does not render children when there is no token', () => {
+  it('does not render children when there is no token and not loading', () => {
     mockUseAuth.mockReturnValue({ token: null, isLoading: false });
     const { container } = renderWithAuth(<div>Protected Content</div>);
     expect(container.textContent).not.toContain('Protected Content');
@@ -109,23 +104,25 @@ describe('AuthGuard', () => {
   it('transitions from loading to authenticated content', () => {
     mockUseAuth.mockReturnValue({ token: null, isLoading: true });
     const { container, rerender } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).toContain('Loading...');
+    // AuthGuard renders children optimistically during loading
+    expect(container.textContent).toContain('Protected Content');
 
     mockUseAuth.mockReturnValue({ token: 'valid-token', isLoading: false });
     rerender(<AuthGuard><div>Protected Content</div></AuthGuard>);
     expect(container.textContent).toContain('Protected Content');
-    expect(container.textContent).not.toContain('Loading...');
   });
 
   // === Transition: Loading → Not Authenticated ===
   it('transitions from loading to redirect when no token', async () => {
     mockUseAuth.mockReturnValue({ token: null, isLoading: true });
     const { container, rerender } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).toContain('Loading...');
+    // During loading, children render optimistically
+    expect(container.textContent).toContain('Protected Content');
 
     mockUseAuth.mockReturnValue({ token: null, isLoading: false });
     rerender(<AuthGuard><div>Protected Content</div></AuthGuard>);
-    expect(container.textContent).toContain('Redirecting to login...');
+    expect(container.textContent).toContain('redirecting');
+    expect(container.textContent).not.toContain('Protected Content');
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/login');
     });
@@ -135,32 +132,25 @@ describe('AuthGuard', () => {
   it('handles empty string token as falsy', () => {
     mockUseAuth.mockReturnValue({ token: '', isLoading: false });
     const { container } = renderWithAuth(<div>Protected Content</div>);
-    expect(container.textContent).toContain('Redirecting to login...');
+    expect(container.textContent).toContain('redirecting');
+    expect(container.textContent).not.toContain('Protected Content');
   });
 
-  it('renders spinner with correct styling', () => {
-    mockUseAuth.mockReturnValue({ token: null, isLoading: true });
+  it('renders redirect spinner with correct styling', () => {
+    mockUseAuth.mockReturnValue({ token: null, isLoading: false });
     const { container } = renderWithAuth(<div>Protected Content</div>);
     const spinner = container.querySelector('.animate-spin');
     expect(spinner).toBeTruthy();
     expect(spinner!.className).toContain('rounded-full');
-    expect(spinner!.className).toContain('border-b-2');
   });
 
-  it('uses min-h-screen for full page layout in loading state', () => {
-    mockUseAuth.mockReturnValue({ token: null, isLoading: true });
+  it('uses min-h-screen for redirect state', () => {
+    mockUseAuth.mockReturnValue({ token: null, isLoading: false });
     const { container } = renderWithAuth(<div>Protected Content</div>);
     const wrapper = container.querySelector('.min-h-screen');
     expect(wrapper).toBeTruthy();
     expect(wrapper!.className).toContain('flex');
     expect(wrapper!.className).toContain('items-center');
     expect(wrapper!.className).toContain('justify-center');
-  });
-
-  it('uses min-h-screen for redirect state too', () => {
-    mockUseAuth.mockReturnValue({ token: null, isLoading: false });
-    const { container } = renderWithAuth(<div>Protected Content</div>);
-    const wrapper = container.querySelector('.min-h-screen');
-    expect(wrapper).toBeTruthy();
   });
 });
