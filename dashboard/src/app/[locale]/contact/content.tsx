@@ -293,7 +293,7 @@ export function ContactPageContent() {
                 href="/pricing"
                 className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-3.5 rounded-xl font-semibold border border-white/10 hover:bg-white/20 transition-all duration-300"
               >
-                {t('pricing.viewPlans') || 'View Plans'}
+                {t('pricing.title')}
               </a>
             </div>
           </div>
