@@ -436,7 +436,13 @@
     "deliveryId": "Teslimat ID",
     "httpResponse": "HTTP Yanıt",
     "attempt": "Deneme",
-    "deliveryAttempts": "Teslimat Denemeleri"
+    "deliveryAttempts": "Teslimat Denemeleri",
+    "colEvent": "Olay",
+    "colEndpoint": "Uç Nokta",
+    "colStatus": "Durum",
+    "colAttempts": "Deneme",
+    "colResponse": "Yanıt",
+    "colTime": "Zaman"
   },
   "search": {
     "title": "Webhook Arama",
