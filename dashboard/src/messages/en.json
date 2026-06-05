@@ -7459,8 +7459,25 @@
         "latencyTrend": "Check the endpoint, server may be slowing down",
         "rateLimitRisk": "Consider increasing rate limit or reducing requests",
         "stressDetection": "Check server resources",
-        "cascadeRisk": "Fix the main endpoint, others may also be affected"
-      }
+        "cascadeRisk": "Fix the main endpoint, others may also be affected",
+        "degradation": "This endpoint's success rate is declining. Take action before it hits the anomaly threshold."
+      },
+      "steps": {
+        "checkEndpoint": "Open the endpoint detail page and check recent deliveries",
+        "checkServer": "Check your server logs for errors or slowdowns",
+        "enableFallback": "Enable a fallback URL in endpoint settings",
+        "upgradePlan": "Consider upgrading your plan for higher limits",
+        "reduceTraffic": "Review and reduce unnecessary webhook traffic",
+        "checkResources": "Check server CPU, memory, and disk usage",
+        "scaleUp": "Consider scaling up your server resources",
+        "fixMainEndpoint": "Fix the main endpoint first — others depend on it",
+        "checkDependents": "Check dependent endpoints for cascading failures",
+        "openEndpoint": "Open the affected endpoint and check recent delivery history",
+        "checkServerLogs": "Check your server logs for errors or timeouts",
+        "checkRecentDeploy": "Check if a recent code deployment caused the issue"
+      },
+      "endpointLink": "View endpoint",
+      "nextSteps": "What to do:"
     },
     "drift": {
       "title": "Drift Detection Events",
