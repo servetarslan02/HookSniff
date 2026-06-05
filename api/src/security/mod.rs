@@ -8,6 +8,7 @@
 //! - Compliance auditing
 //! - Zero trust verification
 
+pub mod auto_resolve;
 pub mod compliance;
 pub mod ddos;
 pub mod incident_response;
