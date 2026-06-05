@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
  */
 export function ServiceWorkerRegister() {
   const [showUpdate, setShowUpdate] = useState(false);
+  const [newWorkerRef, setNewWorkerRef] = useState<ServiceWorker | null>(null);
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
 
@@ -60,6 +61,7 @@ export function ServiceWorkerRegister() {
               // Only show prompt if user hasn't dismissed this exact version
               const storedDismissed = localStorage.getItem('sw_dismissed_version');
               if (storedDismissed !== swUrl && isMounted) {
+                setNewWorkerRef(newWorker);
                 setShowUpdate(true);
               }
             }
@@ -82,19 +84,20 @@ export function ServiceWorkerRegister() {
 
   // Apply update when user clicks the prompt
   function applyUpdate() {
-    if (!registration?.waiting) return;
-    registration.waiting.postMessage('skipWaiting');
-    // Reload once the new SW takes control
+    const worker = newWorkerRef ?? registration?.waiting;
+    if (!worker) return;
+    // Listen BEFORE posting skipWaiting to avoid race condition
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       window.location.reload();
-    });
+    }, { once: true });
+    worker.postMessage('skipWaiting');
   }
 
   // Dismiss and persist so this version doesn't prompt again
   function dismissUpdate() {
-    if (registration?.waiting) {
-      const swUrl = registration.waiting.scriptURL;
-      try { localStorage.setItem('sw_dismissed_version', swUrl); } catch {}
+    const worker = newWorkerRef ?? registration?.waiting;
+    if (worker) {
+      try { localStorage.setItem('sw_dismissed_version', worker.scriptURL); } catch {}
     }
     setShowUpdate(false);
   }
