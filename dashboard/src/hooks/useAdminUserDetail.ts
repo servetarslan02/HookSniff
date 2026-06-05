@@ -46,7 +46,7 @@ export function useAdminUserDetail(id: string) {
       AdminUserDetailSchema
     ),
     enabled: !!token && !!id,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -59,7 +59,7 @@ export function useAdminUserAnalytics(userId: string, days = 30) {
       UserAnalyticsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -72,7 +72,7 @@ export function useAdminUserPlanHistory(userId: string) {
       UserPlanHistoryResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -85,7 +85,7 @@ export function useAdminUserEndpoints(userId: string) {
       UserEndpointsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -101,7 +101,7 @@ export function useAdminUserWebhooks(
       UserWebhooksResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -114,7 +114,7 @@ export function useAdminUserApiKeys(userId: string) {
       UserApiKeysResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -127,7 +127,7 @@ export function useAdminUserApplications(userId: string) {
       UserApplicationsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -140,7 +140,7 @@ export function useAdminUserUsage(userId: string) {
       UserUsageResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -153,7 +153,7 @@ export function useAdminUserNotes(userId: string) {
       NotesResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -166,7 +166,7 @@ export function useAdminUserTags(userId: string) {
       TagsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -182,7 +182,7 @@ export function useAdminUserCommunications(
       CommunicationsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -198,7 +198,7 @@ export function useAdminUserInvoices(
       UserInvoicesResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -211,7 +211,7 @@ export function useAdminUserPayments(userId: string, perPage = 50) {
       UserPaymentsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -224,7 +224,7 @@ export function useAdminUserRefunds(userId: string, perPage = 50) {
       UserRefundsResponseSchema
     ),
     enabled: !!token && !!userId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -237,7 +237,7 @@ export function useDeliveryDetail(deliveryId: string | null) {
       DeliveryDetailResponseSchema
     ),
     enabled: !!token && !!deliveryId,
-    staleTime: 10_000,
+    staleTime: 180_000,
   });
 }
 
@@ -250,7 +250,7 @@ export function useDeliveryAttempts(deliveryId: string | null) {
       return DeliveryAttemptResponseSchema.array().parse(data);
     },
     enabled: !!token && !!deliveryId,
-    staleTime: 10_000,
+    staleTime: 180_000,
   });
 }
 

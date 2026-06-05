@@ -13,7 +13,7 @@ export function useRateLimits() {
     queryKey: ['rate-limits'],
     queryFn: validated(() => api.getRateLimits(token!), RateLimitSchema.array()),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }

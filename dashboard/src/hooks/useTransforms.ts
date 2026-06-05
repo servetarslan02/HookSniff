@@ -19,7 +19,7 @@ export function useTransformRules(endpointId: string) {
       TransformRuleSchema.array()
     ),
     enabled: !!token && !!endpointId,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 

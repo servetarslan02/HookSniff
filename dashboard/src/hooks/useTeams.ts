@@ -14,7 +14,7 @@ export function useTeams() {
       return Array.isArray(data) ? data : [];
     },
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -28,7 +28,7 @@ export function useTeamMembers(teamId: string | null) {
       return Array.isArray(data) ? data : [];
     },
     enabled: !!token && !!teamId,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -39,7 +39,7 @@ export function useTeamDetail(teamId: string | null) {
     queryKey: ['teams', teamId, 'detail'],
     queryFn: () => teamsApi.getDetail(token!, teamId!),
     enabled: !!token && !!teamId,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }

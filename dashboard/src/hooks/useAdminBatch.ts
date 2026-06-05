@@ -37,14 +37,14 @@ export function useAdminDashboardPrimary() {
         queryKey: ['admin', 'stats'],
         queryFn: validated(() => adminApi.getStats(token!), AdminStatsSchema),
         enabled: !!token,
-        staleTime: 30_000,
+        staleTime: 120_000,
         placeholderData: (prev: AdminStatsValidated | undefined) => prev,
       },
       {
         queryKey: ['admin', 'revenue'],
         queryFn: validated(() => adminApi.getRevenue(token!), RevenueSchema),
         enabled: !!token,
-        staleTime: 60_000,
+        staleTime: 180_000,
         placeholderData: (prev: RevenueValidated | undefined) => prev,
       },
     ],
@@ -73,7 +73,7 @@ export function useAdminDashboardHealth(enabled = true) {
           return data;
         },
         enabled: !!token && enabled,
-        staleTime: 15_000,
+        staleTime: 180_000,
       },
       {
         queryKey: ['admin', 'failed-deliveries', { limit: 1 }],
@@ -82,7 +82,7 @@ export function useAdminDashboardHealth(enabled = true) {
           return data;
         },
         enabled: !!token && enabled,
-        staleTime: 15_000,
+        staleTime: 180_000,
       },
     ],
     combine: (results) => ({
@@ -110,7 +110,7 @@ export function useAdminDashboardDeferred(enabled = true) {
           AuditLogResponseSchema
         ),
         enabled: !!token && enabled,
-        staleTime: 15_000,
+        staleTime: 180_000,
       },
       {
         queryKey: ['admin', 'feature-flags'],
@@ -119,7 +119,7 @@ export function useAdminDashboardDeferred(enabled = true) {
           return data;
         },
         enabled: !!token && enabled,
-        staleTime: 60_000,
+        staleTime: 180_000,
       },
       {
         queryKey: ['admin', 'deploy-info'],
@@ -137,7 +137,7 @@ export function useAdminDashboardDeferred(enabled = true) {
           return data;
         },
         enabled: !!token && enabled,
-        staleTime: 15_000,
+        staleTime: 180_000,
       },
     ],
     combine: (results) => ({

@@ -37,7 +37,7 @@ export function useSystemHealth() {
     },
     enabled: !!token,
     refetchInterval: 30_000,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -48,7 +48,7 @@ export function useQueueStatus(enabled = true) {
     queryKey: ['admin', 'queue-status'],
     queryFn: validated(() => adminApi.getQueueStatus(token!), QueueStatusSchema),
     enabled: !!token && enabled,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -60,7 +60,7 @@ export function useFailedDeliveries(params?: { limit?: number; since?: string })
     queryKey: ['admin', 'failed-deliveries', params],
     queryFn: validated(() => adminApi.getFailedDeliveries(token!, params), FailedDeliveriesResponseSchema),
     enabled: !!token && !!params,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -72,7 +72,7 @@ export function useDeadLetters(params?: { limit?: number; since?: string }) {
     queryKey: ['admin', 'dead-letters', params],
     queryFn: validated(() => adminApi.getDeadLetters(token!, params), DeadLettersResponseSchema),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -83,7 +83,7 @@ export function useRateLimitViolations(params?: { limit?: number; since?: string
     queryKey: ['admin', 'rate-limit-violations', params],
     queryFn: validated(() => adminApi.getRateLimitViolations(token!, params), RateLimitViolationsResponseSchema),
     enabled: !!token && !!params,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -95,7 +95,7 @@ export function useApiLatency(params?: { period?: string }) {
     queryKey: ['admin', 'api-latency', params],
     queryFn: validated(() => adminApi.getApiLatency(token!, params), ApiLatencyResponseSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 

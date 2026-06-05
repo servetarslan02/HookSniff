@@ -16,7 +16,7 @@ export function useInboundConfigs() {
       InboundConfigSchema.array()
     ),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (previousData) => previousData,
   });
 }

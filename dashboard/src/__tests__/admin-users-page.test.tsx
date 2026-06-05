@@ -4,6 +4,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, act } from '@testing-library/react';
 
+// Polyfill IntersectionObserver for jsdom
+class MockIntersectionObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+Object.defineProperty(global, 'IntersectionObserver', {
+  writable: true,
+  value: MockIntersectionObserver,
+});
+
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
@@ -11,11 +22,18 @@ const mockTAdmin = (key: string) => `admin.${key}`;
 const mockTCommon = (key: string) => `common.${key}`;
 vi.mock('next-intl', () => ({
   useTranslations: (ns?: string) => ns === 'common' ? mockTCommon : mockTAdmin,
+  useLocale: () => 'en',
 }));
 
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/admin/users',
   Link: ({ children, ...props }: any) => React.createElement('a', props, children),
+}));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/admin/users',
 }));
 
 vi.mock('@/lib/store', () => ({
@@ -27,7 +45,7 @@ vi.mock('@/components/Toast', () => ({
   useToast: () => ({ toast: mockToast }),
 }));
 
-const mockListUsers = vi.fn().mockResolvedValue({ users: [], total: 0 });
+const mockListUsers = vi.fn().mockResolvedValue({ users: [], total: 0, page: 1, per_page: 25 });
 const mockUpdateUserPlan = vi.fn().mockResolvedValue({});
 const mockUpdateUserStatus = vi.fn().mockResolvedValue({});
 
@@ -69,7 +87,7 @@ const { default: AdminUsersPage } = await import('@/app/[locale]/admin/users/pag
 describe('AdminUsersPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockListUsers.mockResolvedValue({ users: [], total: 0 });
+    mockListUsers.mockResolvedValue({ users: [], total: 0, page: 1, per_page: 25 });
   });
 
   it('renders without crashing', async () => {

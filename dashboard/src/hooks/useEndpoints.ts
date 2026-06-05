@@ -13,7 +13,7 @@ export function useEndpoints() {
     queryKey: ['endpoints'],
     queryFn: validated(() => endpointsApi.list(token!), EndpointSchema.array()),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -25,7 +25,7 @@ export function useEndpointDetail(id: string) {
     queryKey: ['endpoint', id],
     queryFn: validated(() => endpointsApi.get(token!, id), EndpointSchema),
     enabled: !!token && !!id,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }

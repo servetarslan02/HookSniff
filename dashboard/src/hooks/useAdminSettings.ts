@@ -19,7 +19,7 @@ export function useAdminFeatureFlags(enabled = true) {
       FeatureFlagsResponseSchema
     ),
     enabled: !!token && enabled,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -92,7 +92,7 @@ export function useFeatureFlags() {
       if (!res.ok) return { enabled_flags: [] as string[] };
       return res.json() as Promise<{ enabled_flags: string[] }>;
     },
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -145,6 +145,6 @@ export function useAdminBroadcasts(params?: { is_active?: string; broadcast_type
       return adminApi.listBroadcasts(token!, qs);
     },
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
