@@ -24,7 +24,7 @@ Webhooks are the backbone of modern integrations, but building reliable webhook 
 - **FIFO ordering** — Guaranteed ordered delivery with sequence numbers for event-sourced systems.
 - **Real-time visibility** — SSE streaming, WebSocket updates, and a full analytics dashboard.
 - **Cortex AI** — ML-powered anomaly detection, auto-healing, drift detection, and predictive monitoring.
-- **SDK ecosystem** — Node.js SDK available, more coming via OpenAPI codegen. See [SDK Status](#sdks) for current state.
+- **11 SDKs** — Official clients for Node.js, Python, Go, Rust, Java, Kotlin, Ruby, PHP, C#, Elixir, and Swift. Each in its own repo under [servetarslan02](https://github.com/servetarslan02?tab=repositories&q=hooksniff).
 
 ---
 
@@ -81,7 +81,7 @@ Webhooks are the backbone of modern integrations, but building reliable webhook 
 | **Inbound proxy** | Receive webhooks from Stripe, GitHub, Shopify |
 | **Embeddable portal** | Customer-facing portal widget |
 | **CLI** | Command-line tool for endpoint and webhook management |
-| **11 SDKs** | Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift (in development) |
+| **11 SDKs** | Node, Python, Go, Rust, Java, Kotlin, Ruby, PHP, C#, Elixir, Swift — [all repos](https://github.com/servetarslan02?tab=repositories&q=hooksniff) |
 
 ---
 
@@ -159,7 +159,7 @@ HookSniff/
 │   └── migrations/    # PostgreSQL migration scripts
 ├── worker/            # Background worker (retry + delivery)
 ├── dashboard/         # Next.js 16 dashboard + landing page
-├── sdks/              # SDKs (Node.js available, more via OpenAPI codegen)
+├── sdks/              # SDK source (Node.js in-repo, others in separate repos)
 ├── cli/               # CLI tool
 ├── portal/            # Embeddable portal widget
 ├── docs/              # API documentation (OpenAPI)
@@ -217,21 +217,21 @@ HookSniff/
 
 | Language | Package | Status |
 |----------|---------|--------|
-| Language | Package | Status |
-|----------|---------|--------|
-| Node.js | `hooksniff-sdk` | ✅ Available (v1.2.0) |
-| Python | `hooksniff` | 🔄 In development |
-| Go | `hooksniff-go` | 🔄 In development |
-| Rust | `hooksniff` | 🔄 In development |
-| Ruby | `hooksniff` | ⏳ Planned |
-| Java | `com.hooksniff` | ⏳ Planned |
-| Kotlin | `com.hooksniff` | ⏳ Planned |
-| PHP | `hooksniff/hooksniff` | ⏳ Planned |
-| C# | `HookSniff` | ⏳ Planned |
-| Elixir | `hooksniff` | ⏳ Planned |
-| Swift | `HookSniff` | ⏳ Planned |
+| Language | Package | Repository | Status |
+|----------|---------|------------|--------|
+| Node.js | `hooksniff-sdk` | [hooksniff-node](https://github.com/servetarslan02/hooksniff-node) | ✅ Available |
+| Python | `hooksniff` | [hooksniff-python](https://github.com/servetarslan02/hooksniff-python) | ✅ Available |
+| Go | `hooksniff-go` | [hooksniff-go](https://github.com/servetarslan02/hooksniff-go) | ✅ Available |
+| Rust | `hooksniff` | [hooksniff-rust](https://github.com/servetarslan02/hooksniff-rust) | ✅ Available |
+| Java | `com.hooksniff` | [hooksniff-java](https://github.com/servetarslan02/hooksniff-java) | ✅ Available |
+| Kotlin | `com.hooksniff` | [hooksniff-kotlin](https://github.com/servetarslan02/hooksniff-kotlin) | ✅ Available |
+| Ruby | `hooksniff` | [hooksniff-ruby](https://github.com/servetarslan02/hooksniff-ruby) | ✅ Available |
+| PHP | `hooksniff/hooksniff` | [hooksniff-php](https://github.com/servetarslan02/hooksniff-php) | ✅ Available |
+| C# | `HookSniff` | [hooksniff-csharp](https://github.com/servetarslan02/hooksniff-csharp) | ✅ Available |
+| Elixir | `hooksniff` | [hooksniff-elixir](https://github.com/servetarslan02/hooksniff-elixir) | ✅ Available |
+| Swift | `HookSniff` | [hooksniff-swift](https://github.com/servetarslan02/hooksniff-swift) | ✅ Available |
 
-> See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
+> All SDKs are MIT licensed. See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 
 ## Testing
 
