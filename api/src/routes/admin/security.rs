@@ -28,6 +28,8 @@ pub struct SecurityEvent {
     pub resolved: bool,
     pub resolved_by: Option<Uuid>,
     pub resolved_at: Option<DateTime<Utc>>,
+    pub auto_resolved: bool,
+    pub auto_resolve_reason: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -125,7 +127,7 @@ pub async fn list_security_events(
     let where_clause = format!("WHERE {}", conditions.join(" AND "));
 
     let query_sql = format!(
-        "SELECT id, event_type, severity, customer_id, email, ip_address, user_agent, details, resolved, resolved_by, resolved_at, created_at
+        "SELECT id, event_type, severity, customer_id, email, ip_address, user_agent, details, resolved, resolved_by, resolved_at, auto_resolved, auto_resolve_reason, created_at
          FROM security_events {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
         where_clause, param_idx, param_idx + 1
     );
@@ -160,7 +162,7 @@ pub async fn security_stats(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
 
-    let row = sqlx::query_as::<_, (i64, i64, i64, i64, i64, i64, i64, serde_json::Value, serde_json::Value, serde_json::Value)>(
+    let row = sqlx::query_as::<_, (i64, i64, i64, i64, i64, i64, i64, i64, serde_json::Value, serde_json::Value, serde_json::Value)>(
         r#"WITH base AS (SELECT * FROM security_events),
            counts AS (
              SELECT
@@ -170,7 +172,8 @@ pub async fn security_stats(
                COUNT(*) FILTER (WHERE severity = 'high' AND created_at > NOW() - INTERVAL '7 days') as high_events,
                COUNT(*) FILTER (WHERE event_type IN ('brute_force_login','brute_force_api') AND created_at > NOW() - INTERVAL '24 hours') as brute,
                COUNT(*) FILTER (WHERE event_type = 'credential_stuffing' AND created_at > NOW() - INTERVAL '24 hours') as stuff,
-               COUNT(*) FILTER (WHERE event_type IN ('sql_injection_attempt','xss_attempt','path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours') as inject
+               COUNT(*) FILTER (WHERE event_type IN ('sql_injection_attempt','xss_attempt','path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours') as inject,
+               COUNT(*) FILTER (WHERE auto_resolved = true AND created_at > NOW() - INTERVAL '24 hours') as auto_resolved_24h
              FROM base
            ),
            by_type AS (
@@ -186,11 +189,11 @@ pub async fn security_stats(
              FROM (SELECT ip_address, COUNT(*) as cnt FROM base WHERE ip_address IS NOT NULL AND created_at > NOW() - INTERVAL '7 days' GROUP BY ip_address ORDER BY cnt DESC LIMIT 10) t
            )
            SELECT c.total_events, c.unresolved_events, c.critical_events, c.high_events,
-                  c.brute, c.stuff, c.inject, bt.data, bs.data, bi.data
+                  c.brute, c.stuff, c.inject, c.auto_resolved_24h, bt.data, bs.data, bi.data
            FROM counts c, by_type bt, by_severity bs, by_ip bi"#
     ).fetch_one(&pool).await?;
 
-    let (total, unresolved, critical, high, brute, stuff, inject, by_type, by_severity, by_ip) = row;
+    let (total, unresolved, critical, high, brute, stuff, inject, auto_resolved_24h, by_type, by_severity, by_ip) = row;
 
     Ok(Json(serde_json::json!({
         "total_events": total,
@@ -200,6 +203,7 @@ pub async fn security_stats(
         "recent_brute_force": brute,
         "recent_credential_stuffing": stuff,
         "recent_injection_attempts": inject,
+        "auto_resolved_24h": auto_resolved_24h,
         "events_by_type": by_type,
         "events_by_severity": by_severity,
         "top_ips": by_ip,
