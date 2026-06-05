@@ -6,9 +6,9 @@
       "name": "API",
       "icon": "zap",
       "status": "down",
-      "latency_ms": 3,
+      "latency_ms": 1,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-04T20:55:32.301Z"
+      "last_checked": "2026-06-05T06:09:08.839Z"
     },
     {
       "name": "Dashboard",
@@ -16,7 +16,7 @@
       "status": "healthy",
       "latency_ms": null,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-04T20:55:32.301Z"
+      "last_checked": "2026-06-05T06:09:08.839Z"
     },
     {
       "name": "Worker",
@@ -24,7 +24,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-04T20:55:32.301Z"
+      "last_checked": "2026-06-05T06:09:08.839Z"
     },
     {
       "name": "Database",
@@ -32,7 +32,7 @@
       "status": "down",
       "latency_ms": null,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-04T20:55:32.301Z"
+      "last_checked": "2026-06-05T06:09:08.839Z"
     },
     {
       "name": "Cache",
@@ -40,14 +40,13 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-04T20:55:32.301Z"
+      "last_checked": "2026-06-05T06:09:08.839Z"
     }
   ],
-  "checked_at": "2026-06-04T20:55:32.301Z",
+  "checked_at": "2026-06-05T06:09:08.839Z",
   "response_times": {
     "API": [
-      9,
-      3
+      1
     ]
   },
   "history": [
@@ -505,7 +504,7 @@
       "incidents": []
     },
     {
-      "date": "2026-06-04",
+      "date": "2026-06-05",
       "uptime": 20,
       "incidents": []
     }

@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CodeBlock from '@/components/CodeBlock';
+import { Globe, CheckCircle2, XCircle, Clock } from '@/components/icons';
 
 export const metadata: Metadata = {
   title: 'Custom Domain — HookSniff',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 async function CustomDomainDocsContent() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🌐 Custom Domain</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={28} className="inline mr-2 align-text-bottom" /> Custom Domain</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Use your own domain for the webhook portal. White-label your customers' experience.
       </p>
@@ -95,7 +96,7 @@ async function CustomDomainDocsContent() {
             </ul>
             <div className="mt-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20">
               <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                <strong>⏱ Important:</strong> DNS changes take 5–30 minutes to propagate globally. Don't worry if verification fails immediately — just wait and try again.
+                <strong><Clock size={14} className="inline mr-1 align-text-bottom" /> Important:</strong> DNS changes take 5–30 minutes to propagate globally. Don't worry if verification fails immediately — just wait and try again.
               </p>
             </div>
           </div>
@@ -110,8 +111,8 @@ async function CustomDomainDocsContent() {
               After adding the DNS records and waiting a few minutes, click <strong>"Verify Domain"</strong> in the dashboard.
             </p>
             <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1 list-disc list-inside mb-3">
-              <li><strong>✅ Success:</strong> Your domain is verified and SSL certificate is automatically provisioned</li>
-              <li><strong>❌ Failed:</strong> DNS records not found yet — wait a few more minutes and try again</li>
+              <li><strong><CheckCircle2 size={14} className="inline mr-1 text-emerald-500 align-text-bottom" /> Success:</strong> Your domain is verified and SSL certificate is automatically provisioned</li>
+              <li><strong><XCircle size={14} className="inline mr-1 text-red-500 align-text-bottom" /> Failed:</strong> DNS records not found yet — wait a few more minutes and try again</li>
             </ul>
             <p className="text-sm text-gray-500 dark:text-slate-500 italic">
               Once verified, your customers can access the webhook portal through your custom domain with a valid HTTPS certificate.
@@ -190,10 +191,10 @@ DELETE /v1/custom-domains/:id`}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                <tr><td className="px-4 py-3">Developer</td><td className="px-4 py-3">❌</td><td className="px-4 py-3">—</td></tr>
-                <tr><td className="px-4 py-3">Startup</td><td className="px-4 py-3">✅</td><td className="px-4 py-3">Auto</td></tr>
-                <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3">✅</td><td className="px-4 py-3">Auto</td></tr>
-                <tr><td className="px-4 py-3">Enterprise</td><td className="px-4 py-3">✅ Unlimited</td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Developer</td><td className="px-4 py-3"><XCircle size={16} className="text-red-500" /></td><td className="px-4 py-3">—</td></tr>
+                <tr><td className="px-4 py-3">Startup</td><td className="px-4 py-3"><CheckCircle2 size={16} className="text-emerald-500" /></td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Pro</td><td className="px-4 py-3"><CheckCircle2 size={16} className="text-emerald-500" /></td><td className="px-4 py-3">Auto</td></tr>
+                <tr><td className="px-4 py-3">Enterprise</td><td className="px-4 py-3"><CheckCircle2 size={16} className="text-emerald-500" /> Unlimited</td><td className="px-4 py-3">Auto</td></tr>
               </tbody>
             </table>
           </div>

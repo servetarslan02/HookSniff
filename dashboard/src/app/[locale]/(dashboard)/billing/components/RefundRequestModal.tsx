@@ -6,16 +6,16 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/lib/errors';
-import { X, AlertTriangle, CheckCircle2 } from '@/components/icons';
+import { X, AlertTriangle, CheckCircle2, ShoppingCart, Frown, Puzzle, Wrench, CreditCard, FileText } from '@/components/icons';
 
 const REFUND_CATEGORIES = [
-  { value: 'accidental_purchase', icon: '🛒' },
-  { value: 'not_satisfied', icon: '😞' },
-  { value: 'missing_features', icon: '🧩' },
-  { value: 'technical_issues', icon: '🔧' },
-  { value: 'billing_error', icon: '💳' },
-  { value: 'other', icon: '📝' },
-] as const;
+  { value: 'accidental_purchase', icon: <ShoppingCart size={16} /> },
+  { value: 'not_satisfied', icon: <Frown size={16} /> },
+  { value: 'missing_features', icon: <Puzzle size={16} /> },
+  { value: 'technical_issues', icon: <Wrench size={16} /> },
+  { value: 'billing_error', icon: <CreditCard size={16} /> },
+  { value: 'other', icon: <FileText size={16} /> },
+];
 
 export function RefundRequestModal({
   isOpen,
