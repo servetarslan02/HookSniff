@@ -2223,7 +2223,7 @@
     "noActiveAlerts": "Aktif uyarı yok",
     "queueStatus": "Kuyruk Durumu",
     "queueStatusDesc": "Webhook teslimat kuyruğu derinliği.",
-    "failedDeliveries": "Başarısız Teslimatlar",
+    "failedDeliveries": "Basarisiz Teslimatlar",
     "noFailedDeliveries": "Son 24 saatte başarısız teslimat yok.",
     "deadLetters": "Ölü Mektuplar",
     "deadLettersDesc": "Kalıcı olarak başarısız teslimatlar — yeniden deneme yok.",
@@ -2409,7 +2409,18 @@
     "clearCache": "React Query Onbellek Temizle",
     "clearCacheDesc": "Tum onbellek alinan verileri zorla gecersiz kil",
     "cacheCleared": "React Query onbellegi temizlendi",
-    "refundLoadFailed": "Iade talepleri yuklenemedi"
+    "refundLoadFailed": "Iade talepleri yuklenemedi",
+    "failedDeliveriesCount": "Son 1 saatte {count} basarisiz teslimat",
+    "queueBacklog": "Kuyruk Birikmesi",
+    "queueBacklogCount": "{count} teslimat bekliyor",
+    "items": "adet",
+    "dismissAll": "Tumunu Gizle",
+    "allClear": "Her sey yolunda",
+    "noAdminNotifications": "Admin bildirimi yok",
+    "justNow": "simdilerde",
+    "minutesAgo": "{n} dk once",
+    "hoursAgo": "{n} saat once",
+    "daysAgo": "{n} gun once"
   },
   "landing": {
     "nav": {
@@ -7573,10 +7584,22 @@
     "attemptDetails": "Tam yanit govdeleri, durum kodlari, zaman damgalari"
   },
   "docsCustomDomain": {
+    "title": "Özel Alan Adı",
+    "subtitle": "Webhook portalınız için kendi alan adınızı kullanın. Müşterilerinize beyaz etiketli bir deneyim sunun.",
     "howItWorks": "Nasil calisir:",
     "onlyUseDomains": "Yalnizca size ait ve kontrol ettiginiz alan adlarini kullanin",
     "cloudflare": "Cloudflare:",
-    "googleDomains": "Google Domains:"
+    "googleDomains": "Google Domains:",
+    "overview": "Genel Bakış",
+    "overviewDesc": "Özel alan adları, varsayılan HookSniff URL'si yerine kendi alan adınızı kullanmanızı sağlar.",
+    "howItWorksFull": "Alan adınızı DNS üzerinden HookSniff'e yönlendirirsiniz. Sahipliğini doğrularız ve SSL sertifikası otomatik olarak sağlanır.",
+    "stepByStep": "Adım Adım Kılavuz",
+    "step1Title": "Alan adınızı ekleyin",
+    "step1Desc": "Dashboard > Özel Alan Adı'na gidin ve kullanmak istediğiniz domaini girin.",
+    "step1Tip1": "webhooks.sirketiniz.com gibi bir alt alan adı kullanın",
+    "step1Tip2": "Tam URL'yi yapıştırabilirsiniz — protokolü otomatik olarak kaldırırız",
+    "step1Tip3": "Yalnızca size ait ve kontrol ettiğiniz alan adlarını kullanın.",
+    "step1After": "Ekledikten sonra yapılandırmanız gereken iki DNS kaydı göreceksiniz."
   },
   "docsSso": {
     "title": "Tek Oturum Acma (SSO)",
