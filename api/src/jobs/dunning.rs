@@ -389,7 +389,7 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
 
     <p style="color: #9ca3af; font-size: 13px; text-align: center;">
       Bu e-postayı yanlışlıkla aldıysanız görmezden gelebilirsiniz.<br>
-      Sorularınız için <a href="mailto:support@hooksniff.dev" style="color: #6d28d9;">support@hooksniff.dev</a>
+      Sorularınız için <a href="mailto:servetarslan02@gmail.com" style="color: #6d28d9;">servetarslan02@gmail.com</a>
     </p>
   </div>
   <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">
@@ -461,7 +461,7 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
 
     <p style="color: #9ca3af; font-size: 13px; text-align: center;">
       If you received this email by mistake, you can ignore it.<br>
-      Questions? <a href="mailto:support@hooksniff.dev" style="color: #6d28d9;">support@hooksniff.dev</a>
+      Questions? <a href="mailto:servetarslan02@gmail.com" style="color: #6d28d9;">servetarslan02@gmail.com</a>
     </p>
   </div>
   <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">

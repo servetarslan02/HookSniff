@@ -376,7 +376,7 @@ export function HomeContent() {
                       onClick={() => { setProfileOpen(false); logout(); router.push('/login'); }}
                       className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     >
-                      Çıkış Yap
+                      {tNav('logout') || 'Log Out'}
                     </button>
                   </div>
                 )}
@@ -415,7 +415,7 @@ export function HomeContent() {
               <div className="h-10 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : (
               <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
-                {token ? (user?.is_admin ? 'Admin Panel' : tNav('dashboard')) : tNav('register')}
+                {token ? (user?.is_admin ? (tNav('adminPanel') || 'Admin Panel') : tNav('dashboard')) : tNav('register')}
               </Link>
             )}
           </div>
