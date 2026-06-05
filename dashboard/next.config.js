@@ -8,6 +8,8 @@ const nextConfig = {
   // output: 'standalone' removed — incompatible with Vercel API routes
   cacheComponents: true,
   reactCompiler: true,
+  swcMinify: true,
+  poweredByHeader: false,
   turbopack: {
     root: __dirname,
   },
