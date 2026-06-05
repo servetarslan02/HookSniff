@@ -328,69 +328,73 @@ async fn verify_domain(
     }
 }
 
-/// Verify DNS TXT record exists
+/// Verify DNS TXT record exists using DNS-over-HTTPS (Google DNS)
 async fn verify_dns_txt(domain: &str, expected: &str) -> bool {
-    // Use tokio::process to run dig/nslookup
-    let output = tokio::process::Command::new("dig")
-        .args(["+short", "TXT", &format!("_hooksniff.{}", domain)])
-        .output()
-        .await;
+    let fqdn = format!("_hooksniff.{}", domain);
+    let url = format!("https://dns.google/resolve?name={}&type=TXT", fqdn);
 
-    match output {
-        Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            stdout.contains(expected)
+    let client = crate::http_client::get_client().clone();
+    let resp = match client.get(&url).send().await {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::warn!("DNS-over-HTTPS TXT lookup failed for {}: {}", fqdn, e);
+            return false;
         }
-        Err(_) => {
-            // Fallback: try nslookup
-            let output = tokio::process::Command::new("nslookup")
-                .args(["-type=TXT", &format!("_hooksniff.{}", domain)])
-                .output()
-                .await;
+    };
 
-            match output {
-                Ok(out) => {
-                    let stdout = String::from_utf8_lossy(&out.stdout);
-                    stdout.contains(expected)
-                }
-                Err(_) => false,
-            }
-        }
+    let body: serde_json::Value = match resp.json().await {
+        Ok(b) => b,
+        Err(_) => return false,
+    };
+
+    // Check if Answer array exists and contains the expected TXT record
+    if let Some(answer) = body.get("Answer").and_then(|a| a.as_array()) {
+        answer.iter().any(|entry| {
+            entry
+                .get("data")
+                .and_then(|d| d.as_str())
+                .map(|s| s.contains(expected))
+                .unwrap_or(false)
+        })
+    } else {
+        false
     }
 }
 
-/// Verify DNS CNAME record exists
+/// Verify DNS CNAME record exists using DNS-over-HTTPS (Google DNS)
 async fn verify_dns_cname(domain: &str) -> bool {
-    let output = tokio::process::Command::new("dig")
-        .args(["+short", "CNAME", domain])
-        .output()
-        .await;
+    let url = format!("https://dns.google/resolve?name={}&type=CNAME", domain);
 
-    match output {
-        Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout).to_lowercase();
-            // Accept CNAME pointing to Vercel DNS or HookSniff domains
-            stdout.contains("vercel-dns.com")
-                || stdout.contains("hooksniff.app")
-                || stdout.contains("hooksniff.com")
+    let client = crate::http_client::get_client().clone();
+    let resp = match client.get(&url).send().await {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::warn!("DNS-over-HTTPS CNAME lookup failed for {}: {}", domain, e);
+            return false;
         }
-        Err(_) => {
-            // Fallback: try nslookup
-            let output = tokio::process::Command::new("nslookup")
-                .args(["-type=CNAME", domain])
-                .output()
-                .await;
+    };
 
-            match output {
-                Ok(out) => {
-                    let stdout = String::from_utf8_lossy(&out.stdout).to_lowercase();
-                    stdout.contains("vercel-dns.com")
-                        || stdout.contains("hooksniff.app")
-                        || stdout.contains("hooksniff.com")
-                }
-                Err(_) => false,
-            }
-        }
+    let body: serde_json::Value = match resp.json().await {
+        Ok(b) => b,
+        Err(_) => return false,
+    };
+
+    // Check if Answer array exists and CNAME points to Vercel/HookSniff
+    if let Some(answer) = body.get("Answer").and_then(|a| a.as_array()) {
+        answer.iter().any(|entry| {
+            entry
+                .get("data")
+                .and_then(|d| d.as_str())
+                .map(|s| {
+                    let lower = s.to_lowercase();
+                    lower.contains("vercel-dns.com")
+                        || lower.contains("hooksniff.app")
+                        || lower.contains("hooksniff.com")
+                })
+                .unwrap_or(false)
+        })
+    } else {
+        false
     }
 }
 
