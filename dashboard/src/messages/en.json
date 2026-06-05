@@ -4392,7 +4392,25 @@
     "criticalDays": "Critical (7 days)",
     "highDays": "High (7 days)",
     "securityEvents": "Security Events",
-    "eventTypes": "Event Types (30 days)",
+    "eventTypes": {
+      "brute_force_login": "Brute Force Login",
+      "brute_force_api": "Brute Force API",
+      "credential_stuffing": "Credential Stuffing",
+      "password_spray": "Password Spray",
+      "sql_injection_attempt": "SQL Injection",
+      "xss_attempt": "XSS Attack",
+      "path_traversal_attempt": "Path Traversal",
+      "scanner_detected": "Scanner Detected",
+      "suspicious_user_agent": "Suspicious User Agent",
+      "disabled_account_login": "Disabled Account Login",
+      "password_reset_abuse": "Password Reset Abuse",
+      "account_enumeration": "Account Enumeration",
+      "rate_limit_exceeded": "Rate Limit Exceeded",
+      "unusual_location": "Unusual Location",
+      "login_new_device": "New Device Login",
+      "threat_detected": "Threat Detected",
+      "blocked_ip_access": "Blocked IP Access"
+    },
     "topIps": "Top IPs with Events (7 days)",
     "allSeverity": "All Severity",
     "allStatus": "All Status",
@@ -4422,7 +4440,25 @@
     "resolveAllConfirm": "Are you sure you want to resolve all unresolved events?",
     "cancel": "Cancel",
     "topIpsTitle": "Top IPs with Events (7 days)",
-    "eventId": "Event ID"
+    "eventId": "Event ID",
+    "severityDesc": {
+      "critical": "Immediate action required — account or data at risk",
+      "high": "Likely malicious activity — investigate promptly",
+      "medium": "Suspicious activity — review when convenient",
+      "low": "Informational — no immediate action needed"
+    },
+    "relativeTime": {
+      "justNow": "just now",
+      "minutesAgo": "{n}m ago",
+      "hoursAgo": "{n}h ago",
+      "daysAgo": "{n}d ago"
+    },
+    "blockReasons": {
+      "brute_force": "Blocked due to brute force attack",
+      "abuse": "Blocked due to API abuse",
+      "manual": "Manually blocked by admin",
+      "auto": "Auto-blocked by security system"
+    }
   },
   "startups": {
     "title": "Startups",

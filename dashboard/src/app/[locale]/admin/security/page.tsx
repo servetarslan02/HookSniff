@@ -50,14 +50,23 @@ const SEVERITY_BAR_COLORS: Record<string, string> = {
   critical: 'bg-red-500', high: 'bg-orange-500', medium: 'bg-amber-500', low: 'bg-blue-500',
 };
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  brute_force_login: 'Brute Force Login', brute_force_api: 'Brute Force API',
-  credential_stuffing: 'Credential Stuffing', password_spray: 'Password Spray',
-  sql_injection_attempt: 'SQL Injection', xss_attempt: 'XSS Attack',
-  path_traversal_attempt: 'Path Traversal', scanner_detected: 'Scanner Detected',
-  suspicious_user_agent: 'Suspicious UA', disabled_account_login: 'Disabled Account Login',
-  password_reset_abuse: 'Password Reset Abuse', account_enumeration: 'Account Enumeration',
-  rate_limit_exceeded: 'Rate Limit Exceeded', unusual_location: 'Unusual Location',
+  brute_force_login: 'Brute Force Login',
+  brute_force_api: 'Brute Force API',
+  credential_stuffing: 'Credential Stuffing',
+  password_spray: 'Password Spray',
+  sql_injection_attempt: 'SQL Injection',
+  xss_attempt: 'XSS Attack',
+  path_traversal_attempt: 'Path Traversal',
+  scanner_detected: 'Scanner Detected',
+  suspicious_user_agent: 'Suspicious UA',
+  disabled_account_login: 'Disabled Account Login',
+  password_reset_abuse: 'Password Reset Abuse',
+  account_enumeration: 'Account Enumeration',
+  rate_limit_exceeded: 'Rate Limit Exceeded',
+  unusual_location: 'Unusual Location',
   login_new_device: 'New Device Login',
+  threat_detected: 'Threat Detected',
+  blocked_ip_access: 'Blocked IP Access',
 };
 const SEVERITY_OPTIONS = ['all', 'critical', 'high', 'medium', 'low'];
 const RESOLVED_OPTIONS = ['all', 'unresolved', 'resolved'];
