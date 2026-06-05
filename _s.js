@@ -10,7 +10,7 @@ const rf = (a, b) => a + Math.random() * (b - a);
 
 (async () => {
   await c.connect();
-  console.log('🧠 Cortex Final Seed\n');
+  console.log('🧠 Cortex Seed FINAL\n');
   const E = (await c.query('SELECT id FROM endpoints WHERE customer_id=$1', [AID])).rows.map(e => e.id);
   if (!E.length) { console.log('❌ No endpoints'); await c.end(); return; }
   console.log('Endpoints:', E.length);
@@ -23,7 +23,7 @@ const rf = (a, b) => a + Math.random() * (b - a);
   }
   console.log('  ✅ ' + E.length);
 
-  // 2. HOURLY STATS (840 = 5 eps * 7 days * 24 hours)
+  // 2. HOURLY STATS
   console.log('📊 Hourly Stats...');
   let sc = 0;
   for (const e of E) { for (let d = 0; d < 7; d++) { for (let h = 0; h < 24; h++) {
@@ -35,7 +35,7 @@ const rf = (a, b) => a + Math.random() * (b - a);
   }}}
   console.log('  ✅ ' + sc);
 
-  // 3. ANOMALIES (score = INTEGER!)
+  // 3. ANOMALIES
   console.log('🚨 Anomalies...');
   let ac = 0;
   for (const e of E) { for (let d = 0; d < 3; d++) { for (const cat of ['latency','failure_rate','volume','timeout','error_pattern']) {
@@ -45,11 +45,11 @@ const rf = (a, b) => a + Math.random() * (b - a);
   }}}
   console.log('  ✅ ' + ac);
 
-  // 4. ML MODELS (training_samples = INTEGER!)
+  // 4. ML MODELS (ON CONFLICT on unique constraint)
   console.log('🤖 ML Models...');
   let mc = 0;
   for (const e of E) { for (const mt of ['latency_predictor','failure_predictor','volume_forecaster','anomaly_detector']) {
-    await c.query('INSERT INTO ml_models (endpoint_id,model_type,parameters,training_samples,last_trained,accuracy) VALUES ($1,$2,$3,$4,$5,$6)',
+    await c.query('INSERT INTO ml_models (endpoint_id,model_type,parameters,training_samples,last_trained,accuracy) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (endpoint_id,model_type) DO UPDATE SET accuracy=$6, last_trained=$5, updated_at=NOW()',
       [e, mt, JSON.stringify({n_estimators:100,max_depth:6}), ri(500,2500), ago(0,ri(0,12)), rf(.75,.95)]);
     mc++;
   }}
@@ -78,7 +78,7 @@ const rf = (a, b) => a + Math.random() * (b - a);
   }}
   console.log('  ✅ ' + dc);
 
-  // 7. FEATURES (feature_value = double precision)
+  // 7. FEATURES
   console.log('📐 Features...');
   const FN = ['avg_latency','p95_latency','success_rate','volume','error_rate','retry_rate','timeout_rate','payload_size'];
   let fc = 0;
@@ -89,7 +89,7 @@ const rf = (a, b) => a + Math.random() * (b - a);
   }}}}
   console.log('  ✅ ' + fc);
 
-  // 8. TRACES (duration_ms = bigint, items_processed = bigint)
+  // 8. TRACES
   console.log('🔍 Traces...');
   const ST = ['signal_collect','anomaly_detect','healing_eval','ml_predict','proactive_scan','drift_check'];
   let tc = 0;
@@ -106,11 +106,11 @@ const rf = (a, b) => a + Math.random() * (b - a);
   await c.query("INSERT INTO ab_tests (endpoint_id,model_type,variant_a,variant_b,split_ratio,metric,status,winner,created_at) VALUES ($1,'retry','{\"s\":\"exp\"}','{\"s\":\"lin\"}',.5,'success_rate','running',NULL,NOW()-INTERVAL '3 days'),($1,'timeout','{\"ms\":5000}','{\"ms\":10000}',.5,'p95_latency','completed','variant_b',NOW()-INTERVAL '7 days') ON CONFLICT DO NOTHING", [E[0]]);
   console.log('  ✅ 2');
 
-  // 10. DRIFT (severity = double precision!, features_affected = jsonb!, detected_by = jsonb!)
+  // 10. DRIFT (severity=double, features_affected=jsonb, detected_by=jsonb)
   console.log('📈 Drift...');
   for (const e of E.slice(0,3)) { for (const d of [{t:'feature_drift',s:0.5,f:['avg_latency','p95_latency'],a:'Retrain'},{t:'concept_drift',s:0.8,f:['failure_rate'],a:'Reset model'},{t:'data_drift',s:0.3,f:['payload_size'],a:'Update baseline'}]) {
     await c.query('INSERT INTO ml_drift_events (endpoint_id,drift_type,severity,features_affected,detected_by,recommended_action,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
-      [e,d.t,d.s,JSON.stringify(d.f),JSON.stringify({method:'statistical_test',p_value:rf(.001,.05)}),d.a,ago(ri(0,5))]);
+      [e,d.t,d.s,JSON.stringify(d.f),JSON.stringify({method:'stat_test',p_value:rf(.001,.05)}),d.a,ago(ri(0,5))]);
   }}
   console.log('  ✅ drifts');
 
