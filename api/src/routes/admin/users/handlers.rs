@@ -330,12 +330,34 @@ pub async fn send_user_email(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
 
-    if !email.is_configured() {
-        return Err(AppError::BadRequest(
-            "Email provider not configured. Set RESEND_API_KEY or GCP_SA_JSON environment variable."
-                .into(),
-        ));
-    }
+    // Try injected provider first, fall back to DB-stored Resend key
+    let effective_email: crate::email::EmailProvider;
+    let email_ref = if email.is_configured() {
+        &email
+    } else {
+        let settings_row: Option<(serde_json::Value,)> =
+            sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
+                .fetch_optional(&pool)
+                .await?;
+        if let Some((val,)) = settings_row {
+            if let Ok(s) = serde_json::from_value::<crate::routes::admin::settings::PlatformSettings>(val) {
+                if let Some(ref key) = s.resend_api_key {
+                    if let Some(client) = crate::resend_email::ResendEmailClient::from_settings(key, s.email_sender.as_deref()) {
+                        effective_email = crate::email::EmailProvider::Resend(client);
+                        &effective_email
+                    } else {
+                        return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+                    }
+                } else {
+                    return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+                }
+            } else {
+                return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+            }
+        } else {
+            return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or configure it in Admin Settings.".into()));
+        }
+    };
 
     let rl_key = format!("admin_email:{}", customer.id);
     if !rate_limiter.check(&rl_key, 20).await {
@@ -364,7 +386,7 @@ pub async fn send_user_email(
 
     let (email_addr, _name) = user.ok_or(AppError::NotFound)?;
 
-    email
+    email_ref
         .send_contact_email(&email_addr, &req.subject, &req.body)
         .await
         .map_err(|e| AppError::BadRequest(format!("Failed to send email: {}", e)))?;
