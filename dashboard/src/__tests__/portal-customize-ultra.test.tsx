@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -51,14 +52,14 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading skeleton initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(PortalCustomizationPage));
+    const { container } = renderWithProviders(React.createElement(PortalCustomizationPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   // === Config Loading ===
   it('loads config from API on mount', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     await waitFor(() => {
       expect(mockApiFetch).toHaveBeenCalledWith('/portal/config', { token: 'test-token' });
@@ -68,7 +69,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders header with title and save button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Portal Customization');
@@ -81,7 +82,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders branding section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Branding');
@@ -95,7 +96,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('populates company name from config', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const input = container.querySelector('input[type="text"][placeholder="My Company"]') as HTMLInputElement;
@@ -107,7 +108,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('populates logo URL from config', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const input = container.querySelector('input[type="url"]') as HTMLInputElement;
@@ -119,7 +120,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows color picker with correct value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const colorInput = container.querySelector('input[type="color"]') as HTMLInputElement;
@@ -131,7 +132,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows font family select with correct value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
@@ -143,7 +144,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders all font options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
@@ -163,7 +164,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders features section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Features');
@@ -176,7 +177,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows toggle states correctly', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -191,7 +192,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders allowed events section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Allowed Events');
@@ -203,7 +204,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('adds new event on Add button click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -222,7 +223,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('adds event on Enter key press', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -238,7 +239,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('does not add empty event', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -255,7 +256,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('removes event on remove button click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
@@ -278,7 +279,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders preview section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Preview');
@@ -289,7 +290,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows company name in preview', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('TestCorp Portal');
@@ -299,7 +300,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows logo image in preview when URL set', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const img = container.querySelector('img[alt="Logo"]');
@@ -312,7 +313,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ ...MOCK_CONFIG, logo_url: '' });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🪝');
@@ -323,7 +324,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders embed code section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Embed Code');
@@ -334,7 +335,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows copy button for embed code', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const copyBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'Copy');
@@ -346,7 +347,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('renders React integration section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('React Integration');
@@ -359,7 +360,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({});
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Changes');
@@ -384,7 +385,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
       .mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Changes');
@@ -405,7 +406,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
       .mockRejectedValueOnce(new Error('Save failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Changes');
@@ -424,7 +425,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({});
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       // Should use default primary_color #6366f1
@@ -437,7 +438,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ primary_color: null, font_family: null });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
@@ -450,7 +451,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ ...MOCK_CONFIG, dark_mode: true });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       const darkContent = container.querySelector('.bg-slate-900.text-white');
@@ -463,7 +464,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ ...MOCK_CONFIG, show_events: false });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).not.toContain('Event Subscriptions');
@@ -474,7 +475,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ ...MOCK_CONFIG, show_deliveries: false });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).not.toContain('Recent Deliveries');
@@ -485,7 +486,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('updates company name on input change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('TestCorp');
@@ -501,7 +502,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('updates primary color on color input change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('TestCorp');
@@ -516,7 +517,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('updates font family on select change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('TestCorp');
@@ -552,7 +553,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
 
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/portal-customize/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -562,7 +563,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ ...MOCK_CONFIG, allowed_events: [] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('All events allowed');
@@ -573,7 +574,7 @@ describe('PortalCustomizationPage - Ultra Coverage', () => {
   it('shows error toast when adding duplicate event', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(PortalCustomizationPage)).container;
+      container = renderWithProviders(React.createElement(PortalCustomizationPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');

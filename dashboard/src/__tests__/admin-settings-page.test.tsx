@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -45,14 +46,14 @@ describe('AdminSettingsPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminSettingsPage));
+      renderWithProviders(React.createElement(AdminSettingsPage));
     });
   });
 
   it('displays page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.platformSettings');
@@ -61,7 +62,7 @@ describe('AdminSettingsPage', () => {
   it('displays subtitle description', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Configure platform-wide defaults and limits');
@@ -70,7 +71,7 @@ describe('AdminSettingsPage', () => {
   it('renders General section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.general');
@@ -79,7 +80,7 @@ describe('AdminSettingsPage', () => {
   it('renders maintenance mode toggle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.maintenanceMode');
@@ -89,7 +90,7 @@ describe('AdminSettingsPage', () => {
   it('renders signup enabled toggle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.signupsEnabled');
@@ -99,7 +100,7 @@ describe('AdminSettingsPage', () => {
   it('renders default plan select with options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Default Plan');
@@ -114,7 +115,7 @@ describe('AdminSettingsPage', () => {
   it('changes default plan select value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const selects = container!.querySelectorAll('select');
@@ -128,7 +129,7 @@ describe('AdminSettingsPage', () => {
   it('renders Plan Limits section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.planLimits');
@@ -139,7 +140,7 @@ describe('AdminSettingsPage', () => {
   it('renders all free plan inputs with default values', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Max Endpoints');
@@ -154,7 +155,7 @@ describe('AdminSettingsPage', () => {
   it('has correct default values for free plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -168,7 +169,7 @@ describe('AdminSettingsPage', () => {
   it('has correct default values for pro plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -182,7 +183,7 @@ describe('AdminSettingsPage', () => {
   it('changes free plan max endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -195,7 +196,7 @@ describe('AdminSettingsPage', () => {
   it('changes pro plan max webhooks', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -208,7 +209,7 @@ describe('AdminSettingsPage', () => {
   it('renders Retry Settings section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.retrySettings');
@@ -219,7 +220,7 @@ describe('AdminSettingsPage', () => {
   it('has correct default retry max attempts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -231,7 +232,7 @@ describe('AdminSettingsPage', () => {
   it('changes retry max attempts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -245,7 +246,7 @@ describe('AdminSettingsPage', () => {
   it('renders save button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('admin.saveSettings');
@@ -257,7 +258,7 @@ describe('AdminSettingsPage', () => {
   it('calls PUT /admin/settings on save', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -280,7 +281,7 @@ describe('AdminSettingsPage', () => {
   it('sends correct settings body on save', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -308,7 +309,7 @@ describe('AdminSettingsPage', () => {
   it('shows success toast on save success', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -323,7 +324,7 @@ describe('AdminSettingsPage', () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({}) });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -338,7 +339,7 @@ describe('AdminSettingsPage', () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -352,7 +353,7 @@ describe('AdminSettingsPage', () => {
   it('toggles maintenance mode', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const toggleButtons = container!.querySelectorAll('button.rounded-full');
@@ -374,7 +375,7 @@ describe('AdminSettingsPage', () => {
   it('toggles signup enabled', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const toggleButtons = container!.querySelectorAll('button.rounded-full');
@@ -394,7 +395,7 @@ describe('AdminSettingsPage', () => {
     mockFetch.mockReturnValue(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -410,7 +411,7 @@ describe('AdminSettingsPage', () => {
     process.env.NEXT_PUBLIC_API_URL = 'https://api.example.com/v1';
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -428,7 +429,7 @@ describe('AdminSettingsPage', () => {
   it('handles parseInt fallback to 0 for invalid number input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');
@@ -442,7 +443,7 @@ describe('AdminSettingsPage', () => {
   it('renders retry input with min/max attributes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSettingsPage));
+      const result = renderWithProviders(React.createElement(AdminSettingsPage));
       container = result.container;
     });
     const numberInputs = container!.querySelectorAll('input[type="number"]');

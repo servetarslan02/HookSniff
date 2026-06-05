@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -40,13 +41,13 @@ describe('RateLimitingPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading skeleton initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(RateLimitingPage));
+    const { container } = renderWithProviders(React.createElement(RateLimitingPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   it('loading skeleton has correct structure', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(RateLimitingPage));
+    const { container } = renderWithProviders(React.createElement(RateLimitingPage));
     const pulse = container.querySelector('.animate-pulse');
     expect(pulse).toBeTruthy();
     // Should have placeholder bars
@@ -59,7 +60,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Rate Limiting');
@@ -73,7 +74,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔄');
@@ -86,7 +87,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('HookSniff automatically rate-limits');
@@ -100,7 +101,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Total Endpoints');
@@ -114,7 +115,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Total Endpoints');
@@ -126,7 +127,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       // avg = (10 + 5 + 20) / 3 = 11.666... → 11.7
@@ -139,7 +140,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       // peak = max(10, 5, 20) = 20
@@ -152,7 +153,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Throttled Requests');
@@ -167,7 +168,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     ]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('15.0');
@@ -180,7 +181,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Per-Endpoint Limits');
@@ -199,7 +200,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr');
@@ -211,7 +212,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       // endpoint_url is endpoint_id.slice(0, 8) + '...'
@@ -225,7 +226,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr');
@@ -242,7 +243,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       // RPM = requests_per_second * 60
@@ -257,7 +258,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('20');
@@ -270,7 +271,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const queueCells = container.querySelectorAll('tbody td:nth-child(5)');
@@ -284,7 +285,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const throttledCells = container.querySelectorAll('tbody td:nth-child(6)');
@@ -299,7 +300,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('How Rate Limiting Works');
@@ -314,7 +315,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('1️⃣');
@@ -328,7 +329,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('token bucket');
@@ -343,7 +344,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('⚡');
@@ -355,7 +356,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Monitor and configure rate limits');
@@ -367,7 +368,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     // Should show empty state (not crash)
     await waitFor(() => {
@@ -379,7 +380,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       // Should show empty state
@@ -404,7 +405,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     }));
     const { default: Page } = await import('@/app/[locale]/[username]/rate-limiting/page');
     await act(async () => {
-      render(React.createElement(Page));
+      renderWithProviders(React.createElement(Page));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -414,7 +415,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr');
@@ -431,7 +432,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     ]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Total Endpoints');
@@ -454,7 +455,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(manyEndpoints);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Total Endpoints');
@@ -469,7 +470,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const table = container.querySelector('table');
@@ -482,7 +483,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_RATE_LIMITS);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       const headerRow = container.querySelector('thead tr');
@@ -498,7 +499,7 @@ describe('RateLimitingPage - Ultra Coverage', () => {
     ]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RateLimitingPage)).container;
+      container = renderWithProviders(React.createElement(RateLimitingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('abcdefgh...');

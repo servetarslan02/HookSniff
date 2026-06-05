@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -56,20 +57,20 @@ describe('EndpointHealthPage', () => {
 
   it('renders loading state', async () => {
     mockFetch.mockReturnValue(new Promise(() => {}));
-    render(React.createElement(EndpointHealthPage));
+    renderWithProviders(React.createElement(EndpointHealthPage));
     expect(document.body.textContent).toContain('common.loading');
   });
 
   it('renders header', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText(/Endpoint Health|health/).length).toBeGreaterThan(0);
   });
 
   it('renders summary cards', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText('Healthy Endpoints').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Degraded Endpoints').length).toBeGreaterThan(0);
@@ -78,7 +79,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders healthy count correctly', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     // 1 healthy endpoint
     const healthyCards = screen.getAllByText('Healthy Endpoints');
@@ -87,7 +88,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders endpoint URLs', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText('https://example.com/hook').length).toBeGreaterThan(0);
     expect(screen.getAllByText('https://staging.example.com/hook').length).toBeGreaterThan(0);
@@ -95,7 +96,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders success rate', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText('99.5%').length).toBeGreaterThan(0);
     expect(screen.getAllByText('85.0%').length).toBeGreaterThan(0);
@@ -104,7 +105,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders stats values', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText('1,000').length).toBeGreaterThan(0); // total
     expect(screen.getAllByText('995').length).toBeGreaterThan(0); // successful
@@ -115,7 +116,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders consecutive failures warning', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText(/consecutive failure/).length).toBeGreaterThan(0);
   });
@@ -126,7 +127,7 @@ describe('EndpointHealthPage', () => {
       json: () => Promise.resolve([]),
     });
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText(/No endpoints yet/).length).toBeGreaterThan(0);
   });
@@ -134,7 +135,7 @@ describe('EndpointHealthPage', () => {
   it('handles fetch error gracefully', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     // Should still render header
     expect(screen.getAllByText(/health/i).length).toBeGreaterThan(0);
@@ -142,7 +143,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders description when present', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     expect(screen.getAllByText('Production webhook').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Staging').length).toBeGreaterThan(0);
@@ -150,7 +151,7 @@ describe('EndpointHealthPage', () => {
 
   it('renders progress bars', async () => {
     await act(async () => {
-      render(React.createElement(EndpointHealthPage));
+      renderWithProviders(React.createElement(EndpointHealthPage));
     });
     const progressBars = document.querySelectorAll('.rounded-full.transition-all');
     expect(progressBars.length).toBeGreaterThanOrEqual(3);

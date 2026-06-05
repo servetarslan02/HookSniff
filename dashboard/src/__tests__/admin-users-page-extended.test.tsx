@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -86,7 +87,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders the user management title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('userManagement');
@@ -95,7 +96,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders the subtitle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Manage users, plans, and account status');
@@ -105,7 +106,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders user table with correct columns', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const headers = container!.querySelectorAll('th');
@@ -122,7 +123,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders user rows with correct data', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('user1@example.com');
@@ -133,7 +134,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders truncated user IDs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     // IDs should be truncated with …
@@ -143,7 +144,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders plan badges for each user', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('free');
@@ -154,7 +155,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders user names', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('User 1');
@@ -165,7 +166,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders search input with correct placeholder', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]') as HTMLInputElement;
@@ -176,7 +177,7 @@ describe('AdminUsersPage - Extended', () => {
   it('updates search value on typing', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]') as HTMLInputElement;
@@ -189,7 +190,7 @@ describe('AdminUsersPage - Extended', () => {
   it('triggers search on form submit', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]') as HTMLInputElement;
@@ -211,7 +212,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders plan filter dropdown with options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const selects = container!.querySelectorAll('select');
@@ -227,7 +228,7 @@ describe('AdminUsersPage - Extended', () => {
   it('updates plan filter and refetches', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const selects = container!.querySelectorAll('select');
@@ -246,7 +247,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders status filter dropdown with options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const selects = container!.querySelectorAll('select');
@@ -260,7 +261,7 @@ describe('AdminUsersPage - Extended', () => {
   it('updates status filter and refetches', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const selects = container!.querySelectorAll('select');
@@ -280,7 +281,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(20), total: 50 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Showing');
@@ -294,7 +295,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(5), total: 5 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).not.toContain('Showing');
@@ -305,7 +306,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(20), total: 50 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -318,7 +319,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(20), total: 50 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -336,7 +337,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(20), total: 50 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -361,7 +362,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders View link for each user', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const viewLinks = container!.querySelectorAll('a');
@@ -373,7 +374,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders Plan button for each user', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -384,7 +385,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders Ban button for active users', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -396,7 +397,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders Activate button for banned users', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -408,7 +409,7 @@ describe('AdminUsersPage - Extended', () => {
   it('opens plan change modal when Plan button is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -424,7 +425,7 @@ describe('AdminUsersPage - Extended', () => {
   it('shows user email in plan change modal', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -439,7 +440,7 @@ describe('AdminUsersPage - Extended', () => {
   it('plan change modal has plan options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -457,7 +458,7 @@ describe('AdminUsersPage - Extended', () => {
   it('closes plan change modal when Cancel is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -476,7 +477,7 @@ describe('AdminUsersPage - Extended', () => {
   it('closes plan change modal when backdrop is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -498,7 +499,7 @@ describe('AdminUsersPage - Extended', () => {
   it('calls updateUserPlan when Update Plan is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -522,7 +523,7 @@ describe('AdminUsersPage - Extended', () => {
   it('shows success toast after plan update', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -541,7 +542,7 @@ describe('AdminUsersPage - Extended', () => {
   it('calls updateUserStatus when Ban button is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -555,7 +556,7 @@ describe('AdminUsersPage - Extended', () => {
   it('calls updateUserStatus when Activate button is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -569,7 +570,7 @@ describe('AdminUsersPage - Extended', () => {
   it('shows toast after ban action', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -583,7 +584,7 @@ describe('AdminUsersPage - Extended', () => {
   it('shows toast after activate action', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -597,7 +598,7 @@ describe('AdminUsersPage - Extended', () => {
   it('refetches users after status toggle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const callCountBefore = mockListUsers.mock.calls.length;
@@ -614,7 +615,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: [], total: 0 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No users found.');
@@ -624,7 +625,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: [], total: 0 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const table = container!.querySelector('table');
@@ -636,7 +637,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockReturnValue(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Loading users...');
@@ -646,7 +647,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const table = container!.querySelector('table');
@@ -657,7 +658,7 @@ describe('AdminUsersPage - Extended', () => {
   it('shows error toast when fetch fails', async () => {
     mockListUsers.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(AdminUsersPage));
+      renderWithProviders(React.createElement(AdminUsersPage));
     });
     expect(mockToast).toHaveBeenCalledWith('common.error', 'error');
   });
@@ -666,7 +667,7 @@ describe('AdminUsersPage - Extended', () => {
     mockUpdateUserPlan.mockRejectedValue(new Error('Update failed'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -685,7 +686,7 @@ describe('AdminUsersPage - Extended', () => {
     mockUpdateUserStatus.mockRejectedValue(new Error('Toggle failed'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const buttons = container!.querySelectorAll('button');
@@ -701,7 +702,7 @@ describe('AdminUsersPage - Extended', () => {
     mockListUsers.mockResolvedValue({ users: makeUsers(20), total: 20 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     const rows = container!.querySelectorAll('tbody tr');
@@ -716,7 +717,7 @@ describe('AdminUsersPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('—');
@@ -726,7 +727,7 @@ describe('AdminUsersPage - Extended', () => {
   it('renders created date for users', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUsersPage));
+      const result = renderWithProviders(React.createElement(AdminUsersPage));
       container = result.container;
     });
     // toLocaleDateString of '2024-01-15T10:00:00Z' should contain 2024

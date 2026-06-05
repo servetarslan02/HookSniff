@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -90,19 +91,19 @@ describe('AuditLogPage', () => {
 
   it('renders without crashing', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     expect(container).toBeTruthy();
   });
 
   it('shows loading state initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {})); // never resolves
-    const { getByText } = render(React.createElement(AuditLogPage));
+    const { getByText } = renderWithProviders(React.createElement(AuditLogPage));
     expect(getByText(/Loading audit log/)).toBeTruthy();
   });
 
   it('renders the page title after loading', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       const h1s = container.querySelectorAll('h1');
       expect(Array.from(h1s).some(h => h.textContent?.includes('Audit Log'))).toBe(true);
@@ -111,7 +112,7 @@ describe('AuditLogPage', () => {
 
   it('renders the page description', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Track all activity in your workspace');
     });
@@ -119,7 +120,7 @@ describe('AuditLogPage', () => {
 
   it('renders the filter dropdown', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       const select = container.querySelector('select');
       expect(select).toBeTruthy();
@@ -129,7 +130,7 @@ describe('AuditLogPage', () => {
 
   it('renders filter options', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       const options = container.querySelectorAll('option');
       const optionTexts = Array.from(options).map(o => o.textContent);
@@ -144,7 +145,7 @@ describe('AuditLogPage', () => {
 
   it('renders table headers', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       const ths = container.querySelectorAll('th');
       const headers = Array.from(ths).map(th => th.textContent);
@@ -159,7 +160,7 @@ describe('AuditLogPage', () => {
 
   it('displays audit entries in the table', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('auth.login');
       expect(container.textContent).toContain('endpoint.create');
@@ -169,7 +170,7 @@ describe('AuditLogPage', () => {
 
   it('displays actor emails', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('admin@test.com');
       expect(container.textContent).toContain('dev@test.com');
@@ -178,7 +179,7 @@ describe('AuditLogPage', () => {
 
   it('displays IP addresses', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('192.168.1.1');
       expect(container.textContent).toContain('10.0.0.1');
@@ -187,7 +188,7 @@ describe('AuditLogPage', () => {
 
   it('shows empty state when no entries', async () => {
     mockApiFetch.mockResolvedValue({ entries: [], has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('No activity yet');
     });
@@ -195,7 +196,7 @@ describe('AuditLogPage', () => {
 
   it('shows empty state description', async () => {
     mockApiFetch.mockResolvedValue({ entries: [], has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Actions like login');
     });
@@ -203,7 +204,7 @@ describe('AuditLogPage', () => {
 
   it('handles API error gracefully', async () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('No activity yet');
     });
@@ -211,7 +212,7 @@ describe('AuditLogPage', () => {
 
   it('shows load more button when has_more is true', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: true });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Load more');
     });
@@ -219,7 +220,7 @@ describe('AuditLogPage', () => {
 
   it('does not show load more when has_more is false', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(container.textContent).not.toContain('Load more');
     });
@@ -227,7 +228,7 @@ describe('AuditLogPage', () => {
 
   it('handles filter change', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       const select = container.querySelector('select')!;
       fireEvent.change(select, { target: { value: 'auth' } });
@@ -239,7 +240,7 @@ describe('AuditLogPage', () => {
 
   it('fetches audit log on mount with token', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    render(React.createElement(AuditLogPage));
+    renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       expect(mockApiFetch).toHaveBeenCalled();
       const call = mockApiFetch.mock.calls[0];
@@ -250,7 +251,7 @@ describe('AuditLogPage', () => {
 
   it('displays resource type and id', async () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     await waitFor(() => {
       // resource_id is sliced to 8 chars in the UI: {resource_type}/{resource_id?.slice(0, 8)}
       expect(container.textContent).toContain('user/usr_abc1');

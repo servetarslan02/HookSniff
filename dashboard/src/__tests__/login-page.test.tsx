@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -54,74 +55,74 @@ describe('LoginPage', () => {
 
   // === Render tests ===
   it('renders without crashing', () => {
-    render(React.createElement(LoginPage));
+    renderWithProviders(React.createElement(LoginPage));
   });
 
   it('displays login title', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('auth.loginTitle');
   });
 
   it('displays login subtitle', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('auth.loginSubtitle');
   });
 
   it('renders email input', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const emailInput = container.querySelector('input[type="email"]');
     expect(emailInput).toBeTruthy();
   });
 
   it('renders password input', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const passwordInput = container.querySelector('input[type="password"]');
     expect(passwordInput).toBeTruthy();
   });
 
   it('renders submit button', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const button = container.querySelector('button[type="submit"]');
     expect(button).toBeTruthy();
     expect(button!.textContent).toContain('auth.signIn');
   });
 
   it('renders email label', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('auth.email');
   });
 
   it('renders password label', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('auth.password');
   });
 
   it('renders sign up link for new users', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('auth.noAccount');
     expect(container.textContent).toContain('auth.signUp');
   });
 
   it('renders HookSniff branding', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('HookSniff');
   });
 
   it('renders LanguageSwitcher', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     expect(container.textContent).toContain('LanguageSwitcher');
   });
 
   // === Input changes ===
   it('allows typing in email field', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     fireEvent.change(emailInput, { target: { value: 'user@test.com' } });
     expect(emailInput.value).toBe('user@test.com');
   });
 
   it('allows typing in password field', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
     fireEvent.change(passwordInput, { target: { value: 'mypassword' } });
     expect(passwordInput.value).toBe('mypassword');
@@ -129,7 +130,7 @@ describe('LoginPage', () => {
 
   // === Login submission ===
   it('calls login on form submit', async () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -148,7 +149,7 @@ describe('LoginPage', () => {
   });
 
   it('navigates to dashboard on successful login', async () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -169,7 +170,7 @@ describe('LoginPage', () => {
   it('shows error on login failure', async () => {
     mockLogin.mockRejectedValueOnce(new Error('Invalid credentials'));
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -191,7 +192,7 @@ describe('LoginPage', () => {
     let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -218,7 +219,7 @@ describe('LoginPage', () => {
     let resolveLogin: (value?: unknown) => void;
     mockLogin.mockReturnValueOnce(new Promise((r) => { resolveLogin = r; }));
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -242,7 +243,7 @@ describe('LoginPage', () => {
 
   // === Register mode ===
   it('toggles to register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -259,7 +260,7 @@ describe('LoginPage', () => {
   });
 
   it('shows name field in register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -276,13 +277,13 @@ describe('LoginPage', () => {
   });
 
   it('hides name field in login mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const nameInput = container.querySelector('input[type="text"]');
     expect(nameInput).toBeNull();
   });
 
   it('shows create account button in register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -297,7 +298,7 @@ describe('LoginPage', () => {
   });
 
   it('shows "has account" link in register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -312,7 +313,7 @@ describe('LoginPage', () => {
   });
 
   it('toggles back to login mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     // Go to register
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
@@ -333,7 +334,7 @@ describe('LoginPage', () => {
 
   // === Register submission ===
   it('calls register on form submit in register mode', async () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     // Switch to register
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
@@ -360,7 +361,7 @@ describe('LoginPage', () => {
   });
 
   it('calls register without name when name is empty', async () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -384,7 +385,7 @@ describe('LoginPage', () => {
   });
 
   it('navigates to dashboard on successful register', async () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -410,7 +411,7 @@ describe('LoginPage', () => {
   it('shows error on register failure', async () => {
     mockRegister.mockRejectedValueOnce(new Error('Email already exists'));
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -435,7 +436,7 @@ describe('LoginPage', () => {
 
   // === Password strength ===
   it('shows weak password strength for short password', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     // Switch to register mode
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
@@ -452,7 +453,7 @@ describe('LoginPage', () => {
   });
 
   it('shows medium password strength', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -468,7 +469,7 @@ describe('LoginPage', () => {
   });
 
   it('shows strong password strength', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -484,7 +485,7 @@ describe('LoginPage', () => {
   });
 
   it('does not show password strength in login mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
     act(() => {
@@ -497,7 +498,7 @@ describe('LoginPage', () => {
   });
 
   it('renders password strength bars in register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -517,7 +518,7 @@ describe('LoginPage', () => {
   // === Error handling ===
   it('clears error when switching modes', () => {
     mockLogin.mockRejectedValueOnce(new Error('Login error'));
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     // Trigger login error
     const form = container.querySelector('form')!;
@@ -548,7 +549,7 @@ describe('LoginPage', () => {
   it('displays error with error styling', async () => {
     mockLogin.mockRejectedValueOnce(new Error('Server error'));
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -569,19 +570,19 @@ describe('LoginPage', () => {
 
   // === Email autocomplete ===
   it('email input has correct autocomplete', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     expect(emailInput.autocomplete).toBe('email');
   });
 
   it('password input has current-password autocomplete in login mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
     expect(passwordInput.autocomplete).toBe('current-password');
   });
 
   it('password input has new-password autocomplete in register mode', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -594,7 +595,7 @@ describe('LoginPage', () => {
 
   // === Name input in register mode ===
   it('allows typing in name field', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const signUpButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('auth.signUp')
@@ -610,21 +611,21 @@ describe('LoginPage', () => {
 
   // === Email placeholder ===
   it('renders email placeholder', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     expect(emailInput.placeholder).toBeTruthy();
   });
 
   // === Password min length ===
   it('password input has minLength attribute', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;
     expect(passwordInput.minLength).toBe(8);
   });
 
   // === Non-error case: no error message shown ===
   it('does not show error initially', () => {
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
     const errorDiv = container.querySelector('.bg-red-50, [class*="red"]');
     // No error should be shown on initial render
     expect(errorDiv).toBeNull();
@@ -634,7 +635,7 @@ describe('LoginPage', () => {
   it('handles non-Error rejection gracefully', async () => {
     mockLogin.mockRejectedValueOnce('string error');
 
-    const { container } = render(React.createElement(LoginPage));
+    const { container } = renderWithProviders(React.createElement(LoginPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[type="password"]') as HTMLInputElement;

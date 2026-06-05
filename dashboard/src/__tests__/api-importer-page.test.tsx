@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -73,48 +74,48 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(ApiSpecImporterPage));
+    renderWithProviders(React.createElement(ApiSpecImporterPage));
   });
 
   it('displays page title (i18n key)', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.title');
   });
 
   it('displays description (i18n key)', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.subtitle');
   });
 
   it('renders URL mode by default', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.fromUrl');
   });
 
   it('renders paste mode button', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.pasteJson');
   });
 
   it('renders URL input in URL mode', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     expect(urlInput).toBeTruthy();
   });
 
   it('URL input has correct placeholder', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     expect(urlInput.placeholder).toContain('openapi.json');
   });
 
   it('renders fetch button', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.fetch');
   });
 
   it('fetch button is disabled when URL is empty', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const fetchBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.fetch')
     );
@@ -122,7 +123,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('can type URL', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/openapi.json' } });
@@ -131,7 +132,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('fetch button enables when URL has value', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -143,7 +144,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('fetches spec from URL', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -156,7 +157,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('shows parsed endpoints after fetch', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -173,7 +174,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('shows endpoint methods', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -190,7 +191,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('calls fetch API when fetch button clicked', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -204,7 +205,7 @@ describe('ApiSpecImporterPage', () => {
 
   it('shows error toast for invalid JSON', async () => {
     mockFetch.mockResolvedValue({ ok: true, text: () => Promise.resolve('not json') });
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -220,7 +221,7 @@ describe('ApiSpecImporterPage', () => {
 
   it('handles fetch failure gracefully', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -234,7 +235,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('switches to paste mode', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );
@@ -244,7 +245,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('paste mode has parse button', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );
@@ -253,7 +254,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('parse button disabled when content empty', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );
@@ -265,7 +266,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('parses pasted JSON', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );
@@ -284,7 +285,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('shows error for invalid pasted JSON', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );
@@ -303,7 +304,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('can toggle endpoint selection', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -323,7 +324,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('toggle all button renders', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -340,7 +341,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('import button renders', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -355,7 +356,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('imports selected endpoints', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -377,14 +378,14 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('renders supported formats section', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.supportedFormats');
     expect(container.textContent).toContain('apiImporter.openapi30');
     expect(container.textContent).toContain('apiImporter.swagger20');
   });
 
   it('renders tip section after parsing', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -405,7 +406,7 @@ describe('ApiSpecImporterPage', () => {
       paths: { '/test': { get: { summary: 'Test' } } },
     });
     mockFetch.mockResolvedValue({ ok: true, text: () => Promise.resolve(specNoServers) });
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -421,7 +422,7 @@ describe('ApiSpecImporterPage', () => {
 
   it('handles empty paths', async () => {
     mockFetch.mockResolvedValue({ ok: true, text: () => Promise.resolve(emptySpec) });
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlInput = container.querySelector('input[type="url"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(urlInput, { target: { value: 'https://api.example.com/spec.json' } });
@@ -437,7 +438,7 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('mode buttons have active style', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const urlBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.fromUrl')
     );
@@ -445,17 +446,17 @@ describe('ApiSpecImporterPage', () => {
   });
 
   it('renders clear button', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('apiImporter.clearAll');
   });
 
   it('renders keyboard shortcut hint', () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     expect(container.textContent).toContain('Ctrl');
   });
 
   it('renders YAML support hint in paste mode', async () => {
-    const { container } = render(React.createElement(ApiSpecImporterPage));
+    const { container } = renderWithProviders(React.createElement(ApiSpecImporterPage));
     const pasteBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('apiImporter.pasteJson')
     );

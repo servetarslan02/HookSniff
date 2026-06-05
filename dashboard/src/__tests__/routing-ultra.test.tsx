@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -35,14 +36,14 @@ describe('RoutingPage - Ultra Coverage', () => {
 
   it('shows loading initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(RoutingPage));
+    const { container } = renderWithProviders(React.createElement(RoutingPage));
     expect(container.textContent).toContain('Loading');
   });
 
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔀');
@@ -53,7 +54,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('round-robin, latency-based, or failover');
@@ -63,7 +64,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders all endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('https://api.example.com/webhook');
@@ -74,7 +75,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders routing strategy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('round-robin');
@@ -85,7 +86,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders fallback URL when set', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('https://backup.example.com/payments');
@@ -95,7 +96,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders response time', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('120ms');
@@ -106,7 +107,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders healthy status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Healthy');
@@ -116,7 +117,7 @@ describe('RoutingPage - Ultra Coverage', () => {
   it('renders unhealthy status for high failure streak', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Unhealthy');
@@ -127,7 +128,7 @@ describe('RoutingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No endpoints configured yet');
@@ -138,7 +139,7 @@ describe('RoutingPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No endpoints configured yet');
@@ -153,7 +154,7 @@ describe('RoutingPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/routing/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -162,7 +163,7 @@ describe('RoutingPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([{ ...MOCK_ENDPOINTS[0], routing_strategy: '' }]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RoutingPage)).container;
+      container = renderWithProviders(React.createElement(RoutingPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('round-robin');

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -70,28 +71,28 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(TeamPage));
+    renderWithProviders(React.createElement(TeamPage));
   });
 
   it('displays team title', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('team.title');
   });
 
   it('renders create team button', () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('Create Team');
   });
 
   it('shows loading state initially', () => {
     mockTeamsList.mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('Loading teams');
   });
 
   it('shows empty state when no teams', async () => {
     mockTeamsList.mockResolvedValue([]);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('team.noTeams');
     });
@@ -99,7 +100,7 @@ describe('TeamPage — Ultra Coverage', () => {
 
   it('renders team list when teams exist', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
       expect(container.textContent).toContain('Marketing');
@@ -109,7 +110,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('selects a team on click', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -127,7 +128,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('shows members when team is selected', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -144,7 +145,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('shows member roles', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -158,7 +159,7 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('opens create team modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -167,7 +168,7 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('create modal has name input', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -177,7 +178,7 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('can type team name in create modal', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -190,7 +191,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('submits create team form', async () => {
     mockTeamsList.mockResolvedValue([]);
     mockTeamsCreate.mockResolvedValue({});
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -208,7 +209,7 @@ describe('TeamPage — Ultra Coverage', () => {
 
   it('shows success toast after creating team', async () => {
     mockTeamsCreate.mockResolvedValue({});
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -226,7 +227,7 @@ describe('TeamPage — Ultra Coverage', () => {
 
   it('shows error toast on create failure', async () => {
     mockTeamsCreate.mockRejectedValue(new Error('Create failed'));
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -243,7 +244,7 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('closes create modal on cancel', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -261,7 +262,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('opens invite modal when team selected', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -286,7 +287,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('invite modal has email input', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -309,7 +310,7 @@ describe('TeamPage — Ultra Coverage', () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
     mockTeamsInviteMember.mockResolvedValue({});
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -341,7 +342,7 @@ describe('TeamPage — Ultra Coverage', () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
     mockTeamsInviteMember.mockRejectedValue(new Error('Invite failed'));
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -371,7 +372,7 @@ describe('TeamPage — Ultra Coverage', () => {
 
   it('handles team list fetch error', async () => {
     mockTeamsList.mockRejectedValue(new Error('Network error'));
-    render(React.createElement(TeamPage));
+    renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Failed to load teams', 'error');
     });
@@ -380,7 +381,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('handles member list fetch error', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -394,13 +395,13 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('renders your teams section header', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     expect(container.textContent).toContain('team.yourTeams');
   });
 
   it('shows team member count', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Engineering');
     });
@@ -409,7 +410,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('renders role options in invite modal', async () => {
     mockTeamsList.mockResolvedValue(mockTeams);
     mockTeamsListMembers.mockResolvedValue(mockMembers);
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     await waitFor(() => { expect(container.textContent).toContain('Engineering'); });
     const teamButton = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Engineering')
@@ -434,7 +435,7 @@ describe('TeamPage — Ultra Coverage', () => {
   it('refreshes teams after creating one', async () => {
     mockTeamsList.mockResolvedValueOnce([]).mockResolvedValueOnce(mockTeams);
     mockTeamsCreate.mockResolvedValue({});
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );
@@ -453,7 +454,7 @@ describe('TeamPage — Ultra Coverage', () => {
   });
 
   it('create description textarea works', async () => {
-    const { container } = render(React.createElement(TeamPage));
+    const { container } = renderWithProviders(React.createElement(TeamPage));
     const createBtn = Array.from(container.querySelectorAll('button')).find(
       b => b.textContent?.includes('Create Team')
     );

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -21,7 +22,7 @@ vi.mock('@/lib/store', () => ({
 import { AuthGuard } from '@/components/AuthGuard';
 
 function renderWithAuth(ui: React.ReactNode) {
-  return render(<AuthGuard>{ui}</AuthGuard>);
+  return renderWithProviders(<AuthGuard>{ui}</AuthGuard>);
 }
 
 describe('AuthGuard', () => {

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -63,13 +64,13 @@ describe('AlertsPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AlertsPage));
+      renderWithProviders(React.createElement(AlertsPage));
     });
   });
 
   it('fetches alerts on mount', async () => {
     await act(async () => {
-      render(React.createElement(AlertsPage));
+      renderWithProviders(React.createElement(AlertsPage));
     });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/alerts'),
@@ -80,7 +81,7 @@ describe('AlertsPage', () => {
   it('displays alerts title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('alerts.title');
@@ -89,7 +90,7 @@ describe('AlertsPage', () => {
   it('displays alert names from API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -106,7 +107,7 @@ describe('AlertsPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -118,7 +119,7 @@ describe('AlertsPage', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('common.loading');
@@ -127,7 +128,7 @@ describe('AlertsPage', () => {
   it('renders new alert button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('alerts.newAlert');
@@ -136,7 +137,7 @@ describe('AlertsPage', () => {
   it('opens create alert form', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -155,7 +156,7 @@ describe('AlertsPage', () => {
   it('closes create form when toggle button clicked again', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const toggleBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -178,7 +179,7 @@ describe('AlertsPage', () => {
   it('fills create form fields', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -204,7 +205,7 @@ describe('AlertsPage', () => {
   it('changes condition select', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -223,7 +224,7 @@ describe('AlertsPage', () => {
   it('toggles channel selection', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -246,7 +247,7 @@ describe('AlertsPage', () => {
   it('submits create alert form', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -281,7 +282,7 @@ describe('AlertsPage', () => {
   it('disables create button when name is empty', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -299,7 +300,7 @@ describe('AlertsPage', () => {
   it('shows active/paused status badges', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -311,7 +312,7 @@ describe('AlertsPage', () => {
   it('displays condition labels correctly', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -329,7 +330,7 @@ describe('AlertsPage', () => {
   it('displays channel icons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -345,7 +346,7 @@ describe('AlertsPage', () => {
   it('renders Test and Delete buttons for each alert', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -363,7 +364,7 @@ describe('AlertsPage', () => {
   it('calls test alert API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -387,7 +388,7 @@ describe('AlertsPage', () => {
   it('clicks delete and shows confirm dialog', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -410,7 +411,7 @@ describe('AlertsPage', () => {
   it('confirms delete alert', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -443,7 +444,7 @@ describe('AlertsPage', () => {
   it('cancels delete alert', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -470,7 +471,7 @@ describe('AlertsPage', () => {
   it('refreshes alerts after create', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const initialFetchCount = mockFetch.mock.calls.length;
@@ -503,7 +504,7 @@ describe('AlertsPage', () => {
   it('refreshes alerts after delete', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const initialFetchCount = mockFetch.mock.calls.length;
@@ -539,7 +540,7 @@ describe('AlertsPage', () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     // Should still render, just no alerts
@@ -555,7 +556,7 @@ describe('AlertsPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -567,7 +568,7 @@ describe('AlertsPage', () => {
   it('creates alert with all channel options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -615,7 +616,7 @@ describe('AlertsPage', () => {
   it('renders condition options in create form', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AlertsPage));
+      const result = renderWithProviders(React.createElement(AlertsPage));
       container = result.container;
     });
     const newAlertBtn = Array.from(container!.querySelectorAll('button')).find(

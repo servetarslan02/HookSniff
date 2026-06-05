@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -79,13 +80,13 @@ describe('AdminSystemPage - Extended', () => {
   // --- Basic Rendering ---
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminSystemPage));
+      renderWithProviders(React.createElement(AdminSystemPage));
     });
   });
 
   it('fetches health on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminSystemPage));
+      renderWithProviders(React.createElement(AdminSystemPage));
     });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/health'),
@@ -100,7 +101,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays system health title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('systemHealth');
@@ -109,7 +110,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays subtitle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Monitor infrastructure services and system status');
@@ -120,7 +121,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const pulseElements = container!.querySelectorAll('.animate-pulse');
@@ -131,7 +132,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const glassCards = container!.querySelectorAll('.glass-card.animate-pulse');
@@ -142,7 +143,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).not.toContain('API Server');
@@ -153,7 +154,7 @@ describe('AdminSystemPage - Extended', () => {
   it('shows all operational when all services healthy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('allOperational');
@@ -162,7 +163,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders API Server card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('API Server');
@@ -171,7 +172,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders PostgreSQL Database card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('PostgreSQL Database');
@@ -180,7 +181,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders Redis Cache card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Redis Cache');
@@ -189,7 +190,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders Webhook Queue card', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Webhook Queue');
@@ -198,7 +199,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays API uptime', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // 172800 seconds = 2 days
@@ -209,7 +210,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays database latency', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('5ms');
@@ -219,7 +220,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays redis latency', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('2ms');
@@ -228,7 +229,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays queue stats', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('3 pending');
@@ -239,7 +240,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays service statuses', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('ok');
@@ -255,7 +256,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('partialDegradation');
@@ -268,7 +269,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('slow');
@@ -281,7 +282,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('15 failed');
@@ -295,7 +296,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('systemIssues');
@@ -308,7 +309,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('down');
@@ -319,7 +320,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders infrastructure section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('infrastructure');
@@ -328,7 +329,7 @@ describe('AdminSystemPage - Extended', () => {
   it('shows infrastructure providers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Oracle Cloud ARM');
@@ -342,7 +343,7 @@ describe('AdminSystemPage - Extended', () => {
   it('shows infrastructure details', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('4 OCPU, 24 GB RAM');
@@ -354,7 +355,7 @@ describe('AdminSystemPage - Extended', () => {
   it('sets up auto-refresh interval', async () => {
     vi.useFakeTimers();
     await act(async () => {
-      render(React.createElement(AdminSystemPage));
+      renderWithProviders(React.createElement(AdminSystemPage));
     });
     const callsAfterMount = mockFetch.mock.calls.length;
     await act(async () => {
@@ -369,7 +370,7 @@ describe('AdminSystemPage - Extended', () => {
     const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
     let unmount: () => void;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       unmount = result.unmount;
     });
     unmount!();
@@ -383,7 +384,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // Should still render the page, just without health data
@@ -394,7 +395,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockResolvedValue({ ok: false, json: () => Promise.resolve({}) });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // Should render with unknown statuses
@@ -405,7 +406,7 @@ describe('AdminSystemPage - Extended', () => {
     mockFetch.mockResolvedValue({ ok: false, json: () => Promise.resolve({}) });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Checking...');
@@ -415,7 +416,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders latency bars for database and redis', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // Latency bars have a specific structure with 0ms and 500ms labels
@@ -426,7 +427,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders latency value in bar label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // Both database (5ms) and redis (2ms) should show their latency
@@ -439,7 +440,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders green dot for healthy status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const greenDots = container!.querySelectorAll('.bg-green-500');
@@ -449,7 +450,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders green dot for overall status when all healthy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // The overall status indicator should be green
@@ -464,7 +465,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const yellowDots = container!.querySelectorAll('.animate-pulse.bg-yellow-500');
@@ -478,7 +479,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const redDots = container!.querySelectorAll('.animate-pulse.bg-red-500');
@@ -489,7 +490,7 @@ describe('AdminSystemPage - Extended', () => {
   it('displays last checked timestamp', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Last checked');
@@ -500,7 +501,7 @@ describe('AdminSystemPage - Extended', () => {
   it('shows healthy queue when failed is 0', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // Queue should show healthy since failed = 0
@@ -518,7 +519,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     const queueCard = Array.from(container!.querySelectorAll('.glass-card')).find(card =>
@@ -532,7 +533,7 @@ describe('AdminSystemPage - Extended', () => {
     // 172800 seconds = 2d 0h 0m
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('2d 0h 0m');
@@ -548,7 +549,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('2h 0m');
@@ -564,7 +565,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('5m');
@@ -574,7 +575,7 @@ describe('AdminSystemPage - Extended', () => {
   it('renders service icons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('🚀'); // API

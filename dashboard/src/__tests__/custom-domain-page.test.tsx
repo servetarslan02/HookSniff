@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -131,58 +132,58 @@ describe('CustomDomainPage', () => {
   });
 
   it('renders without crashing', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container).toBeTruthy();
   });
 
   it('renders the page title', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const h1s = container.querySelectorAll('h1');
     expect(Array.from(h1s).some(h => h.textContent?.includes('Custom Domain'))).toBe(true);
   });
 
   it('renders the page description', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('Use your own domain for the webhook portal');
   });
 
   it('renders the domain input', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]');
     expect(input).toBeTruthy();
     expect(input!.placeholder).toContain('webhooks.yourcompany.com');
   });
 
   it('renders add domain button', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const buttons = container.querySelectorAll('button');
     const addBtn = Array.from(buttons).find(b => b.textContent?.includes('Add Domain'));
     expect(addBtn).toBeTruthy();
   });
 
   it('add domain button is disabled when input is empty', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const buttons = container.querySelectorAll('button');
     const addBtn = Array.from(buttons).find(b => b.textContent?.includes('Add Domain'));
     expect(addBtn!.disabled).toBe(true);
   });
 
   it('handles domain input change', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
     expect((input as HTMLInputElement).value).toBe('webhooks.example.com');
   });
 
   it('sanitizes domain input to lowercase', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'WebHooks.Example.COM' } });
     expect((input as HTMLInputElement).value).toBe('webhooks.example.com');
   });
 
   it('strips invalid characters from domain input', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'web hooks@exa!mple.com' } });
     expect((input as HTMLInputElement).value).toBe('webhooksexample.com');
@@ -195,7 +196,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -223,7 +224,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -248,7 +249,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -271,7 +272,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -295,7 +296,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -321,7 +322,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -359,7 +360,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -395,7 +396,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'duplicate.example.com' } });
 
@@ -412,7 +413,7 @@ describe('CustomDomainPage', () => {
   });
 
   it('does not add domain when input is empty', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const buttons = container.querySelectorAll('button');
     const addBtn = Array.from(buttons).find(b => b.textContent?.includes('Add Domain'));
     expect(addBtn!.disabled).toBe(true);
@@ -420,12 +421,12 @@ describe('CustomDomainPage', () => {
   });
 
   it('renders how it works section', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('How it works');
   });
 
   it('renders all three how-it-works steps', () => {
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     expect(container.textContent).toContain('Add your domain');
     expect(container.textContent).toContain('Add DNS records');
     expect(container.textContent).toContain('Verify & go live');
@@ -438,7 +439,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
     const input = container.querySelector('input[type="text"]')!;
     fireEvent.change(input, { target: { value: 'webhooks.example.com' } });
 
@@ -460,7 +461,7 @@ describe('CustomDomainPage', () => {
 
   it('shows empty state when no domains exist', async () => {
     mockApiFetch.mockResolvedValue([]);
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('No domains yet');
@@ -469,7 +470,7 @@ describe('CustomDomainPage', () => {
 
   it('shows loading error with retry button on fetch failure', async () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('Could not load your domains');
@@ -492,7 +493,7 @@ describe('CustomDomainPage', () => {
       },
     ]);
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('hooks.example.com');
@@ -514,7 +515,7 @@ describe('CustomDomainPage', () => {
       },
     ]);
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('pending.example.com');
@@ -538,7 +539,7 @@ describe('CustomDomainPage', () => {
       },
     ]);
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('delete-me.example.com');
@@ -574,7 +575,7 @@ describe('CustomDomainPage', () => {
       return Promise.reject(new Error('Unhandled: ' + path));
     });
 
-    const { container } = render(React.createElement(CustomDomainPage));
+    const { container } = renderWithProviders(React.createElement(CustomDomainPage));
 
     await waitFor(() => {
       expect(container.textContent).toContain('delete-me.example.com');

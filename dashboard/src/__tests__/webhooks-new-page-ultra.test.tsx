@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -52,7 +53,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.title');
@@ -62,7 +63,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders configuration section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.configuration');
@@ -72,7 +73,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders endpoint select', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select');
@@ -84,7 +85,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders event type input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       const input = container.querySelector('input[placeholder*="webhooks.eventType"]');
@@ -95,7 +96,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders payload textarea with default JSON', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       const textarea = container.querySelector('textarea');
@@ -107,7 +108,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders send button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.sendWebhook');
@@ -117,7 +118,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('renders response section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.responseTitle');
@@ -128,7 +129,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('shows JSON error for invalid payload', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.configuration');
@@ -143,7 +144,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('clears JSON error for valid payload', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     const textarea = container.querySelector('textarea')!;
     // First make it invalid
@@ -161,7 +162,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('calls webhooksApi.create on send', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhooks.sendWebhook');
@@ -186,7 +187,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
   it('shows response after successful send', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     const select = container.querySelector('select')!;
     await act(async () => {
@@ -205,7 +206,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
     mockWebhooksCreate.mockRejectedValue(new Error('Send failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SendWebhookPage)).container;
+      container = renderWithProviders(React.createElement(SendWebhookPage)).container;
     });
     const select = container.querySelector('select')!;
     await act(async () => {
@@ -234,7 +235,7 @@ describe('SendWebhookPage (webhooks/new) - Ultra Coverage', () => {
     vi.doMock('@/components/LoadingSpinner', () => ({ default: () => null }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/webhooks/new/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockEndpointsList).not.toHaveBeenCalled();
   });

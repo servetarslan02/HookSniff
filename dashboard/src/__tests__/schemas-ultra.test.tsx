@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -37,7 +38,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading text initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(SchemasPage));
+    const { container } = renderWithProviders(React.createElement(SchemasPage));
     expect(container.textContent).toContain('Loading...');
   });
 
@@ -45,7 +46,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📋 Schemas');
@@ -55,7 +56,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Define and validate event schemas');
@@ -66,7 +67,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   it('renders all schemas', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Order Schema');
@@ -78,7 +79,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   it('renders schema versions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('v1.0.0');
@@ -90,7 +91,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   it('renders schema creation dates', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('2024-01-15');
@@ -104,7 +105,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ schemas: [] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No schemas registered yet');
@@ -116,7 +117,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ schemas: [] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       const emptyDiv = container.querySelector('.text-center.py-12');
@@ -129,7 +130,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       // Should show empty state (schemas defaults to [])
@@ -146,7 +147,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/schemas/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -156,7 +157,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ schemas: [MOCK_SCHEMAS[0]] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Order Schema');
@@ -168,7 +169,7 @@ describe('SchemasPage - Ultra Coverage', () => {
   // === API Call ===
   it('calls apiFetch with correct endpoint', async () => {
     await act(async () => {
-      render(React.createElement(SchemasPage));
+      renderWithProviders(React.createElement(SchemasPage));
     });
     await waitFor(() => {
       expect(mockApiFetch).toHaveBeenCalledWith('/schemas', { token: 'test-token' });
@@ -180,7 +181,7 @@ describe('SchemasPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ schemas: null });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SchemasPage)).container;
+      container = renderWithProviders(React.createElement(SchemasPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No schemas registered yet');

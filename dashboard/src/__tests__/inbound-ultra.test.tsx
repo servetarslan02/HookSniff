@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -55,7 +56,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📨');
@@ -66,7 +67,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Receive webhooks from Stripe, GitHub, Shopify');
@@ -76,7 +77,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders Add Provider button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === '+ Add Provider');
@@ -87,7 +88,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders how it works section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('How it works');
@@ -99,7 +100,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders inbound URLs for all providers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Your Inbound URLs');
@@ -113,7 +114,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders active configs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Active Configs');
@@ -125,7 +126,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders config endpoint mapping', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('https://api.example.com/webhook');
@@ -136,7 +137,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('shows create form on Add Provider click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('+ Add Provider');
@@ -151,7 +152,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('renders provider selection cards', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     const addBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === '+ Add Provider');
     await act(async () => {
@@ -166,7 +167,7 @@ describe('InboundPage - Ultra Coverage', () => {
   it('shows secret input after selecting provider', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     const addBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === '+ Add Provider');
     await act(async () => {
@@ -185,7 +186,7 @@ describe('InboundPage - Ultra Coverage', () => {
     mockInboundListConfigs.mockRejectedValue(new Error('Error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(InboundPage)).container;
+      container = renderWithProviders(React.createElement(InboundPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Inbound Webhooks');
@@ -204,7 +205,7 @@ describe('InboundPage - Ultra Coverage', () => {
     }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/inbound/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockEndpointsList).not.toHaveBeenCalled();
   });

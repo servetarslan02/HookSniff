@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -63,13 +64,13 @@ describe('AdminSystemPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminSystemPage));
+      renderWithProviders(React.createElement(AdminSystemPage));
     });
   });
 
   it('fetches system health on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminSystemPage));
+      renderWithProviders(React.createElement(AdminSystemPage));
     });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/health'),
@@ -84,7 +85,7 @@ describe('AdminSystemPage', () => {
   it('displays system title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('systemHealth');
@@ -94,7 +95,7 @@ describe('AdminSystemPage', () => {
     mockFetch.mockReturnValueOnce(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminSystemPage));
+      const result = renderWithProviders(React.createElement(AdminSystemPage));
       container = result.container;
     });
     // During loading, the page shows skeleton cards (animate-pulse divs)

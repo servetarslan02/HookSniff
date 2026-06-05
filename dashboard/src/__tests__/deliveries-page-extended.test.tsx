@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -87,7 +88,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders all deliveries from API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -99,7 +100,7 @@ describe('DeliveriesPage - Extended', () => {
   it('displays all delivery events', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -115,7 +116,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders all four filter buttons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const buttons = Array.from(container!.querySelectorAll('button'));
@@ -129,7 +130,7 @@ describe('DeliveriesPage - Extended', () => {
   it('highlights "All" as active filter by default', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const allBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -141,7 +142,7 @@ describe('DeliveriesPage - Extended', () => {
   it('sends filter=delivered when Delivered clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const deliveredBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -159,7 +160,7 @@ describe('DeliveriesPage - Extended', () => {
   it('sends filter=failed when Failed clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const failedBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -177,7 +178,7 @@ describe('DeliveriesPage - Extended', () => {
   it('sends filter=pending when Pending clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const pendingBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -201,7 +202,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     // Change filter
@@ -227,7 +228,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders search input with placeholder', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]');
@@ -238,7 +239,7 @@ describe('DeliveriesPage - Extended', () => {
   it('filters deliveries by search term (event name)', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -259,7 +260,7 @@ describe('DeliveriesPage - Extended', () => {
   it('filters deliveries by search term (id)', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -276,7 +277,7 @@ describe('DeliveriesPage - Extended', () => {
   it('shows "no results matching" message when search finds nothing', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const input = container!.querySelector('input[type="text"]')!;
@@ -298,7 +299,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -316,7 +317,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -330,7 +331,7 @@ describe('DeliveriesPage - Extended', () => {
   it('hides pagination when total <= perPage', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -348,7 +349,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -380,7 +381,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -412,7 +413,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -432,7 +433,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -468,7 +469,7 @@ describe('DeliveriesPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -482,7 +483,7 @@ describe('DeliveriesPage - Extended', () => {
   it('navigates to delivery detail on row click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -498,7 +499,7 @@ describe('DeliveriesPage - Extended', () => {
   it('navigates to detail on View Details button click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -520,7 +521,7 @@ describe('DeliveriesPage - Extended', () => {
   it('displays green text for 2xx response codes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -533,7 +534,7 @@ describe('DeliveriesPage - Extended', () => {
   it('displays red text for 4xx/5xx response codes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -545,7 +546,7 @@ describe('DeliveriesPage - Extended', () => {
   it('shows dash for missing response_status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -559,7 +560,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders status badges for all deliveries', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -577,7 +578,7 @@ describe('DeliveriesPage - Extended', () => {
     mockWebhooksList.mockReturnValueOnce(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('deliveries.loadingDeliveries');
@@ -588,7 +589,7 @@ describe('DeliveriesPage - Extended', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Connection timeout'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -601,7 +602,7 @@ describe('DeliveriesPage - Extended', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Server error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -616,7 +617,7 @@ describe('DeliveriesPage - Extended', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -638,7 +639,7 @@ describe('DeliveriesPage - Extended', () => {
   it('shows confirm dialog for replay', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     // The confirm dialog is controlled by replayTarget state.
@@ -654,7 +655,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders all table column headers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -673,7 +674,7 @@ describe('DeliveriesPage - Extended', () => {
   it('displays formatted timestamps', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -685,7 +686,7 @@ describe('DeliveriesPage - Extended', () => {
   it('displays attempt counts for each delivery', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -699,7 +700,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders subtitle text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('deliveries.subtitle');
@@ -709,7 +710,7 @@ describe('DeliveriesPage - Extended', () => {
   it('highlights Delivered filter when selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const deliveredBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -726,7 +727,7 @@ describe('DeliveriesPage - Extended', () => {
   // ─── Default filter sends no status ───
   it('sends status=undefined for "all" filter', async () => {
     await act(async () => {
-      render(React.createElement(DeliveriesPage));
+      renderWithProviders(React.createElement(DeliveriesPage));
     });
     expect(mockWebhooksList).toHaveBeenCalledWith('test-token', expect.objectContaining({
       page: 1,
@@ -738,7 +739,7 @@ describe('DeliveriesPage - Extended', () => {
   it('renders event tags with mono font', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {

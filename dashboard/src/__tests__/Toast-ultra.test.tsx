@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -15,7 +16,7 @@ function ToastTrigger({ message, type }: { message: string; type?: 'success' | '
 }
 
 function renderWithProvider(ui: React.ReactNode) {
-  return render(
+  return renderWithProviders(
     <ToastProvider>
       {ui}
     </ToastProvider>
@@ -274,7 +275,7 @@ describe('ToastProvider + useToast - Ultra Coverage', () => {
     }
     // Suppress console.error for this test
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(React.createElement(BadComponent))).toThrow('useToast must be used within ToastProvider');
+    expect(() => renderWithProviders(React.createElement(BadComponent))).toThrow('useToast must be used within ToastProvider');
     spy.mockRestore();
   });
 

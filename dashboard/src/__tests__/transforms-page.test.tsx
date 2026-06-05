@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -94,38 +95,38 @@ describe('TransformsPage', () => {
 
   // === Render tests ===
   it('renders without crashing', () => {
-    render(React.createElement(TransformsPage));
+    renderWithProviders(React.createElement(TransformsPage));
   });
 
   it('displays transforms title', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Webhook Transforms');
   });
 
   it('renders endpoint selector', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select Endpoint');
   });
 
   it('shows select endpoint message', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select an endpoint to manage transforms');
   });
 
   it('renders new rule button', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('New Rule');
   });
 
   it('renders description text', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Filter, map, and enrich webhook payloads before delivery');
   });
 
   // === Endpoint fetching ===
   it('fetches endpoints on mount', async () => {
     await act(async () => {
-      render(React.createElement(TransformsPage));
+      renderWithProviders(React.createElement(TransformsPage));
     });
     expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
   });
@@ -133,7 +134,7 @@ describe('TransformsPage', () => {
   it('renders endpoint options in select', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -148,7 +149,7 @@ describe('TransformsPage', () => {
   it('loads rules when endpoint is selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -165,7 +166,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -186,7 +187,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -203,7 +204,7 @@ describe('TransformsPage', () => {
   it('shows empty state when no rules for selected endpoint', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -217,7 +218,7 @@ describe('TransformsPage', () => {
 
   // === Create form ===
   it('shows create form when New Rule is clicked', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -237,7 +238,7 @@ describe('TransformsPage', () => {
   });
 
   it('hides create form when New Rule is clicked again', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -251,7 +252,7 @@ describe('TransformsPage', () => {
   });
 
   it('renders Create button in form', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -275,7 +276,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -312,7 +313,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -347,7 +348,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -383,7 +384,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -415,7 +416,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -441,7 +442,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -481,7 +482,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -504,7 +505,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -525,12 +526,12 @@ describe('TransformsPage', () => {
 
   // === Empty/no endpoint selected ===
   it('shows placeholder message when no endpoint selected', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     expect(container.textContent).toContain('Select an endpoint to manage transforms');
   });
 
   it('shows "Choose an endpoint..." as default select option', () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
     const select = container.querySelector('select') as HTMLSelectElement;
     expect(select.options[0].textContent).toContain('Choose an endpoint...');
   });
@@ -541,7 +542,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -562,7 +563,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -579,7 +580,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -596,7 +597,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -608,7 +609,7 @@ describe('TransformsPage', () => {
   it('fetches rules for different endpoint', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 
@@ -622,7 +623,7 @@ describe('TransformsPage', () => {
 
   // === Input changes in create form ===
   it('allows typing in filter include input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -639,7 +640,7 @@ describe('TransformsPage', () => {
   });
 
   it('allows typing in filter exclude input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -654,7 +655,7 @@ describe('TransformsPage', () => {
   });
 
   it('allows typing in map source input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -669,7 +670,7 @@ describe('TransformsPage', () => {
   });
 
   it('allows typing in map target input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -684,7 +685,7 @@ describe('TransformsPage', () => {
   });
 
   it('allows typing in enrich key input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -699,7 +700,7 @@ describe('TransformsPage', () => {
   });
 
   it('allows typing in enrich value input', async () => {
-    const { container } = render(React.createElement(TransformsPage));
+    const { container } = renderWithProviders(React.createElement(TransformsPage));
 
     const newRuleButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('New Rule')
@@ -723,7 +724,7 @@ describe('TransformsPage', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TransformsPage));
+      const result = renderWithProviders(React.createElement(TransformsPage));
       container = result.container;
     });
 

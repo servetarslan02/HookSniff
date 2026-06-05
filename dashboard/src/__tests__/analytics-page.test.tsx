@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -63,14 +64,14 @@ describe('AnalyticsPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AnalyticsPage));
+      renderWithProviders(React.createElement(AnalyticsPage));
     });
   });
 
   it('displays analytics title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AnalyticsPage));
+      const result = renderWithProviders(React.createElement(AnalyticsPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('analytics.title');
@@ -78,7 +79,7 @@ describe('AnalyticsPage', () => {
 
   it('renders stat cards', async () => {
     await act(async () => {
-      render(React.createElement(AnalyticsPage));
+      renderWithProviders(React.createElement(AnalyticsPage));
     });
     // StatCard mocks render their labels
   });

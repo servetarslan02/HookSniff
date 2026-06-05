@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -76,34 +77,34 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('renders the page header', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.title/)).toBeTruthy();
   });
 
   it('shows description text', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.subtitle/)).toBeTruthy();
   });
 
   it('renders template buttons', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText('order.created')).toBeTruthy();
     expect(getByText('payment.completed')).toBeTruthy();
     expect(getByText('user.created')).toBeTruthy();
   });
 
   it('renders event type input with default value', () => {
-    const { getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByDisplayValue('order.created')).toBeTruthy();
   });
 
   it('renders payload fields section', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.payloadFields/)).toBeTruthy();
   });
 
   it('renders default template fields for order.created', () => {
-    const { getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByDisplayValue('order_id')).toBeTruthy();
     expect(getByDisplayValue('ord_123')).toBeTruthy();
     expect(getByDisplayValue('total')).toBeTruthy();
@@ -111,19 +112,19 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('renders add field button', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.addField/)).toBeTruthy();
   });
 
   it('adds a new field when clicking add field', () => {
-    const { getByText, getAllByPlaceholderText } = render(<WebhookBuilderPage />);
+    const { getByText, getAllByPlaceholderText } = renderWithProviders(<WebhookBuilderPage />);
     const initialCount = getAllByPlaceholderText('field_name').length;
     fireEvent.click(getByText(/webhookBuilder\.addField/));
     expect(getAllByPlaceholderText('field_name').length).toBe(initialCount + 1);
   });
 
   it('removes a field when clicking remove button', () => {
-    const { getAllByText, getAllByPlaceholderText } = render(<WebhookBuilderPage />);
+    const { getAllByText, getAllByPlaceholderText } = renderWithProviders(<WebhookBuilderPage />);
     const initialCount = getAllByPlaceholderText('field_name').length;
     const removeButtons = getAllByText('✕');
     fireEvent.click(removeButtons[0]);
@@ -131,42 +132,42 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('loads payment.completed template when clicked', () => {
-    const { getByText, getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByText, getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     fireEvent.click(getByText('payment.completed'));
     expect(getByDisplayValue('payment_id')).toBeTruthy();
     expect(getByDisplayValue('pay_xyz')).toBeTruthy();
   });
 
   it('loads user.created template when clicked', () => {
-    const { getByText, getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByText, getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     fireEvent.click(getByText('user.created'));
     expect(getByDisplayValue('user_id')).toBeTruthy();
     expect(getByDisplayValue('usr_456')).toBeTruthy();
   });
 
   it('renders endpoint select dropdown', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.selectEndpoint/)).toBeTruthy();
   });
 
   it('renders send webhook button', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.sendWebhook/)).toBeTruthy();
   });
 
   it('send button is disabled when no endpoint is selected', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     const btn = getByText(/webhookBuilder\.sendWebhook/).closest('button');
     expect(btn?.disabled).toBe(true);
   });
 
   it('renders preview section', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.preview/)).toBeTruthy();
   });
 
   it('auto-updates preview on load', () => {
-    const { container } = render(<WebhookBuilderPage />);
+    const { container } = renderWithProviders(<WebhookBuilderPage />);
     const pre = container.querySelector('pre');
     expect(pre).toBeTruthy();
     expect(pre!.textContent).toContain('order.created');
@@ -174,7 +175,7 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('auto-updates preview when fields change', () => {
-    const { getByDisplayValue, container } = render(<WebhookBuilderPage />);
+    const { getByDisplayValue, container } = renderWithProviders(<WebhookBuilderPage />);
     const keyInput = getByDisplayValue('order_id');
     fireEvent.change(keyInput, { target: { value: 'new_key' } });
     const pre = container.querySelector('pre');
@@ -182,32 +183,32 @@ describe('WebhookBuilderPage', () => {
   });
 
   it('allows editing event type', () => {
-    const { getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     const input = getByDisplayValue('order.created');
     fireEvent.change(input, { target: { value: 'custom.event' } });
     expect(input.value).toBe('custom.event');
   });
 
   it('allows editing field values', () => {
-    const { getByDisplayValue } = render(<WebhookBuilderPage />);
+    const { getByDisplayValue } = renderWithProviders(<WebhookBuilderPage />);
     const keyInput = getByDisplayValue('order_id');
     fireEvent.change(keyInput, { target: { value: 'new_key' } });
     expect(keyInput.value).toBe('new_key');
   });
 
   it('renders field type selectors', () => {
-    const { getAllByText } = render(<WebhookBuilderPage />);
+    const { getAllByText } = renderWithProviders(<WebhookBuilderPage />);
     // i18n key: webhookBuilder.typeStr
     expect(getAllByText(/webhookBuilder\.typeStr/).length).toBeGreaterThan(0);
   });
 
   it('renders clear all button', () => {
-    const { getByText } = render(<WebhookBuilderPage />);
+    const { getByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getByText(/webhookBuilder\.clearAll/)).toBeTruthy();
   });
 
   it('renders keyboard shortcut hint', () => {
-    const { getAllByText } = render(<WebhookBuilderPage />);
+    const { getAllByText } = renderWithProviders(<WebhookBuilderPage />);
     expect(getAllByText(/Ctrl/).length).toBeGreaterThan(0);
   });
 });

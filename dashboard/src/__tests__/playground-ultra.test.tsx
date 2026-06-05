@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -92,12 +93,12 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 1. Renders without crashing ───
   it('renders without crashing', () => {
-    render(React.createElement(PlaygroundPage));
+    renderWithProviders(React.createElement(PlaygroundPage));
   });
 
   // ─── 2. Renders playground title ───
   it('renders playground title', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const h1 = container.querySelector('h1');
     expect(h1).toBeTruthy();
     expect(h1!.textContent).toBe('playground.title');
@@ -105,7 +106,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 3. Renders method selector ───
   it('renders method selector', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     expect(select).toBeTruthy();
     expect(select.tagName).toBe('SELECT');
@@ -113,7 +114,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 4. Renders path input ───
   it('renders path input', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const pathInput = getPathInput(container);
     expect(pathInput).toBeTruthy();
     expect(pathInput.type).toBe('text');
@@ -121,7 +122,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 5. Renders send button ───
   it('renders send button', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = getSendButton(container);
     expect(sendBtn).toBeTruthy();
     expect(sendBtn.disabled).toBe(false);
@@ -129,14 +130,14 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 6. Default method is POST (component default) ───
   it('default method is POST', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     expect(select.value).toBe('POST');
   });
 
   // ─── 7. Can change method to GET ───
   it('can change method to GET', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     fireEvent.change(select, { target: { value: 'GET' } });
     expect(select.value).toBe('GET');
@@ -144,7 +145,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 8. Can change method to PUT ───
   it('can change method to PUT', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     fireEvent.change(select, { target: { value: 'PUT' } });
     expect(select.value).toBe('PUT');
@@ -152,7 +153,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 9. Can change method to DELETE ───
   it('can change method to DELETE', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     fireEvent.change(select, { target: { value: 'DELETE' } });
     expect(select.value).toBe('DELETE');
@@ -160,7 +161,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 10. Can change method to PATCH ───
   it('can change method to PATCH', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     fireEvent.change(select, { target: { value: 'PATCH' } });
     expect(select.value).toBe('PATCH');
@@ -168,7 +169,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 11. Can type in path input ───
   it('can type in path input', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const pathInput = getPathInput(container);
     fireEvent.change(pathInput, { target: { value: '/v1/custom/path' } });
     expect(pathInput.value).toBe('/v1/custom/path');
@@ -176,7 +177,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 12. Renders all method options ───
   it('renders all method options (GET, POST, PUT, DELETE, PATCH)', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     const options = Array.from(select.querySelectorAll('option')).map((o) => o.value);
     expect(options).toEqual(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
@@ -184,7 +185,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 13. Renders AI payload template buttons ───
   it('renders AI payload template buttons', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const templates = ['order.created', 'order.completed', 'payment.failed', 'payment.succeeded', 'user.registered', 'user.updated', 'invoice.created'];
     templates.forEach((t) => {
       expect(container.textContent).toContain(t);
@@ -193,7 +194,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 14. Clicking template fills body editor ───
   it('clicking template fills body editor', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const orderBtn = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent === 'order.created'
     )!;
@@ -204,13 +205,13 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 15. Shows empty response inspector initially ───
   it('shows empty response inspector initially', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.sendToInspect');
   });
 
   // ─── 16. Send button triggers API call ───
   it('send button triggers API call', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = getSendButton(container);
     await act(async () => { fireEvent.click(sendBtn); });
     expect(mockFetch).toHaveBeenCalledWith(
@@ -226,7 +227,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ ok: true }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toContain('200');
@@ -241,7 +242,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ error: 'fail' }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toContain('500');
@@ -256,7 +257,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({}),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toMatch(/\d+ms/);
@@ -270,7 +271,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ data: 'test' }),
       headers: new Map([['x-request-id', 'abc']]),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('200'); });
 
@@ -289,7 +290,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ data: 'test' }),
       headers: new Map([['x-request-id', 'abc']]),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => { expect(container.textContent).toContain('200'); });
 
@@ -314,7 +315,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ ok: true }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -331,7 +332,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       response: { ok: true }, timestamp: '2024-01-01T00:00:00Z', duration_ms: 50,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('Request History');
     expect(container.textContent).toContain('/loaded');
   });
@@ -351,7 +352,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       headers: new Map(),
     });
 
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       const savedArg = localStorageMock.setItem.mock.calls.find(
@@ -370,7 +371,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       response: {}, timestamp: '2024-01-01T00:00:00Z', duration_ms: 50,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
 
     const clearBtn = Array.from(container.querySelectorAll('button')).find((b) => b.textContent === 'Clear')!;
     await act(async () => { fireEvent.click(clearBtn); });
@@ -386,7 +387,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       response: {}, timestamp: '2024-06-15T12:00:00Z', duration_ms: 200,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('POST');
     expect(container.textContent).toContain('/webhooks');
   });
@@ -398,7 +399,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       response: {}, timestamp: '2024-01-01T00:00:00Z', duration_ms: 80,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('200');
   });
 
@@ -409,7 +410,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       response: {}, timestamp: '2024-06-15T14:30:00.000Z', duration_ms: 50,
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     // toLocaleString output depends on locale, but the timestamp should render something
     // We check that the div with the timestamp class exists
     const _timeDivs = container.querySelectorAll('[class*="text-\\[10px\\]"]');
@@ -423,7 +424,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
   it('shows loading state during request', async () => {
     let resolveFetch: any;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
 
     act(() => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
@@ -439,7 +440,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
   it('send button disabled during loading', async () => {
     let resolveFetch: any;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const sendBtn = getSendButton(container);
 
     act(() => { fireEvent.click(sendBtn); });
@@ -454,7 +455,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 31. Renders endpoint path quick buttons ───
   it('renders endpoint path quick buttons', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('List Endpoints');
     expect(container.textContent).toContain('List Deliveries');
     expect(container.textContent).toContain('Get Stats');
@@ -462,7 +463,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 32. Endpoint path fills path input ───
   it('endpoint path button fills path input and sets GET', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const pathInput = getPathInput(container);
     const select = getSelect(container);
 
@@ -480,7 +481,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 33. Body editor renders for POST/PUT/PATCH ───
   it('body editor renders for POST, PUT, PATCH', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
 
     // POST (default) — textarea should exist
@@ -501,7 +502,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 34. Body editor does not render for GET ───
   it('body editor does not render for GET', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const select = getSelect(container);
     fireEvent.change(select, { target: { value: 'GET' } });
     expect(container.querySelector('textarea')).toBeNull();
@@ -509,13 +510,13 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 35. Response inspector shows empty state initially ───
   it('response inspector shows empty state with sendToInspect text', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.sendToInspect');
   });
 
   // ─── 36. Request includes Authorization header with apiKey ───
   it('request includes Authorization header', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.any(String),
@@ -529,7 +530,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 37. Request sends body for non-GET methods ───
   it('request sends body for non-GET methods', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     const textarea = container.querySelector('textarea')!;
     fireEvent.change(textarea, { target: { value: '{"key":"value"}' } });
     await act(async () => { fireEvent.click(getSendButton(container)); });
@@ -541,7 +542,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 38. Request does NOT send body for GET ───
   it('request does not send body for GET', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     fireEvent.change(getSelect(container), { target: { value: 'GET' } });
     await act(async () => { fireEvent.click(getSendButton(container)); });
     expect(mockFetch).toHaveBeenCalledWith(
@@ -552,13 +553,13 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 39. Path defaults to /webhooks ───
   it('path defaults to /webhooks', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(getPathInput(container).value).toBe('/webhooks');
   });
 
   // ─── 40. AI template changes method to POST ───
   it('clicking AI template sets method to POST', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     // Change to GET first
     fireEvent.change(getSelect(container), { target: { value: 'GET' } });
     expect(getSelect(container).value).toBe('GET');
@@ -579,7 +580,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       duration_ms: 120, headers: { 'x-request-id': 'req-99' },
     }]);
     localStorageMock.getItem.mockReturnValueOnce(entry);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
 
     const historyItem = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('/api/resource/42')
@@ -598,7 +599,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
   // ─── 42. Network error is displayed in response ───
   it('network error is displayed in response body', async () => {
     mockFetch.mockRejectedValueOnce(new Error('fetch failed'));
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toContain('fetch failed');
@@ -607,7 +608,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 43. Preset click sets method to GET and clears body ───
   it('preset click sets method to GET and clears body', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     // First fill body
     const textarea = container.querySelector('textarea')!;
     fireEvent.change(textarea, { target: { value: '{"old":"data"}' } });
@@ -632,7 +633,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       { id: 'h3', method: 'DELETE', path: '/c', body: '', status: 204, response: {}, timestamp: '2024-01-03T00:00:00Z', duration_ms: 30 },
     ]);
     localStorageMock.getItem.mockReturnValueOnce(entries);
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('/a');
     expect(container.textContent).toContain('/b');
     expect(container.textContent).toContain('/c');
@@ -640,19 +641,19 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 45. Live viewer section renders ───
   it('renders live request viewer section', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.liveViewer');
   });
 
   // ─── 46. Headers section shows auto-added headers ───
   it('headers section shows auto-added headers', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('Headers (auto-added)');
   });
 
   // ─── 47. cURL command section renders ───
   it('cURL command section renders', () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     expect(container.textContent).toContain('playground.curlCommand');
   });
 
@@ -663,7 +664,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ error: 'validation' }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toContain('422');
@@ -678,7 +679,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
       json: () => Promise.resolve({ redirect: true }),
       headers: new Map(),
     });
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     await waitFor(() => {
       expect(container.textContent).toContain('301');
@@ -688,7 +689,7 @@ describe('PlaygroundPage — Ultra Coverage', () => {
 
   // ─── 50. Send request passes credentials ───
   it('send request passes credentials include', async () => {
-    const { container } = render(React.createElement(PlaygroundPage));
+    const { container } = renderWithProviders(React.createElement(PlaygroundPage));
     await act(async () => { fireEvent.click(getSendButton(container)); });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.any(String),
