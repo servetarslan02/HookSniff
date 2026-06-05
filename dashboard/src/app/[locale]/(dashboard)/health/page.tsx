@@ -190,7 +190,7 @@ export default function EndpointHealthPage() {
                       <span>{t('uptime7d') || 'Uptime 7d'}: <strong className="text-gray-700 dark:text-slate-300">{ep.uptime_7d.toFixed(1)}%</strong></span>
                     )}
                     {ep.last_success_at && (
-                      <span>{t('lastSuccess') || 'Son başarılı'}: <strong className="text-gray-700 dark:text-slate-300">{new Date(ep.last_success_at).toLocaleString()}</strong></span>
+                      <span>{t('lastSuccess') || 'Last success'}: <strong className="text-gray-700 dark:text-slate-300">{new Date(ep.last_success_at).toLocaleString()}</strong></span>
                     )}
                   </div>
                 </div>

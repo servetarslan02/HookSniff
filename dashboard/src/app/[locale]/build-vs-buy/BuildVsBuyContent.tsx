@@ -36,7 +36,7 @@ export default function BuildVsBuyContent() {
 
   const hooksniffCostRows = [
     { item: t('costSetup'), cost: '1 gün' },
-    { item: t('costMonthly'), cost: '$24/mo' },
+    { item: t('costMonthly'), cost: '$29/mo' },
     { item: t('costInfra'), cost: t('costInfraIncluded') },
     { item: t('costSoc2'), cost: t('costSoc2Ready') },
     { item: t('costOnCall'), cost: t('costOnCallZero') },
@@ -85,7 +85,7 @@ export default function BuildVsBuyContent() {
             <p className="text-sm text-gray-600 dark:text-slate-400">{t("timeToProduction")}</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 text-center">
-            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">$24/mo</p>
+            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">$29/mo</p>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t("hooksniffPro")}</p>
           </div>
         </div>

@@ -113,7 +113,7 @@ async function DlqPageContent(params: Promise<{ locale: string }>) {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">Developer ($0)</td><td className="px-4 py-3">7 gün</td><td className="px-4 py-3">100</td></tr>
-              <tr><td className="px-4 py-3">Startup ($24/ay)</td><td className="px-4 py-3">14 gün</td><td className="px-4 py-3">30.000</td></tr>
+              <tr><td className="px-4 py-3">Startup ($29/ay)</td><td className="px-4 py-3">14 gün</td><td className="px-4 py-3">30.000</td></tr>
               <tr><td className="px-4 py-3">Pro ($49/ay)</td><td className="px-4 py-3">180 gün</td><td className="px-4 py-3">100.000</td></tr>
               <tr><td className="px-4 py-3">Enterprise ($149/ay)</td><td className="px-4 py-3">Özel</td><td className="px-4 py-3">Sınırsız</td></tr>
             </tbody>
