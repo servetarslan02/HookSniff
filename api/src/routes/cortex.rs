@@ -1,4 +1,4 @@
-//! Cortex API routes — admin-only endpoints for platform-wide intelligence.
+﻿//! Cortex API routes — admin-only endpoints for platform-wide intelligence.
 //!
 //! These endpoints expose the Cortex brain's data: all customers, all endpoints.
 //! Only accessible to admin users. The brain sees everything.
@@ -8,7 +8,7 @@ use axum::extract::Path;
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::models::customer::Customer;
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 
 pub fn router() -> Router {
     Router::new()
@@ -350,7 +350,7 @@ async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extensio
 
 async fn post_explain_anomaly(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::coded(ErrorCode::EndpointIdRequired))?;
     // Get current stats
     let stats: Option<(f64, f64, f64, f64, f64)> = sqlx::query_as(
         "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)::FLOAT, COALESCE(total_deliveries,0)::FLOAT FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start DESC LIMIT 1"
@@ -365,7 +365,7 @@ async fn post_explain_anomaly(Extension(pool): Extension<PgPool>, Extension(c): 
 
 async fn post_explain_prediction(Extension(_pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::coded(ErrorCode::EndpointIdRequired))?;
     let predicted_sr = body.get("predicted_sr").and_then(|v| v.as_f64()).unwrap_or(90.0);
     let predicted_latency = body.get("predicted_latency").and_then(|v| v.as_f64()).unwrap_or(500.0);
     let confidence = body.get("confidence").and_then(|v| v.as_f64()).unwrap_or(0.7);
@@ -391,7 +391,7 @@ async fn post_chaos_run(Extension(pool): Extension<PgPool>, Extension(c): Extens
         "database_slow" => crate::cortex::ml::chaos::ChaosScenario::DatabaseSlow,
         "traffic_spike" => crate::cortex::ml::chaos::ChaosScenario::TrafficSpike,
         "error_burst" => crate::cortex::ml::chaos::ChaosScenario::ErrorBurst,
-        _ => return Err(AppError::BadRequest("unknown scenario".into())),
+        _ => return Err(AppError::BadRequest("Unknown chaos scenario. Valid options: endpoint_down, redis_down, database_slow, traffic_spike, error_burst".into())),
     };
 
     let result = if let Some(eid) = eid {
@@ -444,7 +444,7 @@ async fn get_ab_tests(Extension(pool): Extension<PgPool>, Extension(c): Extensio
 
 async fn post_ab_test_start(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::coded(ErrorCode::EndpointIdRequired))?;
     let model_type = body.get("model_type").and_then(|v| v.as_str()).unwrap_or("anomaly_detector");
     let variant_a = body.get("variant_a").and_then(|v| v.as_str()).unwrap_or("current");
     let variant_b = body.get("variant_b").and_then(|v| v.as_str()).unwrap_or("alternative");
@@ -475,7 +475,7 @@ async fn get_automl_trials(Extension(pool): Extension<PgPool>, Extension(c): Ext
 
 async fn post_automl_run(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::coded(ErrorCode::EndpointIdRequired))?;
     let model_type = body.get("model_type").and_then(|v| v.as_str()).unwrap_or("adaptive_threshold");
     let max_trials = body.get("max_trials").and_then(|v| v.as_u64()).unwrap_or(10) as usize;
     let result = crate::cortex::ml::automl::run_automl_for_endpoint(&pool, eid, model_type, max_trials).await
