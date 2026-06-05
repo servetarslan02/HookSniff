@@ -45,6 +45,47 @@ export function DriftTab() {
     return translated !== key ? translated : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
+  const translateFeature = (f: string): string => {
+    const key = `feature${f.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
+    const translated = t(key);
+    return translated !== key ? translated : f.replace(/_/g, ' ');
+  };
+
+  const translateMethod = (m: string): string => {
+    if (m.includes('page_hinkley')) return t('methodPageHinkley') || 'Sudden change detected';
+    if (m.includes('adwin')) return t('methodAdwin') || 'Gradual change detected';
+    if (m.includes('ks_test')) return t('methodKsTest') || 'Distribution shift detected';
+    if (m.includes('stat_test')) return t('methodStatTest') || 'Statistical test';
+    if (m.includes('p_value')) {
+      const val = m.split(':').pop()?.trim();
+      if (val) {
+        const p = parseFloat(val);
+        if (p < 0.01) return t('methodPValueVerySignificant') || 'Very high confidence';
+        if (p < 0.05) return t('methodPValueSignificant') || 'High confidence';
+        return t('methodPValueModerate') || 'Moderate confidence';
+      }
+    }
+    return m.replace(/_/g, ' ');
+  };
+
+  const translateAction = (action: string): string => {
+    const key = `action${action.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
+    const translated = t(key);
+    return translated !== key ? translated : action.replace(/_/g, ' ');
+  };
+
+  const formatDetectedBy = (detected: string[] | Record<string, unknown>): string => {
+    if (Array.isArray(detected)) return detected.map(m => translateMethod(m)).join(', ');
+    if (typeof detected === 'object' && detected !== null) {
+      return Object.entries(detected).map(([k, v]) => {
+        if (k === 'p_value') return `${t('methodStatTest') || 'Statistical test'}: %${((v as number) * 100).toFixed(1)} confidence`;
+        if (k === 'method') return translateMethod(String(v));
+        return `${translateMethod(k)}: ${v}`;
+      }).join(' · ');
+    }
+    return translateMethod(String(detected));
+  };
+
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
@@ -76,9 +117,9 @@ export function DriftTab() {
                 <time className="text-xs text-gray-500">{new Date(ev.created_at).toLocaleString()}</time>
               </div>
               <div className="mt-2 text-sm text-gray-600 dark:text-slate-400">
-                <p><strong>{t('affected')}</strong> {Array.isArray(ev.features_affected) ? ev.features_affected.join(', ') || '—' : String(ev.features_affected)}</p>
-                <p><strong>{t('detected')}</strong> {Array.isArray(ev.detected_by) ? ev.detected_by.join(', ') : typeof ev.detected_by === 'object' ? Object.entries(ev.detected_by).map(([k,v]) => `${k}: ${v}`).join(', ') : String(ev.detected_by)}</p>
-                <p><strong>{t('action')}</strong> <span className="capitalize">{ev.recommended_action.replace(/_/g, ' ')}</span></p>
+                <p><strong>{t('affected')}</strong> {Array.isArray(ev.features_affected) ? ev.features_affected.map(f => translateFeature(f)).join(', ') || '—' : translateFeature(String(ev.features_affected))}</p>
+                <p><strong>{t('detected')}</strong> {formatDetectedBy(ev.detected_by)}</p>
+                <p><strong>{t('action')}</strong> {translateAction(ev.recommended_action)}</p>
                 {ev.endpoint_id && (
                   <p className="mt-1 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
                     <ExternalLink size={11} />

@@ -7553,7 +7553,27 @@
         "gradual": "Gradual",
         "incremental": "Incremental"
       },
-      "endpointLink": "View endpoint"
+      "endpointLink": "View endpoint",
+      "featureSuccessRate": "Success Rate",
+      "featureAvgLatency": "Average Latency",
+      "featureP95Latency": "P95 Latency",
+      "featureP99Latency": "P99 Latency",
+      "featureLatency": "Latency",
+      "featureDeliveryRate": "Delivery Rate",
+      "featureErrorRate": "Error Rate",
+      "featureVolume": "Traffic Volume",
+      "methodPageHinkley": "Sudden change detected",
+      "methodAdwin": "Gradual change detected",
+      "methodKsTest": "Distribution shift detected",
+      "methodStatTest": "Statistical test",
+      "methodPValueVerySignificant": "Very high confidence",
+      "methodPValueSignificant": "High confidence",
+      "methodPValueModerate": "Moderate confidence",
+      "actionRetrain": "Model will be retrained",
+      "actionMonitor": "Closely monitoring",
+      "actionAlert": "Alert sent",
+      "actionRollback": "Reverting to previous model",
+      "actionCollectingBaseline": "Collecting reference data"
     },
     "modelMonitor": {
       "stats": {
