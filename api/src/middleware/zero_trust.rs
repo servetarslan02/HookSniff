@@ -39,8 +39,8 @@ pub async fn zero_trust_middleware(
     let query = request.uri().query().unwrap_or("");
     let method = request.method().as_str();
 
-    // WAF scan: check path + query for injection attempts
-    if !result.is_admin {
+    // WAF scan: check path + query for injection attempts (skip for admin)
+    if !customer.is_admin {
         let waf_input = format!("{}?{}", path, query);
         if let Some(waf_result) = crate::security::waf::analyze_request(&waf_input) {
             if waf_result.confidence >= 0.7 {

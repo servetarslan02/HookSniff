@@ -136,7 +136,7 @@ impl BehaviorProfile {
 
         // 5. Only GET requests (no resource loading)
         let total_methods: u32 = self.methods_used.values().sum();
-        let get_ratio = self.methods_used.get("GET").unwrap_or(&0) as f64 / total_methods.max(1) as f64;
+        let get_ratio = *self.methods_used.get("GET").unwrap_or(&0) as f64 / total_methods.max(1) as f64;
         if get_ratio > 0.95 && total_methods >= 10 {
             score += 15;
             reasons.push(format!("only_get: {:.0}% GET requests", get_ratio * 100.0));
