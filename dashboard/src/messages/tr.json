@@ -7677,7 +7677,29 @@
         "cancelled": "İptal",
         "pending": "Bekliyor"
       },
-      "testCount": "{n} test"
+      "testCount": "{n} test",
+      "variant": {
+        "exponential": "Üstel Geri Çekilme",
+        "exponentialDesc": "Gecikmeler her denemede ikiye katlanır (1s, 2s, 4s, 8s...)",
+        "linear": "Doğrusal Geri Çekilme",
+        "linearDesc": "Gecikmeler doğrusal artar (1s, 2s, 3s, 4s...)",
+        "fixed": "Sabit Gecikme",
+        "fixedDesc": "Her deneme arasında aynı gecikme",
+        "aggressive": "Agresif Yeniden Deneme",
+        "aggressiveDesc": "Daha kısa gecikmelerle daha hızlı yeniden deneme",
+        "conservative": "Muhafazakar Yeniden Deneme",
+        "conservativeDesc": "Daha uzun gecikmelerle daha yavaş yeniden deneme",
+        "timeout": "Zaman Aşımı",
+        "timeoutDesc": "En fazla bekle",
+        "seconds": "saniye",
+        "beforeGivingUp": "vazgeçmeden önce",
+        "threshold": "Eşik",
+        "circuitDesc": "Devreyi aç",
+        "consecutiveFailures": "ardışık hatadan sonra",
+        "requestsPerMin": "istek/dk",
+        "rateLimitDesc": "En fazla izin ver",
+        "requestsPerMinute": "dakika başına istek"
+      }
     },
     "autoML": {
       "title": "AutoML Optimizasyon Denemeleri",

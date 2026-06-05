@@ -7641,7 +7641,29 @@
         "cancelled": "Cancelled",
         "pending": "Pending"
       },
-      "testCount": "{n} tests"
+      "testCount": "{n} tests",
+      "variant": {
+        "exponential": "Exponential Backoff",
+        "exponentialDesc": "Delays double each retry (1s, 2s, 4s, 8s...)",
+        "linear": "Linear Backoff",
+        "linearDesc": "Delays increase linearly (1s, 2s, 3s, 4s...)",
+        "fixed": "Fixed Delay",
+        "fixedDesc": "Same delay between every retry",
+        "aggressive": "Aggressive Retry",
+        "aggressiveDesc": "Faster retries with shorter delays",
+        "conservative": "Conservative Retry",
+        "conservativeDesc": "Slower retries with longer delays",
+        "timeout": "Timeout",
+        "timeoutDesc": "Wait up to",
+        "seconds": "seconds",
+        "beforeGivingUp": "before giving up",
+        "threshold": "Threshold",
+        "circuitDesc": "Open circuit after",
+        "consecutiveFailures": "consecutive failures",
+        "requestsPerMin": "req/min",
+        "rateLimitDesc": "Allow up to",
+        "requestsPerMinute": "requests per minute"
+      }
     },
     "autoML": {
       "title": "AutoML Optimization Trials",
