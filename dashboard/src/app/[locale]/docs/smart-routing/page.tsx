@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { RefreshCw, Shield, Scale, Dice5 } from '@/components/icons';
 
 
 export const metadata: Metadata = {
@@ -47,21 +48,21 @@ async function SmartRoutingPageContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('routingDesc')}</p>
         <div className="space-y-4 not-prose">
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 {t('roundRobinTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"><RefreshCw size={16} className="inline mr-1 align-text-bottom" /> {t('roundRobinTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('roundRobinDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('roundRobinExample')}</code>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🛡️ {t('failoverTitle')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"><Shield size={16} className="inline mr-1 align-text-bottom" /> {t('failoverTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('failoverDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('failoverExample')}</code>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">⚖️ {t('weighted') || 'Weighted'}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"><Scale size={16} className="inline mr-1 align-text-bottom" /> {t('weighted') || 'Weighted'}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('weightedDesc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🎲 {t('random') || 'Random'}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"><Dice5 size={16} className="inline mr-1 align-text-bottom" /> {t('random') || 'Random'}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('randomDesc')}</p>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { CheckCircle2 } from '@/components/icons';
 
 
 export const metadata: Metadata = {
@@ -87,10 +88,10 @@ async function CloudEventsPageContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('benefits')}</h2>
         <ul className="space-y-2">
-          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit1')}</li>
-          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit2')}</li>
-          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit3')}</li>
-          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit4')}</li>
+          <li className="text-gray-600 dark:text-slate-400"><CheckCircle2 size={14} className="inline mr-1 text-emerald-500 align-text-bottom" />{t('benefit1')}</li>
+          <li className="text-gray-600 dark:text-slate-400"><CheckCircle2 size={14} className="inline mr-1 text-emerald-500 align-text-bottom" />{t('benefit2')}</li>
+          <li className="text-gray-600 dark:text-slate-400"><CheckCircle2 size={14} className="inline mr-1 text-emerald-500 align-text-bottom" />{t('benefit3')}</li>
+          <li className="text-gray-600 dark:text-slate-400"><CheckCircle2 size={14} className="inline mr-1 text-emerald-500 align-text-bottom" />{t('benefit4')}</li>
         </ul>
       </section>
 

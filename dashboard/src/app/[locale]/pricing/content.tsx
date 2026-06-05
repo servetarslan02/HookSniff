@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
 import PublicNavbar from '@/components/PublicNavbar';
-import { DollarSign, Lock, Shield, Key, ShieldCheck, ClipboardList, Globe, MapPin, Rocket, Star, Anchor, XCircle, CheckCircle, Clock } from '@/components/icons';
+import { DollarSign, Lock, Shield, Key, ShieldCheck, ClipboardList, Globe, MapPin, Rocket, Star, Anchor, XCircle, CheckCircle, Clock, Lightbulb } from '@/components/icons';
 
 
 
@@ -243,7 +243,7 @@ export function PricingPageContent() {
           </div>
           {/* Always-visible discount hint */}
           <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-            💡 {t('savePercent', { percent: 20 })} {t('annual') || 'yıllık'} {t('billedAnnually') || 'ödeme ile'}
+            <Lightbulb size={14} className="inline mr-1 align-text-bottom" /> {t('savePercent', { percent: 20 })} {t('annual') || 'yıllık'} {t('billedAnnually') || 'ödeme ile'}
           </p>
         </div>
 
