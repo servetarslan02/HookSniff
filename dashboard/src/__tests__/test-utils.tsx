@@ -7,16 +7,20 @@
  */
 import React, { type ReactElement } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Try to import NextIntlClientProvider — may be mocked out by test files
+// Lazy imports — may be mocked out by test files
+let QueryClient: any = null;
+let QueryClientProvider: any = null;
+try {
+  const rq = require('@tanstack/react-query');
+  QueryClient = rq.QueryClient;
+  QueryClientProvider = rq.QueryClientProvider;
+} catch { /* mocked out */ }
+
 let NextIntlClientProvider: React.ComponentType<any> | null = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   NextIntlClientProvider = require('next-intl').NextIntlClientProvider;
-} catch {
-  // Not available (mocked out)
-}
+} catch { /* mocked out */ }
 
 // Common messages for tests — maps i18n keys to readable values
 const testMessages: Record<string, any> = {
