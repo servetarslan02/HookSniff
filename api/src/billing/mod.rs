@@ -215,7 +215,7 @@ impl Plan {
     /// Max events per day
     pub fn max_events_per_day(&self) -> u64 {
         match self {
-            Plan::Developer => 1_000,
+            Plan::Developer => 300,
             Plan::Startup => 30_000,
             Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
@@ -258,7 +258,7 @@ impl Plan {
     /// Max webhook deliveries per day
     pub fn max_webhooks_per_day(&self) -> u64 {
         match self {
-            Plan::Developer => 1_000,
+            Plan::Developer => 300,
             Plan::Startup => 30_000,
             Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
@@ -268,16 +268,21 @@ impl Plan {
     /// Max API requests per minute
     pub fn max_requests_per_minute(&self) -> u32 {
         match self {
-            Plan::Developer => 1_000,
-            Plan::Startup => 1_000,
-            Plan::Pro => 10_000,
-            Plan::Enterprise => u32::MAX,
+            Plan::Developer => 100,
+            Plan::Startup => 500,
+            Plan::Pro => 1_000,
+            Plan::Enterprise => 5_000,
         }
     }
 
-    /// Max endpoints (unlimited for all plans)
+    /// Max endpoints per plan
     pub fn max_endpoints(&self) -> u32 {
-        u32::MAX
+        match self {
+            Plan::Developer => 5,
+            Plan::Startup => 20,
+            Plan::Pro => 50,
+            Plan::Enterprise => 200,
+        }
     }
 
     /// Max payload size in bytes
