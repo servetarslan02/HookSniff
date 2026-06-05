@@ -292,7 +292,7 @@ async function DocsPageContent(params: Promise<{ locale: string }>) {
               <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
                 {[
                   { plan: 'Developer', price: '$0', rpm: '100', events: '300', highlight: false },
-                  { plan: 'Startup', price: '$24/mo', rpm: '500', events: '30,000', highlight: false },
+                  { plan: 'Startup', price: '$29/mo', rpm: '500', events: '30,000', highlight: false },
                   { plan: 'Pro', price: '$49/mo', rpm: '1,000', events: '100,000', highlight: true },
                   { plan: 'Enterprise', price: '$149/mo', rpm: 'Custom', events: 'Unlimited', highlight: false },
                 ].map((row) => (

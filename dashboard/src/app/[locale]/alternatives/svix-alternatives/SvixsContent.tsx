@@ -17,7 +17,7 @@ function getAlternatives(t: ReturnType<typeof useTranslations>) {
     {
       name: 'HookSniff',
       icon: '🪝',
-      price: '$24/mo (Startup)',
+      price: '$29/mo (Startup)',
       pros: [t('hooksniffPro1'), t('hooksniffPro2'), t('hooksniffPro3')],
       cons: [t('hooksniffCon1'), t('hooksniffCon2')],
     },
@@ -81,7 +81,7 @@ export function SvixsContent() {
               <tbody>
                 {[
                   { name: 'Svix', price: '$490/mo', sdks: '6', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: 'Type 2', sla: '99.99%', highlight: false },
-                  { name: 'HookSniff', price: '$24/mo', sdks: '11', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: t('ready'), sla: '99.9%', highlight: true },
+                  { name: 'HookSniff', price: '$29/mo', sdks: '11', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: t('ready'), sla: '99.9%', highlight: true },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, self: <X size={14} strokeWidth={1.75} className="text-red-500" />, soc2: 'Type 2', sla: '99.999%', highlight: false },
                   { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '4', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, sla: 'N/A', highlight: false },
                   { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '1 (Go)', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, sla: 'N/A', highlight: false },

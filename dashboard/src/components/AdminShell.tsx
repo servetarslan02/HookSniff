@@ -79,7 +79,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       case '/admin/system':
         return [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystemHealth(token), staleTime: 15_000 }];
       case '/admin/activity':
-        return [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }];
+        return [{ queryKey: ['admin', 'audit-logs'], queryFn: () => apiFetch('/admin/audit-logs', { token }), staleTime: 15_000 }];
       case '/admin/alerts':
         return [{ queryKey: ['admin', 'alerts'], queryFn: () => apiFetch('/admin/alerts', { token }), staleTime: 15_000 }];
       case '/admin/security':
