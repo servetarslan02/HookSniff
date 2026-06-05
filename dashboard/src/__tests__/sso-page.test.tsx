@@ -66,7 +66,8 @@ describe('SSO Page', () => {
 
   it('renders SSO configuration form for enterprise plan', async () => {
     const { container } = renderWithProviders(
-      React.createElement('div', null, 'SSO Page Test')
+      React.createElement('div', null, 'SSO Page Test'),
+      { withIntl: false }
     );
     expect(container.textContent).toBe('SSO Page Test');
   });
