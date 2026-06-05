@@ -8,16 +8,16 @@ import { Check } from '@/components/icons';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
-    '10eventsDay', '1app', '5endpoints', '10eventTypes', '10subscriptions', '7dayLog', 'hmac', '2faSupport', 'communitySupport',
+    '10eventsDay', '5endpoints', '7dayLog', 'hmac', 'communitySupport',
   ],
   startup: [
-    '30kEventsDay', '1application', '20endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
+    '30kEventsDay', '20endpoints', '14dayLog', 'neverBlocked', 'deadLetter', 'emailSupport',
   ],
   pro: [
-    '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
+    '100kEventsDay', '500endpoints', '30dayLog', 'fifo', 'analytics', 'prioritySupport',
   ],
   enterprise: [
-    'unlimitedEvents', 'unlimitedApps', '200endpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
+    'unlimitedEvents', '200endpoints', 'customLog', 'ssoSaml', 'accountManager', 'sla99',
   ],
 };
 
