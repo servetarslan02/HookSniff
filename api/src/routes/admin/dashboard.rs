@@ -29,7 +29,7 @@ pub async fn admin_dashboard(
         .await?;
 
     let total_revenue: (Option<String>,) = sqlx::query_as(
-        "SELECT COALESCE(SUM(amount)::TEXT, '0') FROM payment_transactions WHERE status = 'succeeded'"
+        "SELECT COALESCE(SUM(amount_cents)::TEXT, '0') FROM payment_transactions WHERE status = 'succeeded'"
     )
     .fetch_one(&pool)
     .await?;
