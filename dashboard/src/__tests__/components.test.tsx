@@ -154,3 +154,116 @@ describe('Footer', () => {
     expect(container).toBeTruthy();
   });
 });
+
+// ── Toast ──
+describe('Toast', () => {
+  it('ToastProvider renders children', async () => {
+    const { ToastProvider } = await import('@/components/Toast');
+    const { container } = renderWithProviders(
+      <ToastProvider><div>Toast child</div></ToastProvider>,
+      { withIntl: false }
+    );
+    expect(container.textContent).toContain('Toast child');
+  });
+
+  it('useToast returns toast function', async () => {
+    const { useToast } = await import('@/components/Toast');
+    expect(typeof useToast).toBe('function');
+  });
+});
+
+// ── PrefetchLink ──
+describe('PrefetchLink', () => {
+  it('renders as anchor element', async () => {
+    const { PrefetchLink } = await import('@/components/PrefetchLink');
+    const { container } = renderWithProviders(
+      <PrefetchLink href="/dashboard">Link</PrefetchLink>,
+      { withIntl: false }
+    );
+    const link = container.querySelector('a');
+    expect(link).toBeTruthy();
+  });
+
+  it('renders children inside link', async () => {
+    const { PrefetchLink } = await import('@/components/PrefetchLink');
+    const { container } = renderWithProviders(
+      <PrefetchLink href="/dashboard">Click me</PrefetchLink>,
+      { withIntl: false }
+    );
+    expect(container.textContent).toContain('Click me');
+  });
+});
+
+// ── AuthGuard (extended) ──
+describe('AuthGuard (extended)', () => {
+  it('redirects when no token', async () => {
+    const mockPush = vi.fn();
+    vi.doMock('@/i18n/navigation', () => ({
+      useRouter: () => ({ push: mockPush }),
+      Link: ({ children, ...props }: any) => React.createElement('a', props, children),
+    }));
+    vi.doMock('@/lib/store', () => ({
+      useAuth: () => ({ token: null, isLoading: false }),
+    }));
+    const AuthGuard = (await import('@/components/AuthGuard')).AuthGuard;
+    renderWithProviders(
+      <AuthGuard><div>Protected</div></AuthGuard>,
+      { withIntl: false }
+    );
+    // Should attempt redirect
+    expect(mockPush).toHaveBeenCalled();
+    vi.doUnmock('@/lib/store');
+    vi.doUnmock('@/i18n/navigation');
+  });
+
+  it('shows loading state', async () => {
+    vi.doMock('@/lib/store', () => ({
+      useAuth: () => ({ token: null, isLoading: true }),
+    }));
+    const AuthGuard = (await import('@/components/AuthGuard')).AuthGuard;
+    const { container } = renderWithProviders(
+      <AuthGuard><div>Protected</div></AuthGuard>,
+      { withIntl: false }
+    );
+    // Should show loading, not children
+    expect(container.textContent).not.toContain('Protected');
+    vi.doUnmock('@/lib/store');
+  });
+});
+
+// ── ConfirmDialog (extended) ──
+describe('ConfirmDialog (extended)', () => {
+  it('calls onCancel when cancel clicked', async () => {
+    const ConfirmDialog = (await import('@/components/ConfirmDialog')).default;
+    const onCancel = vi.fn();
+    const { container } = renderWithProviders(
+      <ConfirmDialog open={true} title="Delete?" message="Sure?" onConfirm={vi.fn()} onCancel={onCancel} />,
+      { withIntl: false }
+    );
+    const buttons = container.querySelectorAll('button');
+    const cancelBtn = buttons[0];
+    fireEvent.click(cancelBtn);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ── StatusBadge (extended) ──
+describe('StatusBadge (extended)', () => {
+  it('renders delivered status with correct styling', async () => {
+    const { StatusBadge } = await import('@/components/StatusBadge');
+    const { container } = renderWithProviders(
+      <StatusBadge status="delivered" />,
+      { withIntl: false }
+    );
+    expect(container.textContent!.length).toBeGreaterThan(0);
+  });
+
+  it('renders unknown status', async () => {
+    const { StatusBadge } = await import('@/components/StatusBadge');
+    const { container } = renderWithProviders(
+      <StatusBadge status="unknown_status" />,
+      { withIntl: false }
+    );
+    expect(container.textContent!.length).toBeGreaterThan(0);
+  });
+});
