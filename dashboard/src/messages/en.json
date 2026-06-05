@@ -7466,7 +7466,15 @@
       "affected": "Affected:",
       "detected": "Detected:",
       "action": "Action:",
-      "eventCount": "{n} events"
+      "eventCount": "{n} events",
+      "typeLabels": {
+        "feature_drift": "Feature Drift",
+        "concept_drift": "Concept Drift",
+        "data_drift": "Data Drift",
+        "sudden": "Sudden",
+        "gradual": "Gradual",
+        "incremental": "Incremental"
+      }
     },
     "modelMonitor": {
       "stats": {
