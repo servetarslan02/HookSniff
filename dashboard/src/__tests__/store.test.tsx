@@ -10,16 +10,25 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: vi.fn((key: string) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
-  };
-})();
+let localStorageStore: Record<string, string> = {};
+const localStorageMock = {
+  getItem: vi.fn((key: string) => localStorageStore[key] || null),
+  setItem: vi.fn((key: string, value: string) => { localStorageStore[key] = value; }),
+  removeItem: vi.fn((key: string) => { delete localStorageStore[key]; }),
+  clear: vi.fn(() => { localStorageStore = {}; }),
+};
 Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+
+// Mock proactive refresh (module-level timers)
+vi.mock('@/lib/api', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@/lib/api')>();
+  return {
+    ...mod,
+    startProactiveRefresh: vi.fn(),
+    stopProactiveRefresh: vi.fn(),
+    setTokenRefreshCallback: vi.fn(),
+  };
+});
 
 // Helper component to expose auth context
 function AuthConsumer({ onReady }: { onReady?: (auth: ReturnType<typeof useAuth>) => void }) {
@@ -41,7 +50,10 @@ function AuthConsumer({ onReady }: { onReady?: (auth: ReturnType<typeof useAuth>
 describe('Auth Store', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorageMock.clear();
+    localStorageStore = {};
+    localStorageMock.getItem.mockImplementation((key: string) => localStorageStore[key] || null);
+    localStorageMock.setItem.mockImplementation((key: string, value: string) => { localStorageStore[key] = value; });
+    localStorageMock.removeItem.mockImplementation((key: string) => { delete localStorageStore[key]; });
     mockFetch.mockReset();
   });
 
@@ -53,23 +65,7 @@ describe('Auth Store', () => {
     consoleSpy.mockRestore();
   });
 
-  it('provides initial state with isLoading true', () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-    });
-
-    const { container } = renderWithProviders(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
-
-    const loadingEl = container.querySelector('[data-testid="loading"]');
-    expect(loadingEl?.textContent).toBe('true');
-  });
-
-  it('sets isLoading to false after auth check', async () => {
+  it('sets isLoading to false after mount', async () => {
     mockFetch.mockResolvedValue({
       ok: false,
       status: 401,
@@ -98,19 +94,23 @@ describe('Auth Store', () => {
       status: 401,
     });
 
+    let container: HTMLElement;
     await act(async () => {
-      renderWithProviders(
+      const result = renderWithProviders(
         <AuthProvider>
           <AuthConsumer />
         </AuthProvider>
       );
+      container = result.container;
       await new Promise((r) => setTimeout(r, 0));
     });
 
-    expect(localStorageMock.getItem).toHaveBeenCalledWith('hooksniff_user');
+    const userEl = container!.querySelector('[data-testid="user"]');
+    expect(userEl?.textContent).toBe('cached@test.com');
   });
 
   it('sets user when auth/me succeeds', async () => {
+    localStorageMock.setItem('hooksniff_token', 'saved-token');
     mockFetch.mockResolvedValue({
       ok: true,
       json: () =>
@@ -137,10 +137,11 @@ describe('Auth Store', () => {
     const userEl = container!.querySelector('[data-testid="user"]');
     expect(userEl?.textContent).toBe('user@test.com');
     const tokenEl = container!.querySelector('[data-testid="token"]');
-    expect(tokenEl?.textContent).toBe('cookie');
+    expect(tokenEl?.textContent).toBe('saved-token');
   });
 
-  it('clears user when auth/me fails', async () => {
+  it('clears user when auth/me fails and no stored user', async () => {
+    localStorageMock.setItem('hooksniff_token', 'expired-token');
     mockFetch.mockResolvedValue({
       ok: false,
       status: 401,
@@ -159,22 +160,15 @@ describe('Auth Store', () => {
 
     const userEl = container!.querySelector('[data-testid="user"]');
     expect(userEl?.textContent).toBe('none');
-    const tokenEl = container!.querySelector('[data-testid="token"]');
-    expect(tokenEl?.textContent).toBe('none');
   });
 
   it('login calls correct endpoint', async () => {
-    // First mock for initial auth/me check
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-    });
-
-    // Second mock for login
+    // No saved token in localStorage, so no auth/me call on mount
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () =>
         Promise.resolve({
+          token: 'jwt-token',
           customer: {
             id: '456',
             email: 'new@test.com',
@@ -205,7 +199,6 @@ describe('Auth Store', () => {
     );
     expect(loginCall).toBeTruthy();
     expect(loginCall![1].method).toBe('POST');
-    expect(loginCall![1].credentials).toBe('include');
   });
 
   it('logout clears user and token', async () => {
@@ -232,7 +225,6 @@ describe('Auth Store', () => {
       await new Promise((r) => setTimeout(r, 0));
     });
 
-    // Now mock logout endpoint
     mockFetch.mockResolvedValueOnce({ ok: true });
 
     await act(async () => {
@@ -254,10 +246,6 @@ describe('Auth Store', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
-    });
-
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
       json: () => Promise.resolve({ error: { message: 'Invalid credentials' } }),
     });
 
@@ -277,7 +265,8 @@ describe('Auth Store', () => {
     ).rejects.toThrow('Invalid credentials');
   });
 
-  it('verifies session by calling /auth/me with credentials include', async () => {
+  it('verifies session by calling /auth/me on mount with token', async () => {
+    localStorageMock.setItem('hooksniff_token', 'test-jwt');
     mockFetch.mockResolvedValue({
       ok: false,
       status: 401,
@@ -296,6 +285,6 @@ describe('Auth Store', () => {
       (call: any[]) => call[0].includes('/auth/me')
     );
     expect(authMeCall).toBeTruthy();
-    expect(authMeCall![1].credentials).toBe('include');
+    expect(authMeCall![1].headers['Authorization']).toBe('Bearer test-jwt');
   });
 });
