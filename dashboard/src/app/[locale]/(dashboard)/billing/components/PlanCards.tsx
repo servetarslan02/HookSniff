@@ -8,16 +8,16 @@ import { Check } from '@/components/icons';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
-    '10eventsDay', '1app', 'unlimitedEndpoints', '10eventTypes', '10subscriptions', '7dayLog', 'hmac', '2faSupport', 'communitySupport',
+    '10eventsDay', '1app', '5endpoints', '10eventTypes', '10subscriptions', '7dayLog', 'hmac', '2faSupport', 'communitySupport',
   ],
   startup: [
-    '30kEventsDay', '1application', 'unlimitedEndpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
+    '30kEventsDay', '1application', '20endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
   ],
   pro: [
-    '100kEventsDay', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
+    '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
   ],
   enterprise: [
-    'unlimitedEvents', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
+    'unlimitedEvents', 'unlimitedApps', '200endpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
   ],
 };
 
