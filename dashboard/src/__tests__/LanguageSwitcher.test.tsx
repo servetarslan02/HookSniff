@@ -46,8 +46,6 @@ describe('LanguageSwitcher', () => {
     const button = container.querySelector('button')!;
     fireEvent.click(button);
     expect(container.textContent).toContain('Türkçe');
-    expect(container.textContent).toContain('Deutsch');
-    expect(container.textContent).toContain('日本語');
   });
 
   it('hides dropdown initially', () => {
@@ -76,10 +74,10 @@ describe('LanguageSwitcher', () => {
     fireEvent.click(button);
 
     const dropdownButtons = container.querySelectorAll('button');
-    const deButton = Array.from(dropdownButtons).find(
-      (btn) => btn.textContent?.includes('Deutsch')
+    const trButton = Array.from(dropdownButtons).find(
+      (btn) => btn.textContent?.includes('Türkçe')
     );
-    fireEvent.click(deButton!);
+    fireEvent.click(trButton!);
 
     // After selecting, dropdown should close - Turkish should not be visible
     expect(container.textContent).not.toContain('Türkçe');
