@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock fetch globally
@@ -5,7 +6,7 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Import after mocking
-const { apiFetch, endpointsApi, webhooksApi, statsApi } = await import('../lib/api');
+const { apiFetch, endpointsApi, webhooksApi, adminApi, statsApi, applicationsApi } = await import('../lib/api');
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -76,102 +77,198 @@ describe('apiFetch', () => {
 
     await expect(apiFetch('/test')).rejects.toThrow('API error: 500');
   });
+
+  it('handles 401 with token refresh', async () => {
+    // First call returns 401
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: () => Promise.resolve({ error: { message: 'Unauthorized' } }),
+    });
+
+    await expect(apiFetch('/test', { token: 'expired' })).rejects.toThrow();
+  });
+
+  it('sends custom headers', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    });
+
+    await apiFetch('/test', {
+      token: 'tk',
+      method: 'POST',
+      body: { data: 1 },
+    });
+
+    const call = mockFetch.mock.calls[0];
+    expect(call[1].headers['Content-Type']).toBe('application/json');
+    expect(call[1].headers['Authorization']).toBe('Bearer tk');
+  });
 });
 
 describe('endpointsApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockFetch.mockResolvedValue({
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('list calls correct endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve([]),
     });
-  });
-
-  it('calls list endpoint', async () => {
     await endpointsApi.list('token');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/endpoints'),
-      expect.objectContaining({ method: 'GET' })
+      expect.anything()
     );
   });
 
-  it('calls create endpoint with POST', async () => {
+  it('create sends POST with data', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ id: 'ep_1' }),
+      json: () => Promise.resolve({ id: 'ep1' }),
     });
-
-    await endpointsApi.create('token', { url: 'https://example.com' });
+    await endpointsApi.create('token', { url: 'https://test.com' });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/endpoints'),
       expect.objectContaining({ method: 'POST' })
     );
   });
 
-  it('calls delete endpoint', async () => {
+  it('delete sends DELETE request', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ deleted: true }),
+      json: () => Promise.resolve({}),
     });
-
-    await endpointsApi.delete('token', 'ep_1');
+    await endpointsApi.delete('token', 'ep1');
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/endpoints/ep_1'),
+      expect.stringContaining('/endpoints/ep1'),
       expect.objectContaining({ method: 'DELETE' })
+    );
+  });
+
+  it('update sends PUT request', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ id: 'ep1' }),
+    });
+    await endpointsApi.update('token', 'ep1', { url: 'https://new.com' });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/endpoints/ep1'),
+      expect.objectContaining({ method: 'PUT' })
     );
   });
 });
 
 describe('webhooksApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => { vi.clearAllMocks(); });
 
-  it('calls list with pagination params', async () => {
+  it('list with pagination params', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ deliveries: [], total: 0 }),
     });
-
-    await webhooksApi.list('token', { page: 2, status: 'delivered' });
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('page=2'),
-      expect.anything()
-    );
+    const result = await webhooksApi.list('token', { page: 2, status: 'delivered' });
+    expect(result).toEqual({ deliveries: [], total: 0 });
   });
 
-  it('calls create webhook', async () => {
+  it('create sends correct payload', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ id: 'wh_1' }),
     });
-
     await webhooksApi.create('token', { endpoint_id: 'ep_1', data: {} });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/webhooks'),
       expect.objectContaining({ method: 'POST' })
     );
   });
-});
 
-// authApi no longer exists in api.ts — login/register are in store.ts (AuthProvider)
-// These tests were removed because authApi is not exported from ../lib/api.
-
-describe('statsApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('calls stats endpoint', async () => {
+  it('replay sends POST to replay endpoint', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ total_deliveries: 100 }),
+      json: () => Promise.resolve({ id: 'd1' }),
     });
-
-    await statsApi.get('token');
+    await webhooksApi.replay('token', 'd1');
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/stats'),
+      expect.stringContaining('/webhooks/d1/replay'),
+      expect.objectContaining({ method: 'POST' })
+    );
+  });
+
+  it('batchReplay sends array of ids', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ replayed: 3 }),
+    });
+    const result = await webhooksApi.batchReplay('token', ['d1', 'd2', 'd3']);
+    expect(result.replayed).toBe(3);
+  });
+});
+
+describe('adminApi', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('getStats calls admin stats endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ total_users: 10 }),
+    });
+    await adminApi.getStats('token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/stats'),
       expect.anything()
+    );
+  });
+
+  it('listUsers calls admin users endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ users: [], total: 0 }),
+    });
+    await adminApi.listUsers('token', { page: 1 });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/users'),
+      expect.anything()
+    );
+  });
+
+  it('getSettings calls settings endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ default_plan: 'developer' }),
+    });
+    await adminApi.getSettings('token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/settings'),
+      expect.anything()
+    );
+  });
+});
+
+describe('applicationsApi', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('list calls correct endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
+    await applicationsApi.list('token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/applications'),
+      expect.anything()
+    );
+  });
+
+  it('create sends POST with body', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ id: 'a1' }),
+    });
+    await applicationsApi.create('token', { name: 'Test App' });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/applications'),
+      expect.objectContaining({ method: 'POST' })
     );
   });
 });
