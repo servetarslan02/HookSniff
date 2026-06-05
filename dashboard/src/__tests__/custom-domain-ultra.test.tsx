@@ -33,9 +33,9 @@ describe('CustomDomainPage - Ultra Coverage', () => {
   });
 
   // === Page Header ===
-  it('renders page header with emoji', () => {
+  it('renders page header with Globe icon', () => {
     const { container } = render(React.createElement(CustomDomainPage));
-    expect(container.textContent).toContain('🌐');
+    expect(container.querySelector('svg')).toBeTruthy();
     expect(container.textContent).toContain('Custom Domain');
   });
 
