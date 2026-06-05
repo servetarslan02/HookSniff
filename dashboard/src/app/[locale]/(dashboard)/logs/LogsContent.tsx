@@ -99,7 +99,7 @@ export function LogsContent() {
             onClick={() => refetch()}
             className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
-            ↻ Refresh
+            {tc('refresh') || 'Refresh'}
           </button>
         </div>
       </div>
@@ -173,7 +173,7 @@ export function LogsContent() {
             onClick={() => refetch()}
             className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
           >
-            Retry
+            {tc('retry') || 'Retry'}
           </button>
         </div>
       )}
@@ -188,7 +188,7 @@ export function LogsContent() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              Loading logs...
+              {tc('loading') || 'Loading...'}
             </div>
           </div>
         ) : filtered.length === 0 ? (
@@ -206,12 +206,12 @@ export function LogsContent() {
               header={
                 <div className="grid grid-cols-[80px_120px_minmax(100px,1fr)_90px_70px_80px_140px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
                   <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Event</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">Endpoint</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Att.</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">Resp</div>
-                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Time</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colEvent') || 'Event'}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">{t('colEndpoint') || 'Endpoint'}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colStatus') || 'Status'}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('colAttempts') || 'Att.'}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colResponse') || 'Resp'}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime') || 'Time'}</div>
                 </div>
               }
               renderRow={(d) => (
@@ -350,7 +350,7 @@ export function LogsContent() {
                 onClick={() => setSelected(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
-                Close
+                {tc('close') || 'Close'}
               </button>
             </div>
           </div>
