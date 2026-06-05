@@ -7409,14 +7409,14 @@
       },
       "endpointLink": "Endpoint’i görüntüle",
       "steps": {
-        "checkEndpoint": "Endpoint teslimat geçmişinde kalıpları kontrol edin",
-        "checkServer": "Sunucu yanıt sürelerini ve loglarını kontrol edin",
-        "checkErrors": "Teslimat loglarındaki hata mesajlarını kontrol edin",
-        "checkTraffic": "Trafik artışının beklenip beklenmediğini kontrol edin",
-        "checkCapacity": "Sunucunun trafiği kaldırabileceğini doğrulayın",
-        "increaseTimeout": "Endpoint ayarlarında zaman aşımını artırmayı düşünün",
-        "checkLogs": "Sunucu loglarında yeni hata kalıbını kontrol edin",
-        "checkDeploy": "Son deploy’un soruna neden olup olmadığını kontrol edin"
+        "checkEndpoint": "Cortex bu anomaliyi teslimat kalıplarından otomatik tespit etti",
+        "checkServer": "Devam ederse Cortex devre kesici veya fallback tetikler",
+        "checkErrors": "Hata kalıpları trend analizi için takip ediliyor",
+        "checkTraffic": "Trafik anomalileri gerekirse otomatik hız sınırlaması tetikler",
+        "checkCapacity": "Cortex kapasiteyi izler, eşik aşılırsa uyarı verir",
+        "increaseTimeout": "Zaman aşımı ayarları Cortex iyileştirme tarafından otomatik uygulanır",
+        "checkLogs": "Cortex hata kalıplarını manuel log incelemesi olmadan analiz eder",
+        "checkDeploy": "Cortex deploy ile ilgili performans değişikliklerini otomatik tespit eder"
       }
     },
     "healing": {
@@ -7551,24 +7551,24 @@
         "rateLimitRisk": "Hız sınırını artırmayı veya istekleri azaltmayı düşünün",
         "stressDetection": "Sunucu kaynaklarını kontrol edin",
         "cascadeRisk": "Ana endpoint'i düzeltin, diğerleri de etkilenebilir",
-        "degradation": "Bu endpoint'in başarı oranı düşüyor. Anomali eşiğine ulaşmadan harekete geçin."
+        "degradation": "Cortex bu endpoint'i izliyor. Trend devam ederse otomatik iyileştirme aksiyonları tetiklenir (devre kesici, fallback URL, yavaşlatma)."
       },
       "steps": {
-        "checkEndpoint": "Endpoint detay sayfasını açın ve son teslimatları kontrol edin",
-        "checkServer": "Sunucu loglarında hata veya yavaşlama olup olmadığını kontrol edin",
-        "enableFallback": "Endpoint ayarlarında fallback URL etkinleştirin",
-        "upgradePlan": "Daha yüksek limitler için plan yükseltmeyi düşünün",
-        "reduceTraffic": "Gereksiz webhook trafiğini gözden geçirin ve azaltın",
-        "checkResources": "Sunucu CPU, bellek ve disk kullanımını kontrol edin",
-        "scaleUp": "Sunucu kaynaklarını artırmayı düşünün",
-        "fixMainEndpoint": "Önce ana endpoint'i düzeltin — diğerleri buna bağlı",
-        "checkDependents": "Bağımlı endpoint'lerde zincirleme hata olup olmadığını kontrol edin",
-        "openEndpoint": "Etkilenen endpoint'i açın ve son teslimat geçmişini kontrol edin",
-        "checkServerLogs": "Sunucu loglarında hata veya zaman aşımı olup olmadığını kontrol edin",
-        "checkRecentDeploy": "Son kod deploy'unun soruna neden olup olmadığını kontrol edin"
+        "checkEndpoint": "Cortex bu endpoint'i izliyor ve tüm teslimatları takip ediyor",
+        "checkServer": "Hata oranı eşiği aşarsa Cortex endpoint'i otomatik devre dışı bırakır",
+        "enableFallback": "Fallback URL tanımlıysa otomatik olarak aktifleştirilir",
+        "upgradePlan": "Hız sınırı aşıldı — daha yüksek limitler için plan yükseltmeyi düşünün",
+        "reduceTraffic": "Cortex sunucunuzu korumak için proaktif yavaşlatma uygular",
+        "checkResources": "Cortex sunucu sağlık metriklerini sürekli izler",
+        "scaleUp": "Trafik deseni değişirse otomatik ölçeklendirme önerileri görünecek",
+        "fixMainEndpoint": "Cortex otomatik olarak devre kesici ve fallback URL deneyecek",
+        "checkDependents": "Tüm endpoint'lerde zincirleme risk izlemesi aktif",
+        "openEndpoint": "Cortex bu endpoint'i takip ediyor — manuel işlem gerekmez",
+        "checkServerLogs": "Cortex teslimat kalıplarından anomalileri otomatik tespit eder",
+        "checkRecentDeploy": "Cortex mevcut davranışı otomatik olarak referans ile karşılaştırır"
       },
       "endpointLink": "Endpoint'i görüntüle",
-      "nextSteps": "Ne yapmalısınız:"
+      "nextSteps": "Cortex Yanıtı:"
     },
     "drift": {
       "title": "Sapma Tespit Olayları",
