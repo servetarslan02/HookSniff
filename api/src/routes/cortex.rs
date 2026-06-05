@@ -298,7 +298,7 @@ async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extensio
     require_admin(&c)?;
     
     // Single bulk query instead of N*7 individual queries
-    let models = sqlx::query_as::<_, (Uuid, String, f64, i64, Option<chrono::DateTime<chrono::Utc>>)>(
+    let models = sqlx::query_as::<_, (Uuid, String, f64, i32, Option<chrono::DateTime<chrono::Utc>>)>(
         "SELECT endpoint_id, model_type, COALESCE(accuracy, 0), COALESCE(training_samples, 0), last_trained FROM ml_models ORDER BY endpoint_id LIMIT 200"
     ).fetch_all(&pool).await.unwrap_or_default();
 
