@@ -519,7 +519,17 @@ async fn get_tracing_performance(Extension(pool): Extension<PgPool>, Extension(c
 
 async fn get_stage_performance(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(stage_name): Path<String>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let perf = crate::cortex::ml::cortex_tracing::analyze_stage_performance(&pool, &stage_name).await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
-    Ok(Json(serde_json::to_value(perf).unwrap_or_default()))
+    match crate::cortex::ml::cortex_tracing::analyze_stage_performance(&pool, &stage_name).await {
+        Ok(perf) => Ok(Json(serde_json::to_value(perf).unwrap_or_default())),
+        Err(_) => Ok(Json(serde_json::json!({
+            "stage_name": stage_name,
+            "avg_duration_ms": 0,
+            "total_runs": 0,
+            "success_runs": 0,
+            "timeout_runs": 0,
+            "p95_duration_ms": null,
+            "max_duration_ms": null,
+            "message": "No tracing data available"
+        }))),
+    }
 }
