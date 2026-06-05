@@ -262,7 +262,7 @@ pub async fn upsert_sso_config(
         sqlx::query(
             r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role, role_mapping, team_mapping, scim_enabled, scim_token_hash)
                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-               ON CONFLICT (customer_id) DO UPDATE SET
+               ON CONFLICT (customer_id) WHERE team_id IS NULL DO UPDATE SET
                    provider = EXCLUDED.provider, enabled = EXCLUDED.enabled, admin_bypass = EXCLUDED.admin_bypass,
                    verified_domain = EXCLUDED.verified_domain, metadata_url = EXCLUDED.metadata_url, entity_id = EXCLUDED.entity_id,
                    sso_url = EXCLUDED.sso_url, certificate = COALESCE(EXCLUDED.certificate, sso_configs.certificate),
