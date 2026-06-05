@@ -126,6 +126,8 @@
     "placeholderEmail": "siz@ornek.com",
     "noData": "Veri yok",
     "unlimited": "Sınırsız",
+    "connected": "Bağlı",
+    "disconnected": "Bağlantı Kesildi",
     "statusLabels": {
       "delivered": "Teslim Edildi",
       "success": "Başarılı",
