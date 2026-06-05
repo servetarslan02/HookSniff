@@ -20,7 +20,8 @@ interface SecurityEvent {
   id: string; event_type: string; severity: string; customer_id: string | null;
   email: string | null; ip_address: string | null; user_agent: string | null;
   details: Record<string, unknown>; resolved: boolean; resolved_by: string | null;
-  resolved_at: string | null; created_at: string;
+  resolved_at: string | null; auto_resolved: boolean; auto_resolve_reason: string | null;
+  created_at: string;
 }
 
 interface IpBlockEntry {
@@ -250,11 +251,12 @@ export default function AdminSecurityPage() {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="glass-card p-3 sm:p-4"><div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('totalEvents')}</div></div>
           <div className="glass-card p-3 sm:p-4 border-l-4 border-red-500"><div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">{stats.unresolved_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('unresolved')}</div></div>
           <div className="glass-card p-3 sm:p-4 border-l-4 border-orange-500"><div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.critical_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('criticalDays')}</div></div>
           <div className="glass-card p-3 sm:p-4 border-l-4 border-amber-500"><div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.high_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('highDays')}</div></div>
+          <div className="glass-card p-3 sm:p-4 border-l-4 border-emerald-500"><div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.auto_resolved_24h || 0}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('autoResolved24h')}</div></div>
         </div>
       )}
 
@@ -383,7 +385,7 @@ export default function AdminSecurityPage() {
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLORS[event.severity]}`}>{SEVERITY_ICONS[event.severity]}{event.severity.toUpperCase()}</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">{EVENT_TYPE_LABELS[event.event_type] || event.event_type}</span>
-                            {event.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full"><CheckCircle2 size={12} strokeWidth={1.75} /> {t('resolvedBadge')}</span>}
+                            {event.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full"><CheckCircle2 size={12} strokeWidth={1.75} /> {event.auto_resolved ? t('autoResolved') : t('resolvedBadge')}</span>}
                           </div>
                           <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 flex-wrap">
                             {event.email && <span><Mail size={12} /> {event.email}</span>}
@@ -415,7 +417,7 @@ export default function AdminSecurityPage() {
                           <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">IP Adresi</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.ip_address || '—'}</p></div>
                           <div className="sm:col-span-2"><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">User Agent</span><p className="text-xs text-gray-700 dark:text-slate-300 break-all">{event.user_agent || '—'}</p></div>
                           <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Date</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
-                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes${event.auto_resolved ? ` (${t('autoResolved')}${event.auto_resolve_reason ? ': ' + event.auto_resolve_reason.replace('auto:', '') : ''})` : ''} (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
                         </div>
                         {event.details && Object.keys(event.details).length > 0 && (
                           <div className="mt-3"><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-1">Details</span><pre className="text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>

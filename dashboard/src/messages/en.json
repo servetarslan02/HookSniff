@@ -4438,6 +4438,8 @@
     "active": "active",
     "resolveAllTitle": "Resolve All Events",
     "resolveAllConfirm": "Are you sure you want to resolve all unresolved events?",
+    "autoResolved": "Auto-Resolved",
+    "autoResolved24h": "Auto-Resolved (24h)",
     "cancel": "Cancel",
     "topIpsTitle": "Top IPs with Events (7 days)",
     "eventId": "Event ID",

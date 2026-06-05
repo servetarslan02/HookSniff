@@ -27,6 +27,7 @@ pub enum CortexStage {
     MlQualityCheck,
     SmartRouting,
     DriftDetection,
+    SecurityAutoResolve,
     CleanupJob,
 }
 
@@ -45,6 +46,7 @@ impl CortexStage {
             Self::MlQualityCheck => "ml_quality_check",
             Self::SmartRouting => "smart_routing",
             Self::DriftDetection => "drift_detection",
+            Self::SecurityAutoResolve => "security_auto_resolve",
             Self::CleanupJob => "cleanup_job",
         }
     }
@@ -63,6 +65,7 @@ impl CortexStage {
             Self::MlQualityCheck => "cortex_ml_quality",
             Self::SmartRouting => "cortex_routing",
             Self::DriftDetection => "cortex_drift",
+            Self::SecurityAutoResolve => "cortex_security",
             Self::CleanupJob => "cortex_cleanup",
         }
     }
@@ -82,6 +85,7 @@ impl CortexStage {
             Self::MlQualityCheck => Duration::from_secs(120),
             Self::SmartRouting => Duration::from_secs(120),
             Self::DriftDetection => Duration::from_secs(300),
+            Self::SecurityAutoResolve => Duration::from_secs(120),
             Self::CleanupJob => Duration::from_secs(300),
         }
     }
@@ -101,6 +105,7 @@ impl CortexStage {
             Self::MlQualityCheck => 3600,   // 1 hour
             Self::SmartRouting => 900,      // 15 min
             Self::DriftDetection => 600,     // 10 min
+            Self::SecurityAutoResolve => 900,  // 15 min
             Self::CleanupJob => 86400,     // 24 hours
         }
     }
@@ -120,6 +125,7 @@ impl CortexStage {
             Self::MlQualityCheck => 660,    // minute 11
             Self::Insights => 7200,         // 02:00 UTC
             Self::DriftDetection => 540,     // minute 9
+            Self::SecurityAutoResolve => 570,  // minute 9.5
             Self::CleanupJob => 7800,     // 02:30 UTC
         }
     }
@@ -136,6 +142,7 @@ const ALL_STAGES: &[CortexStage] = &[
     CortexStage::Predictions,
     CortexStage::SmartRouting,
     CortexStage::DriftDetection,
+    CortexStage::SecurityAutoResolve,
     CortexStage::MlTraining,
     CortexStage::MlQualityCheck,
     CortexStage::Insights,
@@ -465,6 +472,13 @@ async fn execute_stage(
                 super::CORTEX_METRICS.drift_detected.fetch_add(drift_count, std::sync::atomic::Ordering::Relaxed);
             }
             Ok(drift_count)
+        }
+        CortexStage::SecurityAutoResolve => {
+            let n = crate::security::auto_resolve::run_auto_resolve(pool).await?;
+            if n > 0 {
+                tracing::info!("🔒 Security: auto-resolved {} events", n);
+            }
+            Ok(n)
         }
         CortexStage::CleanupJob => {
             let mut cleaned = 0u64;

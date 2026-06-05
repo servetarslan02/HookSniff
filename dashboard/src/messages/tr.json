@@ -4443,6 +4443,8 @@
     "active": "aktif",
     "resolveAllTitle": "Tüm Olayları Çöz",
     "resolveAllConfirm": "çözülmemiş olay var. Tümünü çözmek istediğinize emin misiniz?",
+    "autoResolved": "Otomatik Çözüldü",
+    "autoResolved24h": "Otomatik Çözülen (24s)",
     "cancel": "İptal",
     "topIpsTitle": "En Çok Olay Olan IP'ler (7 gün)",
     "eventId": "Olay ID",
