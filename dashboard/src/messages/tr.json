@@ -7281,19 +7281,19 @@
     "formatDesc": "API anahtarları whsec_ ile başlar, ardından base64 kodlanmış bir sır gelir. İsteklerinizde Authorization başlığında Bearer token olarak ekleyin."
   },
   "cortex": {
-    "title": "Cortex — Akıllı Koruma",
-    "subtitle": "Webhook'larınızı izler, sorunları tespit eder ve otomatik düzeltir.",
+    "title": "Cortex — AI İzleme",
+    "subtitle": "Yapay zeka destekli webhook izleme ve anomali tespiti",
     "refresh": "Yenile",
-    "healthy": "Her şey yolunda",
-    "unhealthy": "Dikkat",
-    "activeInsights": "aktif öneri mevcut",
-    "anomaliesDetected": "sorun tespit edildi",
+    "healthy": "Sağlıklı",
+    "unhealthy": "Sağlıksız",
+    "activeInsights": "aktif içgörü",
+    "anomaliesDetected": "anomali tespit edildi",
     "tabs": {
       "overview": "Genel Bakış",
-      "anomalies": "Sorunlar",
-      "healing": "Düzeltmeler",
+      "anomalies": "Anomaliler",
+      "healing": "İyileştirme",
       "predictions": "Tahminler",
-      "mlQuality": "ML Kalite",
+      "mlQuality": "ML Kalitesi",
       "proactive": "Proaktif",
       "drift": "Drift",
       "monitor": "Model İzleme",
@@ -7301,122 +7301,160 @@
       "automl": "AutoML"
     },
     "common": {
-      "dataLoadError": "Veri yüklenirken hata oluştu.",
-      "score": "Skor",
-      "severity": {
-        "critical": "Kritik",
-        "warning": "Uyarı",
-        "info": "Bilgi",
-        "normal": "Normal"
+      "dataLoadError": "Veri yüklenemedi",
+      "score": "Puan",
+      "severity": "Şiddet"
+    },
+    "overview": {
+      "noData": "Henüz Cortex verisi yok. Endpoint'leriniz webhook almaya başlayınca veriler burada görünecek.",
+      "metric": {
+        "monitoredEndpoints": "İzlenen Endpoint",
+        "issues24h": "Sorun (24s)",
+        "autoFix": "Otomatik Düzeltme",
+        "predictions": "Tahminler",
+        "activeInsights": "Aktif İçgörü",
+        "dataPoints": "Veri Noktası",
+        "mlPredictions": "ML Tahminleri",
+        "proactiveAlert": "Proaktif Uyarı"
+      },
+      "issuesDetected": "{n} sorun tespit edildi",
+      "minorIssues": "{n} sorun, {h} iyileştirme",
+      "statsSummary": "{dataPoints} veri noktası, {endpoints} endpoint izleniyor",
+      "desc": {
+        "monitoredEndpoints": "İzlenen endpoint sayısı",
+        "noIssues": "Son 24 saatte sorun yok",
+        "performanceDrop": "Performans düşüşü tespit edildi",
+        "autoFix": "Otomatik uygulanan düzeltmeler",
+        "predictions": "Yaklaşan sorun tahminleri",
+        "activeInsights": "İncelemeniz gereken içgörüler",
+        "dataPoints": "Toplanan saatlik istatistik",
+        "noPredictions": "Henüz tahmin üretilmedi",
+        "qualitySamples": "{n} kalite ölçümü (24s)",
+        "systemNormal": "Sorun yok, sistem izliyor",
+        "needsAttention": "Dikkat gereken durumlar var"
       }
     },
     "anomalies": {
-      "title": "Tespit Edilen Sorunlar",
-      "description": "Cortex her 5 dakikada bir endpoint'lerinizi kontrol eder. Ani hata artışı, yavaşlama veya kesinti tespit ederse burada gösterir.",
+      "title": "Anomali Tespiti",
+      "description": "Endpoint performans anomalileri tespit edildi.",
       "empty": {
-        "title": "Hiç sorun yok",
-        "description": "Tüm endpoint'ler normal çalışıyor."
+        "title": "Anomali yok",
+        "description": "Son 24 saatte anomali tespit edilmedi."
       },
       "severity": {
-        "critical": "Kritik sorun — endpoint ciddi şekilde etkilenmiş",
-        "major": "Büyük sorun — endpoint yavaşlıyor",
-        "minor": "Küçük sorun — performans hafif düştü",
-        "normal": "Normal — küçük dalgalanma"
+        "critical": "Kritik",
+        "major": "Büyük",
+        "minor": "Küçük",
+        "normal": "Normal"
       },
       "detail": {
-        "performanceDropped": "Performans ciddi şekilde düştü",
-        "errorRateHigh": "Hata oranı normalden yüksek",
-        "shouldMonitor": "Şiddetli değil ama izlenmeli",
-        "noConcern": "Endişe verici değil"
+        "srDropped": "Başarı oranı %{v} altına düştü",
+        "performanceDropped": "Performans düştü",
+        "latencyIncreased": "Gecikme {v}ms arttı",
+        "errorRateHigh": "Hata oranı yüksek",
+        "shouldMonitor": "İzlenmeli",
+        "noConcern": "Endişe yok"
       },
       "detectedBy": {
-        "ml": "🧠 ML ile tespit edildi",
-        "formula": "📊 Formül ile tespit edildi"
+        "formula": "Formül",
+        "ml": "ML Modeli"
       }
     },
     "healing": {
-      "title": "Otomatik Düzeltmeler",
-      "description": "Cortex sorun tespit ettiğinde otomatik müdahale eder. Tüm düzeltmeler burada listelenir.",
+      "title": "Otomatik İyileştirme",
+      "description": "Cortex tarafından otomatik uygulanan düzeltici aksiyonlar.",
       "empty": {
-        "title": "Düzeltme yapılmadı",
-        "description": "Tüm endpoint'ler sağlıklı, müdahale gerekmedi."
+        "title": "İyileştirme yok",
+        "description": "Otomatik iyileştirme yapılmadı."
       },
       "status": {
-        "recovered": "Çözüldü",
-        "pending": "Devam ediyor"
+        "pending": "Bekliyor",
+        "recovered": "İyileşti",
+        "disabled": "Devre dışı"
       },
+      "reason": "Neden",
       "action": {
         "auto_disable": {
-          "recovered": "Endpoint geri açıldı",
-          "disabled": "Endpoint geçici olarak kapatıldı"
+          "disabled": "Endpoint devre dışı bırakıldı",
+          "recovered": "Endpoint iyileşti"
         },
-        "circuit_tighten": "Güvenlik duvarı sıkılaştırıldı",
-        "retry_slowdown": "Tekrar deneme yavaşlatıldı",
+        "circuit_tighten": "Devre kesici sıkılaştırıldı",
+        "retry_slowdown": "Yeniden deneme yavaşlatıldı",
         "rate_limit_reduce": "Hız sınırı düşürüldü",
-        "fallback_url_switch": "Yedek adrese geçildi",
-        "retry_increase": "Tekrar deneme sayısı artırıldı",
-        "timeout_adjust": "Zaman aşımı artırıldı",
-        "proactive_throttle": "Önleyici yavaşlatma uygulandı",
-        "cascade_alert": "Toplu sorun uyarısı",
+        "fallback_url_switch": "Fallback URL'e geçildi",
+        "retry_increase": "Yeniden deneme artırıldı",
+        "timeout_adjust": "Zaman aşımı ayarlandı",
+        "proactive_throttle": "Proaktif throttling",
+        "cascade_alert": "Kaskad uyarısı",
         "unknown": "Bilinmeyen aksiyon"
       },
       "detail": {
         "auto_disable": {
-          "recovered": "Endpoint tekrar sağlıklı, otomatik açıldı",
-          "disabled": "Çok fazla hata olduğu için geçici olarak devre dışı bırakıldı"
+          "disabled": "Endpoint otomatik devre dışı bırakıldı",
+          "recovered": "Endpoint kendini iyileştirdi"
         },
-        "circuit_tighten": "Hata oranı yüksek olduğu için koruma hassasiyeti artırıldı",
-        "retry_slowdown": "Sunucu zorlanıyor, denemeler arası süre artırıldı",
-        "rate_limit_reduce": "Sunucuyu korumak için istek sayısı azaltıldı",
-        "fallback_url_switch": "Ana adreste sorun var, yedek adrese yönlendirildi",
-        "retry_increase": "Başarısız iletimler için daha fazla deneme yapılacak",
-        "timeout_adjust": "Sunucu yavaş yanıt veriyor, bekleme süresi uzatıldı",
-        "proactive_throttle": "Gecikme artıyor, sorun olmadan önlem alındı",
-        "cascade_alert": "Birden fazla endpoint aynı anda etkilendi"
+        "circuit_tighten": "Ardışık hatalar nedeniyle devre kesici sıkılaştırıldı",
+        "retry_slowdown": "Tekrarlayan hatalar nedeniyle yeniden deneme yavaşlatıldı",
+        "rate_limit_reduce": "Aşırı yük tespit edildi, hız sınırı düşürüldü",
+        "fallback_url_switch": "Birincil endpoint zaman aşımı sonrası fallback URL'e geçildi",
+        "retry_increase": "Yeniden deneme sayısı artırıldı",
+        "timeout_adjust": "Endpoint yanıt süresine göre zaman ayarı yapıldı",
+        "proactive_throttle": "Proaktif throttling uygulandı",
+        "cascade_alert": "Kaskad hata riski uyarısı gönderildi"
       }
     },
     "predictions": {
-      "title": "Gelecek Tahminleri",
-      "description": "Cortex geçmiş verileri analiz ederek gelecekteki olası sorunları tahmin eder.",
+      "title": "Tahminler",
+      "description": "ML modelleri tarafından üretilen gelecek tahminleri.",
       "empty": {
-        "title": "Henüz tahmin yok",
-        "description": "Tahmin üretilmesi için en az birkaç saatlik veri gerekiyor."
+        "title": "Tahmin yok",
+        "description": "Henüz tahmin üretilmedi."
       },
       "severity": {
-        "high": "Yüksek ihtimalle sorun çıkacak",
-        "medium": "Sorun çıkma ihtimali var",
-        "low": "Küçük bir risk var",
-        "minimal": "Düşük risk"
+        "high": "Yüksek",
+        "medium": "Orta",
+        "low": "Düşük",
+        "minimal": "Minimal"
       },
-      "detail": {},
+      "detail": {
+        "high": "Tahmini olasılık %{v} — dikkat gerekli",
+        "medium": "Tahmini olasılık %{v} — izlenmeli",
+        "low": "Tahmini olasılık %{v} — düşük risk",
+        "minimal": "Tahmini olasılık %{v} — minimal risk"
+      },
       "advice": {
-        "high": "Şimdi önlem alın: endpoint'i kontrol edin veya yedek adrese geçin",
-        "medium": "Endpoint'inizi kontrol etmeniz önerilir",
-        "low": "Şimdilik endişe verici değil, izleniyor",
+        "high": "Endpoint'i yakından izleyin ve fallback planı hazırlayın",
+        "medium": "Performans metriklerini düzenli kontrol edin",
+        "low": "Normal izleme yeterli",
         "minimal": "Her şey normal görünüyor"
       },
       "method": {
-        "timeSeries": "🧠 Zaman serisi analizi",
-        "trend": "📊 Trend analizi"
-      }
+        "timeSeries": "Zaman serisi",
+        "trend": "Trend analizi"
+      },
+      "probability": "Olasılık"
     },
     "mlQuality": {
       "title": "ML Model Kalitesi",
-      "description": "Cortex'in tahmin modellerinin doğruluğu.",
-      "resetButton": "Düşük Kaliteli Modelleri Sıfırla",
-      "overallScore": "Genel Kalite Skoru",
+      "description": "ML modellerinin doğruluk ve kalite metrikleri.",
+      "resetButton": "Modelleri Sıfırla",
+      "overallScore": "Genel Puan",
       "empty": {
-        "title": "Henüz model verisi yok",
-        "description": "Cortex'in tahmin modelleri veri topladıkça kalite metrikleri burada görünecek.",
-        "info": "📊 ML kalite kontrolü her saat başı çalışır · Tahminler her 15 dakikada bir üretilir"
+        "title": "Model yok",
+        "description": "Henüz ML modeli eğitilmedi."
       },
       "quality": {
-        "excellent": "Mükemmel kalite",
-        "good": "İyi kalite",
-        "low": "Düşük kalite",
-        "critical": "Kritik kalite"
+        "excellent": "Mükemmel",
+        "good": "İyi",
+        "low": "Düşük",
+        "critical": "Kritik"
       },
-      "detail": {},
+      "detail": {
+        "excellent": "Doğruluk %{acc}, ortalama hata %{err}%",
+        "good": "Doğruluk %{acc}% — kabul edilebilir",
+        "low": "Doğruluk %{acc}% — iyileştirme gerekli",
+        "critical": "Doğruluk %{acc}% — acil müdahale gerekli"
+      },
       "metric": {
         "accuracy": "Doğruluk",
         "avgError": "Ort. Hata",
@@ -7424,33 +7462,39 @@
       }
     },
     "proactive": {
-      "title": "Proaktif Koruma",
-      "description": "Cortex sorun çıkmadan önce uyarı verir.",
+      "title": "Proaktif İçgörüler",
+      "description": "Potansiyel sorunlar önceden tespit edildi.",
       "stats": {
         "activeAlerts": "Aktif Uyarı",
         "critical": "Kritik",
         "warning": "Uyarı"
       },
       "empty": {
-        "title": "Proaktif uyarı yok",
-        "description": "Cortex her şeyin normal olduğunu tespit etti.",
-        "info": "🛡️ Proaktif analiz her 15 dakikada bir çalışır"
+        "title": "Sorun yok",
+        "description": "Sistem normal çalışıyor.",
+        "info": "Detay yok"
       },
-      "detail": {},
+      "detail": {
+        "latencyTrend": "Gecikme {v} trendinde",
+        "rateLimitRisk": "Hız sınırı kullanımı %{v}",
+        "stressDetection": "Stres tespiti: {v}",
+        "cascadeRisk": "{v} endpoint etkilenebilir"
+      },
       "advice": {
-        "latencyTrend": "Endpoint'i kontrol edin, sunucu yavaşlıyor olabilir",
-        "rateLimitRisk": "Rate limit'i artırmayı veya istekleri azaltmayı düşünün",
-        "stressDetection": "Sunucu kaynaklarını kontrol edin",
-        "cascadeRisk": "Ana endpoint'i onarın, diğerleri de etkilenebilir"
+        "latencyTrend": "Endpoint kapasitesini kontrol edin",
+        "rateLimitRisk": "Plan yükseltmeyi düşünün",
+        "stressDetection": "Trafik patlamasına hazırlıklı olun",
+        "cascadeRisk": "Fallback URL'ler ayarlayın"
       }
     },
     "drift": {
       "title": "Drift Tespit Olayları",
-      "empty": "Henüz drift tespit edilmedi. ML modelleri normal çalışıyor. ✅.",
+      "empty": "Drift olayı tespit edilmedi.",
       "severity": "Şiddet",
       "affected": "Etkilenen:",
       "detected": "Tespit:",
-      "action": "Aksiyon:"
+      "action": "Aksiyon:",
+      "eventCount": "{n} olay"
     },
     "modelMonitor": {
       "stats": {
@@ -7459,86 +7503,54 @@
         "warning": "Uyarı",
         "critical": "Kritik"
       },
-      "avgAccuracy": "Ort. Accuracy",
-      "avgF1": "Ort. F1 Score",
+      "avgAccuracy": "Ort. Doğruluk",
+      "avgF1": "Ort. F1",
       "worstModels": "En Kötü Modeller",
-      "error": "Model verileri yüklenemedi. Cortex ML servisi başlatılıyor olabilir.",
+      "error": "Model verileri yüklenemedi",
       "modelTypes": {
-        "adaptive_threshold": "Akıllı Eşik",
-        "anomaly_detector": "Anomali Tespiti",
-        "retry_bandit": "Akıllı Yeniden Deneme",
-        "latency_predictor": "Gecikme Tahmini",
-        "pattern_classifier": "Kalıp Sınıflandırıcı",
-        "drift_detector": "Sapma İzleyici"
+        "adaptive_threshold": "Adaptif Eşik",
+        "anomaly_detector": "Anomali Dedektörü",
+        "retry_bandit": "Retry Bandit",
+        "circuit_bandit": "Devre Bandit",
+        "time_series": "Zaman Serisi",
+        "contextual_bandit": "Bağlamsal Bandit",
+        "drift_detector": "Drift Dedektörü"
       },
       "healthStatuses": {
-        "healthy": "Sağlıklı",
-        "warning": "Dikkat Gerekli",
-        "critical": "Kritik Sorun",
-        "degraded": "Bozulmuş",
-        "stale": "Güncel Değil"
+        "Healthy": "Sağlıklı",
+        "Warning": "Uyarı",
+        "Critical": "Kritik",
+        "Degraded": "Bozulmuş"
       },
       "issues": {
-        "model_stale": "Model güncel değil ({value})",
-        "few_samples": "Yetersiz veri ({value} örnek)",
-        "low_accuracy": "Düşük doğruluk ({value})",
-        "high_false_positive": "Çok fazla yanlış alarm ({value})",
-        "data_drift": "Veri kalıbı değişti",
-        "concept_drift": "Davranış kalıbı değişti",
-        "prediction_lag": "Tahminler gecikiyor"
+        "model_stale": "Model güncel değil",
+        "few_samples": "Az örnek",
+        "low_accuracy": "Düşük doğruluk",
+        "high_error": "Yüksek hata"
       }
     },
     "abTest": {
       "title": "A/B Testleri",
-      "empty": "Henüz A/B testi yok. Model karşılaştırmaları için API'den test başlatın.",
+      "empty": "Henüz A/B testi yok.",
       "endpoint": "Endpoint:",
-      "traffic": "% trafik",
-      "winner": "Kazanan: {v}",
+      "traffic": "trafik",
+      "winner": "Kazanan:",
       "statusLabels": {
         "running": "Devam Ediyor",
         "completed": "Tamamlandı",
-        "cancelled": "İptal Edildi",
-        "pending": "Bekliyor"
-      }
+        "cancelled": "İptal"
+      },
+      "testCount": "{n} test"
     },
     "autoML": {
-      "title": "AutoML Optimizasyon Denemeleri",
-      "empty": "Henüz AutoML denemesi yok. API'den optimizasyon başlatın.",
+      "title": "AutoML Denemeleri",
+      "empty": "Henüz AutoML denemesi yok.",
       "best": "En İyi",
       "trialCount": "{n} deneme"
     },
     "securityPage": {
-      "title": "Güvenlik İzleme",
-      "subtitle": "Kurumsal düzeyde güvenlik, girişim dostu fiyatlandırma."
-    },
-    "overview": {
-      "noData": "Henüz veri toplanıyor. Cortex'i webhook'lardan yeterli veri topladığında göstermeye başlayacak.",
-      "metric": {
-        "issues24h": "Sorun (Son 24 Saat)",
-        "autoFix": "Otomatik Düzeltme",
-        "predictions": "Tahmin",
-        "proactiveAlert": "Proaktif Uyarı",
-        "monitoredEndpoints": "İzlenen Endpoint",
-        "activeInsights": "Aktif Öneri",
-        "dataPoints": "Veri Noktası",
-        "mlPredictions": "ML Tahmin"
-      },
-      "issuesDetected": "{n} sorun tespit edildi — hemen inceleyin",
-      "minorIssues": "{n} küçük sorun, {h} düzeltme yapıldı",
-      "statsSummary": "Son 24 saatte {dataPoints} veri noktası toplandı, {endpoints} endpoint izleniyor",
-      "desc": {
-        "monitoredEndpoints": "Aktif webhook adresleriniz",
-        "noIssues": "Hiç sorun yok",
-        "performanceDrop": "Performans düşüşü veya hata artışı",
-        "autoFix": "Cortex'in otomatik yaptığı müdahaleler",
-        "predictions": "Olası gelecek sorunlar hakkında uyarı",
-        "activeInsights": "İncelemeniz gereken öneriler",
-        "dataPoints": "Toplanan saatlik istatistik",
-        "noPredictions": "Henüz tahmin üretilmedi",
-        "qualitySamples": "{n} kalite ölçümü (24s)",
-        "systemNormal": "Sorun yok, sistem izliyor",
-        "needsAttention": "Dikkat gereken durumlar var"
-      }
+      "title": "Güvenlik",
+      "subtitle": "Güvenlik olayları ve IP engelleme"
     }
   },
   "operationalWebhooks": {

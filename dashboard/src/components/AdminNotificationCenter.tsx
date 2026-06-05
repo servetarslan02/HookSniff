@@ -45,11 +45,11 @@ export function AdminNotificationCenter() {
 
       const items: AdminNotification[] = [];
 
-      // Security events
+      // Security events — use stable IDs based on event type so dismiss works across fetches
       if (securityData?.events) {
         for (const event of securityData.events.slice(0, 3)) {
           items.push({
-            id: `sec-${event.id}`,
+            id: `sec-${event.event_type}`,
             type: 'security',
             severity: event.severity as AdminNotification['severity'],
             title: getSecurityLabel(event.event_type),
