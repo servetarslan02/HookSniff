@@ -94,6 +94,7 @@
     "failedToCreate": "Could not create. Please check your input and try again.",
     "failedToLoadEndpoints": "Could not load endpoints. Please refresh the page.",
     "failedToLoadTransforms": "Could not load transform rules. Please refresh the page.",
+    "tryDifferentSearch": "Try a different search term",
     "failedToDelete": "Could not delete. Please try again.",
     "cancelFailed": "Could not cancel. Please try again.",
     "upgradeFailed": "Upgrade failed. Please try again or contact support.",
@@ -4900,7 +4901,11 @@
     "manageEndpoints": "Manage endpoints",
     "edit": "Edit",
     "created": "Application created",
-    "noApplications": "No applications"
+    "noApplications": "No applications",
+    "labelActive": "active",
+    "labelInactive": "inactive",
+    "labelNew": "new",
+    "labelProduction": "production"
   },
   "serviceTokens": {
     "title": "Service Tokens",

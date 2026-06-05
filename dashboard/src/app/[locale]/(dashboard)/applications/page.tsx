@@ -23,20 +23,20 @@ interface AppLabel {
   color: string;
 }
 
-function getAppLabels(app: Application): AppLabel[] {
+function getAppLabels(app: Application, t: (key: string) => string): AppLabel[] {
   const labels: AppLabel[] = [];
   if (app.is_active) {
-    labels.push({ text: 'active', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' });
+    labels.push({ text: t('labelActive') || 'active', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' });
   } else {
-    labels.push({ text: 'inactive', color: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' });
+    labels.push({ text: t('labelInactive') || 'inactive', color: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' });
   }
   const created = new Date(app.created_at);
   const daysSinceCreated = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
   if (daysSinceCreated < 7) {
-    labels.push({ text: 'new', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' });
+    labels.push({ text: t('labelNew') || 'new', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' });
   }
   if (app.endpoint_count > 5) {
-    labels.push({ text: 'production', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' });
+    labels.push({ text: t('labelProduction') || 'production', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' });
   }
   return labels;
 }
@@ -265,7 +265,7 @@ export default function ApplicationsPage() {
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {search
-              ? 'Try a different search term'
+              ? (tc('tryDifferentSearch') || 'Try a different search term')
               : (t('subtitle') || 'Create your first application to get started')}
           </p>
           {!search && (
@@ -287,7 +287,7 @@ export default function ApplicationsPage() {
           keyExtractor={(app) => app.id}
           emptyMessage={t('noApplications') || 'No applications'}
           renderItem={(app) => {
-            const labels = getAppLabels(app);
+            const labels = getAppLabels(app, t);
             return (
               <div className="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow mb-4">
                 {/* Name */}

@@ -4902,7 +4902,11 @@
     "manageEndpoints": "Endpoint'leri yönet",
     "edit": "Düzenle",
     "created": "Uygulama oluşturuldu",
-    "noApplications": "Uygulama yok"
+    "noApplications": "Uygulama yok",
+    "labelActive": "aktif",
+    "labelInactive": "pasif",
+    "labelNew": "yeni",
+    "labelProduction": "üretim"
   },
   "serviceTokens": {
     "title": "Hizmet Jetonları",

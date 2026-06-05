@@ -19,7 +19,7 @@ function RoiCalculator() {
 
   const svixCost = events <= 0 ? 0 : events <= 10000 ? 0 : events <= 50000 ? 99 : events <= 100000 ? 249 : 499;
   const hookdeckCost = events <= 10000 ? 0 : events <= 100000 ? 49 : 99;
-  const hooksniffCost = events <= 1000 ? 0 : events <= 30000 ? 29 : events <= 100000 ? 49 : 149;
+  const hooksniffCost = events <= 0 ? 0 : events <= 3000 ? 0 : events <= 30000 ? 29 : events <= 100000 ? 49 : 149;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
@@ -136,7 +136,7 @@ export function PricingPageContent() {
     {
       category: t('usage'),
       items: [
-        { feature: t('dailyEvents'), developer: '1,000', startup: '30,000', pro: '100,000', enterprise: t('custom') },
+        { feature: t('dailyEvents'), developer: '300', startup: '30,000', pro: '100,000', enterprise: t('custom') },
         { feature: t('applications'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('endpoints'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('eventTypes'), developer: '10', startup: '50', pro: t('unlimited'), enterprise: t('unlimited') },
