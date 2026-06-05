@@ -937,6 +937,7 @@
       "sla99": "%99.9 SLA garantisi",
       "customIntegrations": "Özel entegrasyonlar",
       "onPremise": "On-premise seçeneği",
+      "300 events/day": "300 olay/gün",
       "100 events/day": "300 olay/gün",
       "1 application": "1 uygulama",
       "5 endpoints": "5 endpoint",
@@ -4283,7 +4284,8 @@
     "quoteCloudSyncShort": "Gerçekten çalışan ücretsiz plan. Ayda 8K webhook'ı bir kuruş ödemeden işliyoruz.",
     "quoteMedConnect": "GDPR uyumluluğu ve AB veri işleme müzakere edilemezdi. HookSniff her kutuyu işaretledi.",
     "quoteBuildKit": "Webhook playground'ı ve 11 SDK (geliştirme aşamasında) entegrasyonu kolaylaştırdı. Geliştiricilerimiz bayılıyor.",
-    "backToList": "Müşeri Hikayelerine Dön"
+    "backToList": "Müşeri Hikayelerine Dön",
+    "storyNotFound": "Müşteri hikayesi bulunamadı"
   },
   "providers": {
     "title": "Sağlayıcılar",
