@@ -436,7 +436,13 @@
     "deliveryId": "Delivery ID",
     "httpResponse": "HTTP Response",
     "attempt": "Attempt",
-    "deliveryAttempts": "Delivery Attempts"
+    "deliveryAttempts": "Delivery Attempts",
+    "colEvent": "Event",
+    "colEndpoint": "Endpoint",
+    "colStatus": "Status",
+    "colAttempts": "Att.",
+    "colResponse": "Resp",
+    "colTime": "Time"
   },
   "search": {
     "title": "Webhook Search",

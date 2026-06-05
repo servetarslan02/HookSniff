@@ -38,7 +38,7 @@ export function HookdecksContent() {
               <tbody>
                 {[
                   { name: 'Hookdeck', price: '$39/mo+', oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, self: <X size={14} strokeWidth={1.75} className="text-red-500" />, sdks: '8', soc2: 'Type 2', hl: false },
-                  { name: 'HookSniff', price: '$24/mo', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '11', soc2: t('ready'), hl: true },
+                  { name: 'HookSniff', price: '$29/mo', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '11', soc2: t('ready'), hl: true },
                   { name: 'Svix', price: '$490/mo', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '6', soc2: 'Type 2', hl: false },
                   { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '4', soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, hl: false },
                   { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '1', soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, hl: false },
