@@ -59,10 +59,16 @@ pub fn detect_bot(request: &Request) -> BotDetectionResult {
         .unwrap_or("")
         .to_lowercase();
 
-    let path = request.uri().path().to_lowercase();
+    let raw_path = request.uri().path().to_lowercase();
+    // Normalize path: remove trailing slash, decode double encoding
+    let path = raw_path.trim_end_matches('/');
+    let path_decoded = path
+        .replace("%2f", "/").replace("%5c", "\\")
+        .replace("%2e", ".").replace("%00", "")
+        .replace("%252f", "/").replace("%255c", "\\");
 
-    // Check for scanner paths
-    let is_scanner = SCANNER_PATHS.iter().any(|p| path.contains(p));
+    // Check for scanner paths (raw + decoded)
+    let is_scanner = SCANNER_PATHS.iter().any(|p| path.contains(p) || path_decoded.contains(p));
     if is_scanner {
         return BotDetectionResult {
             is_bot: true,
