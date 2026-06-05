@@ -7441,7 +7441,8 @@
       "overallScore": "Genel Puan",
       "empty": {
         "title": "Model yok",
-        "description": "Henüz ML modeli eğitilmedi."
+        "description": "Henüz ML modeli eğitilmedi.",
+        "info": "ML kalite kontrolü saatlik çalışır"
       },
       "quality": {
         "excellent": "Mükemmel",
@@ -7453,13 +7454,14 @@
         "excellent": "Doğruluk %{acc}, ortalama hata %{err}%",
         "good": "Doğruluk %{acc}% — kabul edilebilir",
         "low": "Doğruluk %{acc}% — iyileştirme gerekli",
-        "critical": "Doğruluk %{acc}% — acil müdahale gerekli"
+        "critical": "Doğruluk %{acc} — acil müdahale gerekli"
       },
       "metric": {
         "accuracy": "Doğruluk",
         "avgError": "Ort. Hata",
         "predictionCount": "Tahmin Sayısı"
-      }
+      },
+      "modelSummary": "Model Özeti"
     },
     "proactive": {
       "title": "Proaktif İçgörüler",
