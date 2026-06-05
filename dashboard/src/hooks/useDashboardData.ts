@@ -91,7 +91,7 @@ export function useApplicationDetail(id: string) {
       return { app, endpoints: appEndpoints, deliveries: appDeliveries };
     },
     enabled: !!token && !!id,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -105,7 +105,7 @@ export function useSsoConfig(teamId?: string | null) {
       SsoConfigSchema
     ),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -116,7 +116,7 @@ export function useAuditLogs(params?: { page?: number; limit?: number; action?: 
     queryKey: ['audit-log', params],
     queryFn: () => api.getAuditLog(token!, params),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
   });
 }
 
@@ -127,7 +127,7 @@ export function useSchemas() {
     queryKey: ['schemas'],
     queryFn: validated(() => api.getSchemas(token!), SchemaRegistryListSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -144,7 +144,7 @@ export function useSearch(params: { q?: string; status?: string; page?: number; 
     queryKey: ['search', params],
     queryFn: () => api.search(token!, searchParams),
     enabled,
-    staleTime: 10_000,
+    staleTime: 180_000,
   });
 }
 
@@ -155,6 +155,6 @@ export function useTemplates(industry?: string) {
     queryKey: ['templates', industry],
     queryFn: validated(() => api.getTemplates(token!, industry), TemplateListSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }

@@ -11,7 +11,7 @@ export function useBroadcasts() {
     queryKey: ['broadcasts', 'active'],
     queryFn: () => broadcastsApi.listActive(token!),
     enabled: !!token,
-    staleTime: 60_000, // 1 dk — broadcasts nadiren değişir
+    staleTime: 180_000, // 1 dk — broadcasts nadiren değişir
     placeholderData: (previousData) => previousData,
   });
 }
@@ -23,7 +23,7 @@ export function useBroadcastUnreadCount() {
     queryKey: ['broadcasts', 'unread-count'],
     queryFn: () => broadcastsApi.getUnreadCount(token!),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
     placeholderData: (previousData) => previousData,
   });
 }

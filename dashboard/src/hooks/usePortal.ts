@@ -24,7 +24,7 @@ export function usePortalConfig() {
     queryKey: ['portal-config'],
     queryFn: validated(() => api.getPortalConfig(token!), PortalConfigSchema) as () => Promise<PortalConfigResponse>,
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -34,7 +34,7 @@ export function usePortalEmbedCode() {
     queryKey: ['portal-embed-code'],
     queryFn: validated(() => api.getPortalEmbedCode(token!), PortalEmbedCodeSchema),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 }
 
@@ -53,7 +53,7 @@ export function usePortalProfile() {
     queryKey: ['portal-profile'],
     queryFn: validated(() => api.getPortalProfile(token!), PortalProfileSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }
 
@@ -63,6 +63,6 @@ export function usePortalUsage() {
     queryKey: ['portal-usage'],
     queryFn: validated(() => api.getPortalUsage(token!), PortalUsageSchema),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 }

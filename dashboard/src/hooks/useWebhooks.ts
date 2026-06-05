@@ -16,7 +16,7 @@ export function useWebhooks(params?: { page?: number; status?: string }) {
       DeliveryListResponseSchema
     ),
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (prev) => prev,
   });
 }
@@ -42,7 +42,7 @@ export function useDeliveryDetail(id: string) {
     queryKey: ['delivery', id],
     queryFn: () => webhooksApi.get(token!, id),
     enabled: !!token && !!id,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -60,7 +60,7 @@ export function useDeliveryAttempts(id: string) {
       }
     },
     enabled: !!token && !!id,
-    staleTime: 15_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -80,7 +80,7 @@ export function useStatusCounts() {
       };
     },
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -106,7 +106,7 @@ export function useDeliveryLogs(params: {
       };
     },
     enabled: !!token,
-    staleTime: 15_000,
+    staleTime: 180_000,
     refetchInterval: params.refetchInterval ?? false,
     placeholderData: (previousData) => previousData,
   });

@@ -19,7 +19,7 @@ export function useTeamRole(teamId?: string | null) {
     queryKey: ['teams'],
     queryFn: () => teamsApi.list(token!),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 
   // Use provided teamId, or fall back to first team
@@ -29,7 +29,7 @@ export function useTeamRole(teamId?: string | null) {
     queryKey: ['teams', effectiveTeamId, 'members'],
     queryFn: () => teamsApi.listMembers(token!, effectiveTeamId!),
     enabled: !!token && !!effectiveTeamId,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 
   const isLoading = teamsLoading || membersLoading;
@@ -68,7 +68,7 @@ export function useAllTeamRoles() {
     queryKey: ['teams'],
     queryFn: () => teamsApi.list(token!),
     enabled: !!token,
-    staleTime: 60_000,
+    staleTime: 180_000,
   });
 
   const teamRoles: Array<{ teamId: string; role: TeamRole }> = [];
