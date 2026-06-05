@@ -46,7 +46,9 @@ export function DriftTab() {
   };
 
   const translateFeature = (f: string): string => {
-    const key = `feature${f.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
+    // Normalize: "failure_rate" or "failure rate" → "featureFailureRate"
+    const normalized = f.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const key = `feature${normalized.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
     const translated = t(key);
     return translated !== key ? translated : f.replace(/_/g, ' ');
   };
@@ -69,9 +71,11 @@ export function DriftTab() {
   };
 
   const translateAction = (action: string): string => {
-    const key = `action${action.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
+    // Normalize: "Reset model" → "reset_model" → "actionResetModel"
+    const normalized = action.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const key = `action${normalized.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
     const translated = t(key);
-    return translated !== key ? translated : action.replace(/_/g, ' ');
+    return translated !== key ? translated : action;
   };
 
   const formatDetectedBy = (detected: string[] | Record<string, unknown>): string => {
