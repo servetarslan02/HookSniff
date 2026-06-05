@@ -15,8 +15,10 @@ use tokio::sync::RwLock;
 use crate::error::AppError;
 
 /// Cached IP blocklist with automatic refresh.
+/// Supports both exact IPs and CIDR ranges (e.g., "192.168.1.0/24").
 pub struct IpBlocklistCache {
     blocked_ips: Arc<RwLock<HashSet<String>>>,
+    blocked_cidrs: Arc<RwLock<Vec<(u32, u32)>>>,  // (network_addr, mask) pairs
     last_refresh: Arc<RwLock<Instant>>,
     refresh_interval: Duration,
 }
@@ -25,12 +27,14 @@ impl IpBlocklistCache {
     pub fn new() -> Self {
         Self {
             blocked_ips: Arc::new(RwLock::new(HashSet::new())),
+            blocked_cidrs: Arc::new(RwLock::new(Vec::new())),
             last_refresh: Arc::new(RwLock::new(Instant::now() - Duration::from_secs(300))),
             refresh_interval: Duration::from_secs(60),
         }
     }
 
     /// Refresh the blocklist from the database.
+    /// Supports both exact IPs and CIDR ranges (e.g., "192.168.1.0/24").
     pub async fn refresh(&self, pool: &PgPool) {
         let rows: Vec<(String,)> = sqlx::query_as(
             "SELECT ip_address FROM ip_blocklist WHERE is_active = true AND (expires_at IS NULL OR expires_at > NOW())"
@@ -39,14 +43,28 @@ impl IpBlocklistCache {
         .await
         .unwrap_or_default();
 
-        let ips: HashSet<String> = rows.into_iter().map(|(ip,)| ip).collect();
+        let mut ips = HashSet::new();
+        let mut cidrs = Vec::new();
+
+        for (entry,) in rows {
+            if entry.contains('/') {
+                // CIDR range — parse "192.168.1.0/24"
+                if let Some((network, prefix_len)) = parse_cidr(&entry) {
+                    let mask = !((1u32 << (32 - prefix_len)) - 1);
+                    cidrs.push((network & mask, mask));
+                }
+            } else {
+                ips.insert(entry);
+            }
+        }
+
         *self.blocked_ips.write().await = ips;
+        *self.blocked_cidrs.write().await = cidrs;
         *self.last_refresh.write().await = Instant::now();
     }
 
-    /// Check if an IP is blocked. Auto-refreshes if stale.
+    /// Check if an IP is blocked (exact match or CIDR range). Auto-refreshes if stale.
     pub async fn is_blocked(&self, ip: &str, pool: &PgPool) -> bool {
-        // Auto-refresh if stale
         let should_refresh = {
             let last = self.last_refresh.read().await;
             last.elapsed() > self.refresh_interval
@@ -55,8 +73,45 @@ impl IpBlocklistCache {
             self.refresh(pool).await;
         }
 
-        self.blocked_ips.read().await.contains(ip)
+        // 1. Exact match
+        if self.blocked_ips.read().await.contains(ip) {
+            return true;
+        }
+
+        // 2. CIDR range match
+        if let Some(ip_u32) = ip_to_u32(ip) {
+            let cidrs = self.blocked_cidrs.read().await;
+            for &(network, mask) in cidrs.iter() {
+                if (ip_u32 & mask) == network {
+                    return true;
+                }
+            }
+        }
+
+        false
     }
+}
+
+/// Parse CIDR notation "192.168.1.0/24" → (network_ip, prefix_len)
+fn parse_cidr(cidr: &str) -> Option<(u32, u8)> {
+    let parts: Vec<&str> = cidr.split('/').collect();
+    if parts.len() != 2 { return None; }
+    let ip = ip_to_u32(parts[0])?;
+    let prefix: u8 = parts[1].parse().ok()?;
+    if prefix > 32 { return None; }
+    Some((ip, prefix))
+}
+
+/// Convert IPv4 string to u32
+fn ip_to_u32(ip: &str) -> Option<u32> {
+    let parts: Vec<&str> = ip.split('.').collect();
+    if parts.len() != 4 { return None; }
+    let mut result: u32 = 0;
+    for part in parts {
+        let octet: u32 = part.parse().ok()?;
+        result = (result << 8) | octet;
+    }
+    Some(result)
 }
 
 /// Axum middleware: block requests from IPs in the blocklist.

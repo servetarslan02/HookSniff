@@ -673,7 +673,7 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
         headers.insert("strict-transport-security", HeaderValue::from_static("max-age=31536000; includeSubDomains"));
         headers.insert("referrer-policy", HeaderValue::from_static("strict-origin-when-cross-origin"));
         headers.insert("x-xss-protection", HeaderValue::from_static("1; mode=block"));
-        headers.insert("content-security-policy", HeaderValue::from_static("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://hooksniff-api-*.run.app wss://hooksniff-api-*.run.app https://vitals.vercel-insights.com https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"));
+        headers.insert("content-security-policy", HeaderValue::from_static("default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://hooksniff-api-*.run.app wss://hooksniff-api-*.run.app https://vitals.vercel-insights.com https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"));
         headers.insert("vary", HeaderValue::from_static("Accept-Encoding, Authorization"));
 
         if path.starts_with("/health") || path.starts_with("/v1/status") || path.starts_with("/metrics") {
