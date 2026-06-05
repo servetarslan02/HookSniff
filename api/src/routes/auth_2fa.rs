@@ -1,4 +1,4 @@
-use axum::extract::Extension;
+﻿use axum::extract::Extension;
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
 use axum::Json;
@@ -127,7 +127,7 @@ pub async fn confirm_2fa(
     ))?;
 
     if !verify_totp_code(secret, &req.code) {
-        return Err(AppError::BadRequest("Invalid TOTP code".into()));
+        return Err(AppError::coded(ErrorCode::Invalid2faCode));
     }
 
     let backup_codes = generate_backup_codes(8);
@@ -192,7 +192,7 @@ pub async fn disable_2fa(
         .ok_or(AppError::coded(ErrorCode::PasswordNotSet))?;
 
     if !jwt::verify_password_async(req.password.clone(), hash.clone()).await? {
-        return Err(AppError::BadRequest("Invalid password".into()));
+        return Err(AppError::coded(ErrorCode::WrongPassword));
     }
 
     sqlx::query(

@@ -1,4 +1,4 @@
-use axum::extract::{Extension, Path, Query};
+﻿use axum::extract::{Extension, Path, Query};
 use axum::Json;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -201,7 +201,7 @@ pub async fn change_plan(
 
     let valid_plans = ["developer", "startup", "pro", "enterprise"];
     if !valid_plans.contains(&req.plan.as_str()) {
-        return Err(AppError::BadRequest("Invalid plan".into()));
+        return Err(AppError::coded(ErrorCode::InvalidFormat));
     }
 
     let limit: i64 = match req.plan.as_str() {
