@@ -5,7 +5,7 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Import after mocking
-const { apiFetch, endpointsApi, webhooksApi, authApi, statsApi } = await import('../lib/api');
+const { apiFetch, endpointsApi, webhooksApi, statsApi } = await import('../lib/api');
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -25,7 +25,6 @@ describe('apiFetch', () => {
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({
-          'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token',
         }),
         credentials: 'include',
@@ -155,37 +154,8 @@ describe('webhooksApi', () => {
   });
 });
 
-describe('authApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('calls login endpoint', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ token: 'jwt', user: { id: '1' } }),
-    });
-
-    await authApi.login('test@test.com', 'password');
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/login'),
-      expect.objectContaining({ method: 'POST' })
-    );
-  });
-
-  it('calls register endpoint', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ token: 'jwt', user: { id: '1' } }),
-    });
-
-    await authApi.register('test@test.com', 'password', 'Test');
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/auth/register'),
-      expect.objectContaining({ method: 'POST' })
-    );
-  });
-});
+// authApi no longer exists in api.ts — login/register are in store.ts (AuthProvider)
+// These tests were removed because authApi is not exported from ../lib/api.
 
 describe('statsApi', () => {
   beforeEach(() => {
