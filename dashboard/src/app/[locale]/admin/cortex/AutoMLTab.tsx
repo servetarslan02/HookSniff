@@ -22,17 +22,18 @@ export function AutoMLTab() {
 
   useEffect(() => {
     if (!token) return;
-    // Get automl trials for the first available endpoint
-    apiFetch<{ trials: Trial[] }>('/cortex/stats', { token })
-      .then(async (d: any) => {
-        const endpoints = d?.endpoints || d || [];
-        const firstId = Array.isArray(endpoints) && endpoints.length > 0 ? endpoints[0]?.endpoint_id : null;
-        if (firstId) {
-          const trialData = await apiFetch<{ trials: Trial[] }>(`/cortex/automl/trials/${firstId}`, { token });
-          setTrials(trialData.trials ?? []);
-        } else {
-          setTrials([]);
+    // Get automl trials - try all endpoints until we find trials
+    apiFetch<{ stats: Array<{ endpoint_id: string }> }>('/cortex/stats', { token })
+      .then(async (d) => {
+        const endpoints = d?.stats || [];
+        let allTrials: Trial[] = [];
+        for (const ep of endpoints) {
+          try {
+            const trialData = await apiFetch<{ trials: Trial[] }>(`/cortex/automl/trials/${ep.endpoint_id}`, { token });
+            if (trialData.trials?.length) { allTrials = trialData.trials; break; }
+          } catch { /* skip */ }
         }
+        setTrials(allTrials);
       })
       .catch(() => setTrials([]))
       .finally(() => setLoading(false));
