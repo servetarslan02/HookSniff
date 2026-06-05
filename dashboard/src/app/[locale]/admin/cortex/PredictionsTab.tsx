@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
-import { Brain, Clock, Info } from '@/components/icons';
+import { Brain, Clock, Info, ExternalLink } from '@/components/icons';
+import { PrefetchLink } from '@/components/PrefetchLink';
 
 function describePrediction(probability: number, factors: any, t: any): { title: string; detail: string; severity: string; advice: string } {
   const pct = Math.round(probability * 100);
@@ -69,6 +70,7 @@ export function PredictionsTab({ token }: { token: string | null }) {
       ) : (
         <div className="space-y-3">
           {predictions.slice(0, 20).map((p: any, i: number) => {
+            const endpointId = p[1] || '';
             const probability = p[4] || 0;
             const factors = p[5] || {};
             const ts = p[7];
@@ -93,6 +95,14 @@ export function PredictionsTab({ token }: { token: string | null }) {
                       }`}>{t('probability', {v: Math.round(probability * 100)})}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
+                    {endpointId && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                        <ExternalLink size={11} />
+                        <PrefetchLink href={`/endpoints/${endpointId}`} className="hover:underline">
+                          {t('endpointLink') || 'View endpoint'}: {endpointId.substring(0, 8)}...
+                        </PrefetchLink>
+                      </p>
+                    )}
                     <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1"><Info size={12} /> {info.advice}</p>
                     </div>
