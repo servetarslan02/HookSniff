@@ -2,51 +2,55 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CodeBlock from '@/components/CodeBlock';
 import { Globe, CheckCircle2, XCircle, Clock } from '@/components/icons';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: 'Custom Domain — HookSniff',
   description: 'Use your own domain for the webhook portal. White-label your customers experience.',
 };
 
-async function CustomDomainDocsContent() {
+async function CustomDomainDocsContent({ locale }: { locale: string }) {
+  setRequestLocale(locale);
+  const t = await getTranslations('docsCustomDomain');
+
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={28} className="inline mr-2 align-text-bottom" /> Custom Domain</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={28} className="inline mr-2 align-text-bottom" /> {t('title') || 'Custom Domain'}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Use your own domain for the webhook portal. White-label your customers' experience.
+        {t('subtitle') || 'Use your own domain for the webhook portal. White-label your customers experience.'}
       </p>
 
       {/* Overview */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Overview</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('overview') || 'Overview'}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Custom domains let you use your own domain (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhooks.yourcompany.com</code>) instead of the default HookSniff URL. This gives your customers a branded, professional experience.
+          {t('overviewDesc') || 'Custom domains let you use your own domain instead of the default HookSniff URL.'}
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          <strong>How it works:</strong> You point your domain to HookSniff via DNS. We verify ownership and automatically provision an SSL certificate. Your customers access the portal through your domain.
+          <strong>{t('howItWorks')}</strong> {t('howItWorksFull')}
         </p>
       </section>
 
       {/* Step by Step */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step-by-Step Guide</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('stepByStep') || 'Step-by-Step Guide'}</h2>
 
         <div className="space-y-6">
           {/* Step 1 */}
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <span className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm">1</span>
-              Add your domain
+              {t('step1Title')}
             </h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
-              Go to <strong>Dashboard → Custom Domain</strong> and enter the domain you want to use.
+              {t('step1Desc')}
             </p>
             <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1 list-disc list-inside mb-3">
-              <li>Use a subdomain like <code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">webhooks.yourcompany.com</code></li>
-              <li>You can paste the full URL (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">https://webhooks.yourcompany.com</code>) — we'll strip the protocol automatically</li>
-              <li>Only use domains you own and control</li>
+              <li>{t('step1Tip1')}</li>
+              <li>{t('step1Tip2')}</li>
+              <li>{t('onlyUseDomains')}</li>
             </ul>
-            <p className="text-sm text-gray-500 dark:text-slate-500 italic">After adding, you'll see two DNS records you need to configure.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-500 italic">{t('step1After')}</p>
           </div>
 
           {/* Step 2 */}
