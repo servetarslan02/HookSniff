@@ -86,13 +86,13 @@ describe('AdminOverviewPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      renderWithProviders(React.createElement(AdminOverviewPage));
+      renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
     });
   });
 
   it('fetches admin stats on mount', async () => {
     await act(async () => {
-      renderWithProviders(React.createElement(AdminOverviewPage));
+      renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
     });
     expect(mockGetStats).toHaveBeenCalledWith('test-token');
   });
@@ -100,7 +100,7 @@ describe('AdminOverviewPage', () => {
   it('displays admin overview title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = renderWithProviders(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
       container = result.container;
     });
     // After loading, the page shows hardcoded "Admin Overview"
@@ -111,7 +111,7 @@ describe('AdminOverviewPage', () => {
     mockGetStats.mockReturnValueOnce(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = renderWithProviders(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
       container = result.container;
     });
     expect(container!.textContent).toContain('loadingDashboard');
@@ -120,7 +120,7 @@ describe('AdminOverviewPage', () => {
   it('shows stat cards after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = renderWithProviders(React.createElement(AdminOverviewPage));
+      const result = renderWithProviders(React.createElement(AdminOverviewPage, { withIntl: false }));
       container = result.container;
     });
     const statCards = container!.querySelectorAll('[data-testid="stat-card"]');
