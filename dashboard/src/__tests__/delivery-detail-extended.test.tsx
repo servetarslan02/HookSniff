@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -90,21 +91,21 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   // === Render ===
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(DeliveryDetailPage));
+      renderWithProviders(React.createElement(DeliveryDetailPage));
     });
   });
 
   // === Loading state ===
   it('shows loading state initially', () => {
     mockWebhooksGet.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   // === Error state ===
   it('shows error state on fetch failure', async () => {
     mockWebhooksGet.mockRejectedValue(new Error('Not found'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Failed to load delivery');
       expect(container.textContent).toContain('Not found');
@@ -113,7 +114,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   it('renders retry button on error', async () => {
     mockWebhooksGet.mockRejectedValue(new Error('Fail'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Try Again');
     });
@@ -121,7 +122,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   it('renders back button on error', async () => {
     mockWebhooksGet.mockRejectedValue(new Error('Fail'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Back to Deliveries');
     });
@@ -129,7 +130,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   // === Content ===
   it('renders delivery details after loading', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery Details');
       expect(container.textContent).toContain('del_test_123');
@@ -137,7 +138,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('renders status badge', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const badge = container.querySelector('[data-testid="status-badge"]');
       expect(badge).toBeTruthy();
@@ -146,14 +147,14 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('renders event type', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('order.created');
     });
   });
 
   it('renders attempt count', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('1');
     });
@@ -161,14 +162,14 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   // === Replay ===
   it('renders replay button', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
   });
 
   it('opens replay confirmation dialog', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -185,7 +186,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('replays webhook on confirm', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -207,7 +208,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('shows success toast after replay', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -232,7 +233,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   it('shows error toast on replay failure', async () => {
     mockWebhooksReplay.mockRejectedValue(new Error('Replay failed'));
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -256,7 +257,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('cancels replay on cancel', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Replay Webhook');
     });
@@ -282,7 +283,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   // === Back navigation ===
   it('renders back button', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery Details');
     });
@@ -292,7 +293,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   });
 
   it('navigates back on back button click', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery Details');
     });
@@ -307,21 +308,21 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
 
   // === Overview cards ===
   it('renders Status card', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Status');
     });
   });
 
   it('renders Event card', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Event');
     });
   });
 
   it('renders Attempts card', async () => {
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Attempts');
     });
@@ -334,7 +335,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
       status: 'failed',
       response_status: 500,
     });
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       const badge = container.querySelector('[data-testid="status-badge"]');
       expect(badge!.textContent).toBe('failed');
@@ -345,7 +346,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
   it('returns null when delivery is null and not loading', async () => {
     mockWebhooksGet.mockResolvedValue(null);
     mockWebhooksGetAttempts.mockResolvedValue([]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       // After loading, if delivery is null and no error, should render nothing
       expect(container.textContent).not.toContain('Delivery Details');
@@ -360,7 +361,7 @@ describe('DeliveryDetailPage — Extended Coverage', () => {
       { id: 'att_2', status: 'failed', status_code: 500, duration_ms: 200, attempted_at: '2024-06-01T10:05:01Z' },
       { id: 'att_3', status: 'failed', status_code: 500, duration_ms: 300, attempted_at: '2024-06-01T10:15:01Z' },
     ]);
-    const { container } = render(React.createElement(DeliveryDetailPage));
+    const { container } = renderWithProviders(React.createElement(DeliveryDetailPage));
     await waitFor(() => {
       expect(container.textContent).toContain('3');
     });

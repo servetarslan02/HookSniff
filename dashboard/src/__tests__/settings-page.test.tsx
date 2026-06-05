@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -75,21 +76,21 @@ describe('SettingsPage', () => {
 
   // === Render tests ===
   it('renders without crashing', () => {
-    render(React.createElement(SettingsPage));
+    renderWithProviders(React.createElement(SettingsPage));
   });
 
   it('displays settings title', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     expect(container.textContent).toContain('settings.title');
   });
 
   it('renders profile section', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     expect(container.textContent).toContain('settings.profile');
   });
 
   it('renders password section', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => {
       expect(container.textContent).toContain('settings.changePassword');
@@ -97,7 +98,7 @@ describe('SettingsPage', () => {
   });
 
   it('renders API key section', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => {
       expect(container.textContent).toContain('settings.api');
@@ -105,12 +106,12 @@ describe('SettingsPage', () => {
   });
 
   it('renders notification settings', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     expect(container.textContent).toContain('settings.notifications');
   });
 
   it('renders danger zone', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.dangerZone');
     await waitFor(() => {
       expect(container.textContent).toContain('settings.signOut');
@@ -119,7 +120,7 @@ describe('SettingsPage', () => {
   });
 
   it('renders notification toggles', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.notifications');
     await waitFor(() => {
       expect(container.textContent).toContain('settings.emailNotifications');
@@ -127,7 +128,7 @@ describe('SettingsPage', () => {
   });
 
   it('renders profile name and email inputs with user data', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const inputs = container.querySelectorAll('input[type="text"], input[type="email"]');
     const nameInput = Array.from(inputs).find((i) => (i as HTMLInputElement).value === 'Test');
     const emailInput = Array.from(inputs).find((i) => (i as HTMLInputElement).value === 'test@test.com');
@@ -136,17 +137,17 @@ describe('SettingsPage', () => {
   });
 
   it('renders avatar with initial', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     expect(container.textContent).toContain('T'); // First letter of name
   });
 
   it('renders user plan badge', () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     expect(container.textContent).toContain('pro');
   });
 
   it('renders password min length hint', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('settings.passwordMinLength'), { timeout: 3000 });
   });
@@ -154,7 +155,7 @@ describe('SettingsPage', () => {
   // === Profile form tests ===
   it('submits profile form with current data', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form');
     expect(profileForm).toBeTruthy();
@@ -172,7 +173,7 @@ describe('SettingsPage', () => {
 
   it('sends correct profile data in request body', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     // Change name
     const nameInput = container.querySelector('input[type="text"]') as HTMLInputElement;
@@ -194,7 +195,7 @@ describe('SettingsPage', () => {
 
   it('shows success message after profile save', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
     await act(async () => {
@@ -206,7 +207,7 @@ describe('SettingsPage', () => {
 
   it('shows error message on profile save failure', async () => {
     mockApiPut.mockRejectedValueOnce(new Error('Update failed'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
     await act(async () => {
@@ -218,7 +219,7 @@ describe('SettingsPage', () => {
 
   it('handles network failure on profile save', async () => {
     mockApiPut.mockRejectedValueOnce(new Error('Network error'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
     await act(async () => {
@@ -231,7 +232,7 @@ describe('SettingsPage', () => {
   it.skip('shows saving state during profile save', async () => {
     let resolvePut: (v: any) => void;
     mockApiPut.mockReturnValueOnce(new Promise((r) => { resolvePut = r; }));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const profileForm = container.querySelector('form')!;
     await act(async () => {
@@ -251,7 +252,7 @@ describe('SettingsPage', () => {
   it('clears previous profile error on new submit', async () => {
     // First submit fails
     mockApiPut.mockRejectedValueOnce(new Error('Fail 1'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const profileForm = container.querySelector('form')!;
 
     await act(async () => { fireEvent.submit(profileForm); });
@@ -266,7 +267,7 @@ describe('SettingsPage', () => {
 
   // === Email input change ===
   it('allows changing profile email', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     await act(async () => {
       fireEvent.change(emailInput, { target: { value: 'new@test.com' } });
@@ -277,7 +278,7 @@ describe('SettingsPage', () => {
   // === Password form tests ===
   it('submits password change form with valid data', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const passwordInputs = container.querySelectorAll('input[type="password"]');
     if (passwordInputs.length >= 3) {
@@ -303,7 +304,7 @@ describe('SettingsPage', () => {
 
   it('sends correct password data in request body', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0), { timeout: 3000 });
     clickTab(container, 'settings.security');
@@ -330,7 +331,7 @@ describe('SettingsPage', () => {
 
   it('shows success after password change', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0), { timeout: 3000 });
     clickTab(container, 'settings.security');
@@ -353,7 +354,7 @@ describe('SettingsPage', () => {
 
   it('clears password fields after successful change', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0), { timeout: 3000 });
     clickTab(container, 'settings.security');
@@ -378,7 +379,7 @@ describe('SettingsPage', () => {
   });
 
   it('rejects mismatched passwords', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -398,7 +399,7 @@ describe('SettingsPage', () => {
   });
 
   it('does not call API when passwords mismatch', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -423,7 +424,7 @@ describe('SettingsPage', () => {
   });
 
   it('rejects short passwords', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -444,7 +445,7 @@ describe('SettingsPage', () => {
 
   it.skip('shows error on password API failure', async () => {
     mockApiPut.mockRejectedValueOnce(new Error('Wrong current password'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -465,7 +466,7 @@ describe('SettingsPage', () => {
 
   it.skip('handles network failure on password change', async () => {
     mockApiPut.mockRejectedValueOnce(new Error('Network error'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -487,7 +488,7 @@ describe('SettingsPage', () => {
   it('shows saving state during password change', async () => {
     let resolvePut: (v: any) => void;
     mockApiPut.mockReturnValueOnce(new Promise((r) => { resolvePut = r; }));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.querySelectorAll('input[type="password"]').length).toBeGreaterThan(0));
 
@@ -514,7 +515,7 @@ describe('SettingsPage', () => {
 
   // === API Key section ===
   it('copies API key to clipboard', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const copyButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Copy') || b.textContent?.includes('settings.copyKey')
@@ -529,7 +530,7 @@ describe('SettingsPage', () => {
   });
 
   it('shows "Copied!" text after copying', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const copyButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('Copy')
@@ -544,14 +545,14 @@ describe('SettingsPage', () => {
   });
 
   it('renders masked API key display', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('••••••••••••••••••••••••••••••••'));
   });
 
   // === Notification toggle tests ===
   it('toggles email notifications checkbox', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
 
     if (checkboxes.length > 0) {
@@ -565,7 +566,7 @@ describe('SettingsPage', () => {
   });
 
   it('toggles failure alerts checkbox', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
 
     if (checkboxes.length >= 2) {
@@ -579,7 +580,7 @@ describe('SettingsPage', () => {
   });
 
   it('toggles weekly digest checkbox', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
 
     if (checkboxes.length >= 3) {
@@ -594,7 +595,7 @@ describe('SettingsPage', () => {
 
   it('saves notification preferences', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     // Find the save button in notification section
     const buttons = Array.from(container.querySelectorAll('button'));
@@ -618,7 +619,7 @@ describe('SettingsPage', () => {
 
   it('handles notification save failure', async () => {
     mockApiPut.mockRejectedValueOnce(new Error('Save failed'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const buttons = Array.from(container.querySelectorAll('button'));
     const notifSaveButton = buttons.find(
@@ -636,7 +637,7 @@ describe('SettingsPage', () => {
 
   // === ToggleRow component ===
   it('renders ToggleRow with correct labels', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.notifications');
     await waitFor(() => expect(container.textContent).toContain('settings.emailNotifications'));
     // ToggleRow renders label and description
@@ -647,7 +648,7 @@ describe('SettingsPage', () => {
   });
 
   it('ToggleRow button toggles state', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     // The toggle buttons are rendered by ToggleRow
     const toggleButtons = container.querySelectorAll('.rounded-full');
     if (toggleButtons.length > 0) {
@@ -660,7 +661,7 @@ describe('SettingsPage', () => {
 
   // === Delete account modal tests ===
   it('opens delete account modal', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -678,7 +679,7 @@ describe('SettingsPage', () => {
   });
 
   it('shows delete confirmation input in modal', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -695,7 +696,7 @@ describe('SettingsPage', () => {
   });
 
   it('confirm button is disabled until DELETE is typed', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -716,7 +717,7 @@ describe('SettingsPage', () => {
   });
 
   it('enables confirm button when DELETE is typed', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -742,7 +743,7 @@ describe('SettingsPage', () => {
 
   it('confirms account deletion with DELETE text', async () => {
     mockApiDelete.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -774,7 +775,7 @@ describe('SettingsPage', () => {
 
   it('handles delete account API failure', async () => {
     mockApiDelete.mockRejectedValueOnce(new Error('Delete failed'));
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -803,7 +804,7 @@ describe('SettingsPage', () => {
   });
 
   it('cancels delete modal', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -830,7 +831,7 @@ describe('SettingsPage', () => {
   });
 
   it('closes delete modal by clicking backdrop', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -853,7 +854,7 @@ describe('SettingsPage', () => {
   });
 
   it('does not delete when non-DELETE text is typed', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const deleteButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('settings.deleteAccount')
@@ -884,7 +885,7 @@ describe('SettingsPage', () => {
 
   // === Sign out ===
   it('sign out button calls logout', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const signOutButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.trim() === 'Sign Out'
@@ -901,7 +902,7 @@ describe('SettingsPage', () => {
   // === Profile form email change ===
   it('profile form sends updated email', async () => {
     mockApiPut.mockResolvedValueOnce({});
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
 
     const emailInput = container.querySelector('input[type="email"]') as HTMLInputElement;
     await act(async () => {
@@ -922,49 +923,49 @@ describe('SettingsPage', () => {
 
   // === Profile section description ===
   it('renders profile description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     // Profile tab is default - check for displayName and emailAddress labels
     await waitFor(() => expect(container.textContent).toContain('settings.displayName'), { timeout: 3000 });
   });
 
   it('renders password change description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('settings.changePasswordDesc'), { timeout: 3000 });
   });
 
   it('renders API key description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('settings.apiDesc'), { timeout: 3000 });
   });
 
   it('renders notification description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.notifications');
     await waitFor(() => expect(container.textContent).toContain('settings.notificationsDesc'), { timeout: 3000 });
   });
 
   it('renders sign out description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.dangerZone');
     await waitFor(() => expect(container.textContent).toContain('settings.signOutDesc'), { timeout: 3000 });
   });
 
   it('renders delete account description', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.dangerZone');
     await waitFor(() => expect(container.textContent).toContain('settings.deleteAccountDesc'), { timeout: 3000 });
   });
 
   it('renders manage API keys link', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('settings.manageApiKeys'), { timeout: 3000 });
   });
 
   it('renders keep secret note', async () => {
-    const { container } = render(React.createElement(SettingsPage));
+    const { container } = renderWithProviders(React.createElement(SettingsPage));
     clickTab(container, 'settings.security');
     await waitFor(() => expect(container.textContent).toContain('settings.keepSecret'), { timeout: 3000 });
   });

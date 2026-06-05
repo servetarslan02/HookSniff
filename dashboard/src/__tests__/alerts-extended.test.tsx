@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -70,22 +71,22 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Render ===
   it('renders without crashing', () => {
-    render(React.createElement(AlertsPage));
+    renderWithProviders(React.createElement(AlertsPage));
   });
 
   it('displays title', () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('alerts.title');
   });
 
   it('renders new alert button', () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('alerts.newAlert');
   });
 
   // === Alert list ===
   it('renders alert list', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
       expect(container.textContent).toContain('Slow Latency');
@@ -93,28 +94,28 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders active badge', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('alerts.active');
     });
   });
 
   it('renders paused badge', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('alerts.paused');
     });
   });
 
   it('renders condition labels', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Failure Rate >');
     });
   });
 
   it('renders threshold values', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('10');
       expect(container.textContent).toContain('5000');
@@ -122,7 +123,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders channel icons', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('📧');
       expect(container.textContent).toContain('💬');
@@ -130,7 +131,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders test button for each alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const testButtons = Array.from(container.querySelectorAll('button')).filter(
         (b) => b.textContent?.includes('Test')
@@ -140,7 +141,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders delete button for each alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const deleteButtons = Array.from(container.querySelectorAll('button')).filter(
         (b) => b.textContent?.includes('Delete')
@@ -152,7 +153,7 @@ describe('AlertsPage — Extended Coverage', () => {
   // === Empty state ===
   it('shows empty state when no alerts', async () => {
     mockAlertsList.mockResolvedValue([]);
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('No alert rules yet');
     });
@@ -161,13 +162,13 @@ describe('AlertsPage — Extended Coverage', () => {
   // === Loading state ===
   it('shows loading state', () => {
     mockAlertsList.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     expect(container.textContent).toContain('common.loading');
   });
 
   // === Create form ===
   it('shows create form on button click', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -181,7 +182,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('hides create form on second click', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -195,7 +196,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders form fields', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -210,7 +211,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders condition options', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -226,7 +227,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('renders channel toggle buttons', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -240,7 +241,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('toggles channel selection', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -263,7 +264,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Create alert ===
   it('creates alert', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -296,7 +297,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('disables create when name is empty', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
 
     const newAlertButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('alerts.newAlert')
@@ -313,7 +314,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Test alert ===
   it('tests alert on test click', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
     });
@@ -330,7 +331,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('shows toast after test', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
     });
@@ -350,7 +351,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Delete alert ===
   it('opens confirm dialog on delete click', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
     });
@@ -367,7 +368,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('deletes alert on confirm', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
     });
@@ -389,7 +390,7 @@ describe('AlertsPage — Extended Coverage', () => {
   });
 
   it('cancels delete on cancel click', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('High Failure Rate');
     });
@@ -415,7 +416,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Latency condition ===
   it('renders latency condition label', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Avg Latency >');
     });
@@ -423,7 +424,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Consecutive failures condition ===
   it('renders consecutive failures condition label', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       expect(container.textContent).toContain('Consecutive Failures >');
     });
@@ -431,7 +432,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Failure rate percentage suffix ===
   it('shows % suffix for failure rate', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       // failure_rate alert has threshold 10, should show "10%"
       const alertItems = container.querySelectorAll('.px-6.py-4');
@@ -444,7 +445,7 @@ describe('AlertsPage — Extended Coverage', () => {
 
   // === Latency ms suffix ===
   it('shows ms suffix for latency', async () => {
-    const { container } = render(React.createElement(AlertsPage));
+    const { container } = renderWithProviders(React.createElement(AlertsPage));
     await waitFor(() => {
       const alertItems = container.querySelectorAll('.px-6.py-4');
       const latencyAlert = Array.from(alertItems).find((el) =>

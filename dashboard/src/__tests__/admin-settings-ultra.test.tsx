@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -49,20 +50,20 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 1. Renders without crashing ===
   it('1. renders without crashing', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container).toBeTruthy();
     expect(container.firstChild).toBeTruthy();
   });
 
   // === 2. Displays platform settings title ===
   it('2. displays platform settings title', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.platformSettings');
   });
 
   // === 3. Renders maintenance mode toggle ===
   it('3. renders maintenance mode toggle', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.maintenanceMode');
     expect(container.textContent).toContain('admin.maintenanceDesc');
     const toggles = getToggles(container);
@@ -71,14 +72,14 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 4. Renders signups enabled toggle ===
   it('4. renders signups enabled toggle', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.signupsEnabled');
     expect(container.textContent).toContain('admin.signupsDesc');
   });
 
   // === 5. Toggles maintenance mode on click ===
   it('5. toggles maintenance mode on click', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const toggles = getToggles(container);
     const maintenanceToggle = toggles[0];
 
@@ -95,7 +96,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 6. Toggles signups enabled on click ===
   it('6. toggles signups enabled on click', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const toggles = getToggles(container);
     const signupsToggle = toggles[1];
 
@@ -112,7 +113,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 7. Maintenance toggle shows correct color (red when on, gray when off) ===
   it('7. maintenance toggle shows red when on, gray when off', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const toggles = getToggles(container);
     const toggle = toggles[0];
 
@@ -137,7 +138,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 8. Signups toggle shows correct color (green when on, gray when off) ===
   it('8. signups toggle shows green when on, gray when off', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const toggles = getToggles(container);
     const toggle = toggles[1];
 
@@ -162,7 +163,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 9. Renders default plan select ===
   it('9. renders default plan select', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('Default Plan');
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
@@ -170,7 +171,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 10. Changes default plan to pro ===
   it('10. changes default plan to pro', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const select = container.querySelector('select') as HTMLSelectElement;
     expect(select.value).toBe('free');
 
@@ -183,7 +184,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 11. Changes default plan back to free ===
   it('11. changes default plan back to free', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const select = container.querySelector('select') as HTMLSelectElement;
 
     await act(async () => {
@@ -199,19 +200,19 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 12. Renders free plan section ===
   it('12. renders free plan section', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.freePlan');
   });
 
   // === 13. Renders pro plan section ===
   it('13. renders pro plan section', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.proPlan');
   });
 
   // === 14. Renders all free plan inputs ===
   it('14. renders all free plan inputs (endpoints, webhooks, rate_limit, retention)', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const numberInputs = getNumberInputs(container);
     // 4 free + 4 pro + 1 retry = 9 total
     expect(numberInputs.length).toBe(9);
@@ -224,7 +225,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 15. Renders all pro plan inputs ===
   it('15. renders all pro plan inputs', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const numberInputs = getNumberInputs(container);
     expect((numberInputs[4] as HTMLInputElement).value).toBe('50');    // max_endpoints_pro
     expect((numberInputs[5] as HTMLInputElement).value).toBe('50000'); // max_webhooks_pro
@@ -234,7 +235,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 16. Changes free max endpoints value ===
   it('16. changes free max endpoints value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[0] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '20' } });
@@ -244,7 +245,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 17. Changes free max webhooks value ===
   it('17. changes free max webhooks value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[1] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '2000' } });
@@ -254,7 +255,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 18. Changes free rate limit value ===
   it('18. changes free rate limit value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[2] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '200' } });
@@ -264,7 +265,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 19. Changes free retention days value ===
   it('19. changes free retention days value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[3] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '14' } });
@@ -274,7 +275,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 20. Changes pro max endpoints value ===
   it('20. changes pro max endpoints value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[4] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '100' } });
@@ -284,7 +285,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 21. Changes pro max webhooks value ===
   it('21. changes pro max webhooks value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[5] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '100000' } });
@@ -294,7 +295,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 22. Changes pro rate limit value ===
   it('22. changes pro rate limit value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[6] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '2000' } });
@@ -304,7 +305,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 23. Changes pro retention days value ===
   it('23. changes pro retention days value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[7] as HTMLInputElement;
     await act(async () => {
       fireEvent.change(input, { target: { value: '60' } });
@@ -314,7 +315,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 24. Renders retry settings section ===
   it('24. renders retry settings section', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.retrySettings');
     expect(container.textContent).toContain('Max Retry Attempts');
     expect(container.textContent).toContain('admin.retryDesc');
@@ -322,7 +323,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 25. Changes retry max attempts value ===
   it('25. changes retry max attempts value', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const retryInput = getNumberInputs(container)[8] as HTMLInputElement;
     expect(retryInput.value).toBe('3');
     await act(async () => {
@@ -333,7 +334,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 26. Retry input has min/max attributes ===
   it('26. retry input has min/max attributes', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const retryInput = getNumberInputs(container)[8] as HTMLInputElement;
     expect(retryInput.getAttribute('min')).toBe('0');
     expect(retryInput.getAttribute('max')).toBe('10');
@@ -341,7 +342,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 27. Renders save button ===
   it('27. renders save button', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
     expect(saveBtn).toBeTruthy();
     expect(saveBtn!.textContent).toContain('admin.saveSettings');
@@ -352,7 +353,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
     let resolveFetch: (v: any) => void;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -369,7 +370,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 29. Successful save shows toast ===
   it('29. successful save shows success toast', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -383,7 +384,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
   // === 30. Failed save shows error toast ===
   it('30. failed save shows error toast', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({}) });
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -395,7 +396,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 31. Save sends correct data to API ===
   it('31. save sends correct data to API', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -421,7 +422,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 32. Save includes Authorization header with token ===
   it('32. save includes Authorization header with token', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -435,7 +436,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 33. Save uses PUT method ===
   it('33. save uses PUT method', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -447,7 +448,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 34. All numeric inputs default to correct values ===
   it('34. all numeric inputs default to correct values', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const inputs = getNumberInputs(container);
     const expectedValues = [
       '5',     // max_endpoints_free
@@ -468,7 +469,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 35. Update function properly merges state (toggle + input change) ===
   it('35. update function properly merges state', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const toggles = getToggles(container);
     const numberInputs = getNumberInputs(container);
 
@@ -497,25 +498,25 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   // === 36. Renders plan limits section header ===
   it('36. renders plan limits section header', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.planLimits');
   });
 
   // === 37. Renders retry settings section header ===
   it('37. renders retry settings section header', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.retrySettings');
   });
 
   // === 38. Renders free plan label ===
   it('38. renders free plan label', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.freePlan');
   });
 
   // === 39. Renders pro plan label ===
   it('39. renders pro plan label', () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     expect(container.textContent).toContain('admin.proPlan');
   });
 
@@ -524,7 +525,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
     let resolveFetch: (v: any) => void;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container) as HTMLButtonElement;
 
     expect(saveBtn.disabled).toBe(false);
@@ -550,7 +551,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
     let resolveFetch: (v: any) => void;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container) as HTMLButtonElement;
 
     // First click triggers save
@@ -576,7 +577,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
     let resolveFetch: (v: any) => void;
     mockFetch.mockReturnValueOnce(new Promise((r) => { resolveFetch = r; }));
 
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container) as HTMLButtonElement;
 
     // Before save: shows "saveSettings"
@@ -605,7 +606,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
 
   it('handles network error on save', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {
@@ -616,7 +617,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
   });
 
   it('saves changed values after multiple input modifications', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const inputs = getNumberInputs(container);
 
     // Change several inputs
@@ -638,7 +639,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
   });
 
   it('maintains default plan in saved data', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const select = container.querySelector('select') as HTMLSelectElement;
 
     await act(async () => {
@@ -655,7 +656,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
   });
 
   it('handles NaN input gracefully (defaults to 0)', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[0] as HTMLInputElement;
 
     await act(async () => {
@@ -666,7 +667,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
   });
 
   it('handles empty input gracefully (defaults to 0)', async () => {
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const input = getNumberInputs(container)[0] as HTMLInputElement;
 
     await act(async () => {
@@ -680,7 +681,7 @@ describe('AdminSettingsPage — Ultra Coverage', () => {
     const originalEnv = process.env.NEXT_PUBLIC_API_URL;
     process.env.NEXT_PUBLIC_API_URL = 'https://custom-api.example.com/v2';
 
-    const { container } = render(React.createElement(AdminSettingsPage));
+    const { container } = renderWithProviders(React.createElement(AdminSettingsPage));
     const saveBtn = getSaveButton(container);
 
     await act(async () => {

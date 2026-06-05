@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -72,7 +73,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays profile email', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('user@example.com');
@@ -81,7 +82,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays profile plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('pro');
@@ -90,7 +91,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays member since date', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     // Should contain a formatted date from created_at
@@ -101,7 +102,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays webhook limit', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('10,000');
@@ -111,7 +112,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays profile section heading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Profile');
@@ -120,7 +121,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays email label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Email');
@@ -129,7 +130,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays plan label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Plan');
@@ -138,7 +139,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays member since label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Member since');
@@ -147,7 +148,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays webhook limit label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Webhook limit');
@@ -157,7 +158,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays usage section heading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Usage');
@@ -166,7 +167,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays webhooks used count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('500');
@@ -175,7 +176,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays endpoints count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('5');
@@ -184,7 +185,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays API calls today', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('50');
@@ -193,7 +194,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays webhooks used label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Webhooks used');
@@ -202,7 +203,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays endpoints label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Endpoints');
@@ -211,7 +212,7 @@ describe('PortalPage - Extended Tests', () => {
   it('displays API calls today label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('API calls today');
@@ -220,13 +221,13 @@ describe('PortalPage - Extended Tests', () => {
   // === Loading State ===
   it('shows loading state initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(React.createElement(PortalPage));
+    const { container } = renderWithProviders(React.createElement(PortalPage));
     expect(container.textContent).toContain('Loading...');
   });
 
   it('loading div has correct styling class', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(PortalPage));
+    const { container } = renderWithProviders(React.createElement(PortalPage));
     const loadingDiv = container.querySelector('.text-gray-500');
     expect(loadingDiv).toBeTruthy();
     expect(loadingDiv!.textContent).toContain('Loading...');
@@ -238,7 +239,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Network error');
@@ -249,7 +250,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Customer Portal');
@@ -260,7 +261,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     const errorDiv = container.querySelector('[class*="red"]');
@@ -272,7 +273,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Failed to load portal data');
@@ -281,14 +282,14 @@ describe('PortalPage - Extended Tests', () => {
   // === API Fetch Calls ===
   it('calls apiFetch for /portal/me', async () => {
     await act(async () => {
-      render(React.createElement(PortalPage));
+      renderWithProviders(React.createElement(PortalPage));
     });
     expect(mockApiFetch).toHaveBeenCalledWith('/portal/me', { token: 'test-token' });
   });
 
   it('calls apiFetch for /portal/usage', async () => {
     await act(async () => {
-      render(React.createElement(PortalPage));
+      renderWithProviders(React.createElement(PortalPage));
     });
     expect(mockApiFetch).toHaveBeenCalledWith('/portal/usage', { token: 'test-token' });
   });
@@ -303,7 +304,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('/month');
@@ -326,7 +327,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     // Should still render usage section
@@ -342,7 +343,7 @@ describe('PortalPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('user@example.com');
@@ -353,7 +354,7 @@ describe('PortalPage - Extended Tests', () => {
     // Need to re-mock useAuth without token
     // We can't easily change the mock mid-test, but we can verify the initial behavior
     await act(async () => {
-      render(React.createElement(PortalPage));
+      renderWithProviders(React.createElement(PortalPage));
     });
     // With our mock token 'test-token', it should have fetched
     expect(mockApiFetch).toHaveBeenCalled();
@@ -363,7 +364,7 @@ describe('PortalPage - Extended Tests', () => {
   it('has max-w-4xl container', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     const mainDiv = container!.querySelector('.max-w-4xl');
@@ -373,7 +374,7 @@ describe('PortalPage - Extended Tests', () => {
   it('renders profile grid with 2 columns', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     const grid = container!.querySelector('.grid-cols-2');
@@ -383,7 +384,7 @@ describe('PortalPage - Extended Tests', () => {
   it('renders usage grid with 3 columns', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     const grid = container!.querySelector('.grid-cols-3');
@@ -393,7 +394,7 @@ describe('PortalPage - Extended Tests', () => {
   it('renders portal title with emoji', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('👤');

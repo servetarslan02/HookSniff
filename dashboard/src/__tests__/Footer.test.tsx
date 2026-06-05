@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
@@ -30,17 +31,17 @@ vi.mock('@/i18n/navigation', () => ({
 
 describe('Footer', () => {
   it('renders without crashing', () => {
-    const { container } = render(<Footer />);
+    const { container } = renderWithProviders(<Footer />);
     expect(container.querySelector('footer')).toBeTruthy();
   });
 
   it('renders the hook emoji', () => {
-    const { container } = render(<Footer />);
+    const { container } = renderWithProviders(<Footer />);
     expect(container.textContent).toContain('🪝');
   });
 
   it('renders footer links', () => {
-    const { container } = render(<Footer />);
+    const { container } = renderWithProviders(<Footer />);
     const text = container.textContent!;
     expect(text).toContain('GitHub');
     expect(text).toContain('Docs');
@@ -53,12 +54,12 @@ describe('Footer', () => {
   });
 
   it('renders copyright text', () => {
-    const { container } = render(<Footer />);
+    const { container } = renderWithProviders(<Footer />);
     expect(container.textContent).toContain('© 2024 HookSniff');
   });
 
   it('renders as a footer element', () => {
-    const { container } = render(<Footer />);
+    const { container } = renderWithProviders(<Footer />);
     expect(container.querySelector('footer')).toBeTruthy();
   });
 });

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -53,7 +54,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading skeleton initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(SsoSettingsPage));
+    const { container } = renderWithProviders(React.createElement(SsoSettingsPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
@@ -61,7 +62,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders page header with emoji', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔐');
@@ -72,7 +73,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Configure Single Sign-On');
@@ -84,7 +85,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders SAML provider option', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('SAML 2.0');
@@ -95,7 +96,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders OIDC provider option', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('OpenID Connect');
@@ -106,7 +107,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders provider icons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🏛️');
@@ -117,7 +118,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('highlights selected provider', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       const samlBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent?.includes('SAML 2.0'));
@@ -129,7 +130,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders SAML configuration fields when SAML selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('SAML Configuration');
@@ -143,7 +144,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('populates SAML fields from config', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       const inputs = container.querySelectorAll('input');
@@ -157,7 +158,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue(MOCK_OIDC_CONFIG);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('OpenID Connect Configuration');
@@ -170,7 +171,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('switches to OIDC on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('OpenID Connect');
@@ -186,7 +187,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders enable SSO toggle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Enable SSO');
@@ -197,7 +198,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('toggle reflects enabled state from config', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
@@ -208,7 +209,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('toggles enable state on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Enable SSO');
@@ -224,7 +225,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders save button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       const saveBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Save Configuration');
@@ -236,7 +237,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({});
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Configuration');
@@ -260,7 +261,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
       .mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Configuration');
@@ -280,7 +281,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
       .mockRejectedValueOnce(new Error('Save failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Configuration');
@@ -298,7 +299,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('renders info banner about Business plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('SSO is available on the');
@@ -312,7 +313,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     // Should still render with defaults
     await waitFor(() => {
@@ -330,7 +331,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/sso/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -339,7 +340,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('updates metadata URL on input change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Metadata URL');
@@ -354,7 +355,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('updates entity ID on input change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Entity ID');
@@ -369,7 +370,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('updates SSO URL on input change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('SSO URL');
@@ -384,7 +385,7 @@ describe('SsoSettingsPage - Ultra Coverage', () => {
   it('updates certificate on textarea change', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(SsoSettingsPage)).container;
+      container = renderWithProviders(React.createElement(SsoSettingsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('X.509 Certificate');

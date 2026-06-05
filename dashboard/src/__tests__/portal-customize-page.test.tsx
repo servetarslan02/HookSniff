@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -48,13 +49,13 @@ describe('PortalCustomizationPage', () => {
 
   it('renders loading state initially', async () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    render(React.createElement(PortalCustomizationPage));
+    renderWithProviders(React.createElement(PortalCustomizationPage));
     expect(document.querySelector('.animate-pulse')).toBeTruthy();
   });
 
   it('renders header and save button', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getByText('🖼️ Portal Customization')).toBeTruthy();
     expect(screen.getAllByText('Save Changes').length).toBeGreaterThan(0);
@@ -62,7 +63,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders branding section', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('🎨 Branding').length).toBeGreaterThan(0);
     expect(screen.getAllByDisplayValue('Test Co').length).toBeGreaterThan(0);
@@ -71,7 +72,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders features toggles', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('⚙️ Features').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Dark Mode').length).toBeGreaterThan(0);
@@ -81,7 +82,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders allowed events section', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('📋 Allowed Events').length).toBeGreaterThan(0);
     expect(screen.getAllByText('All events allowed').length).toBeGreaterThan(0);
@@ -89,7 +90,7 @@ describe('PortalCustomizationPage', () => {
 
   it('adds an event to allowed_events', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     const eventInputs = screen.getAllByPlaceholderText('order.created');
     const eventInput = eventInputs[eventInputs.length - 1]; // use last (loaded state)
@@ -106,7 +107,7 @@ describe('PortalCustomizationPage', () => {
 
   it('shows error toast when adding duplicate event', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     const eventInputs = screen.getAllByPlaceholderText('order.created');
     const eventInput = eventInputs[eventInputs.length - 1];
@@ -127,7 +128,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders preview section', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('👁️ Preview').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Test Co Portal').length).toBeGreaterThan(0);
@@ -135,7 +136,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders embed code section', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('📋 Embed Code').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Copy this code/).length).toBeGreaterThan(0);
@@ -143,7 +144,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders React integration section', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('⚛️ React Integration').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/HookSniffPortal/).length).toBeGreaterThan(0);
@@ -153,7 +154,7 @@ describe('PortalCustomizationPage', () => {
     mockApiFetch.mockResolvedValue({});
 
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
 
     const saveBtns = screen.getAllByText('Save Changes');
@@ -173,7 +174,7 @@ describe('PortalCustomizationPage', () => {
     mockApiFetch.mockRejectedValue(new Error('Save failed'));
 
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
 
     const saveBtns = screen.getAllByText('Save Changes');
@@ -187,7 +188,7 @@ describe('PortalCustomizationPage', () => {
 
   it('handles font family change', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     const fontSelects = screen.getAllByDisplayValue('Inter');
     const fontSelect = fontSelects[fontSelects.length - 1];
@@ -201,7 +202,7 @@ describe('PortalCustomizationPage', () => {
     mockApiFetch.mockResolvedValue({});
 
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
 
     expect(screen.getAllByText(/Portal Customization/).length).toBeGreaterThan(0);
@@ -210,7 +211,7 @@ describe('PortalCustomizationPage', () => {
 
   it('does not add empty event', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
 
     const addBtns = screen.getAllByText('Add');
@@ -224,7 +225,7 @@ describe('PortalCustomizationPage', () => {
 
   it('renders font options', async () => {
     await act(async () => {
-      render(React.createElement(PortalCustomizationPage));
+      renderWithProviders(React.createElement(PortalCustomizationPage));
     });
     expect(screen.getAllByText('Inter').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Roboto').length).toBeGreaterThan(0);

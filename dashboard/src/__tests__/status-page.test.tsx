@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -59,14 +60,14 @@ describe('StatusPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(StatusPage));
+      renderWithProviders(React.createElement(StatusPage));
     });
   });
 
   it('displays status title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('System Status');
@@ -75,7 +76,7 @@ describe('StatusPage', () => {
   it('displays status subtitle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Real-time monitoring');
@@ -83,7 +84,7 @@ describe('StatusPage', () => {
 
   it('fetches status on mount', async () => {
     await act(async () => {
-      render(React.createElement(StatusPage));
+      renderWithProviders(React.createElement(StatusPage));
     });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/status'),
@@ -94,7 +95,7 @@ describe('StatusPage', () => {
   it('renders service status indicators', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('API');
@@ -105,7 +106,7 @@ describe('StatusPage', () => {
   it('renders current status section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('All Systems Operational');
@@ -114,7 +115,7 @@ describe('StatusPage', () => {
   it('renders components section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Components');
@@ -123,7 +124,7 @@ describe('StatusPage', () => {
   it('renders uptime percentage', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('99.97%');
@@ -132,7 +133,7 @@ describe('StatusPage', () => {
   it('renders last 30 days label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Last 30 days');
@@ -141,7 +142,7 @@ describe('StatusPage', () => {
   it('renders incident history section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Incident History');
@@ -152,7 +153,7 @@ describe('StatusPage', () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Major Outage Detected');
@@ -161,7 +162,7 @@ describe('StatusPage', () => {
   it('renders component latency values', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('45ms');

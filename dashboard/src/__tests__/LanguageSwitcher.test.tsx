@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
@@ -25,22 +26,22 @@ describe('LanguageSwitcher', () => {
   });
 
   it('renders without crashing', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     expect(container.querySelector('button')).toBeTruthy();
   });
 
   it('displays current locale code', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     expect(container.textContent).toContain('EN');
   });
 
   it('displays current locale name', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     expect(container.textContent).toContain('English');
   });
 
   it('shows dropdown when button clicked', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     const button = container.querySelector('button')!;
     fireEvent.click(button);
     expect(container.textContent).toContain('Türkçe');
@@ -49,12 +50,12 @@ describe('LanguageSwitcher', () => {
   });
 
   it('hides dropdown initially', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     expect(container.textContent).not.toContain('Türkçe');
   });
 
   it('switches locale when a language is selected', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     const button = container.querySelector('button')!;
     fireEvent.click(button);
 
@@ -69,7 +70,7 @@ describe('LanguageSwitcher', () => {
   });
 
   it('closes dropdown after selecting a language', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     const button = container.querySelector('button')!;
     fireEvent.click(button);
 
@@ -84,7 +85,7 @@ describe('LanguageSwitcher', () => {
   });
 
   it('highlights current locale in dropdown', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     const button = container.querySelector('button')!;
     fireEvent.click(button);
 
@@ -98,19 +99,19 @@ describe('LanguageSwitcher', () => {
 
   it('displays locale for non-English language', () => {
     mockLocale = 'tr';
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     expect(container.textContent).toContain('TR');
     expect(container.textContent).toContain('Türkçe');
   });
 
   it('applies custom className', () => {
-    const { container } = render(<LanguageSwitcher className="custom" />);
+    const { container } = renderWithProviders(<LanguageSwitcher className="custom" />);
     const wrapper = container.firstElementChild!;
     expect(wrapper.classList.contains('custom')).toBe(true);
   });
 
   it('closes dropdown on click outside', () => {
-    const { container } = render(<LanguageSwitcher />);
+    const { container } = renderWithProviders(<LanguageSwitcher />);
     const button = container.querySelector('button')!;
     fireEvent.click(button);
     expect(container.textContent).toContain('Türkçe');

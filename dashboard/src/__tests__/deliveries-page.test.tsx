@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -103,13 +104,13 @@ describe('DeliveriesPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(DeliveriesPage));
+      renderWithProviders(React.createElement(DeliveriesPage));
     });
   });
 
   it('fetches deliveries on mount', async () => {
     await act(async () => {
-      render(React.createElement(DeliveriesPage));
+      renderWithProviders(React.createElement(DeliveriesPage));
     });
     expect(mockWebhooksList).toHaveBeenCalledWith('test-token', expect.objectContaining({ page: 1 }));
   });
@@ -117,7 +118,7 @@ describe('DeliveriesPage', () => {
   it('displays deliveries title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('deliveries.title');
@@ -126,7 +127,7 @@ describe('DeliveriesPage', () => {
   it('displays delivery data in table', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -139,7 +140,7 @@ describe('DeliveriesPage', () => {
   it('shows status badges for each delivery', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -154,7 +155,7 @@ describe('DeliveriesPage', () => {
   it('displays attempt counts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -166,7 +167,7 @@ describe('DeliveriesPage', () => {
   it('displays response status codes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -179,7 +180,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockResolvedValueOnce({ deliveries: [], total: 0, page: 1, per_page: 20 });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -191,7 +192,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockReturnValueOnce(new Promise(() => {}));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('deliveries.loadingDeliveries');
@@ -200,7 +201,7 @@ describe('DeliveriesPage', () => {
   it('renders filter buttons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('All');
@@ -212,7 +213,7 @@ describe('DeliveriesPage', () => {
   it('changes filter and refetches', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const failedBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -232,7 +233,7 @@ describe('DeliveriesPage', () => {
   it('highlights active filter button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const allBtn = Array.from(container!.querySelectorAll('button')).find(
@@ -244,7 +245,7 @@ describe('DeliveriesPage', () => {
   it('resets page to 1 when filter changes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     // Change filter
@@ -264,7 +265,7 @@ describe('DeliveriesPage', () => {
   it('renders search input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]');
@@ -274,7 +275,7 @@ describe('DeliveriesPage', () => {
   it('filters deliveries by search term', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -292,7 +293,7 @@ describe('DeliveriesPage', () => {
   it('filters deliveries by event id', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -309,7 +310,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockResolvedValueOnce(MOCK_LARGE_RESPONSE);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -324,7 +325,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockResolvedValueOnce(MOCK_LARGE_RESPONSE);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -352,7 +353,7 @@ describe('DeliveriesPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -378,7 +379,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockResolvedValueOnce(MOCK_LARGE_RESPONSE);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -399,7 +400,7 @@ describe('DeliveriesPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -441,7 +442,7 @@ describe('DeliveriesPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -454,7 +455,7 @@ describe('DeliveriesPage', () => {
   it('shows View Details button for each delivery', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -468,7 +469,7 @@ describe('DeliveriesPage', () => {
   it('displays event tags', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -481,7 +482,7 @@ describe('DeliveriesPage', () => {
   it('displays truncated delivery IDs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -494,7 +495,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -507,7 +508,7 @@ describe('DeliveriesPage', () => {
     mockWebhooksList.mockRejectedValueOnce(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -532,7 +533,7 @@ describe('DeliveriesPage', () => {
   it('displays green status for 2xx response', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -545,7 +546,7 @@ describe('DeliveriesPage', () => {
   it('displays red status for 5xx response', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -558,7 +559,7 @@ describe('DeliveriesPage', () => {
   it('renders table headers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -571,7 +572,7 @@ describe('DeliveriesPage', () => {
     // d323456789012 has no response_status
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -583,7 +584,7 @@ describe('DeliveriesPage', () => {
   it('displays formatted timestamps', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     await waitFor(() => {
@@ -594,7 +595,7 @@ describe('DeliveriesPage', () => {
 
   it('sends filter=all by default (no status param)', async () => {
     await act(async () => {
-      render(React.createElement(DeliveriesPage));
+      renderWithProviders(React.createElement(DeliveriesPage));
     });
     expect(mockWebhooksList).toHaveBeenCalledWith('test-token', expect.objectContaining({
       page: 1,
@@ -605,7 +606,7 @@ describe('DeliveriesPage', () => {
   it('renders subtitle text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('deliveries.subtitle');
@@ -614,7 +615,7 @@ describe('DeliveriesPage', () => {
   it('renders search placeholder', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DeliveriesPage));
+      const result = renderWithProviders(React.createElement(DeliveriesPage));
       container = result.container;
     });
     const searchInput = container!.querySelector('input[type="text"]')!;

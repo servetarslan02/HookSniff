@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -57,7 +58,7 @@ const mockEndpoints = [
 
 /** Helper: render page, wait for endpoints to load, select ep1 */
 async function renderWithEndpoint() {
-  const result = render(React.createElement(SendWebhookPage));
+  const result = renderWithProviders(React.createElement(SendWebhookPage));
   const { container } = result;
   // Wait for endpoint options to load
   await waitFor(() => {
@@ -80,32 +81,32 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('renders without crashing', () => {
-    render(React.createElement(SendWebhookPage));
+    renderWithProviders(React.createElement(SendWebhookPage));
   });
 
   it('displays title', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.title');
   });
 
   it('renders configuration section', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.configuration');
   });
 
   it('renders response section', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.responseTitle');
   });
 
   it('renders endpoint selector', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const select = container.querySelector('select');
     expect(select).toBeTruthy();
   });
 
   it('populates endpoint options', async () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
       const options = Array.from(select.options).map((o) => o.value);
@@ -115,29 +116,29 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('shows placeholder option', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.selectEndpoint');
   });
 
   it('renders event type input', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('Event Type');
   });
 
   it('renders payload textarea', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const textarea = container.querySelector('textarea');
     expect(textarea).toBeTruthy();
   });
 
   it('has default payload', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
     expect(textarea.value).toContain('Hello from HookSniff');
   });
 
   it('allows editing payload', async () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
     await act(async () => {
       fireEvent.change(textarea, { target: { value: '{"key": "value"}' } });
@@ -146,7 +147,7 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('shows error for invalid JSON', async () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
     await act(async () => {
       fireEvent.change(textarea, { target: { value: 'not json' } });
@@ -157,7 +158,7 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('clears error for valid JSON', async () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
     await act(async () => {
       fireEvent.change(textarea, { target: { value: 'invalid' } });
@@ -169,12 +170,12 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('renders send button', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.sendWebhook');
   });
 
   it('disables send when no endpoint selected', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     const sendButton = Array.from(container.querySelectorAll('button')).find(
       (b) => b.textContent?.includes('webhooks.sendWebhook')
     );
@@ -270,7 +271,7 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('shows empty response state initially', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('webhooks.sendToSeeResponse');
   });
 
@@ -299,7 +300,7 @@ describe('SendWebhookPage — Extended Coverage', () => {
   });
 
   it('renders payload label', () => {
-    const { container } = render(React.createElement(SendWebhookPage));
+    const { container } = renderWithProviders(React.createElement(SendWebhookPage));
     expect(container.textContent).toContain('Payload (JSON)');
   });
 });

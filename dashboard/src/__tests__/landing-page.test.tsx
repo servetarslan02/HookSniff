@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -64,14 +65,14 @@ describe('LandingPage', () => {
 
   it('renders without crashing', () => {
     act(() => {
-      render(React.createElement(LandingPage));
+      renderWithProviders(React.createElement(LandingPage));
     });
   });
 
   it('displays landing page content', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('HookSniff');
@@ -80,7 +81,7 @@ describe('LandingPage', () => {
   it('renders navigation with HookSniff branding', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     const nav = container.querySelector('nav');
@@ -91,7 +92,7 @@ describe('LandingPage', () => {
   it('renders feature sections', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.features');
@@ -106,7 +107,7 @@ describe('LandingPage', () => {
   it('renders hero section', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.hero.title');
@@ -117,7 +118,7 @@ describe('LandingPage', () => {
   it('renders CTA buttons', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.hero.cta');
@@ -132,7 +133,7 @@ describe('LandingPage', () => {
   it('renders pricing section', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.pricing');
@@ -147,7 +148,7 @@ describe('LandingPage', () => {
   it('renders how it works section', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.howItWorks');
@@ -159,7 +160,7 @@ describe('LandingPage', () => {
   it('renders footer with links', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.footer');
@@ -173,7 +174,7 @@ describe('LandingPage', () => {
   it('renders navigation links', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.nav.features');
@@ -186,7 +187,7 @@ describe('LandingPage', () => {
   it('renders dashboard preview mockup', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     // Dashboard preview contains stats
@@ -198,7 +199,7 @@ describe('LandingPage', () => {
   it('renders code example section', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('send-webhook.sh');
@@ -208,7 +209,7 @@ describe('LandingPage', () => {
   it('renders most popular pricing badge', () => {
     let result: any;
     act(() => {
-      result = render(React.createElement(LandingPage));
+      result = renderWithProviders(React.createElement(LandingPage));
     });
     const { container } = result;
     expect(container.textContent).toContain('landing.pricing.mostPopular');

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -102,13 +103,13 @@ describe('AdminUserDetailPage - Extended', () => {
   // --- Basic Rendering ---
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(AdminUserDetailPage));
+      renderWithProviders(React.createElement(AdminUserDetailPage));
     });
   });
 
   it('fetches user detail on mount', async () => {
     await act(async () => {
-      render(React.createElement(AdminUserDetailPage));
+      renderWithProviders(React.createElement(AdminUserDetailPage));
     });
     expect(mockGetUserDetail).toHaveBeenCalledWith('test-token', 'user-123');
   });
@@ -116,7 +117,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays user name as title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Test User');
@@ -125,7 +126,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays "User Detail" subtitle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('User Detail');
@@ -134,7 +135,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays user email', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('test@example.com');
@@ -143,7 +144,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays user ID', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('user-123');
@@ -152,7 +153,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays user status via StatusBadge', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const badges = container!.querySelectorAll('[data-testid="status-badge"]');
@@ -163,7 +164,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays created date', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('2024');
@@ -173,7 +174,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders User Info section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('User Info');
@@ -182,7 +183,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders ID label and value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const labels = container!.querySelectorAll('label');
@@ -193,7 +194,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders Email label and value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const labels = container!.querySelectorAll('label');
@@ -204,7 +205,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders Name label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const labels = container!.querySelectorAll('label');
@@ -219,7 +220,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     // Should show — for empty name
@@ -231,7 +232,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders Management section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Management');
@@ -240,7 +241,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('shows plan selector with current plan', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -251,7 +252,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('plan selector has all plan options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -262,7 +263,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('Update button is disabled when plan unchanged', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const updateBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Update');
@@ -273,7 +274,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('Update button enables when plan is changed', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -287,7 +288,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('calls updateUserPlan when Update is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -304,7 +305,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('shows success toast after plan update', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -321,7 +322,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('refetches detail after plan update', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const callsBefore = mockGetUserDetail.mock.calls.length;
@@ -340,7 +341,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockUpdateUserPlan.mockRejectedValue(new Error('fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -358,7 +359,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('shows "Ban User" button for active users', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const banBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Ban User');
@@ -372,7 +373,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const activateBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Activate User');
@@ -382,7 +383,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('calls updateUserStatus when Ban User is clicked', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const banBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Ban User')!;
@@ -399,7 +400,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const activateBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Activate User')!;
@@ -412,7 +413,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('shows toast after status toggle', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const banBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Ban User')!;
@@ -426,7 +427,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockUpdateUserStatus.mockRejectedValue(new Error('fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const banBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent === 'Ban User')!;
@@ -440,7 +441,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays total deliveries', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Total Deliveries');
@@ -450,7 +451,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays success rate', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Success Rate');
@@ -460,7 +461,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('displays endpoints count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Endpoints');
@@ -474,7 +475,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('0');
@@ -484,7 +485,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders Endpoints section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const headings = Array.from(container!.querySelectorAll('h2'));
@@ -495,7 +496,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders endpoint URLs', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('https://example.com/webhook');
@@ -505,7 +506,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders endpoint active/inactive status', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Active');
@@ -519,7 +520,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No endpoints');
@@ -532,7 +533,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No endpoints');
@@ -542,7 +543,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders Recent Deliveries section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Recent Deliveries');
@@ -551,7 +552,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders delivery table headers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const headers = Array.from(container!.querySelectorAll('th')).map(h => h.textContent);
@@ -565,7 +566,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders delivery data rows', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('order.created');
@@ -575,7 +576,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders attempt count', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     // attempt_count values are 1 and 3
@@ -590,7 +591,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No deliveries');
@@ -603,7 +604,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No deliveries');
@@ -613,7 +614,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('renders back button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const backBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Back'));
@@ -623,7 +624,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('navigates to users list on back click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const backBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Back'))!;
@@ -638,7 +639,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockGetUserDetail.mockReturnValue(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.querySelector('.animate-pulse')).toBeTruthy();
@@ -648,7 +649,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockGetUserDetail.mockReturnValue(new Promise(() => {}));
     let container: HTMLElement;
     act(() => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).not.toContain('Test User');
@@ -660,7 +661,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockGetUserDetail.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('User Not Found');
@@ -670,7 +671,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockGetUserDetail.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Back to Users');
@@ -680,7 +681,7 @@ describe('AdminUserDetailPage - Extended', () => {
     mockGetUserDetail.mockResolvedValue(null);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const backLink = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Back to Users'));
@@ -694,7 +695,7 @@ describe('AdminUserDetailPage - Extended', () => {
   it('shows error toast when fetch fails', async () => {
     mockGetUserDetail.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(AdminUserDetailPage));
+      renderWithProviders(React.createElement(AdminUserDetailPage));
     });
     expect(mockToastFn).toHaveBeenCalledWith('Failed to load user details', 'error');
   });
@@ -707,7 +708,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     const badges = container!.querySelectorAll('[data-testid="status-badge"]');
@@ -722,7 +723,7 @@ describe('AdminUserDetailPage - Extended', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(AdminUserDetailPage));
+      const result = renderWithProviders(React.createElement(AdminUserDetailPage));
       container = result.container;
     });
     // h1 should contain the email

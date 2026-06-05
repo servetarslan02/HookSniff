@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -64,7 +65,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('endpoints.title');
@@ -74,7 +75,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
   it('renders all endpoints', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('https://api.example.com/webhook');
@@ -86,7 +87,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
   it('renders endpoint descriptions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Production webhook');
@@ -97,7 +98,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
   it('renders status indicators', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       // Endpoints page shows status as text or badge
@@ -109,7 +110,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
     mockEndpointsList.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       // Page renders with title but no endpoint rows
@@ -123,7 +124,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
     mockEndpointsList.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       // Page still renders
@@ -134,7 +135,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
   it('navigates to endpoint detail on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(EndpointsPage)).container;
+      container = renderWithProviders(React.createElement(EndpointsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('https://api.example.com/webhook');
@@ -162,7 +163,7 @@ describe('EndpointsPage - Ultra Coverage', () => {
     }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/endpoints/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockEndpointsList).not.toHaveBeenCalled();
   });

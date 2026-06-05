@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -123,14 +124,14 @@ describe('DashboardOverview', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     expect(mockStatsApiGet).toHaveBeenCalled();
   });
 
   it('fetches stats on mount', async () => {
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     expect(mockStatsApiGet).toHaveBeenCalledWith('test-token');
     expect(mockWebhooksApiList).toHaveBeenCalledWith('test-token', { page: 1 });
@@ -139,7 +140,7 @@ describe('DashboardOverview', () => {
   it('renders stat cards after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     // StatCard mocks render their labels
@@ -151,7 +152,7 @@ describe('DashboardOverview', () => {
   it('renders time range selector', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     expect(container!.textContent).toContain('timeRange.24h');
@@ -162,7 +163,7 @@ describe('DashboardOverview', () => {
   it('renders recent deliveries section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(DashboardOverview));
+      const result = renderWithProviders(React.createElement(DashboardOverview));
       container = result.container;
     });
     expect(container!.textContent).toContain('recentDeliveries');
@@ -173,7 +174,7 @@ describe('DashboardOverview', () => {
     mockWebhooksApiList.mockRejectedValueOnce(new Error('Network error'));
 
     await act(async () => {
-      render(React.createElement(DashboardOverview));
+      renderWithProviders(React.createElement(DashboardOverview));
     });
     // Should not throw
   });

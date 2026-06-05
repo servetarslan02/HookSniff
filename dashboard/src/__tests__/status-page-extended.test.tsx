@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -175,7 +176,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders all healthy components', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('API');
@@ -190,7 +191,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders component descriptions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('REST API');
@@ -201,7 +202,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders latency values for each component', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('45ms');
@@ -212,7 +213,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders uptime percentages', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('99.99%');
@@ -222,7 +223,7 @@ describe('StatusPage - Extended Tests', () => {
   it('shows operational banner when all healthy', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('All Systems Operational');
@@ -240,7 +241,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Some Systems Degraded');
@@ -258,7 +259,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Major Outage Detected');
@@ -276,7 +277,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Degraded');
@@ -293,7 +294,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Down');
@@ -310,7 +311,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Unknown');
@@ -321,7 +322,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders incidents when present', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('API Latency Spike');
@@ -331,7 +332,7 @@ describe('StatusPage - Extended Tests', () => {
   it('shows incident severity labels', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('minor');
@@ -341,7 +342,7 @@ describe('StatusPage - Extended Tests', () => {
   it('shows incident status badges', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     // Both incidents are resolved
@@ -353,7 +354,7 @@ describe('StatusPage - Extended Tests', () => {
   it('expands incident details on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
 
@@ -372,7 +373,7 @@ describe('StatusPage - Extended Tests', () => {
   it('collapses incident on second click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
 
@@ -394,7 +395,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No incidents in the past 30 days');
@@ -405,7 +406,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders scheduled maintenance', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Database Migration');
@@ -415,7 +416,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders completed maintenance', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Cache Upgrade');
@@ -424,7 +425,7 @@ describe('StatusPage - Extended Tests', () => {
   it('shows affected components for maintenance', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     // Upcoming maintenance shows "Affects: ..."
@@ -438,7 +439,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No scheduled maintenance');
@@ -449,7 +450,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders uptime bar section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Overall Uptime');
@@ -459,7 +460,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders 30-day uptime bar with history data', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     // Should show "30 days ago" and "Today" labels
@@ -470,7 +471,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders 90-day uptime calendar when history is available', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Uptime — Last 90 Days');
@@ -481,7 +482,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     // Should still show uptime from data
@@ -494,7 +495,7 @@ describe('StatusPage - Extended Tests', () => {
     const setIntervalSpy = vi.spyOn(global, 'setInterval');
 
     await act(async () => {
-      render(React.createElement(StatusPage));
+      renderWithProviders(React.createElement(StatusPage));
     });
 
     expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 30000);
@@ -506,7 +507,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let unmount: () => void;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       unmount = result.unmount;
     });
 
@@ -517,7 +518,7 @@ describe('StatusPage - Extended Tests', () => {
 
   it('refreshes data when interval fires', async () => {
     await act(async () => {
-      render(React.createElement(StatusPage));
+      renderWithProviders(React.createElement(StatusPage));
     });
 
     const initialCalls = mockFetch.mock.calls.length;
@@ -549,7 +550,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('showing cached data');
@@ -560,7 +561,7 @@ describe('StatusPage - Extended Tests', () => {
   it('has a refresh button in the status banner', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
 
@@ -573,7 +574,7 @@ describe('StatusPage - Extended Tests', () => {
   it('refresh button calls router.refresh()', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
 
@@ -591,7 +592,7 @@ describe('StatusPage - Extended Tests', () => {
     // Don't resolve fetch immediately
     mockFetch.mockImplementation(() => new Promise(() => {}));
 
-    const { container } = render(React.createElement(StatusPage));
+    const { container } = renderWithProviders(React.createElement(StatusPage));
     expect(container.textContent).toContain('Loading status');
   });
 
@@ -602,7 +603,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Major Outage Detected');
@@ -613,7 +614,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Unknown');
@@ -626,7 +627,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders navigation bar', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('HookSniff');
@@ -636,7 +637,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders subscribe button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Subscribe to updates');
@@ -645,7 +646,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders LanguageSwitcher', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('LanguageSwitcher');
@@ -654,7 +655,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders footer with version info', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Powered by HookSniff monitoring');
@@ -664,7 +665,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders doc and home links in footer', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     const links = Array.from(container!.querySelectorAll('a'));
@@ -679,7 +680,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders sparkline for components with response times', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     // Sparkline renders as a div with h-6 class and child bars
@@ -692,7 +693,7 @@ describe('StatusPage - Extended Tests', () => {
   it('renders all major sections', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Overall Uptime');
@@ -717,7 +718,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
 
@@ -737,7 +738,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Cache');
@@ -754,7 +755,7 @@ describe('StatusPage - Extended Tests', () => {
 
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(StatusPage));
+      const result = renderWithProviders(React.createElement(StatusPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Worker');

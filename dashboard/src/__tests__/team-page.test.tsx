@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -76,13 +77,13 @@ describe('TeamPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(TeamPage));
+      renderWithProviders(React.createElement(TeamPage));
     });
   });
 
   it('fetches teams on mount', async () => {
     await act(async () => {
-      render(React.createElement(TeamPage));
+      renderWithProviders(React.createElement(TeamPage));
     });
     expect(mockTeamsList).toHaveBeenCalledWith('test-token');
   });
@@ -90,7 +91,7 @@ describe('TeamPage', () => {
   it('displays page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('team.title');
@@ -99,7 +100,7 @@ describe('TeamPage', () => {
   it('displays team names from API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Team Alpha');
@@ -109,7 +110,7 @@ describe('TeamPage', () => {
   it('displays team descriptions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Alpha team desc');
@@ -118,7 +119,7 @@ describe('TeamPage', () => {
   it('displays member counts', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('3 members');
@@ -130,7 +131,7 @@ describe('TeamPage', () => {
     // Make fetch hang
     mockTeamsList.mockReturnValue(new Promise(() => {}));
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Loading teams...');
@@ -140,7 +141,7 @@ describe('TeamPage', () => {
     mockTeamsList.mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('team.noTeams');
@@ -149,7 +150,7 @@ describe('TeamPage', () => {
   it('handles fetch teams error', async () => {
     mockTeamsList.mockRejectedValueOnce(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(TeamPage));
+      renderWithProviders(React.createElement(TeamPage));
     });
     expect(mockToast).toHaveBeenCalledWith('Failed to load teams', 'error');
   });
@@ -157,7 +158,7 @@ describe('TeamPage', () => {
   it('selects a team and fetches members', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     // Click on first team
@@ -173,7 +174,7 @@ describe('TeamPage', () => {
   it('displays members after selecting team', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -191,7 +192,7 @@ describe('TeamPage', () => {
   it('displays member roles in select dropdowns', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -208,7 +209,7 @@ describe('TeamPage', () => {
     mockTeamsListMembers.mockResolvedValueOnce([]);
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -224,7 +225,7 @@ describe('TeamPage', () => {
     mockTeamsListMembers.mockRejectedValueOnce(new Error('Fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -239,7 +240,7 @@ describe('TeamPage', () => {
   it('shows "Select a team" placeholder when no team selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Select a team to view details');
@@ -248,7 +249,7 @@ describe('TeamPage', () => {
   it('opens create team modal', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const createBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Create Team'));
@@ -263,7 +264,7 @@ describe('TeamPage', () => {
   it('fills and submits create team form', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     // Open modal
@@ -297,7 +298,7 @@ describe('TeamPage', () => {
   it('closes create modal on cancel', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const createBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Create Team'));
@@ -315,7 +316,7 @@ describe('TeamPage', () => {
     mockTeamsCreate.mockRejectedValueOnce(new Error('API Error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const createBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Create Team'));
@@ -338,7 +339,7 @@ describe('TeamPage', () => {
   it('disables create button when name is empty', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const createBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Create Team'));
@@ -352,7 +353,7 @@ describe('TeamPage', () => {
   it('opens invite modal after selecting team', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     // Select team
@@ -372,7 +373,7 @@ describe('TeamPage', () => {
   it('fills and submits invite form', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     // Select team
@@ -408,7 +409,7 @@ describe('TeamPage', () => {
     mockTeamsInviteMember.mockRejectedValueOnce(new Error('Invite failed'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -435,7 +436,7 @@ describe('TeamPage', () => {
   it('disables invite button when email is empty', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -453,7 +454,7 @@ describe('TeamPage', () => {
   it('closes invite modal on cancel', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -474,7 +475,7 @@ describe('TeamPage', () => {
   it('changes member role', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -496,7 +497,7 @@ describe('TeamPage', () => {
     mockTeamsUpdateRole.mockRejectedValueOnce(new Error('Role error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -519,7 +520,7 @@ describe('TeamPage', () => {
   it('removes a member', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -542,7 +543,7 @@ describe('TeamPage', () => {
     mockTeamsRemoveMember.mockRejectedValueOnce(new Error('Remove error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -565,7 +566,7 @@ describe('TeamPage', () => {
   it('highlights selected team in list', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -579,7 +580,7 @@ describe('TeamPage', () => {
   it('refreshes teams after creating a team', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const createBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Create Team'));
@@ -603,7 +604,7 @@ describe('TeamPage', () => {
   it('refreshes members after inviting', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -631,7 +632,7 @@ describe('TeamPage', () => {
   it('shows invite modal role options (admin, member only - no owner)', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));
@@ -655,7 +656,7 @@ describe('TeamPage', () => {
   it('displays joined dates for members', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TeamPage));
+      const result = renderWithProviders(React.createElement(TeamPage));
       container = result.container;
     });
     const teamButton = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('Team Alpha'));

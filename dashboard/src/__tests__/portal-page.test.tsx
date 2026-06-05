@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -55,28 +56,28 @@ describe('PortalPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(PortalPage));
+      renderWithProviders(React.createElement(PortalPage));
     });
   });
 
   it('displays portal title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Customer Portal');
   });
 
   it('shows loading state initially', () => {
-    const { container } = render(React.createElement(PortalPage));
+    const { container } = renderWithProviders(React.createElement(PortalPage));
     expect(container.textContent).toContain('Loading...');
   });
 
   it('displays profile after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Profile');
@@ -86,7 +87,7 @@ describe('PortalPage', () => {
   it('displays usage after loading', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(PortalPage));
+      const result = renderWithProviders(React.createElement(PortalPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Usage');

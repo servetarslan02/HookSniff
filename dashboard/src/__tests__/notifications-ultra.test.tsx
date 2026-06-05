@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -56,7 +57,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('notifications.title');
@@ -66,7 +67,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders subtitle text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Stay updated on webhook events');
@@ -76,7 +77,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders Mark all as read button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Mark all as read');
@@ -87,7 +88,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading indicator initially', () => {
     mockList.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(NotificationsPage));
+    const { container } = renderWithProviders(React.createElement(NotificationsPage));
     expect(container.textContent).toContain('Loading notifications');
   });
 
@@ -96,7 +97,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     mockList.mockResolvedValue({ notifications: [], total: 0 });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('notifications.noNotifications');
@@ -108,7 +109,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders all notifications', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Webhook Failed');
@@ -121,7 +122,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders notification messages', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delivery to endpoint failed');
@@ -132,7 +133,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders type icons correctly', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔴'); // webhook_failed
@@ -145,7 +146,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('shows unread indicator for unread notifications', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const dots = container.querySelectorAll('.bg-brand-500.rounded-full');
@@ -156,7 +157,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('shows "Mark read" button only for unread notifications', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const markReadBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'Mark read');
@@ -167,7 +168,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('shows "Delete" button for all notifications', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const deleteBtns = Array.from(container.querySelectorAll('button')).filter(b => b.textContent === 'Delete');
@@ -178,7 +179,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders timestamps', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('2024');
@@ -188,7 +189,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders type badges', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('webhook failed');
@@ -202,7 +203,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders type filter buttons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('All');
@@ -216,7 +217,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('sends type filter to API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Alerts');
@@ -235,7 +236,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('renders read filter buttons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const btns = Array.from(container.querySelectorAll('button'));
@@ -249,7 +250,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('sends read filter to API', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Unread');
@@ -268,7 +269,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('marks single notification as read', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Mark read');
@@ -283,7 +284,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('marks all notifications as read', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Mark all as read');
@@ -301,7 +302,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('deletes notification on Delete click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delete');
@@ -320,7 +321,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('shows toast on fetch failure', async () => {
     mockList.mockRejectedValue(new Error('Network error'));
     await act(async () => {
-      render(React.createElement(NotificationsPage));
+      renderWithProviders(React.createElement(NotificationsPage));
     });
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith('Failed to load notifications', 'error');
@@ -331,7 +332,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     mockMarkAsRead.mockRejectedValue(new Error('Failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Mark read');
@@ -349,7 +350,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     mockMarkAllAsRead.mockRejectedValue(new Error('Failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Mark all as read');
@@ -367,7 +368,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     mockDeleteNotification.mockRejectedValue(new Error('Failed'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delete');
@@ -393,7 +394,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
     }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/notifications/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockList).not.toHaveBeenCalled();
   });
@@ -402,7 +403,7 @@ describe('NotificationsPage - Ultra Coverage', () => {
   it('applies unread background styling', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(NotificationsPage)).container;
+      container = renderWithProviders(React.createElement(NotificationsPage)).container;
     });
     await waitFor(() => {
       const unreadItems = container.querySelectorAll('.bg-brand-50\\/30, .dark\\:bg-brand-500\\/5');

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -41,7 +42,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading skeleton initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(RetryPolicyPage));
+    const { container } = renderWithProviders(React.createElement(RetryPolicyPage));
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
 
@@ -49,7 +50,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders page header with emoji', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔄');
@@ -60,7 +61,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Configure global retry behavior');
@@ -70,7 +71,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders save button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const saveBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Save Changes');
@@ -82,7 +83,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders retry settings section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Retry Settings');
@@ -97,7 +98,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('populates max attempts from API data', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const input = container.querySelector('input[type="number"][min="1"][max="20"]') as HTMLInputElement;
@@ -110,7 +111,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders backoff options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Exponential');
@@ -122,7 +123,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders backoff descriptions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delay doubles each attempt');
@@ -134,7 +135,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('selects exponential backoff by default', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const radios = container.querySelectorAll('input[type="radio"][name="backoff"]') as NodeListOf<HTMLInputElement>;
@@ -145,7 +146,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('backoff radio buttons are rendered with correct values', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const radios = container.querySelectorAll('input[type="radio"][name="backoff"]');
@@ -160,7 +161,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders DLQ section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Dead Letter Queue');
@@ -171,7 +172,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('DLQ is enabled by default', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const dlqCheckbox = container.querySelectorAll('input[type="checkbox"]')[0] as HTMLInputElement;
@@ -182,7 +183,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('shows max age hours when DLQ enabled', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Max Age');
@@ -194,7 +195,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders status code checkboxes', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Retry on Status Codes');
@@ -210,7 +211,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('all status codes checked by default', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -225,7 +226,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('toggles status code on click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('408');
@@ -242,7 +243,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders delay preview section', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Delay Preview');
@@ -253,7 +254,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders total retry time', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Total retry time');
@@ -263,7 +264,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
   it('renders tip about per-endpoint overrides', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Per-endpoint retry policies override');
@@ -279,7 +280,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
       .mockResolvedValueOnce({}); // ep_2 save
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Save Changes');
@@ -298,7 +299,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       // Should still render with defaults
@@ -316,7 +317,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/retry-policy/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -326,7 +327,7 @@ describe('RetryPolicyPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue([]);
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(RetryPolicyPage)).container;
+      container = renderWithProviders(React.createElement(RetryPolicyPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Retry Policy');

@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -64,13 +65,13 @@ describe('SendWebhookPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(SendWebhookPage));
+      renderWithProviders(React.createElement(SendWebhookPage));
     });
   });
 
   it('fetches endpoints on mount', async () => {
     await act(async () => {
-      render(React.createElement(SendWebhookPage));
+      renderWithProviders(React.createElement(SendWebhookPage));
     });
     expect(mockEndpointsList).toHaveBeenCalledWith('test-token');
   });
@@ -78,7 +79,7 @@ describe('SendWebhookPage', () => {
   it('displays page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('webhooks.title');
@@ -87,7 +88,7 @@ describe('SendWebhookPage', () => {
   it('renders endpoint selector with options', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select');
@@ -102,7 +103,7 @@ describe('SendWebhookPage', () => {
   it('renders event type input', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const inputs = container!.querySelectorAll('input[type="text"]');
@@ -113,7 +114,7 @@ describe('SendWebhookPage', () => {
   it('renders payload textarea with default value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const textarea = container!.querySelector('textarea');
@@ -124,7 +125,7 @@ describe('SendWebhookPage', () => {
   it('renders send button', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('sendWebhook');
@@ -133,7 +134,7 @@ describe('SendWebhookPage', () => {
   it('renders response panel with empty state', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('responseTitle');
@@ -143,7 +144,7 @@ describe('SendWebhookPage', () => {
   it('disables send button when no endpoint selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const sendBtn = Array.from(container!.querySelectorAll('button')).find(b => b.textContent?.includes('sendWebhook'));
@@ -154,7 +155,7 @@ describe('SendWebhookPage', () => {
   it('enables send button when endpoint is selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -168,7 +169,7 @@ describe('SendWebhookPage', () => {
   it('sends webhook successfully', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     // Select endpoint
@@ -191,7 +192,7 @@ describe('SendWebhookPage', () => {
   it('sends webhook with event type', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     // Set event type
@@ -219,7 +220,7 @@ describe('SendWebhookPage', () => {
   it('shows success toast on successful send', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -236,7 +237,7 @@ describe('SendWebhookPage', () => {
   it('displays response after successful send', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -255,7 +256,7 @@ describe('SendWebhookPage', () => {
     mockWebhooksCreate.mockRejectedValue(new Error('API error'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -273,7 +274,7 @@ describe('SendWebhookPage', () => {
     mockWebhooksCreate.mockRejectedValue(new Error('Server down'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -290,7 +291,7 @@ describe('SendWebhookPage', () => {
   it('shows JSON validation error for invalid payload', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const textarea = container!.querySelector('textarea') as HTMLTextAreaElement;
@@ -303,7 +304,7 @@ describe('SendWebhookPage', () => {
   it('clears JSON validation error when valid JSON entered', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const textarea = container!.querySelector('textarea') as HTMLTextAreaElement;
@@ -321,7 +322,7 @@ describe('SendWebhookPage', () => {
   it('shows invalid JSON toast when send with bad payload', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     // Enter invalid JSON
@@ -347,7 +348,7 @@ describe('SendWebhookPage', () => {
   it('does not call create when no endpoint selected', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     // Button should be disabled
@@ -359,7 +360,7 @@ describe('SendWebhookPage', () => {
     mockEndpointsList.mockRejectedValue(new Error('fail'));
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select');
@@ -370,7 +371,7 @@ describe('SendWebhookPage', () => {
     mockWebhooksCreate.mockReturnValue(new Promise(() => {})); // never resolves
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const select = container!.querySelector('select') as HTMLSelectElement;
@@ -388,7 +389,7 @@ describe('SendWebhookPage', () => {
   it('updates payload textarea value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const textarea = container!.querySelector('textarea') as HTMLTextAreaElement;
@@ -401,7 +402,7 @@ describe('SendWebhookPage', () => {
   it('updates event type input value', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     const eventInput = container!.querySelector('input[type="text"]') as HTMLInputElement;
@@ -414,7 +415,7 @@ describe('SendWebhookPage', () => {
   it('renders configuration section header', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('configuration');
@@ -423,7 +424,7 @@ describe('SendWebhookPage', () => {
   it('renders Endpoint label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Endpoint');
@@ -432,7 +433,7 @@ describe('SendWebhookPage', () => {
   it('renders Payload (JSON) label', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(SendWebhookPage));
+      const result = renderWithProviders(React.createElement(SendWebhookPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Payload (JSON)');

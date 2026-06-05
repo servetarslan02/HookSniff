@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -37,7 +38,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   // === Loading State ===
   it('shows loading spinner initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(AuditLogPage));
+    const { container } = renderWithProviders(React.createElement(AuditLogPage));
     expect(container.querySelector('.animate-spin')).toBeTruthy();
     expect(container.textContent).toContain('Loading audit log');
   });
@@ -46,7 +47,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders page header with emoji', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📋');
@@ -57,7 +58,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders description text', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Track all activity');
@@ -69,7 +70,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders filter dropdown', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select');
@@ -82,7 +83,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('filter options have correct values', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const select = container.querySelector('select') as HTMLSelectElement;
@@ -102,7 +103,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders table headers', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const headers = container.querySelectorAll('th');
@@ -120,7 +121,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders all entries', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr');
@@ -131,7 +132,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders action names', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('auth.login');
@@ -143,7 +144,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders actor emails', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('admin@test.com');
@@ -154,7 +155,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders resource type and ID (truncated)', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       // resource_id is sliced to 8 chars: user_1ab, ep_12345
@@ -166,7 +167,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders IP addresses', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('192.168.1.1');
@@ -177,7 +178,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders timestamps', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('2024');
@@ -187,7 +188,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('renders action icons', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('🔑'); // auth.login
@@ -200,7 +201,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('shows load more button when has_more is true', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const loadMoreBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Load more');
@@ -212,7 +213,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ entries: MOCK_ENTRIES, has_more: false });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       const loadMoreBtn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === 'Load more');
@@ -223,7 +224,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
   it('loads more entries on button click', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Load more');
@@ -246,7 +247,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ entries: [], has_more: false });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No activity yet');
@@ -259,7 +260,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Not found'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       // Should show empty state
@@ -276,7 +277,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/audit-log/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
@@ -289,7 +290,7 @@ describe('AuditLogPage - Ultra Coverage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(AuditLogPage)).container;
+      container = renderWithProviders(React.createElement(AuditLogPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📌'); // default icon

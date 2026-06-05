@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -35,14 +36,14 @@ describe('TemplatesPage - Ultra Coverage', () => {
 
   it('shows loading initially', () => {
     mockApiFetch.mockReturnValue(new Promise(() => {}));
-    const { container } = render(React.createElement(TemplatesPage));
+    const { container } = renderWithProviders(React.createElement(TemplatesPage));
     expect(container.textContent).toContain('Loading');
   });
 
   it('renders page title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('📦');
@@ -53,7 +54,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
   it('renders all templates', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('E-commerce Order');
@@ -64,7 +65,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
   it('renders template descriptions', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Order created webhook template');
@@ -75,7 +76,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
   it('renders tags', async () => {
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('ecommerce');
@@ -87,7 +88,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
     mockApiFetch.mockResolvedValue({ templates: [] });
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('No templates');
@@ -98,7 +99,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
     mockApiFetch.mockRejectedValue(new Error('Error'));
     let container: HTMLElement;
     await act(async () => {
-      container = render(React.createElement(TemplatesPage)).container;
+      container = renderWithProviders(React.createElement(TemplatesPage)).container;
     });
     await waitFor(() => {
       expect(container.textContent).toContain('Templates');
@@ -113,7 +114,7 @@ describe('TemplatesPage - Ultra Coverage', () => {
     vi.doMock('@/lib/api', () => ({ apiFetch: (...args: unknown[]) => mockApiFetch(...args) }));
     const { default: PageNoToken } = await import('@/app/[locale]/[username]/templates/page');
     await act(async () => {
-      render(React.createElement(PageNoToken));
+      renderWithProviders(React.createElement(PageNoToken));
     });
     expect(mockApiFetch).not.toHaveBeenCalled();
   });

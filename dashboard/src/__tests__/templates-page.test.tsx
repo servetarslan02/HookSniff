@@ -1,3 +1,4 @@
+import { renderWithProviders } from './test-utils';
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
@@ -34,13 +35,13 @@ describe('TemplatesPage', () => {
 
   it('renders without crashing', async () => {
     await act(async () => {
-      render(React.createElement(TemplatesPage));
+      renderWithProviders(React.createElement(TemplatesPage));
     });
   });
 
   it('fetches templates on mount', async () => {
     await act(async () => {
-      render(React.createElement(TemplatesPage));
+      renderWithProviders(React.createElement(TemplatesPage));
     });
     expect(mockApiFetch).toHaveBeenCalledWith('/templates', { token: 'test-token' });
   });
@@ -48,7 +49,7 @@ describe('TemplatesPage', () => {
   it('displays templates title', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TemplatesPage));
+      const result = renderWithProviders(React.createElement(TemplatesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Templates');
@@ -57,7 +58,7 @@ describe('TemplatesPage', () => {
   it('shows empty state when no templates', async () => {
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TemplatesPage));
+      const result = renderWithProviders(React.createElement(TemplatesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('No templates available');
@@ -72,7 +73,7 @@ describe('TemplatesPage', () => {
     });
     let container: HTMLElement;
     await act(async () => {
-      const result = render(React.createElement(TemplatesPage));
+      const result = renderWithProviders(React.createElement(TemplatesPage));
       container = result.container;
     });
     expect(container!.textContent).toContain('Stripe Webhooks');
