@@ -174,7 +174,7 @@ ${Object.entries(headers)
             {/* AI Payload Generator */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                <Bot size={16} strokeWidth={1.75} className="inline mr-1" /> AI Payload Generator
+                <Bot size={16} strokeWidth={1.75} className="inline mr-1" /> {t('aiPayloadGenerator') || 'AI Payload Generator'}
               </label>
               <div className="flex flex-wrap gap-2">
                 {Object.keys(AI_PAYLOAD_TEMPLATES).map((eventType) => (
@@ -279,7 +279,7 @@ ${Object.entries(headers)
                 onClick={copyCurl}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
               >
-                <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> Copy
+                <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {tc('copy') || 'Copy'}
               </button>
             </div>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto">

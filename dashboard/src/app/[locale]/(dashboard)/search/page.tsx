@@ -62,7 +62,7 @@ export default function SearchPage() {
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">Search and filter your webhook delivery logs.</p>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle') || 'Search and filter your webhook delivery logs.'}</p>
       </div>
 
       <form onSubmit={handleSearch} className="glass-card p-4 sm:p-6">
@@ -82,7 +82,7 @@ export default function SearchPage() {
             </select>
           </div>
           <div>
-            <button type="submit" className="w-full px-4 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">Search</button>
+            <button type="submit" className="w-full px-4 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition">{t('search') || 'Search'}</button>
           </div>
         </div>
       </form>
