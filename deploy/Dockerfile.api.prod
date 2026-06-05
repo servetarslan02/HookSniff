@@ -8,7 +8,7 @@
 # ── Stage 1: Builder ──
 # Item 346: Pin to digest for reproducible builds. Example:
 #   FROM rust:1.95-bookworm@sha256:<digest> AS builder
-FROM rust:1.95-bookworm AS builder
+FROM rust:1.96-bookworm AS builder
 
 WORKDIR /app
 
