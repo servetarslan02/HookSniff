@@ -7606,20 +7606,30 @@
         "circuit_bandit": "Devre Stratejisi",
         "time_series": "Zaman Serisi Tahmini",
         "contextual_bandit": "Bağlamsal Strateji",
-        "drift_detector": "Sapma İzleyici"
+        "drift_detector": "Sapma İzleyici",
+        "latency_predictor": "Gecikme Tahmincisi",
+        "pattern_classifier": "Kalıp Sınıflandırıcı"
       },
       "healthStatuses": {
         "Healthy": "Saglikli",
         "Warning": "Dikkat Gerekli",
         "Critical": "Kritik Sorun",
         "Degraded": "Bozulmus",
-        "stale": "Güncel Değil"
+        "stale": "Güncel Değil",
+        "healthy": "Sağlıklı",
+        "warning": "Dikkat Gerekli",
+        "critical": "Kritik Sorun",
+        "degraded": "Bozulmuş"
       },
       "issues": {
         "model_stale": "Model güncel değil ({value})",
         "few_samples": "Yetersiz veri ({value} örnek)",
         "low_accuracy": "Düşük doğruluk ({value})",
-        "high_error": "Yüksek hata oranı"
+        "high_error": "Yüksek hata oranı",
+        "high_false_positive": "Çok fazla yanlış alarm ({value})",
+        "data_drift": "Veri kalıbı değişti",
+        "concept_drift": "Davranış kalıbı değişti",
+        "prediction_lag": "Tahminler gecikiyor"
       }
     },
     "abTest": {
@@ -7631,7 +7641,8 @@
       "statusLabels": {
         "running": "Devam Ediyor",
         "completed": "Tamamlandı",
-        "cancelled": "İptal"
+        "cancelled": "İptal",
+        "pending": "Bekliyor"
       },
       "testCount": "{n} test"
     },
@@ -7733,7 +7744,12 @@
     "step1Tip1": "webhooks.sirketiniz.com gibi bir alt alan adı kullanın",
     "step1Tip2": "Tam URL'yi yapıştırabilirsiniz — protokolü otomatik olarak kaldırırız",
     "step1Tip3": "Yalnızca size ait ve kontrol ettiğiniz alan adlarını kullanın.",
-    "step1After": "Ekledikten sonra yapılandırmanız gereken iki DNS kaydı göreceksiniz."
+    "step1After": "Ekledikten sonra yapılandırmanız gereken iki DNS kaydı göreceksiniz.",
+    "addYourDomain": "Alan adınızı ekleyin",
+    "addYourDomainDesc": "Dashboard > Custom Domain bölümüne gidin ve kullanmak istediğiniz alan adını girin.",
+    "useSubdomain": "webhooks.sirketiniz.com gibi bir alt alan adı kullanın",
+    "pasteFullUrl": "Tam URL’i yapıştırabilirsiniz - protokolü otomatik kaldırırız",
+    "afterAdding": "Ekledikten sonra yapılandırmanız gereken iki DNS kaydı görürsünüz."
   },
   "docsSso": {
     "title": "Tek Oturum Acma (SSO)",
@@ -7822,6 +7838,64 @@
     "testConnection": "Baglantiyi test et",
     "initiateLogin": "Giris baslat",
     "listProviders": "Saglayicilari listele",
-    "ssoApiReference": "API Referansı"
+    "ssoApiReference": "API Referansı",
+    "goToAzurePortal": "Azure Portal’a gidin",
+    "nameHookSniff": "HookSniff olarak adlandırın",
+    "redirectUri": "Yönlendirme URI’sı",
+    "copyApplicationId": "Uygulama Kimliğini kopyalayın",
+    "goToCertificates": "Sertifikalar bölümüne gidin",
+    "inHookSniffSso": "HookSniff SSO ayarlarında",
+    "clickSaveTestActivate": "Kaydet, Test Et ve Etkinleştir’e tıklayın",
+    "goToGoogleConsole": "Google Cloud Console’a gidin",
+    "applicationType": "Uygulama türü",
+    "authorizedRedirectUri": "Yetkili yönlendirme URI’sı",
+    "copyClientIdSecret": "Client ID ve Secret’ı kopyalayın",
+    "goToOktaAdmin": "Okta Admin Console’a gidin",
+    "signInMethod": "Giriş yöntemi",
+    "signInRedirectUri": "Giriş yönlendirme URI’sı",
+    "createNewRealm": "Yeni Realm oluşturun",
+    "goToClients": "Clients bölümüne gidin",
+    "clientType": "Müşteri türü",
+    "validRedirectUris": "Geçerli yönlendirme URI’leri",
+    "goToCredentialsTab": "Credentials sekmesine gidin",
+    "goToApplications": "Applications bölümüne gidin",
+    "setAcsUrl": "ACS URL’ı ayarlayın",
+    "setEntityId": "Entity ID’ı ayarlayın",
+    "copyMetadataUrl": "Metadata URL’ı kopyalayın",
+    "providerSaml": "Sağlayıcı SAML",
+    "metadataUrl": "Metadata URL",
+    "ssoUrl": "SSO URL",
+    "certificate": "Sertifika",
+    "domainVerificationFullDesc": "Alan adı doğrulaması, SSO yapılandırmasının doğruluğunu kanıtlar. TXT kaydı ekleyin ve doğrulayın.",
+    "afterAddingRecordDesc": "DNS yayılması 5-10 dakika sürebilir. Doğrulandıktan sonra SSO otomatik olarak etkinleşir."
+  },
+  "docsQuickstartPage": {
+    "createApiKey": "API anahtarı oluşturun",
+    "alwaysVerify": "Payload’ları işlemeden önce webhook imzalarını her zaman doğrulayın.",
+    "createApiKeyBtn": "API Anahtarı Oluştur"
+  },
+  "docsSelfHosting": {
+    "dockerComposeInstalled": "Docker ve Docker Compose yüklü",
+    "postgresqlDatabase": "PostgreSQL veritabanı (cluster içinde veya yönetilen)",
+    "redisOptional": "Redis (opsiyonel, hız sınırlama için)",
+    "loadBalancer": "Yük Dengeleyici:"
+  },
+  "docsArchitecture": {
+    "axumRust": "Axum (Rust)"
+  },
+  "docsMigrationFromSvix": {
+    "standardWebhooks": "Standard Webhooks"
+  },
+  "docsIntegrationsPage": {
+    "forwardsDesc": "HookSniff imzasıyla gerçek endpoint’inize yönlendirir."
+  },
+  "docsWebhookVerification": {
+    "alwaysVerify": "Her zaman doğrulayın",
+    "checkTimestamp": "Zaman damgasını kontrol edin: 5 dakikadan eskiyse reddedin",
+    "computeExpected": "Beklenen imzayı hesaplayın:",
+    "compareReceived": "Alınan imzayı sabit zamanlı karşılaştırma ile karşılaştırın"
+  },
+  "docsWhatIsHookSniff": {
+    "axumRust": "Axum (Rust)"
   }
 }
