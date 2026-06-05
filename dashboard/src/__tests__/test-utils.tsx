@@ -7,15 +7,7 @@
  */
 import React, { type ReactElement } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
-
-// Lazy imports — may be mocked out by test files
-let QueryClient: any = null;
-let QueryClientProvider: any = null;
-try {
-  const rq = require('@tanstack/react-query');
-  QueryClient = rq.QueryClient;
-  QueryClientProvider = rq.QueryClientProvider;
-} catch { /* mocked out */ }
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 let NextIntlClientProvider: React.ComponentType<any> | null = null;
 try {
