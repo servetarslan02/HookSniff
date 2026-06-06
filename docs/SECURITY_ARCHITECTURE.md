@@ -16,8 +16,11 @@ For webhook signature verification, see [SECURITY.md](SECURITY.md).
 │                   API Gateway (Axum)                  │
 │  Rate Limiting · JWT Auth · API Key Validation       │
 ├──────────┬──────────┬──────────┬────────────────────┤
-│  SSRF    │  Threat  │  Zero    │  Behavioral        │
-│Protection│Detection │  Trust   │  Analysis          │
+│  SSRF    │  Threat  │  WAF     │  Behavioral        │
+│Protection│Detection │ Injection│  Bot Detection     │
+├──────────┼──────────┼──────────┼────────────────────┤
+│  IP      │  Zero    │  DDoS    │  Compliance        │
+│Reputation│  Trust   │Protection│  & Audit           │
 ├──────────┴──────────┴──────────┴────────────────────┤
 │              PostgreSQL (Encrypted at Rest)           │
 │              Redis (TLS in Transit)                   │
@@ -32,14 +35,12 @@ Webhook delivery means we send HTTP requests to URLs our customers provide. This
 
 ### Private IP Blocking
 
-```rust
-// Blocks requests to:
-// - 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 (RFC 1918)
-// - 127.0.0.0/8 (loopback)
-// - 169.254.0.0/16 (link-local / cloud metadata)
-// - ::1, fe80::/10 (IPv6 loopback/link-local)
-// - 0.0.0.0 (any)
-```
+Blocks requests to:
+- `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (RFC 1918)
+- `127.0.0.0/8` (loopback)
+- `169.254.0.0/16` (link-local / cloud metadata)
+- `::1`, `fe80::/10` (IPv6 loopback/link-local)
+- `0.0.0.0` (any)
 
 ### DNS Validation
 
@@ -53,7 +54,6 @@ Before connecting, HookSniff resolves the hostname and checks:
 Explicitly blocks cloud metadata endpoints:
 - `169.254.169.254` (AWS, GCP, Azure)
 - `metadata.google.internal` (GCP)
-- `instance-data` (AWS)
 
 ### URL Validation
 
@@ -94,6 +94,8 @@ Header: Authorization: Bearer eyJhbG...
 - 60-minute expiry with automatic refresh
 - Refresh tokens: one-time-use with grace period
 - Multi-tab coordination via BroadcastChannel
+- Proactive refresh at 50 minutes (before 60-min expiry)
+- Inactivity auto-logout after 1 hour idle
 
 ### Two-Factor Authentication (TOTP)
 
@@ -146,49 +148,122 @@ Each API key can have custom rate limit overrides, independent of plan limits.
 
 ## 4. Threat Detection
 
-### Behavioral Analysis
+Real-time behavioral analysis using Redis counters for fast lookups. Falls back to in-memory counters if Redis unavailable.
 
-Real-time detection of suspicious patterns:
+### Detected Threat Types
 
 | Attack | Detection Method | Response |
 |--------|-----------------|----------|
-| Credential stuffing | Login velocity per IP | Auto-block IP |
-| Token stuffing | Failed auth burst | Rate limit + alert |
-| Brute force | Password attempt pattern | Account lockout |
-| API key enumeration | Key validation failures | IP block |
-| DDoS | Request rate anomaly | Cloudflare challenge |
+| Brute force | Login velocity per IP | Auto-block IP |
+| Credential stuffing | Failed auth burst | Rate limit + alert |
+| API abuse | Request pattern anomaly | Rate limit |
+| Data exfiltration | Bulk data access pattern | Alert + rate limit |
+| Suspicious pattern | Behavioral fingerprinting | Warn + log |
+| DDoS attempt | Request rate anomaly | Block |
+| Scanner detected | Sequential path probing | Block |
 
-### IP Reputation Scoring
+### Threat Actions
 
-Each IP gets a reputation score based on:
-- Historical behavior (success/failure ratio)
-- Known threat intelligence feeds
-- Geographic anomalies
-- Request pattern analysis
-
-Low-reputation IPs get:
-- Increased rate limits
-- Additional verification challenges
-- Logged for review
-
-### DDoS Protection
-
-- Cloudflare edge protection
-- Application-level rate limiting
-- Connection limits per IP
-- Request size limits (256KB default, 10MB for enterprise)
-
-### Automatic IP Blocking
-
-When threat score exceeds threshold:
-1. IP is automatically blocked for 24 hours
-2. Block is logged with reason and evidence
-3. Admin notification sent
-4. Block can be manually overridden
+- **Allow** — normal request, no threat detected
+- **Warn** — suspicious but not confirmed, log for review
+- **Rate limit** — slow down the source
+- **Block** — immediate block, request rejected
 
 ---
 
-## 5. Zero Trust Architecture
+## 5. WAF — Injection Detection
+
+Context-aware, recursive decoding, AST-level analysis. Unlike simple pattern matching, this understands SQL/XSS/Path syntax.
+
+### Features
+
+- **Recursive URL decoding** — handles single, double, triple encoding
+- **SQL injection detection** — understands SQL syntax, not just pattern matching
+- **XSS detection** — script injection, event handlers, data URIs
+- **Path traversal detection** — `../`, encoded variants
+- **Confidence scoring** — each detection has a confidence level
+- **Severity classification** — low, medium, high, critical
+
+### Detection Flow
+
+```
+Input → Recursive URL Decode → Pattern Analysis → Context Check → Result
+         (handles %2527 → '    (SQL/XSS/Path)    (is it in a     (is_attack,
+                                                  safe context?)   confidence, type)
+```
+
+---
+
+## 6. Behavioral Bot Detection
+
+Tracks request patterns over time to detect bots that evade user-agent and path-based detection.
+
+### Behavioral Fingerprinting
+
+- **Request timing patterns** — too regular = bot
+- **Session depth** — too many pages too fast
+- **Resource request patterns** — no CSS/JS = bot
+- **Navigation patterns** — sequential paths = scanner
+
+### Profile Data Per IP
+
+- Request timestamps (for interval analysis)
+- Paths visited (for navigation pattern)
+- Methods used (GET/POST distribution)
+- Status codes received (error pattern)
+- Average interval and variance
+- Total requests and session duration
+
+---
+
+## 7. IP Reputation
+
+Multi-source IP reputation checking. Each IP gets a score 0-100 (higher = more dangerous).
+
+### Reputation Sources
+
+| Source | Description |
+|--------|-------------|
+| Internal | From our own security_events table |
+| CIDR block | Known bad IP ranges |
+| AbuseIPDB | Third-party threat intelligence (when API key available) |
+
+### Reputation Actions
+
+- Score 0-30: Normal processing
+- Score 31-60: Increased logging, tighter rate limits
+- Score 61-80: Challenge required, limited access
+- Score 81-100: Blocked
+
+### Caching
+
+Reputation scores are cached in-memory with configurable TTL to avoid repeated lookups.
+
+---
+
+## 8. DDoS Protection
+
+Multi-layer rate limiting using Upstash Redis for distributed rate limiting across instances. Falls back to in-memory if Redis unavailable.
+
+### Adaptive Baselines
+
+- **EWMA baseline** — learns normal requests per minute
+- **Adaptive multiplier** — 3× baseline triggers block
+- **Continuous learning** — baseline updates every minute
+
+### Layers
+
+1. **Cloudflare edge** — volumetric DDoS absorption
+2. **Application rate limit** — sliding window per IP
+3. **Adaptive threshold** — dynamic based on traffic patterns
+4. **Connection limit** — max concurrent connections per IP
+5. **Request size limit** — 256KB default, 10MB for enterprise
+
+---
+
+## 9. Zero Trust Architecture
+
+"Never trust, always verify" — continuous authentication and authorization.
 
 ### Request Verification
 
@@ -200,10 +275,20 @@ Request Flow:
 2. JWT/API key extraction
 3. Token validation (signature, expiry, revocation)
 4. Permission check (scopes, plan limits)
-5. Rate limit check
-6. Request processing
-7. Audit log entry
+5. Zero Trust verification (account active, risk score)
+6. Rate limit check
+7. Request processing
+8. Audit log entry
 ```
+
+### Risk Scoring
+
+Each request gets a risk score based on:
+- Account status (active, suspended)
+- IP reputation
+- Request pattern (normal vs anomalous)
+- Time of day (business hours vs off-hours)
+- Geographic location
 
 ### No Implicit Trust
 
@@ -212,16 +297,50 @@ Request Flow:
 - Each request carries its own credentials
 - Service tokens have minimal required scopes
 
-### Network Segmentation
+---
 
-- API servers cannot access customer databases directly
-- Worker processes have read-only database access
-- Redis is TLS-only with authentication
-- Database connections use connection pooling with TLS
+## 10. Compliance & Audit
+
+### Automated Compliance Checks
+
+Runs periodically and on-demand:
+
+| Check | Description |
+|-------|-------------|
+| Expired API keys | Finds keys past expiry still active |
+| 2FA adoption | Checks percentage of users with 2FA |
+| Password policy | Validates password strength |
+| Orphaned API keys | Keys without valid owner |
+| Admin count | Excessive admin accounts |
+| Audit coverage | Completeness of audit logging |
+
+### GDPR Compliance
+
+- **Data export** — `GET /v1/auth/export` returns all user data
+- **Account deletion** — `DELETE /v1/auth/account` permanently removes all data
+- **Data minimization** — only collect what's needed
+- **Right to rectification** — users can update their data via API
+
+### KVKK Compliance (Turkey)
+
+HookSniff is KVKK compliant for Turkish users:
+- Data processing consent
+- Right to access and deletion
+- Data portability
+- Breach notification procedures
+
+### SOC 2 Readiness
+
+Controls in place:
+- Access controls and authentication
+- Audit logging
+- Encryption at rest and in transit
+- Incident response procedures
+- Change management
 
 ---
 
-## 6. Data Security
+## 11. Data Security
 
 ### Encryption
 
@@ -248,24 +367,9 @@ Request Flow:
 | Business | 90 days | Automatic |
 | Enterprise | 365 days | Custom |
 
-### GDPR Compliance
-
-- **Data export** — `GET /v1/auth/export` returns all user data
-- **Account deletion** — `DELETE /v1/auth/account` permanently removes all data
-- **Data minimization** — only collect what's needed
-- **Right to rectification** — users can update their data via API
-
-### KVKK Compliance (Turkey)
-
-HookSniff is KVKK compliant for Turkish users:
-- Data processing consent
-- Right to access and deletion
-- Data portability
-- Breach notification procedures
-
 ---
 
-## 7. Audit Logging
+## 12. Audit Logging
 
 Every significant action is logged:
 
@@ -294,65 +398,7 @@ Every significant action is logged:
 
 ---
 
-## 8. Infrastructure Security
-
-### Cloudflare
-
-- DDoS protection at edge
-- WAF rules for common attacks
-- SSL/TLS with HSTS
-- Bot management
-
-### Google Cloud Run
-
-- Container isolation
-- Automatic scaling
-- VPC networking
-- IAM with least privilege
-
-### PostgreSQL (Neon)
-
-- Connection pooling with TLS
-- Encrypted at rest
-- Automated backups
-- Point-in-time recovery
-
-### Redis
-
-- TLS-only connections
-- AUTH password required
-- No public access
-- Encrypted at rest
-
----
-
-## 9. Webhook Security
-
-### Standard Webhooks Compliance
-
-Full compliance with [Standard Webhooks](https://www.standardwebhooks.com/) specification:
-- HMAC-SHA256 signatures
-- `whsec_` prefixed secrets
-- Replay protection (±5 minute window)
-- Signature rotation without downtime
-
-### Secret Management
-
-- Secrets are generated with `whsec_` prefix + base64 encoded
-- Stored as Argon2id hashes in database
-- Rotation creates new secret while old one remains valid for 24 hours
-- Multiple signatures supported during rotation window
-
-### Payload Validation
-
-- JSON schema validation (when configured)
-- Maximum payload size enforcement
-- Content-Type verification
-- Idempotency key deduplication (24h TTL)
-
----
-
-## 10. Incident Response
+## 13. Incident Response
 
 ### Automated Response
 
@@ -388,5 +434,3 @@ Full compliance with [Standard Webhooks](https://www.standardwebhooks.com/) spec
 ## Security Contact
 
 For security vulnerabilities, see [SECURITY.md](SECURITY.md). **Do not open public issues for security bugs.**
-
-Email: security@hooksniff.com (planned)
