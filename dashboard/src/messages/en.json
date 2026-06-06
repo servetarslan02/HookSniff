@@ -2587,6 +2587,42 @@
       "featureReliabilityDesc": "Built-in circuit breaker and error classification for production use.",
       "featureSpeedTitle": "Fast",
       "featureSpeedDesc": "Low-latency delivery powered by Rust backend and Redis queue."
+    },
+    "cortex": {
+      "title": "Cortex AI",
+      "subtitle": "Your webhook infrastructure thinks for itself.",
+      "desc": "Built-in ML engine that learns your traffic patterns, detects anomalies before incidents, and auto-heals degraded endpoints.",
+      "anomalyDetection": "Anomaly Detection",
+      "anomalyDetectionDesc": "Adaptive EWMA thresholds, Modified Z-Score, IQR outlier detection, and multivariate correlation learn each endpoint's normal behavior.",
+      "predictiveEngine": "Predictive Engine",
+      "predictiveEngineDesc": "Linear regression and momentum analysis forecast failures before they happen. Get alerts hours before success rate crosses the threshold.",
+      "selfHealing": "Self-Healing",
+      "selfHealingDesc": "Automatically applies recovery strategies: circuit breaker tightening, retry slowdown, rate limit reduction, fallback URL switching.",
+      "smartRouting": "Smart Routing",
+      "smartRoutingDesc": "Monitors endpoint health and switches traffic to the best fallback URL when performance degrades.",
+      "driftDetection": "Drift Detection",
+      "driftDetectionDesc": "Page-Hinkley, ADWIN, and Kolmogorov-Smirnov tests detect when endpoint behavior changes significantly.",
+      "mlQuality": "ML Quality Tracking",
+      "mlQualityDesc": "Every prediction is tracked and scored. Models that underperform are automatically reset and retrained.",
+      "readDocs": "Read Cortex Docs"
+    },
+    "securitySection": {
+      "title": "Security",
+      "subtitle": "Enterprise-grade security. Zero compromises.",
+      "desc": "Built security-first. SSRF protection, WAF, behavioral analysis, and zero-trust architecture.",
+      "ssrf": "SSRF Protection",
+      "ssrfDesc": "Blocks requests to private IPs, metadata endpoints, and internal networks. DNS validation prevents rebinding attacks.",
+      "hmac": "HMAC-SHA256 Signatures",
+      "hmacDesc": "Every webhook signed with Standard Webhooks compliant HMAC-SHA256. Rotate secrets without downtime.",
+      "apiKeys": "API Key Security",
+      "apiKeysDesc": "Keys stored as Argon2id hashes. Automatic rotation with zero-downtime overlap.",
+      "threatDetection": "Threat Detection",
+      "threatDetectionDesc": "Behavioral analysis detects credential stuffing, brute-force, and abuse in real-time. Automatic IP blocking.",
+      "compliance": "Compliance",
+      "complianceDesc": "GDPR, SOC 2, CCPA, KVKK compliant. Full audit logging with IP tracking.",
+      "zeroTrust": "Zero Trust",
+      "zeroTrustDesc": "JWT with TOTP 2FA, SSO/SAML for enterprise. Every request authenticated and authorized.",
+      "readDocs": "Read Security Docs"
     }
   },
   "apiKeys": {
