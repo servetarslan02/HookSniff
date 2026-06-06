@@ -1384,7 +1384,7 @@
     "cortex": "Cortex AI Motoru",
     "cortexDesc": "Yapay zeka destekli anomali tespiti, otomatik kendini iyileştirme, arıza tahmini ve akıllı yönlendirme. Cortex, webhook'larınızı güvenilir tutan beyindir.",
     "cortexWhatIs": "Cortex Nedir?",
-    "cortexWhatIsDesc": "Cortex, HookSniff'ın yerleşik zeka katmanıdır. Her endpoint'i sürekli izler, her birinin normalinin ne olduğunu öğrenir ve bir sorun tespit ettiğinde harekete geçer — çoğu zaman siz fark etmeden önce. Konfigürasyon gerektirmez. Sabit eşik yoktur. Sadece daha akıllı webhook'lar.",
+    "cortexWhatIsDesc": "Cortex, HookSniff'ın içinde çalışan akıllı sistemdir. Her endpoint'i sürekli izler, her birinin normalinin ne olduğunu öğrenir ve bir sorun tespit ettiğinde harekete geçer — çoğu zaman siz fark etmeden önce. Hiçbir şey ayarlamanıza gerek yok. Sabit kurallarla çalışmaz. Sadece daha güvenilir webhook'lar.",
     "cortexSeeing": "Görme",
     "cortexSeeingDesc": "Başarı oranlarını, gecikme sürelerini ve trafik desenlerini aynı anda analiz ederek gerçek zamanlı anomali tespiti yapar",
     "cortexLearning": "Öğrenme",
