@@ -1,3 +1,4 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { BarChart3, DollarSign, Package, Plug, Radio, RefreshCw, Shuffle } from '@/components/icons';
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
  description: 'Migrate from Svix to HookSniff: SDK changes, API differences, and step-by-step guide',
 };
 
-async function MigrationFromSvixContent() {
+async function MigrationFromSvixContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
  return (
   <article className="prose prose-gray max-w-none">
    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Migration from Svix</h1>

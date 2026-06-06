@@ -1,3 +1,4 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { AlertTriangle, Check, FileText, Key, RefreshCw, Search, Shield, Timer, X, Zap } from '@/components/icons';

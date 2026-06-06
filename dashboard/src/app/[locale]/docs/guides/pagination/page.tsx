@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { FileText } from '@/components/icons';
@@ -9,17 +10,23 @@ export const metadata: Metadata = {
   description: 'Paginate through endpoints, deliveries, and events using cursor-based pagination',
 };
 
-async function PaginationContent() {
+async function PaginationContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><FileText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Pagination</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><FileText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('pagination')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         All list endpoints in the HookSniff API use <strong>cursor-based pagination</strong>. This is faster and more reliable than offset-based pagination for large datasets.
       </p>
 
       {/* How It Works */}
       <section className="mb-10">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Each response includes a <code>cursor</code> field pointing to the next page. Pass it as a query parameter to get the next batch:
         </p>

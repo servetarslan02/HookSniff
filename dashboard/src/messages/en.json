@@ -1387,7 +1387,16 @@
     "cortexProtecting": "Protecting",
     "cortexProtectingDesc": "Acts before problems escalate — adjusts rates, switches routes, and alerts you proactively",
     "cortexFAQ": "Frequently Asked Questions",
-    "cortexNextSteps": "Next Steps"
+    "cortexNextSteps": "Next Steps",
+    "pagination": "Pagination",
+    "howItWorks": "How It Works",
+    "errorHandlingDesc": "Handle webhook delivery errors gracefully with retries, DLQ, and alerting",
+    "migrationFromSvixDesc": "Switch from Svix to HookSniff in minutes",
+    "streaming": "Streaming",
+    "streamingDesc": "Real-time delivery updates via SSE and WebSocket",
+    "webhookVerificationDesc": "Verify incoming webhook signatures to ensure authenticity",
+    "realWorldExamplesDesc": "Production-ready code examples for common webhook scenarios",
+    "nextSteps": "Next Steps"
   },
   "status": {
     "title": "HookSniff Status",

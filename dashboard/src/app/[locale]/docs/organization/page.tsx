@@ -93,9 +93,7 @@ async function OrganizationDocsPageContent(params: Promise<{ locale: string }>) 
                 <tr>
                   <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('permAction')}</th>
                   <th className="px-4 py-3 text-center font-medium text-purple-700 dark:text-purple-400">{t('permAdmin')}</th>
-                  <th className="px-4 py-3 text-center font-medium text-blue-700 dark:text-blue-400">{t('permEditor')}</th>
-                  <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permAdmin')}</th>
-                  <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permDeveloper')}</th>
+                  <th className="px-4 py-3 text-center font-medium text-blue-700 dark:text-blue-400">{t('permDeveloper')}</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permAnalyst')}</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permViewer')}</th>
                 </tr>

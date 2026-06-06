@@ -9,11 +9,15 @@ export const metadata: Metadata = {
   description: 'Production webhook patterns for e-commerce, CI/CD, notifications, and more',
 };
 
-export default function RealWorldExamplesPage() {
+export default async function RealWorldExamplesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const { getTranslations, setRequestLocale } = await import('next-intl/server');
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Real-World Examples</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t("realWorldExamples")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Production webhook patterns you can copy and adapt. Each example includes the full flow: sending, receiving, and processing.
       </p>
