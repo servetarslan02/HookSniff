@@ -1382,7 +1382,7 @@
     "webhook": "webhook",
     "errorCodesLink": "Hata Kodları",
     "cortex": "Cortex AI Motoru",
-    "cortexDesc": "ML tabanlı anomali tespiti, kendi kendini iyileştirme, tahmine dayanıklı izleme ve akıllı yönlendirme. HookSniff'ın beyni.",
+    "cortexDesc": "ML tabanlı anomali tespiti, kendi kendini iyileştirme, tahmine dayalı izleme ve akıllı yönlendirme. HookSniff'ın beyni.",
     "cortexWhatIs": "Cortex Nedir?",
     "cortexWhatIsDesc": "Cortex, HookSniff'ın her endpoint için ayrı öğrenen, kendi kendini iyileştiren ve gelecekteki sorunları önceden tahmin eden yapay zeka motorudur. Sabit kurallar yerine gerçek ML algoritmaları kullanır — her endpoint kendi \"normal\"ini öğrenir.",
     "cortexSeeing": "Görme",
@@ -1390,7 +1390,7 @@
     "cortexLearning": "Öğrenme",
     "cortexLearningDesc": "Her endpoint için ayrı ML modeli eğitimi",
     "cortexProtecting": "Koruma",
-    "cortexProtectingDesc": "Proaktif healing ve tahmine dayanıklı aksiyonlar",
+    "cortexProtectingDesc": "Proaktif healing ve tahmine dayalı aksiyonlar",
     "cortexFAQ": "Sıkça Sorulan Sorular",
     "cortexNextSteps": "Sonraki Adımlar"
   },
