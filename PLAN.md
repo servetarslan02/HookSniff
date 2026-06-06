@@ -40,9 +40,10 @@ _(Servet'in yönlendirmesine göre buraya eklenecek)_
 
 ## Tamamlananlar
 
-| Tarih | Görev | Commit |
-|-------|-------|--------|
-| 2026-06-07 | Repo clone + workspace kurulumu | _(local)_ |
+| Tarih | Görev | PR/Commit |
+|-------|-------|-----------|
+| 2026-06-07 | ML Quality boş sayfa fix | PR #87 |
+| 2026-06-07 | Repo clone + workspace kurulumu | local |
 
 ---
 

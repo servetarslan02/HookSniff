@@ -623,6 +623,8 @@ footer {
     </button>
     <div class="nav-links">
       <a href="#features">Features</a>
+      <a href="#cortex">Cortex AI</a>
+      <a href="#security">Security</a>
       <a href="#pricing">Pricing</a>
       <a href="#waitlist" class="nav-cta">Join Waitlist</a>
     </div>
@@ -690,6 +692,94 @@ footer {
         <h3>Simple API</h3>
         <p>4 endpoints. That's it. Send a webhook, list deliveries, get a delivery, retry a delivery. RESTful JSON with predictable responses.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cortex AI -->
+<section id="cortex" class="features">
+  <div class="container">
+    <p class="section-label reveal">Cortex AI</p>
+    <h2 class="section-title reveal">Your webhook infrastructure thinks for itself.</h2>
+    <p class="section-desc reveal">Cortex is HookSniff's built-in ML engine. It learns from your traffic patterns, detects anomalies before they become incidents, and auto-heals degraded endpoints — no manual tuning required.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🧠</div>
+        <h3>Anomaly Detection</h3>
+        <p>Adaptive EWMA thresholds and statistical Z-score detection learn each endpoint's normal behavior. Spikes in latency, drops in success rate, error bursts — Cortex catches them in real-time.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">🔮</div>
+        <h3>Predictive Engine</h3>
+        <p>Linear regression and momentum analysis forecast failures before they happen. Get alerts when an endpoint's success rate is trending downward — hours before it crosses the threshold.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🩹</div>
+        <h3>Self-Healing</h3>
+        <p>When an endpoint degrades, Cortex automatically applies recovery strategies: circuit breaker tightening, retry slowdown, rate limit reduction, fallback URL switching. UCB1 bandit learns which strategy works best per endpoint.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">📈</div>
+        <h3>Smart Routing</h3>
+        <p>Cortex monitors endpoint health across your infrastructure and routes traffic to the fastest, most reliable destination. Round-robin, failover, weighted, and random strategies with automatic fallback.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🔍</div>
+        <h3>Drift Detection</h3>
+        <p>Detects when an endpoint's behavior changes significantly — response format shifts, latency baseline changes, error pattern evolution. Alerts you before breaking changes cascade.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">📊</div>
+        <h3>ML Quality Tracking</h3>
+        <p>Every prediction Cortex makes is tracked and scored. Models that underperform are automatically reset and retrained. You get a real-time quality dashboard showing accuracy, error rates, and model health.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="/docs/cortex" class="btn-secondary" style="display:inline-block;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:15px">Read Cortex Docs →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section id="security" class="features" style="background:var(--bg-secondary)">
+  <div class="container">
+    <p class="section-label reveal">Security</p>
+    <h2 class="section-title reveal">Enterprise-grade security. Zero compromises.</h2>
+    <p class="section-desc reveal">HookSniff is built security-first. Every layer — from network to application — is hardened against modern threats. SSRF protection, WAF, behavioral analysis, and zero-trust architecture.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon green">🛡️</div>
+        <h3>SSRF Protection</h3>
+        <p>Blocks requests to private IPs, metadata endpoints (169.254.169.254), and internal networks. DNS validation prevents DNS rebinding attacks. Your infrastructure stays invisible.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🔐</div>
+        <h3>HMAC-SHA256 Signatures</h3>
+        <p>Every webhook is signed with Standard Webhooks compliant HMAC-SHA256. Secrets use <code>whsec_</code> prefix with base64 encoding. Rotate secrets without downtime.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">🔑</div>
+        <h3>API Key Security</h3>
+        <p>API keys use <code>hr_live_</code> and <code>hr_test_</code> prefixes. Stored as Argon2id hashes — even we can't read them. Automatic key rotation with zero-downtime overlap.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🚨</div>
+        <h3>Threat Detection</h3>
+        <p>Behavioral analysis detects credential stuffing, token stuffing, and brute-force attacks in real-time. Automatic IP blocking with reputation scoring. DDoS protection at the edge.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">📋</div>
+        <h3>Compliance</h3>
+        <p>GDPR, SOC 2, CCPA, KVKK compliant. CloudEvents v1.0 and Standard Webhooks supported. Full audit logging with IP tracking. EU data residency available.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon purple">🔒</div>
+        <h3>Zero Trust</h3>
+        <p>Every request is authenticated and authorized. JWT with TOTP 2FA, SSO/SAML for enterprise teams. No implicit trust — verify everything, every time.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="/docs/security" class="btn-secondary" style="display:inline-block;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:15px">Read Security Docs →</a>
     </div>
   </div>
 </section>
@@ -807,6 +897,8 @@ footer {
         <a href="https://hooksniff.vercel.app/docs/quickstart">Quickstart</a>
         <a href="https://hooksniff.vercel.app/docs/api-reference">API Reference</a>
         <a href="https://hooksniff.vercel.app/docs/sdk-libraries">SDKs</a>
+        <a href="https://hooksniff.vercel.app/docs/cortex">Cortex AI</a>
+        <a href="https://hooksniff.vercel.app/docs/security-architecture">Security</a>
         <a href="https://hooksniff.vercel.app/docs/changelog">Changelog</a>
         <a href="https://hooksniff.vercel.app/blog">Blog</a>
       </div>
