@@ -79,12 +79,12 @@ async function CortexContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('cortexWhatIs')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Cortex is the intelligence layer built into HookSniff. It continuously monitors your webhooks,
-          learns what&apos;s normal for each endpoint, and takes action when something goes wrong —
-          often before you even notice.
+          Cortex is the intelligence layer built into HookSniff. It watches your webhooks around the clock,
+          learns what healthy looks like for each endpoint, and steps in when something goes wrong —
+          often before you even notice there&apos;s a problem.
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-6">
-          You don&apos;t need to configure anything. Cortex works automatically for every endpoint on every plan.
+          No configuration required. No thresholds to set. Cortex works automatically for every endpoint, on every plan.
         </p>
 
         <div className="not-prose grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -112,7 +112,7 @@ async function CortexContent(params: Promise<{ locale: string }>) {
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Your endpoint starts failing</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
-                  Maybe your server is down, or a third-party service is having issues. Cortex detects the anomaly within minutes.
+                  Your server goes down, or a dependency starts failing. Cortex picks up on the pattern within minutes — no manual monitoring needed.
                 </p>
               </div>
             </div>
@@ -131,7 +131,7 @@ async function CortexContent(params: Promise<{ locale: string }>) {
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Your endpoint is getting slower</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
-                  Latency is creeping up over the last few hours. Not failing yet, but trending in the wrong direction.
+                  Latency has been climbing for a few hours. Requests are still succeeding, but the trend is heading south.
                 </p>
               </div>
             </div>
@@ -150,7 +150,7 @@ async function CortexContent(params: Promise<{ locale: string }>) {
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-1">An outage recovers</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
-                  Your server is back online, but there are thousands of queued webhooks waiting to be delivered.
+                  Your server comes back online after an outage. Thousands of queued webhooks are waiting — and dumping them all at once could take your server down again.
                 </p>
               </div>
             </div>
@@ -248,8 +248,8 @@ async function CortexContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Auto-Disable & Recovery</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When an endpoint is consistently failing, Cortex can temporarily disable it to prevent wasted deliveries.
-          This is a safety net, not a punishment.
+          When an endpoint keeps failing despite retries, Cortex can temporarily disable it to stop burning through your delivery quota.
+          Think of it as a circuit breaker — it protects both your quota and your server from repeated hammering.
         </p>
 
         <div className="not-prose space-y-4">
@@ -377,12 +377,12 @@ async function CortexContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('cortexFAQ')}</h2>
         <div className="not-prose space-y-4">
           {[
-            { q: 'Does Cortex cost extra?', a: 'No. Cortex is included in all plans — Free, Pro, Business, and Enterprise. There are no additional charges.' },
-            { q: 'Do I need to configure anything?', a: 'No. Cortex works automatically for every endpoint. It starts learning from your first delivery.' },
-            { q: 'Will Cortex disable my endpoint without warning?', a: 'No. Auto-disable only triggers after sustained, repeated failures. You\'ll receive a warning alert first, and the endpoint is automatically re-enabled once it recovers.' },
-            { q: 'Can I turn off auto-disable?', a: 'Yes. You can disable auto-disable per endpoint in your endpoint settings if you prefer to handle failures manually.' },
-            { q: 'How does Cortex learn what\'s "normal"?', a: 'Cortex analyzes your endpoint\'s historical performance — success rates, latency, delivery volume — and builds a baseline. It then detects deviations from that baseline, not from fixed global thresholds.' },
-            { q: 'Does Cortex affect my webhook delivery speed?', a: 'Only when it helps. Cortex may slow down deliveries to a struggling endpoint (to protect it) or speed up recovery after an outage. Normal operations are unaffected.' },
+            { q: 'Does Cortex cost extra?', a: 'No. Cortex is included on every plan — Free, Pro, Business, and Enterprise. No hidden fees, no add-ons.' },
+            { q: 'Do I need to configure anything?', a: 'No. Cortex starts learning from your very first delivery. It works out of the box for every endpoint.' },
+            { q: 'Will Cortex disable my endpoint without warning?', a: 'No. You\'ll always get a warning alert first. Auto-disable only kicks in after sustained, repeated failures — not from a single bad hour. And once your endpoint recovers, it\'s re-enabled automatically.' },
+            { q: 'Can I turn off auto-disable?', a: 'Yes. You can disable auto-disable per endpoint in your endpoint settings if you prefer to handle failures on your own terms.' },
+            { q: 'How does Cortex learn what\'s "normal"?', a: 'It studies your endpoint\'s own history — success rates, latency patterns, traffic volume — and builds a baseline unique to that endpoint. Anomalies are detected as deviations from that baseline, not from some arbitrary global threshold.' },
+            { q: 'Does Cortex affect my webhook delivery speed?', a: 'Only when it helps. Cortex might slow down deliveries to a struggling endpoint to give it breathing room, or ramp up recovery speed after an outage. During normal operations, delivery runs at full speed — Cortex just watches.' },
           ].map(({ q, a }) => (
             <div key={q} className="p-4 rounded-xl border border-gray-200 dark:border-slate-700">
               <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-2">{q}</h3>
