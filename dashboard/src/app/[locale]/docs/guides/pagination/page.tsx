@@ -14,9 +14,6 @@ async function PaginationContent(params: Promise<{ locale: string }>) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('docs');
-  const { locale } = await params;
-  setRequestLocale(locale);
-  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><FileText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('pagination')}</h1>
