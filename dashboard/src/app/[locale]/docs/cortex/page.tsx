@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Brain, Shield, Zap, TrendingUp, Activity, AlertTriangle, CheckCircle2, Cog, BarChart3, Eye, RefreshCw, GitBranch } from '@/components/icons';
+import { Brain, Shield, Zap, TrendingUp, Activity, AlertTriangle, CheckCircle2, Settings, BarChart3, Eye, RefreshCw, GitBranch } from '@/components/icons';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ const mlAlgorithms = [
     name: 'Multi-Armed Bandit (UCB1)',
     desc: 'Retry stratejileri, circuit breaker eşikleri ve throttle oranları için en iyi aksiyonu otomatik seçer.',
     detail: 'UCB1 formülü: exploitation + exploration bonus. Her endpoint için ayrı öğrenme — keşif dengesi otomatik.',
-    icon: <Cog size={20} strokeWidth={1.75} />,
+    icon: <Settings size={20} strokeWidth={1.75} />,
   },
   {
     name: 'Time Series Forecasting',
