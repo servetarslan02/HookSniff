@@ -1377,7 +1377,7 @@
     "webhook": "webhook",
     "errorCodesLink": "Error Codes",
     "cortex": "Cortex AI Engine",
-    "cortexDesc": "Intelligent anomaly detection, automatic self-healing, failure prediction, and smart routing — all powered by machine learning. Cortex is the brain that keeps your webhooks reliable.",
+    "cortexDesc": "The intelligence behind your webhooks. Cortex detects anomalies, heals failures, predicts problems, and routes traffic — automatically, on every plan.",
     "cortexWhatIs": "What is Cortex?",
     "cortexWhatIsDesc": "Cortex is HookSniff's built-in intelligence layer. It continuously monitors every endpoint, learns what normal looks like for each one, and takes action when something goes wrong — often before you even notice. No configuration needed. No fixed thresholds. Just smarter webhooks.",
     "cortexSeeing": "Seeing",

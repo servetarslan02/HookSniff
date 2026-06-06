@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Cortex AI — HookSniff',
-  description: 'ML-powered anomaly detection, self-healing, predictive monitoring, and smart routing — all built into HookSniff.',
+  description: 'The intelligence behind your webhooks. Cortex detects anomalies, heals failures, predicts problems, and routes traffic — automatically, on every plan.',
 };
 
 const features = [
@@ -380,7 +380,7 @@ async function CortexContent(params: Promise<{ locale: string }>) {
             { q: 'Does Cortex cost extra?', a: 'No. Cortex is included on every plan — Free, Pro, Business, and Enterprise. No hidden fees, no add-ons.' },
             { q: 'Do I need to configure anything?', a: 'No. Cortex starts learning from your very first delivery. It works out of the box for every endpoint.' },
             { q: 'Will Cortex disable my endpoint without warning?', a: 'No. You\'ll always get a warning alert first. Auto-disable only kicks in after sustained, repeated failures — not from a single bad hour. And once your endpoint recovers, it\'s re-enabled automatically.' },
-            { q: 'Can I turn off auto-disable?', a: 'Yes. You can disable auto-disable per endpoint in your endpoint settings if you prefer to handle failures on your own terms.' },
+            { q: 'Can I turn off auto-disable?', a: 'Yes. You can turn off auto-disable for any endpoint in its settings — if you\'d rather handle failures yourself.' },
             { q: 'How does Cortex learn what\'s "normal"?', a: 'It studies your endpoint\'s own history — success rates, latency patterns, traffic volume — and builds a baseline unique to that endpoint. Anomalies are detected as deviations from that baseline, not from some arbitrary global threshold.' },
             { q: 'Does Cortex affect my webhook delivery speed?', a: 'Only when it helps. Cortex might slow down deliveries to a struggling endpoint to give it breathing room, or ramp up recovery speed after an outage. During normal operations, delivery runs at full speed — Cortex just watches.' },
           ].map(({ q, a }) => (
