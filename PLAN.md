@@ -42,6 +42,7 @@ _(Servet'in yönlendirmesine göre buraya eklenecek)_
 
 | Tarih | Görev | PR/Commit |
 |-------|-------|-----------|
+| 2026-06-07 | Cortex + Security docs + landing page (kod incelemeli) | PR #87 |
 | 2026-06-07 | ML Quality boş sayfa fix | PR #87 |
 | 2026-06-07 | Repo clone + workspace kurulumu | local |
 
