@@ -56,9 +56,9 @@ pub async fn snapshot_current_model(
 
     // Son performans metriklerini al
     let quality: Option<(f64, f64)> = sqlx::query_as(
-        "SELECT accuracy_pct, quality_score FROM ml_model_quality
+        "SELECT COALESCE(COUNT(*) FILTER (WHERE within_tolerance)::FLOAT / NULLIF(COUNT(*), 0) * 100, 0.0) as accuracy_pct, COALESCE(AVG(CASE WHEN within_tolerance THEN 100.0 - error_pct ELSE error_pct END), 0.0) as quality_score FROM ml_model_quality
          WHERE endpoint_id = $1 AND model_type = $2
-         ORDER BY measured_at DESC LIMIT 1"
+         AND measured_at > NOW() - INTERVAL '24 hours'"
     )
     .bind(endpoint_id)
     .bind(model_type)
