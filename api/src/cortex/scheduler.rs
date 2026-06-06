@@ -394,6 +394,11 @@ async fn execute_stage(
             Ok(n)
         }
         CortexStage::MlQualityCheck => {
+            // Generate quality records from predictions vs actuals (fills ml_model_quality)
+            let generated = super::ml::quality_tracker::generate_quality_records(pool).await?;
+            if generated > 0 {
+                tracing::info!("🧠 ML Quality: generated {} quality records", generated);
+            }
             // Check model quality and reset degraded models
             let reset_count = super::ml::quality_tracker::check_and_reset_degraded_models(pool, 60.0).await?;
             if reset_count > 0 {
@@ -410,7 +415,7 @@ async fn execute_stage(
                     }
                 }
             }
-            Ok(reset_count)
+            Ok(reset_count + generated)
         }
         CortexStage::SmartRouting => {
             let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(

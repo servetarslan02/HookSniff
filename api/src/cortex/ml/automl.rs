@@ -212,7 +212,7 @@ pub async fn run_automl_for_endpoint(
             let best_score = optimizer.trials.iter().map(|t| t.score).fold(0.0f64, f64::max);
             // Get current model quality as baseline
             let current_quality: Option<(f64,)> = sqlx::query_as(
-                "SELECT COALESCE(AVG(quality_score), 50.0) FROM ml_model_quality WHERE endpoint_id = $1 AND model_type = $2"
+                "SELECT COALESCE(AVG(CASE WHEN within_tolerance THEN 100.0 - error_pct ELSE error_pct END), 50.0) FROM ml_model_quality WHERE endpoint_id = $1 AND model_type = $2"
             ).bind(endpoint_id).bind(model_type).fetch_optional(pool).await.unwrap_or(None);
             let baseline = current_quality.unwrap_or((50.0,)).0;
 
@@ -238,7 +238,7 @@ async fn evaluate_params(
 ) -> Result<f64, sqlx::Error> {
     // 1. Quality score from ml_model_quality (son 7 gün)
     let quality: Option<(f64,)> = sqlx::query_as(
-        "SELECT COALESCE(AVG(quality_score), 50.0) FROM ml_model_quality
+        "SELECT COALESCE(AVG(CASE WHEN within_tolerance THEN 100.0 - error_pct ELSE error_pct END), 50.0) FROM ml_model_quality
          WHERE endpoint_id = $1 AND model_type = $2 AND measured_at > NOW() - INTERVAL '7 days'"
     )
     .bind(endpoint_id)
