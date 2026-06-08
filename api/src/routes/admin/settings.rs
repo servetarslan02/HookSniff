@@ -263,9 +263,9 @@ pub async fn update_settings(
                 "plan_price_pro" => { if let Some(v) = value.as_f64() { settings.plan_price_pro = v; } }
                 "plan_price_enterprise" => { if let Some(v) = value.as_f64() { settings.plan_price_enterprise = v; } }
                 "plan_price_business" => { if let Some(v) = value.as_f64() { settings.plan_price_business = v; } }
-                "resend_api_key" => { if let Some(v) = value.as_str() { settings.resend_api_key = Some(v.to_string()); } }
+                "resend_api_key" => { if let Some(v) = value.as_str() { if v != "***" { settings.resend_api_key = Some(v.to_string()); } } }
                 "email_sender" => { if let Some(v) = value.as_str() { settings.email_sender = Some(v.to_string()); } }
-                "webhook_secret" => { if let Some(v) = value.as_str() { settings.webhook_secret = Some(v.to_string()); } }
+                "webhook_secret" => { if let Some(v) = value.as_str() { if v != "***" { settings.webhook_secret = Some(v.to_string()); } } }
                 "backup_retention_days" => { if let Some(v) = value.as_i64() { settings.backup_retention_days = v as i32; } }
                 "global_rate_limit" => { if let Some(v) = value.as_i64() { settings.global_rate_limit = v as i32; } }
                 "cors_origins" => { if let Some(v) = value.as_str() { settings.cors_origins = Some(v.to_string()); } }

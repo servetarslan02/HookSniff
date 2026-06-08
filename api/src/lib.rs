@@ -16,6 +16,7 @@ pub mod crypto;
 pub mod db;
 pub mod email;
 pub mod email_templates;
+pub mod gmail_smtp;
 #[cfg(test)]
 pub mod email_tests;
 pub mod error;

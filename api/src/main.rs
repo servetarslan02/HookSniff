@@ -239,7 +239,7 @@ async fn main() -> Result<()> {
         tracing::info!("✅ R2 storage client initialized");
     }
 
-    let email_provider = email::EmailProvider::from_config(&cfg);
+    let email_provider = email::EmailProvider::from_config_with_db(&cfg, &pool).await;
     let fcm_client = notifications::FcmClient::from_config(&cfg);
 
     background::spawn_background_jobs(

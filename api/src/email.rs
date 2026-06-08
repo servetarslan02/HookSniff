@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::AppError;
+use crate::gmail_smtp::GmailSmtpClient;
 use crate::resend_email::ResendEmailClient;
 use base64::Engine;
 use serde::Deserialize;
@@ -19,22 +20,69 @@ pub use crate::email_templates::{
 pub enum EmailProvider {
     Resend(ResendEmailClient),
     GCloud(GCloudEmailClient),
+    GmailSmtp(GmailSmtpClient),
     None,
 }
 
 impl EmailProvider {
     /// Create from environment: Resend if RESEND_API_KEY is set, else GCloud, else None.
+    ///
+    /// When a database pool is provided, also checks admin DB settings as fallback
+    /// for Resend (resend_api_key + email_sender columns in platform_settings).
     pub fn from_config(cfg: &Config) -> Self {
         if let Some(resend) = ResendEmailClient::from_env() {
-            tracing::info!("📧 Email provider: Resend");
+            tracing::info!("📧 Email provider: Resend (env)");
             return Self::Resend(resend);
+        }
+        if let Some(gmail) = GmailSmtpClient::from_env() {
+            tracing::info!("📧 Email provider: Gmail SMTP");
+            return Self::GmailSmtp(gmail);
         }
         if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
             tracing::info!("📧 Email provider: GCloud Gmail API");
             return Self::GCloud(gcloud);
         }
         tracing::warn!(
-            "⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)"
+            "⚠️ No email provider configured (RESEND_API_KEY, GMAIL_ADDRESS, and GCP_SA_JSON all missing)"
+        );
+        Self::None
+    }
+
+    /// Create from config with DB fallback for Resend settings.
+    ///
+    /// Tries env vars first, then reads `resend_api_key` + `email_sender` from
+    /// the `platform_settings` table, then GCloud, else None.
+    pub async fn from_config_with_db(cfg: &Config, pool: &sqlx::PgPool) -> Self {
+        if let Some(resend) = ResendEmailClient::from_env() {
+            tracing::info!("📧 Email provider: Resend (env)");
+            return Self::Resend(resend);
+        }
+
+        // Fallback: read Resend credentials from DB admin settings
+        let settings = crate::routes::admin::settings::fetch_platform_settings(pool).await;
+        if let Some(ref api_key) = settings.resend_api_key {
+            if !api_key.is_empty() && api_key != "***" {
+                if let Some(resend) =
+                    ResendEmailClient::from_settings(api_key, settings.email_sender.as_deref())
+                {
+                    tracing::info!("📧 Email provider: Resend (DB settings)");
+                    return Self::Resend(resend);
+                }
+            }
+        }
+
+        if let Some(gmail) = GmailSmtpClient::from_env() {
+            tracing::info!("📧 Email provider: Gmail SMTP");
+            return Self::GmailSmtp(gmail);
+        }
+
+        if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
+            tracing::info!("📧 Email provider: GCloud Gmail API");
+            return Self::GCloud(gcloud);
+        }
+
+        tracing::warn!(
+            "⚠️ No email provider configured (RESEND_API_KEY, DB settings, GMAIL_ADDRESS, and GCP_SA_JSON all missing)"
         );
         Self::None
     }
@@ -52,6 +100,7 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => c.send_contact_email(to, subject, html).await,
+            Self::GmailSmtp(c) => c.send_contact_email(to, subject, html).await,
             Self::GCloud(c) => c.send_contact_email(to, subject, html).await,
             Self::None => {
                 tracing::warn!(
@@ -72,6 +121,7 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => c.send_welcome_email(to, name, lang).await,
+            Self::GmailSmtp(c) => c.send_welcome_email(to, name, lang).await,
             Self::GCloud(c) => c.send_welcome_email(to, name, lang).await,
             Self::None => {
                 tracing::warn!("Welcome email not sent (no provider): to={}", to);
@@ -88,6 +138,7 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => c.send_verification_email(to, verification_url, lang).await,
+            Self::GmailSmtp(c) => c.send_verification_email(to, verification_url, lang).await,
             Self::GCloud(c) => c.send_verification_email(to, verification_url, lang).await,
             Self::None => {
                 tracing::warn!("Verification email not sent (no provider): to={}", to);
@@ -104,6 +155,7 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => c.send_password_reset_email(to, reset_url, lang).await,
+            Self::GmailSmtp(c) => c.send_password_reset_email(to, reset_url, lang).await,
             Self::GCloud(c) => c.send_password_reset_email(to, reset_url, lang).await,
             Self::None => {
                 tracing::warn!("Password reset email not sent (no provider): to={}", to);
@@ -121,6 +173,10 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => {
+                c.send_delivery_failed_email(to, endpoint_name, error_details, lang)
+                    .await
+            }
+            Self::GmailSmtp(c) => {
                 c.send_delivery_failed_email(to, endpoint_name, error_details, lang)
                     .await
             }
@@ -153,6 +209,19 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => {
+                c.send_invoice_email(
+                    to,
+                    invoice_number,
+                    amount,
+                    plan_name,
+                    period_start,
+                    period_end,
+                    payment_url,
+                    lang,
+                )
+                .await
+            }
+            Self::GmailSmtp(c) => {
                 c.send_invoice_email(
                     to,
                     invoice_number,
@@ -198,6 +267,7 @@ impl EmailProvider {
     ) -> Result<(), AppError> {
         match self {
             Self::Resend(c) => c.send_webhook_success_email(to, endpoint_name, lang).await,
+            Self::GmailSmtp(c) => c.send_webhook_success_email(to, endpoint_name, lang).await,
             Self::GCloud(c) => c.send_webhook_success_email(to, endpoint_name, lang).await,
             Self::None => {
                 tracing::warn!(
