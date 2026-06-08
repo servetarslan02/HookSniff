@@ -54,6 +54,21 @@ impl ResendEmailClient {
         })
     }
 
+    /// Create from env vars first, then fall back to DB admin settings.
+    /// This is the recommended constructor for background jobs.
+    pub async fn from_env_or_db(pool: &sqlx::PgPool) -> Option<Self> {
+        if let Some(client) = Self::from_env() {
+            return Some(client);
+        }
+        let settings = crate::routes::admin::settings::fetch_platform_settings(pool).await;
+        if let Some(ref api_key) = settings.resend_api_key {
+            if !api_key.is_empty() && api_key != "***" {
+                return Self::from_settings(api_key, settings.email_sender.as_deref());
+            }
+        }
+        None
+    }
+
     /// Create from admin settings (DB-stored API key + sender).
     /// Used as fallback when env var is not set.
     pub fn from_settings(api_key: &str, sender: Option<&str>) -> Option<Self> {

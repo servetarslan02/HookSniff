@@ -204,7 +204,7 @@ pub fn spawn_background_jobs(
                 true
             };
             if should_run {
-                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env() {
+                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env_or_db(&dunning_pool).await {
                     match jobs::dunning::run_dunning(&dunning_pool, &email_client).await {
                         Ok(sent) => {
                             if sent > 0 {
@@ -259,7 +259,7 @@ pub fn spawn_background_jobs(
                 true
             };
             if should_run {
-                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env() {
+                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env_or_db(&alert_pool).await {
                     match jobs::alert_eval::run_alert_evaluation(&alert_pool, &email_client).await {
                         Ok(triggered) => {
                             if triggered > 0 {
@@ -287,7 +287,7 @@ pub fn spawn_background_jobs(
                 true
             };
             if should_run {
-                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env() {
+                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env_or_db(&overage_pool).await {
                     match jobs::overage_invoicing::run_overage_invoicing(&overage_pool, &email_client).await {
                         Ok(created) => {
                             if created > 0 {
@@ -329,7 +329,7 @@ pub fn spawn_background_jobs(
                 true
             };
             if should_run {
-                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env() {
+                if let Some(email_client) = crate::resend_email::ResendEmailClient::from_env_or_db(&digest_pool).await {
                     match jobs::weekly_digest::run_weekly_digest(&digest_pool, &email_client).await {
                         Ok(sent) => {
                             tracing::info!("📊 Weekly digest: {} emails sent", sent);
