@@ -50,62 +50,31 @@ pub async fn create_delivery_failure_notification(
             return; // User disabled failure emails
         }
 
-        // Get Resend API key from platform settings
-        let api_key: Option<String> = sqlx::query_scalar(
-            "SELECT value->>'resend_api_key' FROM platform_settings WHERE key = 'main'",
-        )
-        .fetch_optional(pool)
-        .await
-        .unwrap_or(None)
-        .flatten();
+        // Use unified EmailProvider from common/api
+        let provider = {
+            // Notifications often run in the worker where we don't have the full API config.
+            // But we have environment variables injected by Cloud Run.
+            // We'll try to build a provider from env + DB fallback.
+            let cfg = hooksniff_api::config::Config::from_env();
+            hooksniff_api::email::EmailProvider::from_config_with_db(&cfg, pool).await
+        };
 
-        if let Some(key) = api_key {
-            if !key.is_empty() {
-                let sender: String = sqlx::query_scalar(
-                    "SELECT COALESCE(value->>'email_sender', 'noreply@resend.dev') FROM platform_settings WHERE key = 'main'"
-                )
-                .fetch_one(pool)
-                .await
-                .unwrap_or_else(|_| "noreply@resend.dev".to_string());
+        if provider.is_configured() {
+            let is_tr = lang.as_deref() == Some("tr");
+            let language = if is_tr {
+                hooksniff_api::email::Language::Tr
+            } else {
+                hooksniff_api::email::Language::En
+            };
 
-                let is_tr = lang.as_deref() == Some("tr");
-                let (subject, body) = if is_tr {
-                    (
-                        format!("❌ Teslimat Başarısız: {}", endpoint_url),
-                        format!(
-                            "Webhook teslimatınız başarısız oldu.\n\nEndpoint: {}\nHata: {}\nTeslimat ID: {}\n\nDashboard'dan kontrol edin: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
-                            endpoint_url, error_msg, delivery_id, delivery_id
-                        ),
-                    )
-                } else {
-                    (
-                        format!("❌ Delivery Failed: {}", endpoint_url),
-                        format!(
-                            "Your webhook delivery has failed.\n\nEndpoint: {}\nError: {}\nDelivery ID: {}\n\nCheck your dashboard: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
-                            endpoint_url, error_msg, delivery_id, delivery_id
-                        ),
-                    )
-                };
-
-                let client = reqwest::Client::new();
-                let _ = client
-                    .post("https://api.resend.com/emails")
-                    .header("Authorization", format!("Bearer {}", key))
-                    .json(&serde_json::json!({
-                        "from": sender,
-                        "to": [email],
-                        "subject": subject,
-                        "text": body,
-                    }))
-                    .send()
-                    .await;
-            }
+            let _ = provider
+                .send_delivery_failed_email(&email, endpoint_url, error_msg, language)
+                .await;
         }
     }
 }
 
 /// Send email notification when an endpoint becomes unhealthy (failure_streak >= 5).
-/// Reads Resend config from platform_settings.
 /// Also dispatches `endpoint.disabled` operational webhook at threshold crossings.
 pub async fn notify_endpoint_down(
     pool: &PgPool,
@@ -118,24 +87,18 @@ pub async fn notify_endpoint_down(
         return;
     }
 
-    // Get customer email, customer_id, and platform settings
-    let result = sqlx::query_as::<_, (String, uuid::Uuid, String, Option<String>, Option<String>)>(
-        r#"SELECT c.email, c.id, e.url, s.resend_api_key, s.email_sender
+    // Get customer email, customer_id, and language
+    let result = sqlx::query_as::<_, (String, uuid::Uuid, String, Option<String>)>(
+        r#"SELECT c.email, c.id, e.url, c.language
            FROM endpoints e
            JOIN customers c ON e.customer_id = c.id
-           CROSS JOIN (SELECT value FROM platform_settings WHERE key = 'main') ps
-           LEFT JOIN LATERAL (
-               SELECT
-                   (ps.value->>'resend_api_key') as resend_api_key,
-                   (ps.value->>'email_sender') as email_sender
-           ) s ON true
            WHERE e.id = $1"#,
     )
     .bind(endpoint_id)
     .fetch_optional(pool)
     .await;
 
-    let (customer_email, customer_id, _url, api_key_opt, sender_opt) = match result {
+    let (customer_email, customer_id, _url, lang) = match result {
         Ok(Some(row)) => row,
         _ => return, // Silently skip if we can't fetch
     };
@@ -176,35 +139,24 @@ pub async fn notify_endpoint_down(
         return;
     }
 
-    let api_key = match api_key_opt {
-        Some(k) if !k.is_empty() => k,
-        _ => return, // No Resend key configured
-    };
+    // Use unified EmailProvider
+    let cfg = hooksniff_api::config::Config::from_env();
+    let provider = hooksniff_api::email::EmailProvider::from_config_with_db(&cfg, pool).await;
 
-    let sender = sender_opt.as_deref().unwrap_or("noreply@resend.dev");
+    if provider.is_configured() {
+        let is_tr = lang.as_deref() == Some("tr");
+        let language = if is_tr {
+            hooksniff_api::email::Language::Tr
+        } else {
+            hooksniff_api::email::Language::En
+        };
 
-    let subject = format!("⚠️ Endpoint Down: {}", endpoint_url);
-    let body = format!(
-        "Your endpoint has been experiencing failures.\n\n\
-         Endpoint: {}\n\
-         Consecutive failures: {}\n\n\
-         Please check your endpoint and ensure it's responding correctly.\n\n\
-         — HookSniff",
-        endpoint_url, failure_streak
-    );
+        // We use delivery failed email template for now as it's similar
+        let error_msg = format!("Endpoint is experiencing consecutive failures: {}", failure_streak);
+        let _ = provider
+            .send_delivery_failed_email(&customer_email, endpoint_url, &error_msg, language)
+            .await;
 
-    let client = reqwest::Client::new();
-    let _ = client
-        .post("https://api.resend.com/emails")
-        .header("Authorization", format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "from": sender,
-            "to": [customer_email],
-            "subject": subject,
-            "text": body,
-        }))
-        .send()
-        .await;
-
-    tracing::info!("📧 Endpoint down notification sent for {}", endpoint_url);
+        tracing::info!("📧 Endpoint down notification sent for {}", endpoint_url);
+    }
 }
