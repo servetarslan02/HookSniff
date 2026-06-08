@@ -61,7 +61,11 @@ validate_env "HMAC_SECRET"
 validate_env "JWT_SECRET"
 validate_env "POLAR_ACCESS_TOKEN"
 validate_env "POLAR_WEBHOOK_SECRET"
-validate_env "RESEND_API_KEY"
+
+# GMAIL is preferred, RESEND is fallback
+if [ -z "${GMAIL_ADDRESS:-}" ] && [ -z "${RESEND_API_KEY:-}" ]; then
+    error "Either GMAIL_ADDRESS or RESEND_API_KEY must be set in .env.production"
+fi
 
 echo ""
 echo "🪝 HookSniff — Google Cloud Run Deployment"
@@ -112,6 +116,11 @@ create_or_update_secret() {
     local secret_name=$1
     local secret_value=$2
     
+    if [ -z "$secret_value" ]; then
+        warn "Skipping empty secret '$secret_name'"
+        return
+    fi
+
     if gcloud secrets describe "$secret_name" --project="$PROJECT_ID" &>/dev/null; then
         echo -n "$secret_value" | gcloud secrets versions add "$secret_name" --data-file=- --project="$PROJECT_ID" --quiet
         warn "Secret '$secret_name' updated"
@@ -133,7 +142,9 @@ create_or_update_secret "hooksniff-jwt-secret" "$JWT_SECRET"
 create_or_update_secret "hooksniff-encryption-key" "${ENCRYPTION_KEY:-}"
 create_or_update_secret "hooksniff-polar-token" "$POLAR_ACCESS_TOKEN"
 create_or_update_secret "hooksniff-polar-webhook-secret" "$POLAR_WEBHOOK_SECRET"
-create_or_update_secret "hooksniff-resend-api-key" "$RESEND_API_KEY"
+create_or_update_secret "hooksniff-resend-api-key" "${RESEND_API_KEY:-}"
+create_or_update_secret "hooksniff-gmail-address" "${GMAIL_ADDRESS:-}"
+create_or_update_secret "hooksniff-gmail-app-password" "${GMAIL_APP_PASSWORD:-}"
 create_or_update_secret "hooksniff-otel-headers" "${OTEL_EXPORTER_OTLP_HEADERS:-}"
 
 success "Secrets synchronized to Google Secret Manager"
@@ -182,7 +193,7 @@ gcloud run deploy "$API_SERVICE" \
     --max-instances=3 \
     --timeout=300 \
     --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=${OTEL_ENABLED:-false}" \
-    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest" \
+    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,GMAIL_ADDRESS=hooksniff-gmail-address:latest,GMAIL_APP_PASSWORD=hooksniff-gmail-app-password:latest" \
     --project="$PROJECT_ID" \
     --quiet
 
@@ -201,7 +212,7 @@ gcloud run deploy "$WORKER_SERVICE" \
     --min-instances=0 \
     --max-instances=4 \
     --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json" \
-    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest" \
+    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,GMAIL_ADDRESS=hooksniff-gmail-address:latest,GMAIL_APP_PASSWORD=hooksniff-gmail-app-password:latest" \
     --project="$PROJECT_ID" \
     --quiet
 
