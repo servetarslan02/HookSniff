@@ -20,7 +20,7 @@ use crate::models::customer::{
 use super::{
     CUSTOMER_SELECT, REGISTER_RATE_LIMIT, LOGIN_RATE_LIMIT,
     validate_password_strength, auth_response_with_cookie, extract_client_ip,
-    send_audit_log, send_email_with_fallback,
+    send_audit_log,
 };
 use super::helpers::create_refresh_token;
 // send_verification_email_for_customer — temporarily unused (email disabled)
@@ -109,7 +109,7 @@ pub async fn register(
     let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
 
     Ok(auth_response_with_cookie(AuthResponse {
-        token, customer: customer.to_response(Some(&api_key)), refresh_token: Some(refresh_token_value),
+        token, customer: customer.to_response(Some(api_key)), refresh_token: Some(refresh_token_value),
     }))
 }
 
