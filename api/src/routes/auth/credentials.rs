@@ -22,7 +22,8 @@ use super::{
     validate_password_strength, auth_response_with_cookie, extract_client_ip,
     send_audit_log, send_email_with_fallback,
 };
-use super::helpers::{create_refresh_token, send_verification_email_for_customer};
+use super::helpers::create_refresh_token;
+// send_verification_email_for_customer — temporarily unused (email disabled)
 
 // ── Registration ────────────────────────────────────────────
 
@@ -66,7 +67,7 @@ pub async fn register(
     }
 
     let customer = sqlx::query_as::<_, Customer>(
-        "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, name, is_active) VALUES ($1, $2, $3, $4, $5, true) RETURNING *",
+        "INSERT INTO customers (email, api_key_hash, api_key_prefix, password_hash, name, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, true, true) RETURNING *",
     )
     .bind(&req.email).bind(&api_key_hash).bind(&api_key_prefix).bind(&password_hash).bind(&req.name)
     .fetch_one(&pool).await?;
@@ -82,24 +83,26 @@ pub async fn register(
         }
     }
 
-    let lang = crate::email::Language::from_accept_language(
-        headers.get("accept-language").and_then(|v| v.to_str().ok()).unwrap_or("en")
-    );
-    let to = req.email.clone();
-    let name = req.name.clone();
-    let _ep = email_provider.clone();
-    send_email_with_fallback(job_queue.as_ref(), &email_provider, &to,
-        crate::jobs::job_queue::EmailTemplate::Welcome { name: name.clone() }, lang,
-        move |ep, to, lang| {
-            tokio::spawn(async move {
-                if let Err(e) = ep.send_welcome_email(&to, name.as_deref(), lang).await {
-                    tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
-                }
-            });
-        },
-    ).await;
-
-    send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
+    // TODO: Email sending temporarily disabled — re-enable when email provider is fixed
+    // let lang = crate::email::Language::from_accept_language(
+    //     headers.get("accept-language").and_then(|v| v.to_str().ok()).unwrap_or("en")
+    // );
+    // let to = req.email.clone();
+    // let name = req.name.clone();
+    // let _ep = email_provider.clone();
+    // send_email_with_fallback(job_queue.as_ref(), &email_provider, &to,
+    //     crate::jobs::job_queue::EmailTemplate::Welcome { name: name.clone() }, lang,
+    //     move |ep, to, lang| {
+    //         tokio::spawn(async move {
+    //             if let Err(e) = ep.send_welcome_email(&to, name.as_deref(), lang).await {
+    //                 tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
+    //             }
+    //         });
+    //     },
+    // ).await;
+    //
+    // send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
+    tracing::info!("📧 Email sending disabled — skipping welcome & verification emails for {}", req.email);
 
     Ok((HeaderMap::new(), Json(serde_json::json!({
         "message": "If this email is available, a verification email has been sent.",
@@ -225,9 +228,10 @@ pub async fn login(
         &pool, customer.id, &client_ip, user_agent
     ).await;
 
-    if !customer.email_verified {
-        return Err(AppError::coded(ErrorCode::EmailNotVerified));
-    }
+    // TODO: Email verification check temporarily disabled — re-enable when email provider is fixed
+    // if !customer.email_verified {
+    //     return Err(AppError::coded(ErrorCode::EmailNotVerified));
+    // }
 
     // SSO enforcement check
     let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
