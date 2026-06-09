@@ -104,9 +104,13 @@ pub async fn register(
     // send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
     tracing::info!("📧 Email sending disabled — skipping welcome & verification emails for {}", req.email);
 
-    Ok((HeaderMap::new(), Json(serde_json::json!({
-        "message": "If this email is available, a verification email has been sent.",
-    }))))
+    // Auto-login after registration — generate token
+    let token = jwt::generate_access_token(customer.id, &customer.email, &customer.plan, &cfg.jwt_secret, customer.is_admin)?;
+    let refresh_token_value = create_refresh_token(&pool, customer.id).await?;
+
+    Ok(auth_response_with_cookie(AuthResponse {
+        token, customer: customer.to_response(Some(&api_key)), refresh_token: Some(refresh_token_value),
+    }))
 }
 
 // ── Login ───────────────────────────────────────────────────
