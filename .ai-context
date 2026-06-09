@@ -34,3 +34,13 @@ HookSniff is a webhook infrastructure platform built in Rust (API) + Next.js (Da
 - Resend requires custom domain — not configured, falls back to Gmail SMTP
 - GCP Service Account (`GCP_SA_JSON`) not set up — not needed if Gmail SMTP works
 - Dashboard email.ts uses Gmail API directly (separate from API email)
+
+## Email System — TEMPORARILY DISABLED (2026-06-09)
+- **Status**: Disabled — email sending not working
+- **What changed**:
+  - `api/src/routes/auth/credentials.rs`: Registration no longer sends welcome/verification emails
+  - `api/src/routes/auth/credentials.rs`: Login no longer checks `email_verified` flag
+  - New users auto-verified (`email_verified = true` on INSERT)
+- **Files modified**: `api/src/routes/auth/credentials.rs`, `api/src/routes/auth/helpers.rs` (import cleaned)
+- **To re-enable**: Uncomment the TODO blocks in `credentials.rs` and revert `email_verified` INSERT to default
+- **Commit**: pending push
