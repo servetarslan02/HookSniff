@@ -17,6 +17,7 @@ HookSniff is a webhook infrastructure platform built in Rust (API) + Next.js (Da
 - **Env vars**: `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`
 
 ## Deployment
+- GCP Project: `project-0d7b3b3f-2204-4957-909` (My First Project)
 - GCP Cloud Build (`cloudbuild.yaml`) builds & deploys API + Worker
 - Vercel auto-deploys dashboard from GitHub
 - Secrets managed in GCP Secret Manager
