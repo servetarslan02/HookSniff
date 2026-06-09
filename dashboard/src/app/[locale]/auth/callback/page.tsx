@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { X } from '@/components/icons';
-import { API_BASE } from '@/lib/api';
 
 /**
  * OAuth callback page.
@@ -10,12 +9,8 @@ import { API_BASE } from '@/lib/api';
  * After Google/GitHub OAuth, the backend redirects here:
  *  /auth/callback?token=eyJhbGciOiJIUzI1NiIs...
  *
- * Strategy: Store token in localStorage, then hard-redirect to /core.
- * This ensures a fresh page load where AuthProvider reads the token
- * from localStorage on mount and calls /auth/me to validate.
- *
- * We do NOT use router.replace() — client-side navigation can cause
- * race conditions with AuthProvider initialization.
+ * Strategy: Store token in localStorage + set cookie for middleware,
+ * then hard-redirect to /core. AuthProvider will validate on mount.
  */
 export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +40,13 @@ export default function AuthCallbackPage() {
         if (refreshToken) {
           localStorage.setItem('hooksniff_refresh', refreshToken);
         }
+        // IMPORTANT: Also set cookie for middleware auth check.
+        // Backend sets cookies on the API domain (Cloud Run), which don't
+        // transfer to the dashboard domain (Vercel). We must set them here.
+        document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        if (refreshToken) {
+          document.cookie = `hooksniff_refresh=${refreshToken}; path=/; max-age=${90 * 24 * 60 * 60}; SameSite=Lax`;
+        }
       } catch (e) {
         console.error('Failed to store token:', e);
         setError('Failed to save login token. Please try again.');
@@ -52,34 +54,11 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // Verify the token works before redirecting
-      fetch(`${API_BASE}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      })
-        .then((res) => {
-          if (res.ok) {
-            // Token is valid — hard redirect to /core
-            // This causes a fresh page load where AuthProvider will
-            // read the token from localStorage and call /auth/me
-            setStatus('redirecting');
-            // Clean URL params
-            window.history.replaceState({}, '', '/auth/callback');
-            // Hard redirect — NOT router.replace
-            window.location.href = '/core';
-          } else {
-            // Token invalid — show error
-            console.error('Token validation failed:', res.status);
-            setError('Login token is invalid. Please try again.');
-            setStatus('error');
-          }
-        })
-        .catch((err) => {
-          // Network error — still try redirect, token might work via cookie
-          console.warn('Token verification network error, redirecting anyway:', err);
-          setStatus('redirecting');
-          window.history.replaceState({}, '', '/auth/callback');
-          window.location.href = '/core';
-        });
+      // Token is stored — redirect to dashboard.
+      // No need to verify with API first; AuthProvider will do that on mount.
+      setStatus('redirecting');
+      window.history.replaceState({}, '', '/auth/callback');
+      window.location.href = '/core';
       return;
     }
 
@@ -95,8 +74,6 @@ export default function AuthCallbackPage() {
     // No token anywhere — show error
     setError('No login token received. Please try logging in again.');
     setStatus('error');
-    // OAuth callback: intentionally runs once on mount to process URL token params
-    // Adding searchParams/token/callback to deps would cause infinite re-processing loops
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
