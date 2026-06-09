@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from '@/components/icons';
+import { API_BASE } from '@/lib/api';
 
 /**
  * OAuth callback page.
@@ -52,8 +53,7 @@ export default function AuthCallbackPage() {
       }
 
       // Verify the token works before redirecting
-      const apiUrl = 'https://your-api.trycloudflare.com';
-      fetch(`${apiUrl}/v1/auth/me`, {
+      fetch(`${API_BASE}/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       })
         .then((res) => {
