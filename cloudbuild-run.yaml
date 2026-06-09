@@ -41,7 +41,7 @@ steps:
       - '--cpu=1'
       - '--min-instances=0'
       - '--max-instances=2'
-      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,ENCRYPTION_KEY=encryption-key:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,HMAC_SECRET=hooksniff-hmac-secret:latest'
+      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,ENCRYPTION_KEY=encryption-key:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,GMAIL_ADDRESS=hooksniff-gmail-address:latest,GMAIL_APP_PASSWORD=hooksniff-gmail-app-password:latest'
       - '--set-env-vars=APP_ENV=production,PORT=8080,RUST_LOG=info'
     waitFor: ['push']
 
@@ -65,3 +65,7 @@ availableSecrets:
       env: RESEND_API_KEY
     - versionName: projects/$PROJECT_ID/secrets/hooksniff-hmac-secret/versions/latest
       env: HMAC_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-gmail-address/versions/latest
+      env: GMAIL_ADDRESS
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-gmail-app-password/versions/latest
+      env: GMAIL_APP_PASSWORD

@@ -30,13 +30,14 @@ impl EmailProvider {
     /// When a database pool is provided, also checks admin DB settings as fallback
     /// for Resend (resend_api_key + email_sender columns in platform_settings).
     pub fn from_config(cfg: &Config) -> Self {
-        if let Some(resend) = ResendEmailClient::from_env() {
-            tracing::info!("📧 Email provider: Resend (env)");
-            return Self::Resend(resend);
-        }
+        // Gmail SMTP has priority — works with personal Gmail + App Password
         if let Some(gmail) = GmailSmtpClient::from_env() {
             tracing::info!("📧 Email provider: Gmail SMTP");
             return Self::GmailSmtp(gmail);
+        }
+        if let Some(resend) = ResendEmailClient::from_env() {
+            tracing::info!("📧 Email provider: Resend (env)");
+            return Self::Resend(resend);
         }
         if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
             tracing::info!("📧 Email provider: GCloud Gmail API");
@@ -53,6 +54,12 @@ impl EmailProvider {
     /// Tries env vars first, then reads `resend_api_key` + `email_sender` from
     /// the `platform_settings` table, then GCloud, else None.
     pub async fn from_config_with_db(cfg: &Config, pool: &sqlx::PgPool) -> Self {
+        // Gmail SMTP has priority — works with personal Gmail + App Password
+        if let Some(gmail) = GmailSmtpClient::from_env() {
+            tracing::info!("📧 Email provider: Gmail SMTP");
+            return Self::GmailSmtp(gmail);
+        }
+
         if let Some(resend) = ResendEmailClient::from_env() {
             tracing::info!("📧 Email provider: Resend (env)");
             return Self::Resend(resend);
@@ -69,11 +76,6 @@ impl EmailProvider {
                     return Self::Resend(resend);
                 }
             }
-        }
-
-        if let Some(gmail) = GmailSmtpClient::from_env() {
-            tracing::info!("📧 Email provider: Gmail SMTP");
-            return Self::GmailSmtp(gmail);
         }
 
         if let Some(gcloud) = GCloudEmailClient::from_config(cfg) {
