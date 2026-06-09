@@ -135,11 +135,10 @@ function LoginForm() {
         user = await login(email, password);
       } else {
         user = await register(email, password, name || undefined);
-        // Email verification flow — user needs to verify before login
-        if (user && !user.id) {
-          setSuccess(t('verifyEmailSent') || 'A verification email has been sent. Please check your inbox and verify your email before logging in.');
-          setLoading(false);
-          isSubmitting.current = false;
+        // Auto-login after registration — skip email verification
+        if (user && user.id) {
+          const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/core');
+          router.push(redirectTo);
           return;
         }
       }
