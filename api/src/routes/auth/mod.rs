@@ -109,31 +109,20 @@ pub async fn send_audit_log(pool: &PgPool, customer_id: Uuid, action: &str, head
 
 /// Send email via job queue with fallback to direct send.
 pub async fn send_email_with_fallback<F>(
-    job_queue: Option<&crate::jobs::job_queue::JobQueue>,
+    _job_queue: Option<&crate::jobs::job_queue::JobQueue>,
     email_provider: &crate::email::EmailProvider,
     to: &str,
-    template: crate::jobs::job_queue::EmailTemplate,
+    _template: crate::jobs::job_queue::EmailTemplate,
     lang: crate::email::Language,
     send_direct: F,
 ) where
     F: FnOnce(crate::email::EmailProvider, String, crate::email::Language) + Send + 'static,
 {
-    let lang_str = if lang == crate::email::Language::Tr { "tr" } else { "en" };
+    // Always send emails directly — bypass Redis queue to avoid
+    // dependency on Redis availability for critical email flows.
     let to_owned = to.to_string();
-
-    if let Some(queue) = job_queue {
-        let job = crate::jobs::job_queue::Job::Email {
-            to: to_owned.clone(),
-            template,
-            language: lang_str.to_string(),
-        };
-        if let Err(e) = queue.enqueue(&job).await {
-            tracing::warn!("Failed to enqueue email for {}: {:?}", to_owned, e);
-            send_direct(email_provider.clone(), to_owned, lang);
-        }
-    } else {
-        send_direct(email_provider.clone(), to_owned, lang);
-    }
+    tracing::info!("📧 Sending email directly to {}", to_owned);
+    send_direct(email_provider.clone(), to_owned, lang);
 }
 
 // ════════════════════════════════════════════════════════
