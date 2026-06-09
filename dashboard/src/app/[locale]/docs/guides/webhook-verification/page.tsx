@@ -1,3 +1,4 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 import SdkTabs from '@/components/SdkTabs';
 import { Check, Lock, RefreshCw, Ruler, Shield, X } from '@/components/icons';
@@ -371,7 +372,10 @@ app.post("webhook") { req async throws -> Response in
   },
 ];
 
-async function WebhookVerificationContent() {
+async function WebhookVerificationContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">

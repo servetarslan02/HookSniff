@@ -1,3 +1,4 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
@@ -9,17 +10,20 @@ export const metadata: Metadata = {
   description: 'Real-time SSE streaming and rate limiting configuration',
 };
 
-async function StreamingContent() {
+async function StreamingContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Radio size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Streaming & Rate Limiting</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Radio size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t("streaming")}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         HookSniff supports real-time delivery monitoring via SSE streaming, and per-endpoint rate limiting to protect your servers.
       </p>
 
       {/* SSE Streaming */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Real-Time Streaming (SSE)</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("streaming")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Stream delivery events in real-time using Server-Sent Events (SSE). Useful for live dashboards, monitoring, and debugging.
         </p>
@@ -84,7 +88,7 @@ stream.on('error', (err) => {
 
       {/* Rate Limiting */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Rate Limiting</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("rateLimiting")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Protect your webhook endpoints from being overwhelmed. Configure per-endpoint rate limits using token bucket or sliding window algorithms.
         </p>
@@ -150,7 +154,7 @@ try {
 
       {/* API Rate Limits by Plan */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">API Rate Limits by Plan</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("rateLimiting")} — {t("billing")}</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-slate-800">

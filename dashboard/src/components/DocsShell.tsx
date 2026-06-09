@@ -91,6 +91,7 @@ const sidebarNav: NavGroup[] = [
   {
     title: 'Explanation',
     items: [
+      { name: 'Cortex AI Engine', href: '/docs/cortex', badge: 'AI' },
       { name: 'Event Processing', href: '/docs/event-processing' },
       { name: 'Delivery Guarantees', href: '/docs/delivery-guarantees' },
       { name: 'Webhook vs Polling', href: '/docs/webhook-vs-polling' },

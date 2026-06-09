@@ -203,7 +203,7 @@ SELECT 1 FROM processed_webhooks WHERE delivery_id = $1;`}
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Metrik</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Metric</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('target')}</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('alertWhen')}</th>
               </tr>

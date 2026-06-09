@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   description: 'Handle webhook delivery errors, retries, and failures gracefully',
 };
 
-export default function ErrorHandlingPage() {
+export default async function ErrorHandlingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const { getTranslations, setRequestLocale } = await import('next-intl/server');
+  setRequestLocale(locale);
+  const t = await getTranslations('docs');
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
     <article className="prose prose-gray max-w-none">
