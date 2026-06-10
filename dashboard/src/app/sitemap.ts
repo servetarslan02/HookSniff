@@ -33,7 +33,7 @@ const publicPages = [
   '/alternatives/hook0',
   '/alternatives/convoy',
   '/playground',
-  '/what-is-webhook',
+  '/what-is-a-webhook',
   '/build-vs-buy',
   '/startups',
   '/customers',
