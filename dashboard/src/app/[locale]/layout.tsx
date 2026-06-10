@@ -77,17 +77,8 @@ export async function generateMetadata({
     verification: {
       google: 'TQD51mWwYf0O3V5DviqzU5MZ4I-fKtrrEC66qPOPXzM',
     },
-    alternates: {
-      languages: Object.fromEntries(
-        [
-          ...locales.map((l) => [
-            l,
-            `https://hooksniff.vercel.app/${l}`,
-          ]),
-          ['x-default', 'https://hooksniff.vercel.app/en'],
-        ]
-      ),
-    },
+    // No hreflang alternates — localePrefix: 'never' means all languages
+    // are served from the same URL without /en/ or /tr/ prefix.
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'
     ),

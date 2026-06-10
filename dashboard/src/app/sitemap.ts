@@ -1,10 +1,7 @@
 import { MetadataRoute } from 'next';
-import { routing } from '@/i18n/routing';
 import { blogSlugs } from '@/lib/blog-slugs';
 
 const BASE_URL = 'https://hooksniff.vercel.app';
-
-const locales = routing.locales;
 const lastModified = new Date('2026-05-23T00:00:00.000Z');
 
 const publicPages = [
@@ -45,9 +42,9 @@ const publicPages = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
-  // With localePrefix: 'never', URLs don't have /en/ or /tr/ prefix.
-  // Each page has a single canonical URL without locale prefix.
-  // The alternates.languages field handles hreflang for different locales.
+  // localePrefix: 'never' → no /en/ or /tr/ prefix.
+  // All pages serve both languages from a single URL.
+  // No hreflang needed — Google treats each URL as the canonical version.
 
   // Static pages
   for (const page of publicPages) {
@@ -56,14 +53,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: page === '' ? 'daily' : 'weekly',
       priority: page === '' ? 1 : page.startsWith('/blog') ? 0.9 : 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          [
-            ...locales.map((l) => [l, `${BASE_URL}${page}`]),
-            ['x-default', `${BASE_URL}${page}`],
-          ]
-        ),
-      },
     });
   }
 
@@ -74,14 +63,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'monthly',
       priority: 0.7,
-      alternates: {
-        languages: Object.fromEntries(
-          [
-            ...locales.map((l) => [l, `${BASE_URL}/blog/${slug}`]),
-            ['x-default', `${BASE_URL}/blog/${slug}`],
-          ]
-        ),
-      },
     });
   }
 
