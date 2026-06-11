@@ -90,7 +90,7 @@ fn full_decode(input: &str) -> String {
 }
 
 /// SQL injection detection with context awareness
-fn detect_sql_injection(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
+fn detect_sql_injection(_raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
     let mut score: f64 = 0.0;
     let mut rules = Vec::new();
 
@@ -200,7 +200,7 @@ fn detect_sql_injection(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> 
 }
 
 /// XSS detection with context awareness
-fn detect_xss(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
+fn detect_xss(_raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
     let mut score: f64 = 0.0;
     let mut rules = Vec::new();
 
@@ -281,7 +281,7 @@ fn detect_xss(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
 }
 
 /// Path traversal detection with context awareness
-fn detect_path_traversal(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
+fn detect_path_traversal(_raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
     let mut score: f64 = 0.0;
     let mut rules = Vec::new();
 
@@ -351,7 +351,7 @@ fn detect_path_traversal(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)>
 }
 
 /// SSRF detection
-fn detect_ssrf(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
+fn detect_ssrf(_raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
     let mut score: f64 = 0.0;
     let mut rules = Vec::new();
 
@@ -391,7 +391,7 @@ fn detect_ssrf(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
 }
 
 /// Command injection detection
-fn detect_command_injection(raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
+fn detect_command_injection(_raw: &str, decoded: &str) -> Option<(f64, Vec<String>)> {
     let mut score: f64 = 0.0;
     let mut rules = Vec::new();
 
