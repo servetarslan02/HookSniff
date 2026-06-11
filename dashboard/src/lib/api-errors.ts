@@ -2,8 +2,10 @@
  * HookSniff Custom Error Classes
  *
  * Preserves error codes for i18n-friendly error handling.
- * The API returns { error: { code: string } }.
+ * The API returns { error: { code: string, detail: string } }.
  */
+
+import { getUserFriendlyMessage } from './error-catalog';
 
 /**
  * Structured API error with error code.
@@ -39,16 +41,19 @@ export function createApiError(
   status: number
 ): HookSniffError {
   if (responseBody && typeof responseBody === 'object' && 'error' in responseBody) {
-    const err = (responseBody as { error: { code?: string; message?: string } }).error;
+    const err = (responseBody as { error: { code?: string; message?: string; detail?: string } }).error;
+    // Priority: detail > message > code-mapped message > fallback
+    const code = err.code || 'UNKNOWN';
+    const message = err.detail || err.message || getUserFriendlyMessage(code) || `Something went wrong (${status})`;
     return new HookSniffError({
-      message: err.message || `API error: ${status}`,
-      code: err.code || 'UNKNOWN',
+      message,
+      code,
       status,
     });
   }
 
   return new HookSniffError({
-    message: typeof responseBody === 'string' ? responseBody : `API error: ${status}`,
+    message: typeof responseBody === 'string' ? responseBody : `Something went wrong (${status})`,
     code: 'UNKNOWN',
     status,
   });
