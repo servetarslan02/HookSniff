@@ -508,7 +508,7 @@ pub async fn new_device_login(pool: &PgPool, customer_id: Uuid, ip: &str, user_a
 
     // Check if we already notified about this IP+device combo in the last 7 days
     let already_notified: Option<(i64,)> = sqlx::query_as(
-        "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND category = 'security' AND title ILIKE '%cihaz%' AND created_at > NOW() - INTERVAL '7 days'"
+        "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND type = 'security' AND title ILIKE '%cihaz%' AND created_at > NOW() - INTERVAL '7 days'"
     ).bind(customer_id).fetch_optional(pool).await.unwrap_or(None);
 
     let count = already_notified.map(|(c,)| c).unwrap_or(0);
