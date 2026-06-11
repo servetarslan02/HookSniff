@@ -31,7 +31,7 @@ export function AppDetailContent() {
   const appId = params.id as string;
 
   // Data
-  const { data, isLoading: loading } = useApplicationDetail(appId);
+  const { data, isLoading: loading, isError, refetch } = useApplicationDetail(appId);
   const deleteEndpointMutation = useDeleteEndpoint();
   const toggleEndpointMutation = useToggleEndpoint();
 
@@ -127,6 +127,24 @@ export function AppDetailContent() {
           ))}
         </div>
         <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+      </div>
+    );
+  }
+
+  // ─── Error
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
+        <div className="text-4xl mb-4">⚠️</div>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{tc('error') || 'Something went wrong'}</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{tc('tryAgain') || 'Please try again.'}</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+        >
+          {tc('retry') || 'Retry'}
+        </button>
       </div>
     );
   }
