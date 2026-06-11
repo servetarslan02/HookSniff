@@ -105,6 +105,7 @@ async fn update_profile(
         webhook_limit: customer.webhook_limit,
         webhook_count: customer.webhook_count,
         created_at: customer.created_at.to_rfc3339(),
+        is_sso: false,
     }))
 }
 
