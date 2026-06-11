@@ -44,10 +44,10 @@ async function RateLimitingPageContent(params: Promise<{ locale: string }>) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">300/gün</td><td className="px-4 py-3">5</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Startup</td><td className="px-4 py-3">$29/ay</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30.000/gün</td><td className="px-4 py-3">20</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Pro</td><td className="px-4 py-3">$49/ay</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100.000/gün</td><td className="px-4 py-3">50</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Enterprise</td><td className="px-4 py-3">$149/ay</td><td className="px-4 py-3">5,000</td><td className="px-4 py-3">Sınırsız</td><td className="px-4 py-3">200</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">300/gün</td><td className="px-4 py-3">Sınırsız</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Startup</td><td className="px-4 py-3">$29/ay</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30.000/gün</td><td className="px-4 py-3">Sınırsız</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Pro</td><td className="px-4 py-3">$49/ay</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100.000/gün</td><td className="px-4 py-3">Sınırsız</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Enterprise</td><td className="px-4 py-3">$149/ay</td><td className="px-4 py-3">5,000</td><td className="px-4 py-3">Sınırsız</td><td className="px-4 py-3">Sınırsız</td></tr>
             </tbody>
           </table></div>
         </div>
