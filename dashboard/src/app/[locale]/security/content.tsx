@@ -18,7 +18,7 @@ export function SecurityPageContent() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded-full mb-4">{t("badge")}</span>
           <h1 className="text-4xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             {t("heroTitle")}
@@ -29,7 +29,7 @@ export function SecurityPageContent() {
         </div>
 
         {/* Security Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {[
             { icon: <Lock size={32} strokeWidth={1.75} />, titleKey: 'featureTls', descKey: 'featureTlsDesc' },
             { icon: <Shield size={32} strokeWidth={1.75} />, titleKey: 'featureHmac', descKey: 'featureHmacDesc' },
@@ -53,7 +53,7 @@ export function SecurityPageContent() {
         </div>
 
         {/* Compliance */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("complianceTitle")}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -76,7 +76,7 @@ export function SecurityPageContent() {
         </div>
 
         {/* Architecture Security */}
-        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+        <div className="mb-8 sm:mb-12 md:mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t("architecture")}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -101,7 +101,7 @@ export function SecurityPageContent() {
         </div>
 
         {/* Responsible Disclosure */}
-        <div className="mb-16 p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
+        <div className="mb-8 sm:mb-12 md:mb-16 p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Search size={16} strokeWidth={1.75} className="inline mr-1" /> {t("responsibleDisclosure")}</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
             {t("responsibleDisclosureDesc")}

@@ -112,7 +112,7 @@ export default function AdminSystemPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('fetchingHealth')}</p>
         </div>
-        <div className="flex flex-col items-center justify-center py-16">
+        <div className="flex flex-col items-center justify-center py-8 sm:py-12 md:py-16">
           <div className="relative w-12 h-12 mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-700" />
             <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-red-500 animate-spin" />

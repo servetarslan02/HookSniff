@@ -177,12 +177,12 @@ export default function OperationalWebhooksList() {
 
       {/* Endpoints list */}
       {isLoading ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
           <p className="text-gray-500 dark:text-slate-400">{tc('loading')}</p>
         </div>
       ) : endpoints.length === 0 ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="text-5xl mb-4">🪝</div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noEndpoints')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noEndpointsDesc')}</p>
@@ -277,7 +277,7 @@ export default function OperationalWebhooksList() {
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('deliveryLog')}</h3>
           </div>
           {deliveries.length === 0 ? (
-            <div className="px-6 py-12 text-center">
+            <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
               <div className="flex justify-center mb-2 text-gray-400"><Inbox size={28} strokeWidth={1.5} /></div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDeliveries')}</p>
             </div>

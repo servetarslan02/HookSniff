@@ -256,7 +256,7 @@ export default function AdminActivityPage() {
             </div>
           </div>
         ) : allEntries.length === 0 ? (
-          <div className="px-6 py-12 text-center">
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
             <span className="text-4xl block mb-3" aria-hidden="true"><ClipboardList size={18} strokeWidth={1.75} /></span>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noActivity')}</p>
           </div>

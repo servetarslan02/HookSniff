@@ -395,7 +395,7 @@ export default function CouponsContent() {
           )}
         </div>
         {filteredCoupons.length === 0 ? (
-          <div className="px-6 py-12 text-center">
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
  <div className="text-4xl mb-3"></div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
               {coupons.length === 0 ? (t('noCoupons') || 'Henüz kupon yok') : (t('noCouponsMatch') || 'Aramaya uygun kupon yok')}

@@ -159,7 +159,7 @@ export function EndpointsContent() {
 
   if (queryError && endpoints.length === 0) {
     return (
-      <div className="glass-card p-12 text-center">
+      <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
         <div className="text-4xl mb-3"><AlertTriangle size={18} strokeWidth={1.75} /></div>
         <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error || tc('error')}</p>
         <button type="button" onClick={() => queryClient.invalidateQueries({ queryKey: ['endpoints'] })} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
@@ -240,7 +240,7 @@ export function EndpointsContent() {
 
       <LazySection fallback={Skeletons.table()} rootMargin={300}>
       {endpoints.length === 0 ? (
-        <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-500">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center text-gray-500 dark:text-slate-500">
           {t('noEndpointsYet')}
         </div>
       ) : (

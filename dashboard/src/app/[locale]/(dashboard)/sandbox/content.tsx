@@ -256,10 +256,10 @@ export function PlaygroundPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Idle State — Generate Token */}
         {state === 'idle' && (
-          <div className="max-w-md mx-auto text-center py-16">
+          <div className="max-w-md mx-auto text-center py-8 sm:py-12 md:py-16">
             <span className="text-6xl mb-4 block"><FlaskConical size={18} strokeWidth={1.75} /></span>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('idleTitle')}</h2>
             <p className="text-gray-600 dark:text-slate-400 mb-6">{t('idleDesc')}</p>
@@ -272,7 +272,7 @@ export function PlaygroundPageContent() {
 
         {/* Generating State */}
         {state === 'generating' && (
-          <div className="max-w-md mx-auto text-center py-16">
+          <div className="max-w-md mx-auto text-center py-8 sm:py-12 md:py-16">
             <div className="w-10 h-10 border-2 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-gray-600 dark:text-slate-400">{t('generatingUrl')}</p>
           </div>
@@ -280,7 +280,7 @@ export function PlaygroundPageContent() {
 
         {/* Error State */}
         {state === 'error' && (
-          <div className="max-w-md mx-auto text-center py-16">
+          <div className="max-w-md mx-auto text-center py-8 sm:py-12 md:py-16">
             <span className="text-5xl mb-4 block"><AlertTriangle size={18} strokeWidth={1.75} /></span>
             <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
             <button onClick={generateToken} className="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">

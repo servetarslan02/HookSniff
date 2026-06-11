@@ -126,7 +126,7 @@ export default function ServiceTokensPage() {
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700">
         {tokens.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">{t('noTokens')}</div>
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center text-sm text-gray-500 dark:text-slate-400">{t('noTokens')}</div>
         ) : (
           <VirtualTable
             data={tokens}

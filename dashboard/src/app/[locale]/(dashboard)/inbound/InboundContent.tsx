@@ -305,7 +305,7 @@ export function InboundContent() {
 
       {/* Empty state */}
       {configs.length === 0 && !showCreate && (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="text-5xl mb-4"><Download size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('inbound.noConfigs')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('inbound.noConfigsDesc')}</p>

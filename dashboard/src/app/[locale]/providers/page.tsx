@@ -37,7 +37,7 @@ async function ProvidersContent({ locale }: { locale: string }) {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">{t('guidesDesc')}</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {providers.map((p) => (
             <Link key={p.name} href={p.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-center">
               <span className="text-4xl mb-3 block">{p.icon}</span>

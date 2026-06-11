@@ -25,7 +25,7 @@ const UpgradePrompt = memo(function UpgradePrompt({ t }: { t: (key: string) => s
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
-      <div className="glass-card p-8 text-center">
+      <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
         <div className="text-5xl mb-4"><ShieldCheck size={18} strokeWidth={1.75} /></div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('enterpriseOnlyTitle')}</h2>
         <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{t('enterpriseOnlyDesc')}</p>

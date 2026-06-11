@@ -102,7 +102,7 @@ export function SvixsContent() {
         </div>
 
         {/* Detailed Cards */}
-        <div className="space-y-8 mb-16">
+        <div className="space-y-8 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {alternatives.map((alt) => (
             <div key={alt.name} className={`rounded-xl border overflow-hidden ${alt.name === 'HookSniff' ? 'border-brand-300 dark:border-brand-500/40 ring-1 ring-brand-300 dark:ring-brand-500/40' : 'border-gray-200 dark:border-slate-700'}`}>
               <div className={`p-6 ${alt.name === 'HookSniff' ? 'bg-brand-50 dark:bg-brand-500/10' : 'bg-white dark:bg-slate-800'}`}>

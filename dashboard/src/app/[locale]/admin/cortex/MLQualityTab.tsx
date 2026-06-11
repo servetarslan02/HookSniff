@@ -43,7 +43,7 @@ export function MLQualityTab({ token }: { token: string | null }) {
   };
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
-  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-4 sm:p-6 md:p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   const overallScore = models.length > 0 ? Math.round(models.reduce((sum, m) => sum + m.quality_score, 0) / models.length) : 0;
 
@@ -82,7 +82,7 @@ export function MLQualityTab({ token }: { token: string | null }) {
       )}
 
       {models.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
           <Target size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>

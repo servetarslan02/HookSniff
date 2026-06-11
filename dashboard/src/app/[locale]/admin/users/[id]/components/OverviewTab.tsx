@@ -246,7 +246,7 @@ export function OverviewTab({
           </table>
         </div>
       ) : (
-        <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
+        <div className="px-4 sm:px-6 py-4 sm:py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
           {t("noDeliveries")}
         </div>
       )}

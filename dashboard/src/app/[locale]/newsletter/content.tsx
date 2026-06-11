@@ -98,7 +98,7 @@ export function NewsletterPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Nav */}
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
@@ -126,7 +126,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Subscribe Form */}
-        <div className="max-w-md mx-auto mb-16">
+        <div className="max-w-md mx-auto mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {status === 'success' ? (
             <div className="text-center p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
               <span className="text-3xl mb-2 block"><CheckCircle size={32} strokeWidth={1.75} /></span>
@@ -158,7 +158,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* What You'll Get */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {[
             {
               icon: <Rocket size={16} strokeWidth={1.75} />,
@@ -191,7 +191,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Past Issues */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Upcoming topics</h2>
 
           {/* Category Filter */}
@@ -246,7 +246,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Social Proof */}
-        <div className="mb-16 text-center">
+        <div className="mb-8 sm:mb-12 md:mb-16 text-center">
           <div className="inline-flex items-center gap-6 px-8 py-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">New</p>
@@ -266,7 +266,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* What to Expect */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">What to expect</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
@@ -291,7 +291,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Team */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Who writes this?</h2>
           <div className="max-w-lg mx-auto flex items-start gap-4 p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div className="w-12 h-12 rounded-full bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
@@ -317,7 +317,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* FAQ */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("faq")}</h2>
           <div className="max-w-2xl mx-auto space-y-2">
             {faqs.map((faq, i) => (
@@ -342,7 +342,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Privacy */}
-        <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-16">
+        <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <span className="text-2xl mb-2 block"><Lock size={24} strokeWidth={1.75} /></span>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("privacyMatters")}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400 max-w-lg mx-auto">

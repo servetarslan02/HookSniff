@@ -724,7 +724,7 @@ async function SdksContent(params: Promise<{ locale: string }>) {
 
    {/* SDK Cards */}
    {sdks.map((sdk) => (
-    <section key={sdk.lang} className="mb-16">
+    <section key={sdk.lang} className="mb-8 sm:mb-12 md:mb-16">
      <div className="flex items-center gap-3 mb-2">
       <span className="text-3xl">{sdk.icon}</span>
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t(sdk.nameKey) || sdk.lang}</h2>

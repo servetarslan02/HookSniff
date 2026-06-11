@@ -65,7 +65,7 @@ export default function BuildVsBuyContent() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Webhooks: {t("title")}
           </h1>
@@ -75,7 +75,7 @@ export default function BuildVsBuyContent() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 text-center">
             <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">1–2</p>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t("engineers")}</p>
@@ -91,7 +91,7 @@ export default function BuildVsBuyContent() {
         </div>
 
         {/* Dimensions */}
-        <div className="space-y-6 mb-16">
+        <div className="space-y-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {dimensions.map((dim, i) => (
             <div key={dim.title} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <div className="p-6">
@@ -119,7 +119,7 @@ export default function BuildVsBuyContent() {
         </div>
 
         {/* Cost Breakdown */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-16">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center"><DollarSign size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('costYear1')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -160,7 +160,7 @@ export default function BuildVsBuyContent() {
         </div>
 
         {/* When to Build */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-16">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("whenBuilding")}</h2>
           <ul className="space-y-2">
             {whenBuildItems.map((item) => (
@@ -179,7 +179,7 @@ export default function BuildVsBuyContent() {
         </div>
 
         {/* FAQ */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
             {faq.map((item, i) => (

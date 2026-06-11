@@ -111,7 +111,7 @@ export function DriftTab() {
   };
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
-  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-4 sm:p-6 md:p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">
@@ -121,7 +121,7 @@ export function DriftTab() {
       </div>
 
       {events.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
           <p className="text-gray-500 dark:text-slate-400">{t('empty')}</p>
         </div>
       ) : (
