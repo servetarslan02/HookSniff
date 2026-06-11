@@ -365,7 +365,7 @@ export function GetStartedPageContent() {
 
       {/* Event Types */}
       <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
-        <div className="max-w-5xl mx-auto px-4 py-16">
+        <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12 md:py-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><ClipboardList size={24} strokeWidth={1.75} className="inline mr-1" /> {t('eventTypesTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('eventTypesDesc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -386,7 +386,7 @@ export function GetStartedPageContent() {
       </div>
 
       {/* Embed Portal */}
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12 md:py-16">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Image size={24} strokeWidth={1.75} className="inline mr-1" /> {t('embedTitle')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-8">{t('embedDesc')}</p>
         <div className="bg-gray-900 rounded-xl p-4">
@@ -409,7 +409,7 @@ export function GetStartedPageContent() {
 
       {/* CLI */}
       <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
-        <div className="max-w-5xl mx-auto px-4 py-16">
+        <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12 md:py-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Terminal size={24} strokeWidth={1.75} className="inline mr-1" /> {t('cliTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('cliDesc')}</p>
           <div className="bg-gray-900 rounded-xl p-4">
@@ -431,7 +431,7 @@ hooksniff deliveries list --limit 10`}</code>
       </div>
 
       {/* CTA */}
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12 md:py-16 text-center">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{t('readyTitle')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-8">{t('readyDesc')}</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

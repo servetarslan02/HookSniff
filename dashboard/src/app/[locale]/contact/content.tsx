@@ -278,7 +278,7 @@ export function ContactPageContent() {
         </section>
 
         {/* ── Bottom CTA ── */}
-        <section className="bg-linear-to-br from-gray-900 via-slate-900 to-gray-900 py-16">
+        <section className="bg-linear-to-br from-gray-900 via-slate-900 to-gray-900 py-8 sm:py-12 md:py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">{t('about.readyToStart')}</h2>
             <p className="text-slate-400 mb-8">{t('about.cta')}</p>
