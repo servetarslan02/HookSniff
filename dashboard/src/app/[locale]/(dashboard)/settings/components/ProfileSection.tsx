@@ -36,12 +36,17 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedName = profileName.trim();
+    if (!trimmedName) {
+      setProfileError(t('nameRequired') || 'Name is required');
+      return;
+    }
     setProfileSaving(true);
     setProfileError('');
     setProfileSuccess('');
     try {
       const { api } = await import('@/lib/api');
-      await api.put('/auth/profile', { name: profileName }, token ?? undefined);
+      await api.put('/auth/profile', { name: trimmedName }, token ?? undefined);
       setProfileSuccess(tc('success'));
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setProfileSuccess(''), 3000);
@@ -188,6 +193,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               id="profile-name"
               type="text"
               autoComplete="name"
+              required
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
               placeholder={t('namePlaceholder')}
