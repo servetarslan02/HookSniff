@@ -5,6 +5,7 @@ import { endpointsApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
 import { EndpointSchema, type EndpointValidated } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Endpoints ──
 export function useEndpoints() {
@@ -33,12 +34,14 @@ export function useEndpointDetail(id: string) {
 export function useDeleteEndpoint() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (id: string) => endpointsApi.delete(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     },
+    onError: (err) => showError(err),
   });
 }
 

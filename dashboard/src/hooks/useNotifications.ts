@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsApi, webhooksApi, type NotificationListResponse } from '@/lib/api';
 import { useAuth } from '@/lib/store';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Notifications ──
 export function useNotifications(params?: {
@@ -141,6 +142,7 @@ export function useDeleteNotification() {
 export function useReplayWebhook() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (id: string) => webhooksApi.replay(token!, id),
@@ -151,5 +153,6 @@ export function useReplayWebhook() {
       queryClient.invalidateQueries({ queryKey: ['delivery-logs'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
+    onError: (err) => showError(err),
   });
 }
