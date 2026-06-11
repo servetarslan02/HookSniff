@@ -122,7 +122,19 @@ impl PaymentProviderImpl for PolarProvider {
             // 4xx = client error (e.g. invalid email domain) → return as BadRequest
             // 5xx = Polar server error → return as Internal
             if status.as_u16() >= 400 && status.as_u16() < 500 {
-                return Err(AppError::BadRequest(user_message));
+                // Deduplicate and clean up Polar validation errors
+                let friendly_message = if user_message.contains("is not a valid email") || user_message.contains("does not exist") {
+                    "The email address is not valid. Please use a real email with an existing domain.".to_string()
+                } else if user_message.contains("Field required") {
+                    "A required field is missing. Please check your input and try again.".to_string()
+                } else {
+                    // Deduplicate repeated messages
+                    let parts: Vec<&str> = user_message.split("; ").collect();
+                    let mut seen = std::collections::HashSet::new();
+                    let unique: Vec<&str> = parts.into_iter().filter(|p| seen.insert(*p)).collect();
+                    unique.join("; ")
+                };
+                return Err(AppError::BadRequest(friendly_message));
             }
 
             return Err(AppError::Internal(anyhow::anyhow!(
