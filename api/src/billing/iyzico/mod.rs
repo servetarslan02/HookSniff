@@ -445,7 +445,7 @@ impl PaymentProviderImpl for IyzicoProvider {
                     // Look up customer plan and use iyzico price config
                     if let Ok(Some((plan_str,))) = sqlx::query_as::<_, (String,)>(
                         "SELECT plan FROM customers WHERE id = $1"
-                    ).bind(cid).fetch_optional(_pool).await.ok() {
+                    ).bind(cid).fetch_optional(_pool).await {
                         let plan = Plan::parse_str(&plan_str);
                         self.config.price_for_plan(&plan).unwrap_or(0) as u64
                     } else { 0 }
