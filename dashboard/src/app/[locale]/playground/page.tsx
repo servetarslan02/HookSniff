@@ -54,6 +54,7 @@ export default function PublicPlaygroundPage() {
   const [sendPayload, setSendPayload] = useState(samplePayloads[0].payload);
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<{ status: number; time: number } | null>(null);
+  const [mobileTab, setMobileTab] = useState<'history' | 'detail'>('history');
   const lastPollRef = useRef(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -159,7 +160,7 @@ export default function PublicPlaygroundPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle="Playground" />
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 overflow-x-hidden">
         {/* Idle State */}
         {state === 'idle' && (
           <div className="max-w-md mx-auto text-center py-16">
@@ -197,17 +198,19 @@ export default function PublicPlaygroundPage() {
           <div className="space-y-6">
             {/* URL Bar */}
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                 <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 font-mono text-sm text-gray-900 dark:text-white overflow-x-auto">
                   <span className="text-emerald-500 shrink-0">●</span>
                   <span className="truncate">{webhookUrl}</span>
                 </div>
-                <button onClick={handleCopy} className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${copied ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
-                  {copied ? t('copied') : t('copy')}
-                </button>
-                <button onClick={handleNewSession} className="px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
-                  {t('newSession')}
-                </button>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={handleCopy} className={`flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${copied ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
+                    {copied ? t('copied') : t('copy')}
+                  </button>
+                  <button onClick={handleNewSession} className="flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                    {t('newSession')}
+                  </button>
+                </div>
               </div>
               <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 dark:text-slate-500">
                 <span>{polling ? t('polling') : t('notPolling')}</span>
@@ -221,12 +224,12 @@ export default function PublicPlaygroundPage() {
             {/* Send Test */}
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t('sendTest')}</h3>
-              <div className="grid md:grid-cols-4 gap-3">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t('eventType')}</label>
                   <input type="text" value={sendEvent} onChange={(e) => setSendEvent(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden" />
                 </div>
-                <div className="md:col-span-2">
+                <div className="sm:col-span-2 lg:col-span-2">
                   <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t('quickSamples')}</label>
                   <div className="flex flex-wrap gap-1.5">
                     {samplePayloads.map((s) => (
@@ -249,11 +252,27 @@ export default function PublicPlaygroundPage() {
               )}
             </div>
 
+            {/* Mobile Tab Switcher — sadece lg altında görünür */}
+            <div className="lg:hidden flex gap-2 mb-3">
+              <button
+                onClick={() => setMobileTab('history')}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${mobileTab === 'history' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400'}`}
+              >
+                {t('requestHistory')} ({history.length})
+              </button>
+              <button
+                onClick={() => setMobileTab('detail')}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${mobileTab === 'detail' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400'}`}
+              >
+                {t('requestDetail')}
+              </button>
+            </div>
+
             <div className="grid lg:grid-cols-5 gap-6">
-              {/* Left: Request List */}
-              <div className="lg:col-span-2 space-y-3">
+              {/* Left: Request List — mobilde tab'a bağlı */}
+              <div className={`lg:col-span-2 space-y-3 min-w-0 ${mobileTab !== 'history' ? 'hidden lg:block' : ''}`}>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('requestHistory')} ({history.length})</h3>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white hidden lg:block">{t('requestHistory')} ({history.length})</h3>
                   {history.length > 0 && (
                     <button onClick={() => { setHistory([]); setSelectedRecord(null); lastPollRef.current = 0; }} className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400">{t('clearAll')}</button>
                   )}
@@ -268,7 +287,7 @@ export default function PublicPlaygroundPage() {
                 ) : (
                   <div className="space-y-2 max-h-[600px] overflow-y-auto">
                     {history.map((record) => (
-                      <button key={record.id} onClick={() => setSelectedRecord(record)} className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedRecord?.id === record.id ? 'bg-brand-50 dark:bg-brand-500/10 border-brand-300 dark:border-brand-500/40' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-500/20'}`}>
+                      <button key={record.id} onClick={() => { setSelectedRecord(record); setMobileTab('detail'); }} className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedRecord?.id === record.id ? 'bg-brand-50 dark:bg-brand-500/10 border-brand-300 dark:border-brand-500/40' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-500/20'}`}>
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`px-1.5 py-0.5 rounded-sm text-xs font-mono font-bold ${record.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : record.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'}`}>
                             {record.method}
@@ -285,9 +304,9 @@ export default function PublicPlaygroundPage() {
                 )}
               </div>
 
-              {/* Right: Request Detail */}
-              <div className="lg:col-span-3">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t('requestDetail')}</h3>
+              {/* Right: Request Detail — mobilde tab'a bağlı */}
+              <div className={`lg:col-span-3 min-w-0 ${mobileTab !== 'detail' ? 'hidden lg:block' : ''}`}>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 hidden lg:block">{t('requestDetail')}</h3>
                 {!selectedRecord ? (
                   <div className="flex items-center justify-center h-64 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
                     <p className="text-gray-500 dark:text-slate-600 text-sm">{t('selectRequest')}</p>
@@ -299,18 +318,18 @@ export default function PublicPlaygroundPage() {
                         {selectedRecord.method}
                       </span>
                       <span className="text-sm font-mono text-gray-700 dark:text-slate-300 truncate">{selectedRecord.path}</span>
-                      <span className="text-xs text-gray-500 dark:text-slate-600 ml-auto">{formatTime(selectedRecord.timestamp)}</span>
+                      <span className="text-xs text-gray-500 dark:text-slate-600 ml-auto shrink-0">{formatTime(selectedRecord.timestamp)}</span>
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">{t('headers')}</h4>
-                      <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-48 overflow-y-auto">
-                        <pre className="text-xs text-gray-300 dark:text-slate-400 font-mono whitespace-pre-wrap">{formatHeaders(selectedRecord.headers)}</pre>
+                      <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-48 overflow-y-auto overflow-x-hidden">
+                        <pre className="text-xs text-gray-300 dark:text-slate-400 font-mono whitespace-pre-wrap break-all">{formatHeaders(selectedRecord.headers)}</pre>
                       </div>
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-wider">{t('body')}</h4>
-                      <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
-                        <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">{formatBody(selectedRecord.body)}</pre>
+                      <div className="bg-gray-900 dark:bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto overflow-x-hidden">
+                        <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap break-all">{formatBody(selectedRecord.body)}</pre>
                       </div>
                     </div>
                     {selectedRecord.headers['svix-signature'] || selectedRecord.headers['x-hooksniff-signature'] ? (
@@ -337,7 +356,7 @@ export default function PublicPlaygroundPage() {
             </div>
 
             {/* Info boxes */}
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
                 <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1"><Lightbulb size={14} strokeWidth={1.75} className="inline mr-1" /> {t('worksAnyService')}</h4>
                 <p className="text-xs text-blue-700 dark:text-blue-400">{t('worksAnyServiceDesc')}</p>
