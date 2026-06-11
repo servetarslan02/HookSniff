@@ -292,10 +292,12 @@ pub async fn login(
             } else if bypass && customer.is_admin {
                 tracing::info!("🔓 SSO admin bypass for: {}", req.email);
             } else {
-                tracing::warn!("🔒 SSO login blocked for {}: SSO enforced", req.email);
-                return Err(AppError::BadRequest(
-                    "SSO is required for this account. Please use Single Sign-On to log in.".into()
-                ));
+                tracing::info!("🔒 SSO required for {} — redirecting", req.email);
+                return Ok((HeaderMap::new(), Json(serde_json::json!({
+                    "requires_sso": true,
+                    "email": req.email,
+                    "message": "SSO required for this account."
+                }))));
             }
         }
     }

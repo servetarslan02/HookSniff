@@ -190,6 +190,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       twoFaError.tempToken = data.temp_token;
       throw twoFaError;
     }
+    // SSO required — throw a structured error so the login page can redirect
+    if (data.requires_sso) {
+      const ssoError = new Error('SSO required') as Error & { requiresSso: true; ssoEmail: string };
+      ssoError.requiresSso = true;
+      ssoError.ssoEmail = data.email;
+      throw ssoError;
+    }
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
     persistAuth(u, data.customer.api_key, data.token);
     // Save refresh token for proxy fallback (Vercel doesn't forward Set-Cookie)
