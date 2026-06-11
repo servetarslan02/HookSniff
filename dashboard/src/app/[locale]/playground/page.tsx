@@ -130,21 +130,7 @@ export default function PublicPlaygroundPage() {
         headers: { 'Content-Type': 'application/json', 'X-Event-Type': sendEvent },
         body: sendPayload,
       });
-      const elapsed = Date.now() - start;
-      setSendResult({ status: res.status, time: elapsed });
-
-      // API response'undan yakalanan isteği doğrudan history'ye ekle
-      // Redis çalışmasa bile (Upstash limit dolu) bu çalışır
-      try {
-        const data = await res.clone().json();
-        if (data.request) {
-          setHistory((prev) => {
-            const existing = new Set(prev.map((r) => r.id));
-            if (existing.has(data.request.id)) return prev;
-            return [data.request, ...prev];
-          });
-        }
-      } catch { /* response parse edilemedi, polling'e bırak */ }
+      setSendResult({ status: res.status, time: Date.now() - start });
     } catch {
       setSendResult({ status: 0, time: 0 });
     } finally {

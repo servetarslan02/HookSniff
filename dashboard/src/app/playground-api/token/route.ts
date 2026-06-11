@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { checkRateLimit } from '@/lib/redis';
-import { ensurePlaygroundTable } from '@/lib/neon';
+import { playgroundSet, checkRateLimit } from '@/lib/redis';
 
 // Generate a cryptographically secure playground token
 function generateToken(): string {
@@ -35,7 +34,7 @@ export async function OPTIONS() {
 export async function POST(request: Request) {
   const ip = getClientIp(request);
 
-  // Rate limit: 10 tokens per hour per IP
+  // Rate limit: 10 tokens per hour per IP (plan limitlerinden yemez)
   const { allowed, remaining, retryAfter } = await checkRateLimit(ip, 'token');
 
   if (!allowed) {
@@ -50,7 +49,7 @@ export async function POST(request: Request) {
         headers: {
           ...corsHeaders,
           'Retry-After': String(retryAfter),
-          'X-RateLimit-Limit': '10',
+          'X-RateLimit-Limit': '5',
           'X-RateLimit-Remaining': '0',
         },
       },
@@ -58,10 +57,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Ensure table exists
-    await ensurePlaygroundTable();
-
     const token = generateToken();
+
+    // Initialize empty history for this token (24h TTL)
+    await playgroundSet(`play:history:${token}`, [], 86400);
 
     return NextResponse.json(
       {
@@ -73,7 +72,7 @@ export async function POST(request: Request) {
       {
         headers: {
           ...corsHeaders,
-          'X-RateLimit-Limit': '10',
+          'X-RateLimit-Limit': '5',
           'X-RateLimit-Remaining': String(remaining),
         },
       },

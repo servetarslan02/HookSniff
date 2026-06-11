@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ensurePlaygroundTable } from '@/lib/neon';
+import { playgroundSet } from '@/lib/redis';
 
 // Generate a cryptographically secure playground token
 function generateToken(): string {
@@ -25,8 +25,10 @@ export async function OPTIONS() {
 
 export async function POST() {
   try {
-    await ensurePlaygroundTable();
     const token = generateToken();
+
+    // Initialize empty history for this token (24h TTL)
+    await playgroundSet(`play:history:${token}`, [], 86400);
 
     return NextResponse.json({
       success: true,
