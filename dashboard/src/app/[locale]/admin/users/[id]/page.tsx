@@ -163,7 +163,7 @@ export default function AdminUserDetailPage() {
     try {
       await updatePlanMutation.mutateAsync({ userId: id, plan: newPlan });
       toast(t("planUpdated", { plan: newPlan }), "success");
-    } catch {
+    } catch (e) {
       toast(t("failedToUpdatePlan"), "error");
     }
   };
@@ -180,7 +180,7 @@ export default function AdminUserDetailPage() {
     try {
       await updateStatusMutation.mutateAsync({ userId: id, status: 'active' });
       toast(t("userActivated"), "success");
-    } catch {
+    } catch (e) {
       toast(t("failedToUpdateStatus"), "error");
     }
   };
@@ -196,7 +196,7 @@ export default function AdminUserDetailPage() {
       toast(t("userBanned"), "success");
       setShowBanModal(false);
       setBanReason('');
-    } catch {
+    } catch (e) {
       toast(t("failedToUpdateStatus"), "error");
     }
   };
@@ -205,7 +205,7 @@ export default function AdminUserDetailPage() {
     try {
       await replayDeliveryMutation.mutateAsync({ userId: id, deliveryId });
       toast(t("replaySuccess"), "success");
-    } catch {
+    } catch (e) {
       toast(t("replayFailed"), "error");
     }
   };
@@ -226,8 +226,8 @@ export default function AdminUserDetailPage() {
         newWindow.location.href = `/${locale}/dashboard?impersonate=1`;
       }
       toast(t('impersonating') + `: ${detail.user.email}`, 'success');
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -239,7 +239,7 @@ export default function AdminUserDetailPage() {
       setShowEmailModal(false);
       setEmailSubject('');
       setEmailBody('');
-    } catch {
+    } catch (e) {
       toast(t('emailSendFailed'), 'error');
     }
   };
@@ -257,7 +257,7 @@ export default function AdminUserDetailPage() {
       setShowRefundModal(false);
       setRefundAmount('');
       setRefundReason('');
-    } catch {
+    } catch (e) {
       toast(t('refundFailed'), 'error');
     }
   };
@@ -267,7 +267,7 @@ export default function AdminUserDetailPage() {
     let payload: Record<string, unknown>;
     try {
       payload = JSON.parse(testWebhookPayload);
-    } catch {
+    } catch (e) {
       toast(t('invalidJson'), 'error');
       return;
     }
@@ -283,7 +283,7 @@ export default function AdminUserDetailPage() {
       });
       setTestWebhookResult(result);
       toast(t('testWebhookSent'), 'success');
-    } catch {
+    } catch (e) {
       toast(t('testWebhookFailed'), 'error');
     }
   };
@@ -300,7 +300,7 @@ export default function AdminUserDetailPage() {
       a.click();
       URL.revokeObjectURL(url);
       toast(t('gdprExportSuccess'), 'success');
-    } catch {
+    } catch (e) {
       toast(t('gdprExportFailed'), 'error');
     }
   };
@@ -312,7 +312,7 @@ export default function AdminUserDetailPage() {
       toast(t('gdprDeleteSuccess'), 'success');
       setShowGdprDeleteModal(false);
       setGdprDeleteReason('');
-    } catch {
+    } catch (e) {
       toast(t('gdprDeleteFailed'), 'error');
     }
   };

@@ -120,7 +120,7 @@ export default function AdminRevenuePage() {
       toast(t('settingsSaved') || 'Plan settings saved! Prices syncing to Polar...', 'success');
       setEditingPlans(false);
       queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
-    } catch {
+    } catch (e) {
       toast(t('settingsSaveFailed') || 'Failed to save plan settings', 'error');
     } finally {
       setSavingPlans(false);
@@ -140,8 +140,8 @@ export default function AdminRevenuePage() {
       a.download = `hooksniff-revenue-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       URL.revokeObjectURL(blobUrl);
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 

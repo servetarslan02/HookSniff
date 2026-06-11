@@ -7198,7 +7198,7 @@
       "invalidRefundAmount": "Refund amount must be greater than zero.",
       "refundReasonRequired": "Please provide a reason for the refund.",
       "invalidType": "Invalid payment type. Please contact support.",
-      "polarSyncOnly": "Only Polar-type coupons can be synced.",
+      "polarSyncOnly": "This operation is only available through Polar.sh sync.",
       "invalidCheckoutUrl": "The checkout URL format is invalid. Please check and try again.",
       "csvOnly": "Only CSV format is supported for exports."
     },
@@ -7206,17 +7206,18 @@
       "inactive": "This endpoint is no longer active. Please check your endpoint configuration.",
       "batchTooLarge": "You can send a maximum of 100 webhooks per batch. Please split your request.",
       "bulkReplayDisabled": "Bulk replay is not available on your plan. Please contact support to enable this feature.",
-      "customRetryDisabled": "Custom retry schedules are not available on your plan. Please contact support to enable this feature.",
+      "customRetryDisabled": "Custom retry policies are not available on your plan.",
       "noDeliveryIds": "Please select at least one delivery to replay.",
       "notFound": "The webhook endpoint was not found. It may have been deleted.",
-      "deliveryNotFound": "The delivery record was not found. It may have been deleted."
+      "deliveryNotFound": "The delivery record was not found. It may have been deleted.",
+      "idRequired": "Endpoint ID is required."
     },
     "domain": {
       "alreadyRegistered": "This domain is already registered by another account.",
       "cannotUse": "This domain cannot be used. Please choose a different one.",
-      "publicDomain": "Public email domains (gmail.com, yahoo.com, etc.) cannot be verified. Use a custom domain instead.",
-      "invalidChars": "The domain contains invalid characters. Please check and try again.",
-      "invalidFormat": "Please enter a valid domain name (e.g., example.com).",
+      "publicDomain": "Public domains cannot be used. Please use your own domain.",
+      "invalidChars": "Domain contains invalid characters.",
+      "invalidFormat": "Domain format is invalid. Use format: subdomain.example.com",
       "genericError": "There's an issue with the domain. Please check and try again."
     },
     "team": {
@@ -7250,6 +7251,47 @@
       "invalidJwtHeader": "Invalid authentication token.",
       "invalidJwtHeaderJson": "Invalid authentication token format.",
       "invalidDateFormat": "Please use a valid date format (e.g., 2024-01-01)."
+    },
+    "email": {
+      "providerNotConfigured": "Email service is not configured. Please contact support.",
+      "sendFailed": "Failed to send email. Please try again later."
+    },
+    "webhook": {
+      "invalidSignature": "Invalid webhook signature. Please check your signing secret.",
+      "signatureExpired": "Webhook signature has expired. Please check your system clock.",
+      "batchTooLarge": "Batch size exceeds the maximum limit. Please reduce the number of webhooks.",
+      "bulkReplayDisabled": "Bulk replay is not available. Please replay webhooks individually."
+    },
+    "validation": {
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidUserId": "Invalid user ID.",
+      "missingField": "Please fill in all required fields.",
+      "invalidRetention": "Invalid retention period. Must be between 1 and 365 days.",
+      "invalidRetryAttempts": "Invalid retry attempts. Must be between 1 and 10.",
+      "invalidThreshold": "Invalid threshold value.",
+      "tagEmpty": "Tag cannot be empty.",
+      "tagTooLong": "Tag is too long. Maximum 50 characters.",
+      "titleRequired": "Title is required."
+    },
+    "schema": {
+      "nameRequired": "Schema name is required."
+    },
+    "device": {
+      "tokenRequired": "Device token is required for push notifications."
+    },
+    "alerts": {
+      "invalidCondition": "Invalid alert condition. Please check your settings."
+    },
+    "notifications": {
+      "invalidChannel": "Invalid notification channel.",
+      "invalidUrl": "Invalid notification URL. Please enter a valid URL.",
+      "channelDisabled": "This notification channel is currently disabled."
+    },
+    "portal": {
+      "cssTooLarge": "Custom CSS is too large. Maximum 50KB allowed."
+    },
+    "import": {
+      "csvOnly": "Only CSV files are supported for import."
     }
   },
   "docsEndpoints": {

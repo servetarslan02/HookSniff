@@ -53,7 +53,7 @@ export function createApiError(
   }
 
   return new HookSniffError({
-    message: typeof responseBody === 'string' ? responseBody : `Something went wrong (${status})`,
+    message: typeof responseBody === 'string' ? responseBody : getUserFriendlyMessage('INTERNAL_ERROR'),
     code: 'UNKNOWN',
     status,
   });

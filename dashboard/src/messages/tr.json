@@ -7203,7 +7203,7 @@
       "invalidRefundAmount": "İade tutarı sıfırdan büyük olmalıdır.",
       "refundReasonRequired": "Lütfen iade için bir neden belirtin.",
       "invalidType": "Geçersiz ödeme türü. Lütfen destek ile iletişime geçin.",
-      "polarSyncOnly": "Sadece Polar türü kuponlar senkronize edilebilir.",
+      "polarSyncOnly": "Bu işlem yalnızca Polar.sh senkronizasyonu ile kullanılabilir.",
       "invalidCheckoutUrl": "Ödeme URL biçimi geçersiz. Lütfen kontrol edip tekrar deneyin.",
       "csvOnly": "Dışa aktarım için sadece CSV biçimi desteklenmektedir."
     },
@@ -7211,17 +7211,18 @@
       "inactive": "Bu endpoint artık aktif değil. Lütfen endpoint yapılandırmanızı kontrol edin.",
       "batchTooLarge": "Toplu gönderimde en fazla 100 webhook gönderebilirsiniz. Lütfen isteğinizi bölün.",
       "bulkReplayDisabled": "Toplu tekrar oynatma planınızda mevcut değil. Bu özelliği etkinleştirmek için destek ile iletişime geçin.",
-      "customRetryDisabled": "Özel tekrar deneme planları planınızda mevcut değil. Bu özelliği etkinleştirmek için destek ile iletişime geçin.",
+      "customRetryDisabled": "Özel yeniden deneme politikaları planınızda mevcut değil.",
       "noDeliveryIds": "Lütfen tekrar oynatmak için en az bir teslimat seçin.",
       "notFound": "Webhook endpoint bulunamadı. Silinmiş olabilir.",
-      "deliveryNotFound": "Teslimat kaydı bulunamadı. Silinmiş olabilir."
+      "deliveryNotFound": "Teslimat kaydı bulunamadı. Silinmiş olabilir.",
+      "idRequired": "Endpoint ID gerekli."
     },
     "domain": {
-      "alreadyRegistered": "Bu alan adı başka bir hesap tarafından zaten kayıtlı.",
-      "cannotUse": "Bu alan adı kullanılamaz. Lütfen farklı bir tane seçin.",
-      "publicDomain": "Genel e-posta alan adları (gmail.com, yahoo.com vb.) doğrulanamaz. Bunun yerine özel bir alan adı kullanın.",
-      "invalidChars": "Alan adı geçersiz karakterler içeriyor. Lütfen kontrol edip tekrar deneyin.",
-      "invalidFormat": "Lütfen geçerli bir alan adı girin (ör. example.com).",
+      "alreadyRegistered": "Bu domain başka bir hesap tarafından kayıtlı.",
+      "cannotUse": "Bu domain kullanılamaz. Lütfen farklı bir tane seçin.",
+      "publicDomain": "Genel domainler kullanılamaz. Lütfen kendi domain'inizi kullanın.",
+      "invalidChars": "Domain geçersiz karakterler içeriyor.",
+      "invalidFormat": "Domain formatı geçersiz. Format: altalan.orneginiz.com",
       "genericError": "Alan adıyla ilgili bir sorun var. Lütfen kontrol edip tekrar deneyin."
     },
     "team": {
@@ -7255,6 +7256,47 @@
       "invalidJwtHeader": "Geçersiz kimlik doğrulama token'ı.",
       "invalidJwtHeaderJson": "Geçersiz kimlik doğrulama token biçimi.",
       "invalidDateFormat": "Lütfen geçerli bir tarih biçimi kullanın (ör. 2024-01-01)."
+    },
+    "email": {
+      "providerNotConfigured": "E-posta servisi yapılandırılmamış. Destek ile iletişime geçin.",
+      "sendFailed": "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin."
+    },
+    "webhook": {
+      "invalidSignature": "Geçersiz webhook imzası. Signing secret'ınızı kontrol edin.",
+      "signatureExpired": "Webhook imzasının süresi dolmuş. Sistem saatinizi kontrol edin.",
+      "batchTooLarge": "Batch boyutu maksimum limiti aşıyor. Webhook sayısını azaltın.",
+      "bulkReplayDisabled": "Toplu tekrar oynatma mevcut değil. Webhook'ları tek tek tekrar oynatın."
+    },
+    "validation": {
+      "invalidEmail": "Geçerli bir e-posta adresi girin.",
+      "invalidUserId": "Geçersiz kullanıcı ID'si.",
+      "missingField": "Lütfen tüm zorunlu alanları doldurun.",
+      "invalidRetention": "Geçersiz saklama süresi. 1 ile 365 gün arasında olmalı.",
+      "invalidRetryAttempts": "Geçersiz yeniden deneme sayısı. 1 ile 10 arasında olmalı.",
+      "invalidThreshold": "Geçersiz eşik değeri.",
+      "tagEmpty": "Etiket boş olamaz.",
+      "tagTooLong": "Etiket çok uzun. Maksimum 50 karakter.",
+      "titleRequired": "Başlık gerekli."
+    },
+    "schema": {
+      "nameRequired": "Şema adı gerekli."
+    },
+    "device": {
+      "tokenRequired": "Push bildirimleri için cihaz token'ı gerekli."
+    },
+    "alerts": {
+      "invalidCondition": "Geçersiz alarm koşulu. Ayarlarınızı kontrol edin."
+    },
+    "notifications": {
+      "invalidChannel": "Geçersiz bildirim kanalı.",
+      "invalidUrl": "Geçersiz bildirim URL'i. Geçerli bir URL girin.",
+      "channelDisabled": "Bu bildirim kanalı şu anda devre dışı."
+    },
+    "portal": {
+      "cssTooLarge": "Özel CSS çok büyük. Maksimum 50KB izin verilir."
+    },
+    "import": {
+      "csvOnly": "İçe aktarma için yalnızca CSV dosyaları desteklenir."
     }
   },
   "docsEndpoints": {
