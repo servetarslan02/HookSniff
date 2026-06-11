@@ -38,6 +38,7 @@ export function CommunicationsTab({
 
       {userComms.length > 0 ? (
         <div className="glass-card overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
@@ -67,6 +68,7 @@ export function CommunicationsTab({
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       ) : (
         <p className="text-sm text-gray-500 dark:text-slate-400">{t("noCommunications") || "No communication history yet"}</p>

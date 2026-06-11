@@ -48,7 +48,7 @@ function RoiCalculator() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
           <p className="text-xs text-red-600 dark:text-red-400 font-medium mb-1">Svix</p>
           <p className="text-2xl font-bold text-red-700 dark:text-red-400">${svixCost}</p>
@@ -278,7 +278,7 @@ export function PricingPageContent() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed min-h-[2.5rem]">{t(`${plan.key}Desc`)}</p>
                 <div className="mt-4 flex items-baseline gap-1 min-h-[3.5rem]">
-                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
                   <span className="text-gray-500 dark:text-slate-500 text-sm font-medium">{getPeriodLabel(plan.key)}</span>
                 </div>
                 {billingPeriod === 'annual' && plan.key !== 'developer' && (
