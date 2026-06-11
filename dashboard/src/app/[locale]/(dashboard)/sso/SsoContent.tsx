@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Key, Lightbulb, Loader2, Pencil, Search, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 import { IDP_TEMPLATES } from './sso-utils';
@@ -45,6 +45,13 @@ const UpgradePrompt = memo(function UpgradePrompt({ t }: { t: (key: string) => s
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
   const h = useSsoHandlers(teamIdProp);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  const handleCopyUrl = useCallback(() => {
+    navigator.clipboard.writeText(h.ssoLoginUrl || '');
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  }, [h.ssoLoginUrl]);
 
   // ── Loading ──
   if (h.loading) {
@@ -509,8 +516,10 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">{h.t('ssoLoginUrlDesc')}</p>
           <div className="flex items-center gap-2">
             <code className="flex-1 px-4 py-3 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm font-mono text-gray-800 dark:text-slate-200 break-all">{h.ssoLoginUrl}</code>
-            <button type="button" onClick={() => { navigator.clipboard.writeText(h.ssoLoginUrl!); }}
-              className="px-4 py-3 bg-gray-200 dark:bg-slate-700 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition" title="Copy"><ClipboardList size={18} strokeWidth={1.75} /></button>
+            <button type="button" onClick={handleCopyUrl}
+              className="px-4 py-3 bg-gray-200 dark:bg-slate-700 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition" title="Copy">
+              {copiedUrl ? <Check size={18} strokeWidth={1.75} className="text-emerald-500" /> : <ClipboardList size={18} strokeWidth={1.75} />}
+            </button>
           </div>
         </div>
       )}
