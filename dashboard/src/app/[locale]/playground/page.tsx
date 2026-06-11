@@ -134,7 +134,7 @@ export default function PublicPlaygroundPage() {
       setSendResult({ status: res.status, time: elapsed });
 
       // API response'undan yakalanan isteği doğrudan history'ye ekle
-      // Redis çalışmasa bile (Upstash limit dolu) bu çalışır
+      // Redis çalışmasa bile bu çalışır
       try {
         const data = await res.clone().json();
         if (data.request) {
