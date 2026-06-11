@@ -989,7 +989,11 @@
       "ent13": "Dedicated account manager",
       "ent14": "99.9% SLA guarantee",
       "ent15": "GDPR compliance",
-      "ent16": "Priority + dedicated support"
+      "ent16": "Priority + dedicated support",
+      "dev_limit": "Blocked at limit",
+      "su_overage": "$0.00003/event overage",
+      "pro_overage": "$0.000001/event overage",
+      "ent_overage": "Custom overage pricing"
     },
     "plans.free": "Free",
     "plans.pro": "Pro",
@@ -2900,7 +2904,8 @@
       "Inbound webhook proxy",
       "Embeddable portal",
       "Cortex AI anomaly detection",
-      "Priority support"
+      "Priority support",
+      "$0.000001/event overage"
     ],
     "businessFeatures": [
       "Unlimited events",
@@ -3057,7 +3062,8 @@
       "Dedicated account manager",
       "99.9% SLA guarantee",
       "GDPR compliance",
-      "Priority + dedicated support"
+      "Priority + dedicated support",
+      "Custom overage pricing"
     ],
     "developer": "Developer",
     "startup": "Startup",
@@ -3072,7 +3078,8 @@
       "SSRF protection",
       "2FA authentication",
       "Webhook playground",
-      "Community support"
+      "Community support",
+      "Blocked at limit"
     ],
     "startupFeatures": [
       "30,000 events/day",
@@ -3086,7 +3093,8 @@
       "Circuit breaker",
       "Smart routing",
       "500 req/min API rate",
-      "Email support"
+      "Email support",
+      "$0.00003/event overage"
     ],
     "ctaDeveloper": "Start free",
     "ctaStartup": "Start for $29/mo",

@@ -994,7 +994,11 @@
       "ent13": "Özel hesap yöneticisi",
       "ent14": "%99.9 SLA garantisi",
       "ent15": "GDPR uyumluluğu",
-      "ent16": "Öncelikli + özel destek"
+      "ent16": "Öncelikli + özel destek",
+      "dev_limit": "Limitte engellenir",
+      "su_overage": "Aşım ücreti: event başına $0.00003",
+      "pro_overage": "Aşım ücreti: event başına $0.000001",
+      "ent_overage": "Özel aşım ücretlendirmesi"
     },
     "plans.free": "Ücretsiz",
     "plans.pro": "Pro",
@@ -2905,7 +2909,8 @@
       "Gelen webhook proxy",
       "Gömülebilir portal",
       "Cortex AI anomalı tespiti",
-      "Öncelikli destek"
+      "Öncelikli destek",
+      "Aşım ücreti: event başına $0.000001"
     ],
     "businessFeatures": [
       "Sınırsız event",
@@ -3062,7 +3067,8 @@
       "Özel hesap yöneticisi",
       "%99.9 SLA garantisi",
       "GDPR uyumluluğu",
-      "Öncelikli + özel destek"
+      "Öncelikli + özel destek",
+      "Özel aşım ücretlendirmesi"
     ],
     "developer": "Geliştirici",
     "startup": "Startup",
@@ -3077,7 +3083,8 @@
       "SSRF koruması",
       "2FA kimlik doğrulama",
       "Webhook playground",
-      "Topluluk desteği"
+      "Topluluk desteği",
+      "Limitte engellenir"
     ],
     "startupFeatures": [
       "Günlük 30.000 event",
@@ -3091,7 +3098,8 @@
       "Circuit breaker",
       "Akıllı yönlendirme",
       "Dakikada 500 API isteği",
-      "E-posta desteği"
+      "E-posta desteği",
+      "Aşım ücreti: event başına $0.00003"
     ],
     "ctaDeveloper": "Ücretsiz başla",
     "ctaStartup": "Aylik $29 ile basla",
