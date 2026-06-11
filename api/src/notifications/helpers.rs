@@ -506,10 +506,14 @@ pub async fn api_key_rotated(pool: &PgPool, customer_id: Uuid, key_name: &str) {
 pub async fn new_device_login(pool: &PgPool, customer_id: Uuid, ip: &str, user_agent: &str) {
     let device = extract_device_name(user_agent);
 
-    // Check if we already notified about this IP+device combo in the last 7 days
+    // Dedup: same IP + same device in the last 7 days → skip
+    // Message format contains both IP and device name
+    let pattern = format!("%{}%{}%", ip, device);
     let already_notified: Option<(i64,)> = sqlx::query_as(
-        "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND type = 'security' AND title ILIKE '%cihaz%' AND created_at > NOW() - INTERVAL '7 days'"
-    ).bind(customer_id).fetch_optional(pool).await.unwrap_or(None);
+        "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND type = 'security' AND message ILIKE $2 AND created_at > NOW() - INTERVAL '7 days'"
+    ).bind(customer_id)
+     .bind(&pattern)
+     .fetch_optional(pool).await.unwrap_or(None);
 
     let count = already_notified.map(|(c,)| c).unwrap_or(0);
     if count > 0 {
