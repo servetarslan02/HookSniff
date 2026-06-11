@@ -394,7 +394,7 @@ pub async fn auth_middleware(
                 c
             } else {
                 // 3. Cache miss
-                check_token_revocation(&pool, &claims).await?;
+                check_token_revocation(&pool.0, &claims).await?;
 
                 let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
                     .bind(claims.sub)
@@ -466,7 +466,7 @@ pub async fn jwt_auth_middleware(
             c
         } else {
             // 3. Cache miss — check revocation + fetch customer
-            check_token_revocation(&pool, &claims).await?;
+            check_token_revocation(&pool.0, &claims).await?;
 
             let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
                 .bind(claims.sub)
