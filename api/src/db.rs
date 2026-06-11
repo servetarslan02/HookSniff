@@ -245,6 +245,7 @@ fn migrations() -> Vec<(&'static str, &'static str)> {
         ("053_customer_consents", include_str!("../sql/migrations/053_customer_consents.sql")),
         ("054_weekly_digest", include_str!("../sql/migrations/054_weekly_digest.sql")),
         ("055_performance_indexes", include_str!("../sql/migrations/055_performance_indexes.sql")),
+        ("056_sso_tables", include_str!("../sql/migrations/056_sso_tables.sql")),
     ]
 }
 

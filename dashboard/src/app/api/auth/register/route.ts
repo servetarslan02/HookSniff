@@ -19,7 +19,38 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
     const data = await apiRes.json();
-    return NextResponse.json(data, { status: apiRes.status });
+
+    if (!apiRes.ok) {
+      return NextResponse.json(data, { status: apiRes.status });
+    }
+
+    // Create response with the data
+    const response = NextResponse.json(data);
+
+    // Set HttpOnly cookies if registration returns tokens (auto-login)
+    if (data.token) {
+      const cookieOpts = [
+        'Path=/',
+        'HttpOnly',
+        'Secure',
+        'SameSite=Lax',
+        `Max-Age=${24 * 60 * 60}`, // 24h
+      ].join('; ');
+      response.headers.append('Set-Cookie', `hooksniff_token=${data.token}; ${cookieOpts}`);
+    }
+
+    if (data.refresh_token) {
+      const refreshOpts = [
+        'Path=/',
+        'HttpOnly', 
+        'Secure',
+        'SameSite=Lax',
+        `Max-Age=${30 * 24 * 60 * 60}`, // 30d
+      ].join('; ');
+      response.headers.append('Set-Cookie', `hooksniff_refresh=${data.refresh_token}; ${refreshOpts}`);
+    }
+
+    return response;
   } catch (error) {
     return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Registration failed' } }, { status: 500 });
   }

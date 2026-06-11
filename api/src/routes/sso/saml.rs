@@ -10,6 +10,13 @@ use super::SamlAssertion;
 // ── SAML Response Parsing ───────────────────────────────────
 
 pub fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
+    // SECURITY: Reject excessively large SAML responses (XML bomb protection)
+    const MAX_SAML_SIZE: usize = 512 * 1024; // 512KB — more than enough for any real SAML response
+    if xml.len() > MAX_SAML_SIZE {
+        tracing::warn!("SAML response too large: {} bytes (max {})", xml.len(), MAX_SAML_SIZE);
+        return Err(AppError::coded(ErrorCode::SamlResponseTooLarge));
+    }
+
     // Extract NameID
     let name_id = extract_xml_text(xml, "NameID")
         .or_else(|| extract_xml_attribute(xml, "NameID", "NameID"))

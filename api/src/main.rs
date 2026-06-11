@@ -215,7 +215,7 @@ async fn main() -> Result<()> {
                 }
             }
         },
-        build_sso_store()
+        build_sso_store(&pool)
     );
 
     let ws_gateway = std::sync::Arc::new(hooksniff_api::ws::WsGateway::new(
@@ -411,29 +411,11 @@ fn validate_jwt_config() -> Result<()> {
     Ok(())
 }
 
-/// Build SSO state store with optional Redis backend
-async fn build_sso_store() -> routes::sso::SsoStateStore {
-    let redis_startup = config::redis_startup_timeout();
-    let mut sso_store = routes::sso::SsoStateStore::new();
-    if let Some(url) = config::resolve_redis_url() {
-        match redis::Client::open(url.as_str()) {
-            Ok(client) => match tokio::time::timeout(
-                redis_startup,
-                redis::aio::ConnectionManager::new(client)
-            ).await {
-                Ok(Ok(conn)) => {
-                    tracing::info!("✅ SSO state store using Redis");
-                    sso_store = sso_store.with_redis(conn);
-                }
-                Ok(Err(e)) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),
-                Err(_) => tracing::warn!(
-                    "SSO state Redis timed out ({:?}), using in-memory",
-                    redis_startup
-                ),
-            },
-            Err(e) => tracing::warn!("SSO state Redis client error ({e}), using in-memory"),
-        }
-    }
+/// Build SSO state store backed by PostgreSQL (works across Cloud Run instances)
+async fn build_sso_store(pool: &sqlx::PgPool) -> routes::sso::SsoStateStore {
+    let sso_store = routes::sso::SsoStateStore::new(pool.clone());
+    tracing::info!("✅ SSO state store using PostgreSQL");
+    // Periodic cleanup of expired states (every 5 minutes)
     let cleanup_store = sso_store.clone();
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_secs(300));

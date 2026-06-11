@@ -7,6 +7,15 @@ const handleI18nRouting = createMiddleware(routing);
 // Match locale prefix WITH the trailing slash to avoid double-slash bug
 const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
+// SECURITY: Validate that a cookie value looks like a JWT (3 dot-separated base64url parts).
+// Prevents accepting garbage/expired tokens as valid auth.
+// Full JWT verification happens server-side in /api/auth/me.
+function isValidJwtFormat(token: string): boolean {
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+  return parts.every(p => p.length > 0 && /^[A-Za-z0-9_-]+$/.test(p));
+}
+
 // Route consolidation map: old individual routes → new consolidated routes
 const ROUTE_REDIRECTS: Record<string, string> = {
   // Core section
@@ -87,9 +96,10 @@ export default function middleware(request: NextRequest) {
 
   // Auth check for admin routes
   if (withoutLocale.startsWith('/admin')) {
-    const authCookie = request.cookies.get('hooksniff_token');
-    const refreshCookie = request.cookies.get('hooksniff_refresh');
-    if (!authCookie && !refreshCookie) {
+    const authCookie = request.cookies.get('hooksniff_token')?.value;
+    const refreshCookie = request.cookies.get('hooksniff_refresh')?.value;
+    const hasValidAuth = (authCookie && isValidJwtFormat(authCookie)) || (refreshCookie && isValidJwtFormat(refreshCookie));
+    if (!hasValidAuth) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
@@ -110,9 +120,10 @@ export default function middleware(request: NextRequest) {
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
-    const authCookie = request.cookies.get('hooksniff_token');
-    const refreshCookie = request.cookies.get('hooksniff_refresh');
-    if (!authCookie && !refreshCookie) {
+    const authCookie = request.cookies.get('hooksniff_token')?.value;
+    const refreshCookie = request.cookies.get('hooksniff_refresh')?.value;
+    const hasValidAuth = (authCookie && isValidJwtFormat(authCookie)) || (refreshCookie && isValidJwtFormat(refreshCookie));
+    if (!hasValidAuth) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);

@@ -232,7 +232,8 @@ pub async fn login(
         &pool, customer.id, &client_ip, user_agent
     ).await;
 
-    // TODO: Email verification check temporarily disabled — re-enable when email provider is fixed
+    // TODO: Email verification check — re-enable when email provider (Resend/Gmail) is configured
+    // SSO users are auto-verified via domain_verified flag; password users need email verification
     // if !customer.email_verified {
     //     return Err(AppError::coded(ErrorCode::EmailNotVerified));
     // }
