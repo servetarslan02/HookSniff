@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
     amount_cents BIGINT NOT NULL DEFAULT 0,
     currency TEXT NOT NULL DEFAULT 'usd',
-    plan TEXT NOT NULL DEFAULT 'free',
+    plan TEXT NOT NULL DEFAULT 'developer',
     status TEXT NOT NULL DEFAULT 'paid',
     provider TEXT NOT NULL DEFAULT 'stripe',
     provider_invoice_id TEXT,

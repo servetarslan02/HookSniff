@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
             amount_cents BIGINT NOT NULL DEFAULT 0,
             currency TEXT NOT NULL DEFAULT 'USD',
             status TEXT NOT NULL DEFAULT 'completed',
-            plan TEXT NOT NULL DEFAULT 'free',
+            plan TEXT NOT NULL DEFAULT 'developer',
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 

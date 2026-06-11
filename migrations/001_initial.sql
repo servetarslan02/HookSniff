@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS customers (
     email TEXT NOT NULL UNIQUE,
     api_key_hash TEXT NOT NULL,
     api_key_prefix TEXT NOT NULL,
-    plan TEXT NOT NULL DEFAULT 'free',
+    plan TEXT NOT NULL DEFAULT 'developer',
     webhook_limit INT NOT NULL DEFAULT 10000,
     webhook_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()

@@ -174,7 +174,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
             <div className="text-xs text-gray-500 dark:text-slate-400 truncate">{user?.email}</div>
           </div>
           <span className="px-2 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wide bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
-            {user?.plan || 'free'}
+            {user?.plan || 'developer'}
           </span>
         </div>
 
