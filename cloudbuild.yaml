@@ -6,9 +6,9 @@ options:
 
 steps:
   # Step 1: Pre-build Rust Check (Fast Fail)
-  - name: 'rust:1.95-bookworm'
+  - name: 'rust:1.96-bookworm'
     id: 'rust-check'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |

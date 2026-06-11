@@ -63,7 +63,7 @@ pub async fn get_subscription(
     let billing_customer = if let Some(owner_id) = effective_owner {
         sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", crate::routes::auth::CUSTOMER_SELECT))
             .bind(owner_id)
-            .fetch_optional(&*pool)
+            .fetch_optional(&pool)
             .await?
             .unwrap_or(customer.clone())
     } else {
