@@ -111,7 +111,7 @@ export function MLQualityTab({ token }: { token: string | null }) {
                       }`}>{tc('score')}: {Math.round(m.quality_score)}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
-                    <div className="grid grid-cols-3 gap-3 mt-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                       <div className="text-center p-2 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                         <p className="text-xs text-gray-500 dark:text-slate-400">{t('metric.accuracy')}</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">%{Math.round(m.accuracy_pct)}</p>

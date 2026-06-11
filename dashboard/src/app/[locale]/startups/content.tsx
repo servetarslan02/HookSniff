@@ -12,10 +12,10 @@ export function StartupsPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("title")} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="text-center mb-12">
           <span className="inline-block px-3 py-1 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 text-sm font-medium rounded-full mb-4">{t("badge")}</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t("buildFaster")}</h1>
+          <h1 className="text-4xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t("buildFaster")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t("subtitle")}</p>
         </div>
 

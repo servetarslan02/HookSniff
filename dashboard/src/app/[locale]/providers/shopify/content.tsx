@@ -12,13 +12,13 @@ export function ShopifyWebhooksPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("shopify")} />
 
-      <main className="max-w-5xl mx-auto px-6 py-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 rounded-full border border-green-200 dark:border-green-500/20 mb-4">
             <span className="text-lg"><ShoppingBag size={20} strokeWidth={1.75} /></span>
             <span className="text-sm font-medium text-green-700 dark:text-green-400">{t("shopifyIntegration")}</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("shopifyWebhooksGuide")}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("shopifyWebhooksGuide")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
             Integrate Shopify webhooks for orders, products, customers, and inventory. Keep your systems in sync with real-time events.
           </p>

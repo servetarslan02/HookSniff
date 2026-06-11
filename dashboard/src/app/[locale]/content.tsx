@@ -193,7 +193,7 @@ function DashboardPreview() {
           </div>
         </div>
         <div className="p-6 space-y-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-4">
             {[
               { label: tHero('deliveries'), value: '24,891', color: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400' },
               { label: tHero('successRate'), value: '99.9%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
@@ -261,7 +261,7 @@ function HowItWorks() {
   return (
     <section className="py-12 sm:py-16 md:py-24">
       <div className="text-center mb-8 sm:mb-12 md:mb-16">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('title')}</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('title')}</h2>
         <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{t('subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 relative">
@@ -483,7 +483,7 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
       {/* Features */}
       <div id="features" className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tFeatures('title')}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tFeatures('title')}</h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{tFeatures('subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-24">
@@ -507,7 +507,7 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
       {/* Pricing */}
       <div id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tPricing('title')}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tPricing('title')}</h2>
           {/* Monthly / Yearly toggle */}
           <div className="flex items-center justify-center gap-3 mt-6">
             <span className={`text-sm font-medium transition ${!yearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-slate-400'}`}>

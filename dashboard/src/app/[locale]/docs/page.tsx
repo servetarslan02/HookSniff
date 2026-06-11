@@ -150,7 +150,7 @@ async function DocsPageContent(params: Promise<{ locale: string }>) {
         <div className="absolute -top-12 right-0 w-64 h-64 bg-[#7c3aed]/[0.05] dark:bg-[#7c3aed]/[0.03] rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-4xl sm:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">
             {tp('heroTitle')}
           </h1>
           <p className="mt-4 text-lg text-gray-600 dark:text-slate-400 max-w-2xl leading-relaxed">

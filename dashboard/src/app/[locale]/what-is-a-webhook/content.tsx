@@ -11,8 +11,8 @@ export function WhatIsWebhookPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("title")} />
 
-      <article className="max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
         <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">{t("subtitle")}</p>
 
         <div className="prose prose-gray dark:prose-invert max-w-none space-y-8">

@@ -12,13 +12,13 @@ export function StripeWebhooksPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("stripe")} />
 
-      <main className="max-w-5xl mx-auto px-6 py-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/10 rounded-full border border-purple-200 dark:border-purple-500/20 mb-4">
             <span className="text-lg"><CreditCard size={20} strokeWidth={1.75} /></span>
             <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{t("stripeIntegration")}</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("stripeWebhooksGuide")}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("stripeWebhooksGuide")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
             Receive and verify Stripe webhooks for payments, subscriptions, disputes, and more. Handle every Stripe event reliably.
           </p>

@@ -205,7 +205,7 @@ export function PricingPageContent() {
           <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-medium rounded-full mb-3 sm:mb-4">
             {t('badge')}
           </span>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             {t('heroTitle')}
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-2 px-2">

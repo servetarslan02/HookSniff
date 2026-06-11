@@ -68,8 +68,8 @@ export function FAQPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("faqTitle")} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('faqTitle')}</h1>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+        <h1 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('faqTitle')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mb-12">{t('faqSubtitle')}</p>
 
         {/* Category Tabs */}

@@ -16,11 +16,11 @@ export function SecurityPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("title")} />
 
-      <main className="max-w-6xl mx-auto px-6 py-16">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
         <div className="text-center mb-16">
           <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded-full mb-4">{t("badge")}</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             {t("heroTitle")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
