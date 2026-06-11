@@ -641,9 +641,9 @@ async function ApiReferenceContent(params: Promise<{ locale: string }>) {
           response={`{
   "plan": "startup",
   "webhooks_used": 5432,
-  "webhooks_limit": 10000,
+  "webhooks_limit": 30000,
   "endpoints_used": 8,
-  "endpoints_limit": 20,
+  "endpoints_limit": 2147483647,
   "period_start": "2026-01-01T00:00:00Z",
   "period_end": "2026-01-31T23:59:59Z"
 }`}
