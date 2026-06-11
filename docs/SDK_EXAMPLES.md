@@ -958,8 +958,9 @@ All SDKs support cursor-based pagination. Use `limit` and `cursor` parameters, o
 
 ### Rate Limits
 
-- **Free:** 1,000 webhooks/day, 100 requests/min
-- **Pro:** 10,000 webhooks/day, 1,000 requests/min
-- **Business:** 100,000 webhooks/day, 5,000 requests/min
+- **Developer:** 300 webhooks/day, 100 requests/min
+- **Startup:** 30,000 webhooks/day, 500 requests/min
+- **Pro:** 100,000 webhooks/day, 1,000 requests/min
+- **Enterprise:** Unlimited webhooks/day, 5,000 requests/min
 
 SDKs automatically retry on `429` with exponential backoff.

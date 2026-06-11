@@ -27,15 +27,15 @@ We compared five webhook services:
 
 | Service | Free Events/mo | Endpoints | Retries | SDKs |
 |---------|---------------|-----------|---------|------|
-| HookSniff | 10,000 | 5 | Yes (5 attempts) | 11 |
+| HookSniff | 300/day (~9,000/mo) | Unlimited | Yes (5 attempts) | 11 |
 | Svix | Unlimited | Unlimited | Yes | 11 |
 | Hookdeck | 10,000 | Unlimited | Yes | 8 |
 | Hook0 | Self-hosted | Unlimited | Yes | 4 |
 | Webhook.site | Unlimited | 1 | No | 0 |
 
 ### HookSniff Free Tier
-- 10,000 webhooks per month
-- 5 endpoints
+- 300 webhooks per day (~9,000/month)
+- Unlimited endpoints
 - Automatic retries with exponential backoff
 - HMAC-SHA256 signatures
 - Dashboard with delivery logs
@@ -121,7 +121,7 @@ Free tiers are great for getting started, but watch out for:
 3. **Support** — Is there community or priority support?
 4. **Lock-in** — Can you migrate easily?
 
-HookSniff keeps delivery logs for 7 days on free, 180 days on Pro. All SDKs are MIT licensed. You can self-host the entire stack.
+HookSniff keeps delivery logs for 14 days on free, 180 days on Pro. All SDKs are MIT licensed. You can self-host the entire stack.
 
 ## Migration Guide
 
@@ -142,5 +142,5 @@ If you need enterprise compliance (SOC 2, HIPAA), Svix is worth the premium. If 
 
 The good news: all of these services have free tiers. Try them all and see which fits your workflow.
 
-[Start building with HookSniff for free](https://hooksniff.vercel.app/register) — 10,000 webhooks per month, no credit card required.`,
+[Start building with HookSniff for free](https://hooksniff.vercel.app/register) — 300 webhooks per day, no credit card required.`,
 };

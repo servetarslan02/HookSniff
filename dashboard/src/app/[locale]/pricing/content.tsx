@@ -136,12 +136,13 @@ export function PricingPageContent() {
     {
       category: t('usage'),
       items: [
-        { feature: t('dailyEvents'), developer: '300', startup: '30,000', pro: '100,000', enterprise: t('custom') },
+        { feature: t('dailyEvents'), developer: '300', startup: '30,000', pro: '100,000', enterprise: t('unlimited') },
         { feature: t('applications'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('endpoints'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('payloadSize'), developer: '256 KB', startup: '1 MB', pro: '5 MB', enterprise: '10 MB' },
         { feature: t('eventTypes'), developer: '10', startup: '50', pro: t('unlimited'), enterprise: t('unlimited') },
-        { feature: t('teamMembers'), developer: '1', startup: '25', pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('subscriptions'), developer: '10', startup: '300', pro: t('unlimited'), enterprise: t('unlimited') },
+        { feature: t('rateLimit'), developer: '100/min', startup: '500/min', pro: '1,000/min', enterprise: '5,000/min' },
         { feature: t('overagePerEvent'), developer: '—', startup: '$0.00003', pro: '$0.000001', enterprise: t('custom') },
       ],
     },
@@ -161,8 +162,9 @@ export function PricingPageContent() {
       items: [
         { feature: t('hmacSignatures'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('secretRotation'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('ssrfProtection'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: `${t('ipWhitelisting')} (Coming Soon)`, developer: '—', startup: '—', pro : <Clock size={16} className="text-amber-500 mx-auto" />, enterprise : <Clock size={16} className="text-amber-500 mx-auto" /> },
-        { feature: t('ssoSaml'), developer: '—', startup: '—', pro: '—', enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: <>{t('ssoSaml')} <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">Beta</span></>, developer: '—', startup: '—', pro: '—', enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('twoFactor'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('cloudevents'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
@@ -175,7 +177,7 @@ export function PricingPageContent() {
         { feature: t('realtimeLogs'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('analyticsGraphs'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('schemaRegistry'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
-        { feature: t('webhookPlayground'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('webhookPlayground'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
     },
     {

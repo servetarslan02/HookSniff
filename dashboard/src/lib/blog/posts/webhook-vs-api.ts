@@ -225,5 +225,5 @@ HookSniff makes webhooks reliable. When you use webhooks in your architecture, y
 
 You focus on building your application. HookSniff handles the webhook infrastructure.
 
-Start sending webhooks at [hooksniff.com](https://hooksniff.com) — free tier includes 10,000 events per month.`,
+Start sending webhooks at [hooksniff.com](https://hooksniff.com) — free tier includes 300 events per day.`,
 };

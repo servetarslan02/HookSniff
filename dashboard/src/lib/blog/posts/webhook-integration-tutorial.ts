@@ -16,7 +16,7 @@ export const post: Post = {
 3. Navigate to Settings → API Keys
 4. Create a new API key and copy it — you will need it for all SDK calls
 
-Your free tier includes 10,000 webhooks per month.
+Your free tier includes 300 webhooks per day.
 
 ### Step 2: Install the SDK
 

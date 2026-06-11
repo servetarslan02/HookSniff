@@ -42,7 +42,7 @@ offers this.
 
 🔀 **Smart routing** — Round-robin, failover, weighted strategies with auto-fallback.
 
-💰 **Starting at $49/mo** — 10x cheaper than Svix for comparable features.
+💰 **Starting at $29/mo** — 17x cheaper than Svix for comparable features.
 
 **The stack:**
 - API: Rust (Axum 0.8) — memory safety, async performance
@@ -51,7 +51,7 @@ offers this.
 - Database: PostgreSQL (Neon) + Redis (Upstash)
 - Deploy: Google Cloud Run (4 regions)
 
-**Free tier:** 10,000 webhooks/month, 5 endpoints, no credit card required.
+**Free tier:** 300 webhooks/day, unlimited endpoints, no credit card required.
 
 Would love feedback from this community — what's missing from your current 
 webhook setup? What would make you switch?

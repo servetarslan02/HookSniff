@@ -400,5 +400,5 @@ Now that you know how to use webhooks, you need infrastructure to make them reli
 
 HookSniff handles all of this. You focus on your application logic, HookSniff handles the webhook infrastructure.
 
-Start for free at [hooksniff.com](https://hooksniff.com) — 10,000 events per month, no credit card required.`,
+Start for free at [hooksniff.com](https://hooksniff.com) — 300 events per day, no credit card required.`,
 };

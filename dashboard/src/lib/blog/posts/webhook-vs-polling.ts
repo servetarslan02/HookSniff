@@ -153,5 +153,5 @@ The key is to match the approach to your needs:
 - **Simple prototype?** → Polling
 - **Production system?** → Webhooks with polling fallback
 
-Ready to try webhooks? [Get started with HookSniff for free](https://hooksniff.vercel.app/register) — 10,000 webhooks per month, no credit card required.`,
+Ready to try webhooks? [Get started with HookSniff for free](https://hooksniff.vercel.app/register) — 300 webhooks per day, no credit card required.`,
 };

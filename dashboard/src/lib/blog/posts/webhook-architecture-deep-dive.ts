@@ -7,7 +7,7 @@ export const post: Post = {
     readTime: '10 min',
     tags: ['architecture', 'rust', 'engineering', 'infrastructure'],
     author: 'HookSniff Team',
-    content: `HookSniff processes over 10,000 webhooks per month and costs us $0 to operate. This post explains how we architected the entire system to run on free-tier services without sacrificing reliability.
+    content: `HookSniff processes over 9,000 webhooks per month and costs us $0 to operate. This post explains how we architected the entire system to run on free-tier services without sacrificing reliability.
 
 ### The Architecture
 

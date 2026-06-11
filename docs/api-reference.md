@@ -566,9 +566,9 @@ GET /v1/billing/subscription
   "plan": "pro",
   "status": "active",
   "stripe_subscription_id": "sub_abc123",
-  "webhook_limit": 50000,
-  "endpoint_limit": 50,
-  "retention_days": 30,
+  "webhook_limit": 100000,
+  "endpoint_limit": 2147483647,
+  "retention_days": 180,
   "monthly_price_cents": 4900
 }
 ```
@@ -630,8 +630,8 @@ GET /v1/billing/usage
 ```json
 {
   "plan": "pro",
-  "webhooks": { "used": 1250, "limit": 50000, "remaining": 48750 },
-  "endpoints": { "used": 3, "limit": 50, "remaining": 47 },
+  "webhooks": { "used": 1250, "limit": 100000, "remaining": 98750 },
+  "endpoints": { "used": 3, "limit": 2147483647, "remaining": 2147483644 },
   "rate_limit": { "requests_per_minute": 1000 },
   "period": { "start": "2026-05-01", "end": "2026-05-06" }
 }
