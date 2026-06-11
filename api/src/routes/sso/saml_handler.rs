@@ -149,63 +149,67 @@ pub async fn saml_callback(
         tracing::debug!("SAML audience: {}", aud);
     }
 
-    // Verify SAML response certificate against configured IdP certificate
-    // Use sso_config_id for team-scoped SSO (not customer_id)
-    if let Some(ref login_state) = login_state {
-        let configured_cert: Option<String> = sqlx::query_scalar(
-            "SELECT certificate FROM sso_configs WHERE id = $1 LIMIT 1"
-        )
-        .bind(login_state.sso_config_id)
-        .fetch_optional(&pool)
-        .await?
-        .flatten();
-
-        if let (Some(ref expected_cert), Some(ref response_cert)) = (&configured_cert, &assertion.certificate) {
-            // Normalize both certificates for comparison (strip headers, whitespace)
-            let normalize = |s: &String| -> String {
-                s.replace("-----BEGIN CERTIFICATE-----", "")
-                 .replace("-----END CERTIFICATE-----", "")
-                 .replace('\n', "")
-                 .replace('\r', "")
-                 .replace(' ', "")
-                 .trim()
-                 .to_string()
-            };
-            let expected_norm = normalize(expected_cert);
-            let response_norm = normalize(response_cert);
-
-            if expected_norm != response_norm {
-                tracing::warn!("⚠️ SAML certificate mismatch: response certificate does not match configured IdP certificate");
-                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Certificate mismatch — possible tampering"), &headers).await;
-                return Err(AppError::coded(ErrorCode::SamlCertMismatch));
-            }
-            tracing::debug!("SAML certificate verified successfully");
-
-            // Verify cryptographic signature (RSA-SHA256)
-            if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
-                tracing::warn!("⚠️ SAML cryptographic signature verification failed: {}", e);
-                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed"), &headers).await;
-                return Err(e);
-            }
-            tracing::debug!("SAML cryptographic signature verified successfully");
-        } else if configured_cert.is_some() && assertion.certificate.is_none() {
-            // Assertion doesn't include cert — try verification with configured cert
-            tracing::info!("SAML response missing embedded certificate, attempting verification with configured IdP certificate");
-            if let Some(ref expected_cert) = configured_cert {
-                if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
-                    tracing::warn!("⚠️ SAML signature verification failed (using configured cert): {}", e);
-                    log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed with configured cert"), &headers).await;
-                    return Err(e);
-                }
-                tracing::debug!("SAML cryptographic signature verified using configured IdP certificate");
-            }
-        }
-    }
-
+    // Validate login state FIRST — before any security checks
     let login_state = login_state.ok_or_else(|| {
         tracing::warn!("SAML callback: no valid state found (expired or invalid RelayState)");
         AppError::coded(ErrorCode::SsoSessionExpired)
     })?;
+
+    // Verify SAML response certificate against configured IdP certificate
+    // Use sso_config_id for team-scoped SSO (not customer_id)
+    let configured_cert: Option<String> = sqlx::query_scalar(
+        "SELECT certificate FROM sso_configs WHERE id = $1 LIMIT 1"
+    )
+    .bind(login_state.sso_config_id)
+    .fetch_optional(&pool)
+    .await?
+    .flatten();
+
+    if let (Some(ref expected_cert), Some(ref response_cert)) = (&configured_cert, &assertion.certificate) {
+        // Normalize both certificates for comparison (strip headers, whitespace)
+        let normalize = |s: &String| -> String {
+            s.replace("-----BEGIN CERTIFICATE-----", "")
+             .replace("-----END CERTIFICATE-----", "")
+             .replace('\n', "")
+             .replace('\r', "")
+             .replace(' ', "")
+             .trim()
+             .to_string()
+        };
+        let expected_norm = normalize(expected_cert);
+        let response_norm = normalize(response_cert);
+
+        if expected_norm != response_norm {
+            tracing::warn!("⚠️ SAML certificate mismatch: response certificate does not match configured IdP certificate");
+            log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Certificate mismatch — possible tampering"), &headers).await;
+            return Err(AppError::coded(ErrorCode::SamlCertMismatch));
+        }
+        tracing::debug!("SAML certificate verified successfully");
+
+        // Verify cryptographic signature (RSA-SHA256)
+        if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
+            tracing::warn!("⚠️ SAML cryptographic signature verification failed: {}", e);
+            log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed"), &headers).await;
+            return Err(e);
+        }
+        tracing::debug!("SAML cryptographic signature verified successfully");
+    } else if configured_cert.is_some() && assertion.certificate.is_none() {
+        // Assertion doesn't include cert — try verification with configured cert
+        tracing::info!("SAML response missing embedded certificate, attempting verification with configured IdP certificate");
+        if let Some(ref expected_cert) = configured_cert {
+            if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
+                tracing::warn!("⚠️ SAML signature verification failed (using configured cert): {}", e);
+                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed with configured cert"), &headers).await;
+                return Err(e);
+            }
+            tracing::debug!("SAML cryptographic signature verified using configured IdP certificate");
+        }
+    } else {
+        // No certificate configured — reject in production (require cert for security)
+        tracing::warn!("⚠️ SSO config has no certificate configured — rejecting SAML response");
+        log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("No certificate configured"), &headers).await;
+        return Err(AppError::coded(ErrorCode::SamlMissingCertificate));
+    }
 
     // Verify email matches — strict check
     if assertion.name_id != login_state.email {

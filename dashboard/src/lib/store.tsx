@@ -40,16 +40,12 @@ function toSlug(input: string): string {
     .slice(0, 50);
 }
 
-function setAuthCookie(token: string) {
-  // Set a non-HttpOnly cookie for middleware auth check.
-  // The middleware reads this cookie to determine if the user is authenticated.
-  // The frontend uses localStorage + Authorization header for API calls.
-  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-}
-
-function clearAuthCookie() {
-  document.cookie = 'hooksniff_token=; path=/; max-age=0';
-}
+// SECURITY FIX: Removed document.cookie token storage.
+// The API route /api/auth/login sets an HttpOnly; Secure cookie which is the
+// authoritative auth cookie. Setting a second non-HttpOnly cookie via
+// document.cookie created an XSS exfiltration vector.
+// The middleware reads the HttpOnly cookie set by the API route.
+// The frontend uses localStorage + Authorization header for API calls.
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -64,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     tokenRef.current = newToken;
     if (newToken) {
       localStorage.setItem('hooksniff_token', newToken);
-      setAuthCookie(newToken);
     }
   }, []);
 
@@ -172,8 +167,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [updateToken, startSessionRefresh]);
 
   const login = useCallback(async (email: string, password: string) => {
-    // Call backend directly — token comes from response body
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    // Call Next.js API route (sets HttpOnly cookie on dashboard domain)
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -214,7 +209,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const res = await fetch(`${API_BASE}/auth/register`, {
+    // Call Next.js API route (sets HttpOnly cookie on dashboard domain)
+    const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),
@@ -257,7 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('hooksniff_token');
     localStorage.removeItem('hooksniff_refresh');
-    clearAuthCookie();
+    // Cookie clearing is handled by the API /auth/logout endpoint (HttpOnly cookie)
   }, []);
 
   // Wire up logout ref for inactivity auto-logout

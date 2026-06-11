@@ -35,6 +35,7 @@ pub async fn find_or_create_sso_customer(
     }
 
     // Auto-provision new customer
+    // SECURITY: Use ON CONFLICT to prevent race condition with concurrent SSO logins
     let name: Option<String> = attributes.get("name")
         .or_else(|| attributes.get("displayName"))
         .map(|s| s.clone())
@@ -55,6 +56,7 @@ pub async fn find_or_create_sso_customer(
     let customer = sqlx::query_as::<_, Customer>(
         "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified)
          VALUES ($1, $2, $3, $4, true, $5)
+         ON CONFLICT (email) DO UPDATE SET name = COALESCE(EXCLUDED.name, customers.name)
          RETURNING *"
     )
     .bind(email)

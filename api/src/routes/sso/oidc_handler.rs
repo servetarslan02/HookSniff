@@ -202,15 +202,16 @@ pub async fn oidc_callback(
     })?;
 
     // Decode the ID token and verify signature against JWKS
-    if let Some(ref jwks_uri) = discovery.jwks_uri {
-        verify_jwt_signature(&id_token, jwks_uri).await
-            .map_err(|e| {
-                tracing::warn!("OIDC ID token signature verification failed: {}", e);
-                e
-            })?;
-    } else {
-        tracing::warn!("No JWKS URI in OIDC discovery, skipping signature verification");
-    }
+    // SECURITY: JWKS URI is REQUIRED — reject if missing to prevent forged tokens
+    let jwks_uri = discovery.jwks_uri.ok_or_else(|| {
+        tracing::error!("OIDC discovery document missing jwks_uri — cannot verify ID token signature");
+        AppError::BadRequest("SSO configuration error: identity provider does not expose signing keys (jwks_uri). Contact your administrator.".into())
+    })?;
+    verify_jwt_signature(&id_token, &jwks_uri).await
+        .map_err(|e| {
+            tracing::warn!("OIDC ID token signature verification failed: {}", e);
+            e
+        })?;
     let token_claims = decode_oidc_id_token(&id_token)?;
 
     // Extract email from claims

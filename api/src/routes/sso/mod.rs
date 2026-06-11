@@ -16,10 +16,8 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 use uuid::Uuid;
-use std::collections::HashMap;
-use std::sync::Arc;
-use tokio::sync::Mutex;
 
 // Re-export handler functions for router
 use handlers::*;
@@ -168,14 +166,7 @@ pub struct SsoProviderQuery {
     pub domain: String,
 }
 
-// ── State Storage (in-memory for now, should be Redis) ──────
-
-
-#[derive(Clone)]
-pub struct SsoStateStore {
-    pub states: Arc<Mutex<HashMap<String, SsoLoginState>>>,
-    pub redis: Option<redis::aio::ConnectionManager>,
-}
+// ── State Storage (Database-backed — works across Cloud Run instances) ──
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SsoLoginState {
@@ -188,81 +179,73 @@ pub struct SsoLoginState {
     pub default_role: String,
     pub nonce: Option<String>,
     pub created_at: DateTime<Utc>,
-    // New fields for role/team mapping
     pub sso_config_id: Uuid,
     pub role_mapping: Option<serde_json::Value>,
     pub team_mapping: Option<serde_json::Value>,
 }
 
-pub const SSO_STATE_TTL_SECS: u64 = 600; // 10 minutes
+#[derive(Clone)]
+pub struct SsoStateStore {
+    pool: PgPool,
+}
+
+pub const SSO_STATE_TTL_SECS: i64 = 600; // 10 minutes
 
 impl SsoStateStore {
-    pub fn new() -> Self {
-        Self {
-            states: Arc::new(Mutex::new(HashMap::new())),
-            redis: None,
-        }
-    }
-
-    pub fn with_redis(mut self, redis: redis::aio::ConnectionManager) -> Self {
-        self.redis = Some(redis);
-        self
+    pub fn new(pool: PgPool) -> Self {
+        Self { pool }
     }
 
     pub async fn insert(&self, state: String, login_state: SsoLoginState) {
-        // Always write to in-memory as fallback
-        self.states.lock().await.insert(state.clone(), login_state.clone());
-        // Also write to Redis if available
-        if let Some(ref mut redis) = self.redis.clone() {
-            match serde_json::to_string(&login_state) {
-                Ok(json) => {
-                    let key = format!("sso:state:{}", state);
-                    let _: Result<(), _> = redis::cmd("SETEX")
-                        .arg(&key)
-                        .arg(SSO_STATE_TTL_SECS)
-                        .arg(&json)
-                        .query_async(redis)
-                        .await;
-                }
-                Err(e) => tracing::warn!("Failed to serialize SSO state: {}", e),
+        let data = match serde_json::to_value(&login_state) {
+            Ok(v) => v,
+            Err(e) => {
+                tracing::warn!("Failed to serialize SSO state: {}", e);
+                return;
             }
+        };
+        let expires_at = chrono::Utc::now() + chrono::Duration::seconds(SSO_STATE_TTL_SECS);
+
+        let result = sqlx::query(
+            "INSERT INTO sso_login_states (state, data, email, expires_at)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (state) DO UPDATE SET data = EXCLUDED.data, expires_at = EXCLUDED.expires_at"
+        )
+        .bind(&state)
+        .bind(&data)
+        .bind(&login_state.email)
+        .bind(expires_at)
+        .execute(&self.pool)
+        .await;
+
+        if let Err(e) = result {
+            tracing::warn!("Failed to store SSO state in DB: {}", e);
         }
     }
 
     pub async fn remove(&self, state: &str) -> Option<SsoLoginState> {
-        // Try Redis first
-        if let Some(ref mut redis) = self.redis.clone() {
-            let key = format!("sso:state:{}", state);
-            let result: Result<Option<String>, _> = redis::cmd("GET")
-                .arg(&key)
-                .query_async(redis)
-                .await;
-            if let Ok(Some(json)) = result {
-                // Delete from Redis
-                let _: Result<(), _> = redis::cmd("DEL")
-                    .arg(&key)
-                    .query_async(redis)
-                    .await;
-                // Also remove from in-memory
-                self.states.lock().await.remove(state);
-                return serde_json::from_str(&json).ok();
-            }
-        }
-        // Fallback to in-memory
-        self.states.lock().await.remove(state)
+        // Delete and return in one query — also checks expiry
+        let row: Option<(serde_json::Value,)> = sqlx::query_as(
+            "DELETE FROM sso_login_states WHERE state = $1 AND expires_at > NOW() RETURNING data"
+        )
+        .bind(state)
+        .fetch_optional(&self.pool)
+        .await
+        .ok()
+        .flatten();
+
+        row.and_then(|(data,)| serde_json::from_value(data).ok())
     }
 
-    /// Remove expired states from in-memory store (call periodically)
+    /// Clean up expired states (call periodically or rely on DB cleanup)
     pub async fn cleanup_expired(&self) {
-        let mut states = self.states.lock().await;
-        let now = Utc::now();
-        let before_count = states.len();
-        states.retain(|_, state| {
-            (now - state.created_at).num_seconds() < SSO_STATE_TTL_SECS as i64
-        });
-        let removed = before_count - states.len();
-        if removed > 0 {
-            tracing::info!("SSO state cleanup: removed {} expired states", removed);
+        let result = sqlx::query("DELETE FROM sso_login_states WHERE expires_at < NOW()")
+            .execute(&self.pool)
+            .await;
+        if let Ok(r) = result {
+            if r.rows_affected() > 0 {
+                tracing::info!("SSO state cleanup: removed {} expired states", r.rows_affected());
+            }
         }
     }
 }
