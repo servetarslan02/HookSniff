@@ -238,6 +238,7 @@ pub async fn login(
     // }
 
     // SSO enforcement check
+    // 1. Check by customer_id (direct SSO config)
     let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
         "SELECT enabled, admin_bypass FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
     )
@@ -245,6 +246,7 @@ pub async fn login(
     .fetch_optional(&pool)
     .await?;
 
+    // 2. Check by team membership
     let sso_config = if sso_config.is_none() {
         sqlx::query_as::<_, (bool, Option<bool>)>(
             "SELECT s.enabled, s.admin_bypass FROM sso_configs s
@@ -253,6 +255,20 @@ pub async fn login(
              LIMIT 1"
         )
         .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        sso_config
+    };
+
+    // 3. Check by email domain (verified_domain)
+    let sso_config = if sso_config.is_none() {
+        let email_domain = customer.email.split('@').nth(1).unwrap_or("");
+        sqlx::query_as::<_, (bool, Option<bool>)>(
+            "SELECT enabled, admin_bypass FROM sso_configs
+             WHERE enabled = true AND verified_domain = $1 LIMIT 1"
+        )
+        .bind(email_domain)
         .fetch_optional(&pool)
         .await?
     } else {
