@@ -14,6 +14,7 @@ import {
   type FailedDeliveriesResponseValidated,
   type RateLimitViolationsResponseValidated,
 } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Schema-validated fetcher wrapper ──
 function validated<T>(
@@ -103,6 +104,7 @@ export function useApiLatency(params?: { period?: string }) {
 export function useBatchReplay() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (ids: string[]) => webhooksApi.batchReplay(token!, ids),
     onSettled: () => {
@@ -110,5 +112,6 @@ export function useBatchReplay() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'dead-letters'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'queue-status'] });
     },
+    onError: (err) => showError(err),
   });
 }

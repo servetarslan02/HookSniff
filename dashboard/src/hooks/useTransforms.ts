@@ -8,6 +8,7 @@ import {
   TransformRuleSchema,
   type TransformRuleValidated,
 } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Transform Rules ──
 export function useTransformRules(endpointId: string) {
@@ -26,43 +27,51 @@ export function useTransformRules(endpointId: string) {
 export function useCreateTransformRule() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ endpointId, rule }: { endpointId: string; rule: TransformRuleValidated['rule_json'] }) =>
       transformsApi.create(token!, endpointId, { rule }),
     onSettled: (_data, _error, { endpointId }) => {
       queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useDeleteTransformRule() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ endpointId, ruleId }: { endpointId: string; ruleId: string }) =>
       transformsApi.delete(token!, endpointId, ruleId),
     onSettled: (_data, _error, { endpointId }) => {
       queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useUpdateTransformRule() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ endpointId, ruleId, rule }: { endpointId: string; ruleId: string; rule: TransformRuleValidated['rule_json'] }) =>
       transformsApi.update(token!, endpointId, ruleId, { rule }),
     onSettled: (_data, _error, { endpointId }) => {
       queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useTestTransform() {
   const { token } = useAuth();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ endpointId, payload, config }: { endpointId: string; payload: unknown; config: TransformRuleValidated['rule_json'] }) =>
       transformsApi.test(token!, endpointId, { payload, config }),
+    onError: (err) => showError(err),
   });
 }

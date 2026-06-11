@@ -5,6 +5,7 @@ import { webhooksApi, statsApi, type DeliveryDetail, type DeliveryAttempt } from
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
 import { DeliveryListResponseSchema, type DeliveryListResponseValidated } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Webhooks (Deliveries) ──
 export function useWebhooks(params?: { page?: number; status?: string }) {
@@ -24,6 +25,7 @@ export function useWebhooks(params?: { page?: number; status?: string }) {
 export function useReplayDelivery() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (id: string) => webhooksApi.replay(token!, id),
@@ -32,6 +34,7 @@ export function useReplayDelivery() {
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       queryClient.invalidateQueries({ queryKey: ['status-counts'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
@@ -116,6 +119,7 @@ export function useDeliveryLogs(params: {
 export function useCreateWebhook() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (body: { endpoint_id: string; event?: string; data: unknown }) =>
       webhooksApi.create(token!, body),
@@ -124,5 +128,6 @@ export function useCreateWebhook() {
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       queryClient.invalidateQueries({ queryKey: ['status-counts'] });
     },
+    onError: (err) => showError(err),
   });
 }
