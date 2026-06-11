@@ -27,25 +27,47 @@ type HmacSha256 = Hmac<Sha256>;
 /// Stripe price IDs for each plan (set in environment)
 #[derive(Debug, Clone)]
 pub struct StripePrices {
+    pub startup_monthly: String,
     pub pro_monthly: String,
     pub business_monthly: String,
+    pub startup_yearly: String,
+    pub pro_yearly: String,
+    pub business_yearly: String,
 }
 
 impl StripePrices {
     pub fn from_env() -> Self {
         Self {
+            startup_monthly: std::env::var("STRIPE_PRICE_STARTUP")
+                .unwrap_or_else(|_| "price_startup_monthly".to_string()),
             pro_monthly: std::env::var("STRIPE_PRICE_PRO")
                 .unwrap_or_else(|_| "price_pro_monthly".to_string()),
             business_monthly: std::env::var("STRIPE_PRICE_BUSINESS")
                 .unwrap_or_else(|_| "price_business_monthly".to_string()),
+            startup_yearly: std::env::var("STRIPE_PRICE_STARTUP_YEARLY")
+                .unwrap_or_else(|_| "price_startup_yearly".to_string()),
+            pro_yearly: std::env::var("STRIPE_PRICE_PRO_YEARLY")
+                .unwrap_or_else(|_| "price_pro_yearly".to_string()),
+            business_yearly: std::env::var("STRIPE_PRICE_BUSINESS_YEARLY")
+                .unwrap_or_else(|_| "price_business_yearly".to_string()),
         }
     }
 
-    pub fn for_plan(&self, plan: &Plan) -> Option<&str> {
-        match plan {
-            Plan::Pro => Some(&self.pro_monthly),
-            Plan::Enterprise => Some(&self.business_monthly),
-            _ => None,
+    pub fn for_plan(&self, plan: &Plan, yearly: bool) -> Option<&str> {
+        if yearly {
+            match plan {
+                Plan::Startup => Some(&self.startup_yearly),
+                Plan::Pro => Some(&self.pro_yearly),
+                Plan::Enterprise => Some(&self.business_yearly),
+                _ => None,
+            }
+        } else {
+            match plan {
+                Plan::Startup => Some(&self.startup_monthly),
+                Plan::Pro => Some(&self.pro_monthly),
+                Plan::Enterprise => Some(&self.business_monthly),
+                _ => None,
+            }
         }
     }
 }
@@ -98,10 +120,11 @@ pub async fn create_checkout_session(
     customer_id: Uuid,
     customer_email: &str,
     plan: &Plan,
+    yearly: bool,
 ) -> Result<CheckoutSessionResponse, AppError> {
     let prices = StripePrices::from_env();
     let price_id = prices
-        .for_plan(plan)
+        .for_plan(plan, yearly)
         .ok_or_else(|| AppError::BadRequest("Invalid plan for checkout".into()))?;
 
     let stripe_secret = cfg

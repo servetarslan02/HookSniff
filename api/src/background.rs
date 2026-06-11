@@ -310,13 +310,14 @@ pub fn spawn_background_jobs(
         loop {
             let now = chrono::Utc::now();
             let next_monday = {
-                let days_until_monday = (8 - now.date_naive().weekday().num_days_from_monday()) % 7;
+                let weekday = now.date_naive().weekday().num_days_from_monday(); // 0=Mon, 6=Sun
+                let days_until_monday = if weekday == 0 { 0 } else { 7 - weekday };
                 let target = if days_until_monday == 0
                     && now.time() >= chrono::NaiveTime::from_hms_opt(9, 0, 0).unwrap()
                 {
                     now.date_naive() + chrono::Days::new(7)
                 } else {
-                    now.date_naive() + chrono::Days::new(days_until_monday.max(1) as u64)
+                    now.date_naive() + chrono::Days::new(days_until_monday as u64)
                 };
                 target.and_hms_opt(9, 0, 0).unwrap()
             };

@@ -277,12 +277,7 @@ impl Plan {
 
     /// Max endpoints per plan
     pub fn max_endpoints(&self) -> u32 {
-        match self {
-            Plan::Developer => 5,
-            Plan::Startup => 20,
-            Plan::Pro => 50,
-            Plan::Enterprise => 200,
-        }
+        u32::MAX // unlimited — endpoints are lightweight, no reason to limit
     }
 
     /// Max payload size in bytes
@@ -298,8 +293,8 @@ impl Plan {
     /// Retention days for delivery logs
     pub fn retention_days(&self) -> i64 {
         match self {
-            Plan::Developer => 7,
-            Plan::Startup => 14,
+            Plan::Developer => 14,
+            Plan::Startup => 30,
             Plan::Pro => 180,
             Plan::Enterprise => 365,
         }
@@ -434,6 +429,7 @@ impl BillingService {
                     customer.id,
                     &customer.email,
                     plan,
+                    yearly,
                 )
                 .await?;
 

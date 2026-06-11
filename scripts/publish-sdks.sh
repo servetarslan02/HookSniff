@@ -32,13 +32,13 @@ echo ""
 echo "📦 Java → Maven Central"
 echo "------------------------"
 mkdir -p ~/.m2
-cat > ~/.m2/settings.xml << 'EOF'
+cat > ~/.m2/settings.xml << EOF
 <settings>
   <servers>
     <server>
       <id>ossrh</id>
-      <username>f0wXBf</username>
-      <password>EYLV763IsQVseaffdOXNScf2HZlcLDGEK</password>
+      <username>\${OSSRH_USERNAME}</username>
+      <password>\${OSSRH_PASSWORD}</password>
     </server>
   </servers>
 </settings>

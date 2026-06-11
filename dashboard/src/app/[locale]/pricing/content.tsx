@@ -138,11 +138,11 @@ export function PricingPageContent() {
       items: [
         { feature: t('dailyEvents'), developer: '300', startup: '30,000', pro: '100,000', enterprise: t('custom') },
         { feature: t('applications'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
-        { feature: t('endpoints'), developer: '5', startup: '20', pro: '50', enterprise: '200' },
+        { feature: t('endpoints'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('eventTypes'), developer: '10', startup: '50', pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('teamMembers'), developer: '1', startup: '25', pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('subscriptions'), developer: '10', startup: '300', pro: t('unlimited'), enterprise: t('unlimited') },
-        { feature: t('overagePerEvent'), developer: '—', startup: '$0.003', pro: '$0.0001', enterprise: t('custom') },
+        { feature: t('overagePerEvent'), developer: '—', startup: '$0.00003', pro: '$0.000001', enterprise: t('custom') },
       ],
     },
     {
@@ -171,7 +171,7 @@ export function PricingPageContent() {
       category: t('monitoringLogs'),
       items: [
         { feature: t('dashboard'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
-        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: `365 ${t('days')}` },
+        { feature: t('logRetention'), developer: `14 ${t('days')}`, startup: `30 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: `365 ${t('days')}` },
         { feature: t('realtimeLogs'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('analyticsGraphs'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('schemaRegistry'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },

@@ -127,9 +127,11 @@ async fn handle_checkout_completed(
         .map(|s| s.to_string());
 
     // Update customer with new plan and Stripe IDs
+    let webhook_limit = plan.max_webhooks_per_day() as i64;
     sqlx::query(
         "UPDATE customers SET \
          plan = $1, \
+         webhook_limit = $5, \
          stripe_subscription_id = COALESCE($2, stripe_subscription_id), \
          stripe_customer_id = COALESCE($3, stripe_customer_id), \
          payment_provider = 'stripe', \
@@ -141,6 +143,7 @@ async fn handle_checkout_completed(
     .bind(&stripe_subscription_id)
     .bind(&stripe_customer_id)
     .bind(customer_id)
+    .bind(webhook_limit)
     .execute(pool)
     .await?;
 
@@ -238,7 +241,7 @@ async fn handle_subscription_deleted(
     if let Some(cust) = customer {
         sqlx::query(
             "UPDATE customers SET \
-             plan = 'free', \
+             plan = 'developer', \
              stripe_subscription_id = NULL, \
              cancel_at_period_end = false, \
              updated_at = NOW() \
@@ -249,7 +252,7 @@ async fn handle_subscription_deleted(
         .await?;
 
         tracing::info!(
-            "❌ Stripe subscription deleted: customer {} downgraded to free",
+            "❌ Stripe subscription deleted: customer {} downgraded to developer",
             cust.id
         );
     }
@@ -274,15 +277,16 @@ async fn handle_invoice_paid(
         .await?;
 
         if let Some(cust) = customer {
-            // Extract period dates from invoice
-            let period_start = data
-                .get("period_start")
-                .and_then(|v| v.as_i64())
-                .map(|ts| chrono::DateTime::from_timestamp(ts, 0).map(|dt| dt.to_rfc3339()))
-                .flatten();
+            // Extract period dates from invoice — Stripe stores them in lines.data[0].period
             let period_end = data
-                .get("period_end")
+                .get("lines")
+                .and_then(|l| l.get("data"))
+                .and_then(|d| d.as_array())
+                .and_then(|arr| arr.first())
+                .and_then(|item| item.get("period"))
+                .and_then(|p| p.get("end"))
                 .and_then(|v| v.as_i64())
+                .or_else(|| data.get("period_end").and_then(|v| v.as_i64()))
                 .map(|ts| chrono::DateTime::from_timestamp(ts, 0).map(|dt| dt.to_rfc3339()))
                 .flatten();
 
@@ -303,9 +307,8 @@ async fn handle_invoice_paid(
             extract_and_save_card(pool, cust.id, data).await;
 
             tracing::info!(
-                "💰 Stripe invoice paid: customer {}, period {:?}-{:?}",
+                "💰 Stripe invoice paid: customer {}, period_end {:?}",
                 cust.id,
-                period_start,
                 period_end
             );
         }
@@ -402,12 +405,15 @@ async fn handle_chargeback_created(
 
     if let Some(cid) = customer_id {
         // Downgrade to free, clear payment info
+        // TODO: Also cancel the subscription at Stripe via API to stop future charges.
+        // For now, clearing stripe_subscription_id prevents further webhook processing.
         sqlx::query(
             "UPDATE customers SET \
-             plan = 'free', \
+             plan = 'developer', \
              stripe_subscription_id = NULL, \
              stripe_customer_id = NULL, \
              payment_failed_at = NOW(), \
+             cancel_at_period_end = true, \
              updated_at = NOW() \
              WHERE id = $1"
         )
@@ -451,10 +457,12 @@ fn extract_plan_from_subscription(data: &serde_json::Value) -> Plan {
                     if let Some(price_id) = price.get("id").and_then(|v| v.as_str()) {
                         // Map known price IDs to plans
                         let prices = StripePrices::from_env();
-                        if price_id == prices.pro_monthly {
+                        if price_id == prices.pro_monthly || price_id == prices.pro_yearly {
                             return Plan::Pro;
-                        } else if price_id == prices.business_monthly {
+                        } else if price_id == prices.business_monthly || price_id == prices.business_yearly {
                             return Plan::Enterprise;
+                        } else if price_id == prices.startup_monthly || price_id == prices.startup_yearly {
+                            return Plan::Startup;
                         }
                     }
                 }

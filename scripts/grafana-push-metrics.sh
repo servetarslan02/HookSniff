@@ -3,8 +3,9 @@
 # Runs periodically to push webhook delivery metrics
 
 GRAFANA_RW_URL="https://prometheus-prod-65-prod-eu-west-2.grafana.net/api/prom/push"
-GRAFANA_USER="1625476"
-GRAFANA_TOKEN="glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0="
+# Load credentials from environment — NEVER hardcode tokens
+: "${GRAFANA_USER:?Set GRAFANA_USER env var}"
+: "${GRAFANA_TOKEN:?Set GRAFANA_TOKEN env var}"
 
 # Fetch health data from API
 HEALTH=$(curl -s https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/health 2>/dev/null)

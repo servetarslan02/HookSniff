@@ -21,19 +21,19 @@ pub async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
         (
             obj.and_then(|o| o.get("retention_days_free"))
                 .and_then(|v| v.as_i64())
-                .unwrap_or(7),
+                .unwrap_or(14),
             obj.and_then(|o| o.get("retention_days_startup"))
                 .and_then(|v| v.as_i64())
-                .unwrap_or(14),
+                .unwrap_or(30),
             obj.and_then(|o| o.get("retention_days_pro"))
                 .and_then(|v| v.as_i64())
-                .unwrap_or(30),
+                .unwrap_or(180),
             obj.and_then(|o| o.get("retention_days_enterprise"))
                 .and_then(|v| v.as_i64())
-                .unwrap_or(90),
+                .unwrap_or(365),
         )
     } else {
-        (7, 14, 180, 365)
+        (14, 30, 180, 365)
     };
 
     // Delete deliveries per plan tier
