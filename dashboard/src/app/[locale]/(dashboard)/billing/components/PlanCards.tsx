@@ -9,23 +9,23 @@ import { Check } from '@/components/icons';
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
     'dev1', 'dev2', 'dev3', 'dev4', 'dev5',
-    'dev6', 'dev7', 'dev8', 'dev9', 'dev10',
+    'dev6', 'dev7', 'dev8', 'dev9', 'dev10', 'dev_limit',
   ],
   startup: [
     'su1', 'su2', 'su3', 'su4', 'su5',
     'su6', 'su7', 'su8', 'su9', 'su10',
-    'su11', 'su12',
+    'su11', 'su12', 'su_overage',
   ],
   pro: [
     'pro1', 'pro2', 'pro3', 'pro4', 'pro5',
     'pro6', 'pro7', 'pro8', 'pro9', 'pro10',
-    'pro11', 'pro12', 'pro13', 'pro14',
+    'pro11', 'pro12', 'pro13', 'pro14', 'pro_overage',
   ],
   enterprise: [
     'ent1', 'ent2', 'ent3', 'ent4', 'ent5',
     'ent6', 'ent7', 'ent8', 'ent9', 'ent10',
     'ent11', 'ent12', 'ent13', 'ent14', 'ent15',
-    'ent16',
+    'ent16', 'ent_overage',
   ],
 };
 
