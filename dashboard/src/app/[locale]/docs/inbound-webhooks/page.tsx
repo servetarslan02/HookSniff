@@ -56,7 +56,7 @@ async function InboundWebhooksPageContent(params: Promise<{ locale: string }>) {
       {/* Supported Providers */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('supportedProviders')}</h2>
-        <div className="not-prose overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
+        <div className="not-prose overflow-x-auto overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-slate-800">

@@ -550,7 +550,7 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
                   <p className="mt-1 text-sm text-gray-500 dark:text-slate-400 leading-relaxed min-h-[2.5rem]">{plan.desc}</p>
                 )}
                 <div className="mt-4 flex items-baseline gap-1 min-h-[3.5rem]">
-                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{plan.price}</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">{plan.price}</span>
                   <span className="text-gray-500 dark:text-slate-400 text-sm font-medium">{plan.period}</span>
                 </div>
                 {plan.monthlyEquiv && (
