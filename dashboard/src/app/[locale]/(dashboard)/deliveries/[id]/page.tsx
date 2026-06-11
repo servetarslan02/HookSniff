@@ -120,6 +120,7 @@ export default function DeliveryDetailPage() {
         <div className="flex items-center gap-3">
           <button type="button"
             onClick={goBack}
+            aria-label={t('backToDeliveries')}
             className="p-2 -ml-2 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
           >
