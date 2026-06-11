@@ -125,7 +125,7 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
   const t = useTranslations('cortex');
   if (!health?.metrics) {
     return (
-      <div className="glass-card p-8 text-center">
+      <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
         <Brain size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
         <p className="text-gray-500 dark:text-slate-400">{t('overview.noData')}</p>
       </div>

@@ -324,7 +324,7 @@ export default function AdminEmailPage() {
           {broadcastLoading ? (
             <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="glass-card p-4 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2" /><div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-2/3" /></div>)}</div>
           ) : broadcasts.length === 0 ? (
-            <div className="glass-card p-12 text-center"><Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noBroadcasts') || 'No notifications yet'}</p><p className="text-gray-400 dark:text-slate-500 text-xs mt-1">{t('noBroadcastsDesc') || 'Create your first notification from above.'}</p></div>
+            <div className="glass-card p-6 sm:p-8 md:p-12 text-center"><Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noBroadcasts') || 'No notifications yet'}</p><p className="text-gray-400 dark:text-slate-500 text-xs mt-1">{t('noBroadcastsDesc') || 'Create your first notification from above.'}</p></div>
           ) : (
             <div className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700"><h3 className="text-sm font-semibold text-gray-900 dark:text-white"><ClipboardList size={14} strokeWidth={1.75} className="inline mr-1.5" />{t('broadcastHistory') || 'Notification History'} ({broadcasts.length})</h3></div>

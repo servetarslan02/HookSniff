@@ -58,12 +58,12 @@ export function InvoiceTable({
           <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{invoices.length} {t('invoices')}</span>
         </div>
         {loading ? (
-          <div className="px-6 py-12 text-center">
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
             <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
             <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">{tc('loading')}</p>
           </div>
         ) : invoices.length === 0 ? (
-          <div className="px-6 py-12 text-center">
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noInvoices')}</p>
           </div>
         ) : (

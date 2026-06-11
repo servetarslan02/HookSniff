@@ -53,7 +53,7 @@ export function HealingTab({ token }: { token: string | null }) {
   const actions = data?.actions || [];
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
-  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-4 sm:p-6 md:p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">
@@ -63,7 +63,7 @@ export function HealingTab({ token }: { token: string | null }) {
       </div>
 
       {actions.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
           <ShieldCheck size={48} className="mx-auto text-emerald-400 mb-4" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>

@@ -79,7 +79,7 @@ export function ModelMonitorTab() {
     'text-orange-600 bg-orange-50 dark:bg-orange-900/30';
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
-  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-4 sm:p-6 md:p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">

@@ -317,12 +317,12 @@ export function StreamingContent() {
 
       {/* Channels List */}
       {isLoading ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
           <p className="text-gray-500 dark:text-slate-400">{tc('loading')}</p>
         </div>
       ) : channels.length === 0 ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="text-5xl mb-4"><Radio size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noChannels')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noChannelsDesc')}</p>

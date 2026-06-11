@@ -60,7 +60,7 @@ export function ContactPageContent() {
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
 
-          <div className="relative max-w-5xl mx-auto px-6 text-center">
+          <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-sm text-white/80 mb-6">
               <MessageSquare size={14} strokeWidth={2} />
               {t('contact.subtitle')}
@@ -75,7 +75,7 @@ export function ContactPageContent() {
         </section>
 
         {/* ── Info Cards ── */}
-        <section className="relative -mt-10 max-w-5xl mx-auto px-6 z-10">
+        <section className="relative -mt-10 max-w-5xl mx-auto px-4 sm:px-6 z-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {infoCards.map((card) => (
               <div
@@ -279,7 +279,7 @@ export function ContactPageContent() {
 
         {/* ── Bottom CTA ── */}
         <section className="bg-linear-to-br from-gray-900 via-slate-900 to-gray-900 py-16">
-          <div className="max-w-3xl mx-auto px-6 text-center">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">{t('about.readyToStart')}</h2>
             <p className="text-slate-400 mb-8">{t('about.cta')}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

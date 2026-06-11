@@ -166,7 +166,7 @@ export function CustomersPageContent() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {stats.map((s) => (
             <div key={s.label} className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <p className="text-3xl font-bold text-brand-600 dark:text-brand-400">{s.value}</p>
@@ -176,7 +176,7 @@ export function CustomersPageContent() {
         </div>
 
         {/* Technology Logos */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">{t("builtOn")}</p>
           <div className="flex flex-wrap justify-center gap-6">
             {techLogos.map((tech) => (
@@ -194,7 +194,7 @@ export function CustomersPageContent() {
         </div>
 
         {/* Featured Stories */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("featuredStories")}</h2>
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">{t('illustrativeNote')}</p>
           <div className="grid md:grid-cols-2 gap-6">
@@ -223,7 +223,7 @@ export function CustomersPageContent() {
         </div>
 
         {/* All Stories */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("allStories")}</h2>
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">{t('disclaimerNote')}</p>
 

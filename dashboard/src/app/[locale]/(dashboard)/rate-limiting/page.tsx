@@ -170,7 +170,7 @@ export default function RateLimitingPage() {
       )}
 
       {!stats && (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <div className="text-5xl mb-4"><Zap size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('emptyTitle')}</h2>
           <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-6">{t('emptyDesc')}</p>

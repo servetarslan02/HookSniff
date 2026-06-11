@@ -10,7 +10,7 @@ export function WebhooksContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
             <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
@@ -26,7 +26,7 @@ export function WebhooksContent() {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">A comprehensive resource for webhook implementation, security, and best practices.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {[
             { icon: <BookOpen size={16} strokeWidth={1.75} />, title: 'Guides', desc: 'Step-by-step guides from basics to advanced patterns.', href: '/webhooks/guides' },
             { icon: <HelpCircle size={16} strokeWidth={1.75} />, title: 'Glossary', desc: '35+ webhook terms defined. HMAC, DLQ, CloudEvents, and more.', href: '/webhooks/glossary' },
@@ -43,7 +43,7 @@ export function WebhooksContent() {
         </div>
 
         {/* Alternatives Hub */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('alternativesTitle')}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[

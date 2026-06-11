@@ -403,7 +403,7 @@ export default function AdminBroadcastsPage() {
           ))}
         </div>
       ) : broadcasts.length === 0 ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" />
           <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noBroadcasts') || 'No broadcasts yet'}</p>
           <p className="text-gray-400 dark:text-slate-500 text-xs mt-1">{t('noBroadcastsDesc') || 'Create your first broadcast announcement above'}</p>

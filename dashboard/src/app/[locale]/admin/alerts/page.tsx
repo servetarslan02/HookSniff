@@ -370,7 +370,7 @@ export default function AdminAlertsPage() {
           }}
         />
       ) : (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
           <Bell size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {filter === 'all' ? (t('noAlerts') || 'No alerts configured') : (t('noFilteredAlerts') || `No ${filter} alerts`)}

@@ -225,11 +225,11 @@ export default function TransformsPage() {
 
    {/* Rules list */}
    {!selectedEndpoint ? (
-    <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('selectEndpointHint')}</div>
+    <div className="glass-card p-6 sm:p-8 md:p-12 text-center text-gray-500 dark:text-slate-400">{t('selectEndpointHint')}</div>
    ) : loading ? (
     <div className="glass-card p-6 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" /></div>
    ) : rules.length === 0 ? (
-    <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('empty')}</div>
+    <div className="glass-card p-6 sm:p-8 md:p-12 text-center text-gray-500 dark:text-slate-400">{t('empty')}</div>
    ) : (
     <VirtualList
       items={rules}

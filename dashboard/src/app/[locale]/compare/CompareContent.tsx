@@ -214,7 +214,7 @@ export default function CompareContent() {
         </div>
 
         {/* TL;DR */}
-        <div className="mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+        <div className="mb-8 sm:mb-12 md:mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">TL;DR</h2>
           <ul className="space-y-2">
             {tlDrKeys.map((key) => (
@@ -227,7 +227,7 @@ export default function CompareContent() {
         </div>
 
         {/* Screenshots */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("inAction")}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {screenshots.map((s) => (
@@ -243,7 +243,7 @@ export default function CompareContent() {
         </div>
 
         {/* Scorecard */}
-        <div className="mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+        <div className="mb-8 sm:mb-12 md:mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t("scorecard")}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -279,12 +279,12 @@ export default function CompareContent() {
         </div>
 
         {/* Trust Statement */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <p className="text-center text-sm text-gray-500 dark:text-slate-500">{t('trustedBy')}</p>
         </div>
 
         {/* Detailed Sections */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("detailedComparison")}</h2>
           <div className="space-y-6">
             {sectionKeys.map((section, idx) => (
@@ -321,7 +321,7 @@ export default function CompareContent() {
         </div>
 
         {/* When to choose what */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('whenChooseHooksniff').replace('...', '?')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {chooseSections.map((section) => (
@@ -341,7 +341,7 @@ export default function CompareContent() {
         </div>
 
         {/* FAQ */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
             {faqKeys.map((item, i) => (
@@ -364,7 +364,7 @@ export default function CompareContent() {
         </div>
 
         {/* Deep Dive Links */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("deepDive")}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {deepDiveLinks.map((link) => (

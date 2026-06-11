@@ -50,7 +50,7 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
               </div>
             </div>
           )) : (
-            <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noActivity')}</div>
+            <div className="px-4 sm:px-6 py-4 sm:py-8 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noActivity')}</div>
           )}
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
                 </div>
               </div>
             )) : (
-              <div className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noRecentSignups')}</div>
+              <div className="px-4 sm:px-6 py-4 sm:py-8 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noRecentSignups')}</div>
             )}
           </div>
         </div>

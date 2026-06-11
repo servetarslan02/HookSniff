@@ -260,7 +260,7 @@ function HowItWorks() {
 
   return (
     <section className="py-12 sm:py-16 md:py-24">
-      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+      <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
         <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('title')}</h2>
         <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{t('subtitle')}</p>
       </div>
@@ -326,7 +326,7 @@ export function HomeContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Navigation */}
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
@@ -456,7 +456,7 @@ export function HomeContent() {
       <SocialProof />
 
       {/* Code Example */}
-      <div className="max-w-3xl mx-auto px-6 mb-24">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 mb-12 sm:mb-8 sm:mb-12 md:mb-16 md:mb-12 sm:mb-16 md:mb-24">
         <div className="glass-card overflow-hidden">
           <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50">
             <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -482,11 +482,11 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
 
       {/* Features */}
       <div id="features" className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-8 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tFeatures('title')}</h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{tFeatures('subtitle')}</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-12 sm:mb-16 md:mb-24">
           {featureKeys.map((key, i) => (
             <div key={key} className="glass-card p-5 sm:p-6 md:p-8 hover-lift card-tilt group">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
@@ -500,13 +500,13 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
       </div>
 
       {/* How It Works */}
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <HowItWorks />
       </div>
 
       {/* Pricing */}
       <div id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-8 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tPricing('title')}</h2>
           {/* Monthly / Yearly toggle */}
           <div className="flex items-center justify-center gap-3 mt-6">
@@ -529,7 +529,7 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-8 sm:mb-12 md:mb-16">
           {plans.map((plan, i) => {
             return (
             <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col ${

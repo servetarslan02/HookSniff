@@ -492,7 +492,7 @@ export default function RevenueContent({
       </table>
      </div>
     ) : (
-     <div className="px-6 py-8 text-center">
+     <div className="px-4 sm:px-6 py-4 sm:py-8 text-center">
       <div className="flex justify-center mb-2 text-gray-400" aria-hidden="true"><Inbox size={28} strokeWidth={1.5} /></div>
       <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRefunds') || 'No refunds yet'}</p>
      </div>
@@ -534,7 +534,7 @@ export default function RevenueContent({
       </table>
      </div>
     ) : (
-     <div className="px-6 py-8 text-center">
+     <div className="px-4 sm:px-6 py-4 sm:py-8 text-center">
       <div className="text-3xl mb-2" aria-hidden="true"><TrendingDown size={18} strokeWidth={1.75} /></div>
       <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noChurn')}</p>
      </div>

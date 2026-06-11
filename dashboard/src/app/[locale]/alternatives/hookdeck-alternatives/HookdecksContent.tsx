@@ -57,7 +57,7 @@ export function HookdecksContent() {
           </div>
         </div>
 
-        <div className="space-y-6 mb-16">
+        <div className="space-y-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">

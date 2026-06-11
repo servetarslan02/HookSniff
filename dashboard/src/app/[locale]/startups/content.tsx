@@ -19,7 +19,7 @@ export function StartupsPageContent() {
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t("subtitle")}</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           {[
             { icon: <DollarSign size={32} strokeWidth={1.75} />, titleKey: 'benefit50Title', descKey: 'benefit50Desc' },
             { icon: <TrendingUp size={32} strokeWidth={1.75} />, titleKey: 'benefitFreeTitle', descKey: 'benefitFreeDesc' },
@@ -33,7 +33,7 @@ export function StartupsPageContent() {
           ))}
         </div>
 
-        <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-16">
+        <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t("whoQualifies")}</h2>
           <ul className="space-y-3 text-gray-600 dark:text-slate-400">
             {[t('qualify1'), t('qualify2'), t('qualify3'), t('qualify4'), t('qualify5')].map((q) => (

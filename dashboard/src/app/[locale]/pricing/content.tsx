@@ -201,7 +201,7 @@ export function PricingPageContent() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-medium rounded-full mb-3 sm:mb-4">
             {t('badge')}
           </span>
@@ -327,7 +327,7 @@ export function PricingPageContent() {
         </div>
 
         {/* "Only pay for what you use" */}
-        <div className="text-center mb-16 p-6 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+        <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16 p-6 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
           <p className="text-lg font-semibold text-emerald-800 dark:text-emerald-300 mb-1">
             {t('payWhatYouUse')}
           </p>
@@ -337,7 +337,7 @@ export function PricingPageContent() {
         </div>
 
         {/* ROI Calculator */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <RoiCalculator />
         </div>
 
@@ -382,7 +382,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Security & Compliance */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-8">{t('securityTitle')}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[
@@ -405,7 +405,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Support Levels */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-8">{t('supportTitle')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {[
@@ -440,7 +440,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Build vs Buy */}
-        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg">
+        <div className="mb-8 sm:mb-12 md:mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('buildVsBuy')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -471,7 +471,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Startup Discount */}
-        <div className="mb-16 text-center p-8 bg-linear-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20">
+        <div className="mb-8 sm:mb-12 md:mb-16 text-center p-8 bg-linear-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Rocket size={24} strokeWidth={1.75} className="inline mr-1" /> {t('startupTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto mb-4">
             {t('startupDesc')}
@@ -485,7 +485,7 @@ export function PricingPageContent() {
         </div>
 
         {/* FAQ */}
-        <div className="mb-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('faqTitle')}</h2>
           <div className="max-w-3xl mx-auto space-y-3">
             {Array.from({ length: faqCount }, (_, i) => (

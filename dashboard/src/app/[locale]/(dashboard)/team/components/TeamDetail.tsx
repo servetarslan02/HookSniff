@@ -271,7 +271,7 @@ export function TeamDetail({
         </div>
 
         {members.length === 0 ? (
-          <div className="px-6 py-12 text-center">
+          <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
               <span className="text-2xl"><User size={18} strokeWidth={1.75} /></span>
             </div>
@@ -284,7 +284,7 @@ export function TeamDetail({
             estimateSize={72}
             header={null}
             emptyState={
-              <div className="px-6 py-12 text-center">
+              <div className="px-4 sm:px-6 py-6 sm:py-12 text-center">
                 <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
                   <span className="text-2xl"><User size={18} strokeWidth={1.75} /></span>
                 </div>

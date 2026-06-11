@@ -16,7 +16,7 @@ export function AboutPageContent() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-8 sm:mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-100 dark:border-brand-500/20">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             {t('about.liveOperational')}

@@ -51,7 +51,7 @@ export function AutoMLTab() {
       </div>
 
       {trials.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
           <p className="text-gray-500 dark:text-slate-400">{t('empty')}</p>
           <p className="text-xs text-gray-400 mt-2">POST /cortex/automl/run {'{ "endpoint_id": "...", "model_type": "adaptive_threshold" }'}</p>
         </div>

@@ -89,7 +89,7 @@ export default function DeliveryDetailPage() {
 
   if (error) {
     return (
-      <div className="glass-card p-12 text-center">
+      <div className="glass-card p-6 sm:p-8 md:p-12 text-center">
         <div className="text-5xl mb-4"><AlertTriangle size={18} strokeWidth={1.75} /></div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('loadFailed')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{error.message}</p>

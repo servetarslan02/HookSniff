@@ -69,7 +69,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
   }, [token]);
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
-  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-4 sm:p-6 md:p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   const criticalCount = insights.filter(i => i.severity === 'critical').length;
   const warningCount = insights.filter(i => i.severity === 'warning').length;
@@ -99,7 +99,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
       )}
 
       {insights.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-4 sm:p-6 md:p-8 text-center">
           <Shield size={48} className="mx-auto text-emerald-400 mb-4" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>
