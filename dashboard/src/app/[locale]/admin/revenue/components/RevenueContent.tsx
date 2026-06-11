@@ -20,10 +20,10 @@ const PLAN_COLOR_MAP: Record<string, { border: string; bg: string; dot: string; 
 };
 
 const PLAN_FEATURES: Record<string, string[]> = {
- developer: ['HMAC signatures', '2FA support'],
- startup: ['CloudEvents', 'Secret rotation', 'Dead letter queue', 'Email support'],
- pro: ['FIFO delivery', 'IP whitelist', 'Analytics', 'Schema registry', 'Priority support'],
- enterprise: ['SSO/SAML', 'Account manager', '99.9% SLA', 'Custom integrations', 'On-premise option'],
+ developer: ['300 events/day', '256 KB payload', '14-day log retention', '10 event types', 'Custom headers', 'HMAC-SHA256 signatures', 'SSRF protection', '2FA authentication', 'Webhook playground', 'Community support'],
+ startup: ['30,000 events/day', '1 MB payload', '30-day log retention', '50 event types', 'Secret rotation', 'Dead letter queue', 'Never-blocked mode', 'Batch send & replay', 'Circuit breaker', 'Smart routing', '500 req/min API rate', 'Email support'],
+ pro: ['100,000 events/day', '5 MB payload', '180-day log retention', 'Unlimited event types', 'Idempotency-Key', 'Unlimited subscriptions', 'FIFO ordered delivery', 'Payload transformation', 'Schema registry', 'Alert rules & endpoint health', 'Inbound webhook proxy', 'Embeddable portal', 'Cortex AI anomaly detection', 'Priority support'],
+ enterprise: ['Unlimited events/day', '10 MB payload', '365-day log retention', '5,000 req/min API rate', 'Unlimited endpoints', 'Unlimited applications', 'Custom retry policies', 'SSO / SAML (Beta)', 'OpenTelemetry tracing', 'Prometheus metrics', 'Custom integrations', 'Self-host option', 'Dedicated account manager', '99.9% SLA guarantee', 'GDPR compliance', 'Priority + dedicated support'],
 };
 
 // ── Inline helper components for plan editing ──
