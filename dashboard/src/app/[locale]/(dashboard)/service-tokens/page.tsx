@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getErrorMessage } from '@/lib/errors';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import { useLiveServiceTokens } from '@/hooks/useCollections';
@@ -68,7 +69,7 @@ export default function ServiceTokensPage() {
 
   const handleCopy = async (value: string) => {
     try { await navigator.clipboard.writeText(value); toast(tc('copied'), 'success'); }
-    catch { toast(tc('error'), 'error'); }
+    catch (e) { toast(getErrorMessage(e, tc('unknownError')), 'error'); }
   };
 
   const handleEditSave = () => {

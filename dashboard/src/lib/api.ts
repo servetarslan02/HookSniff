@@ -316,7 +316,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
           continue;
         }
 
-        const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }));
+        const error = await res.json().catch(() => ({ error: { code: 'INTERNAL_ERROR', message: 'Something went wrong. Please try again.' } }));
         throw createApiError(error, res.status);
       }
 

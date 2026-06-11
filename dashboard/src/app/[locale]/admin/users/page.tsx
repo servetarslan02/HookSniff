@@ -135,8 +135,8 @@ export default function AdminUsersPage() {
       a.download = `hooksniff-users-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       URL.revokeObjectURL(blobUrl);
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -151,8 +151,8 @@ export default function AdminUsersPage() {
         newWindow.location.href = `/${locale}/dashboard?impersonate=1`;
       }
       toast(t('impersonating') + `: ${user.email}`, 'success');
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -167,8 +167,8 @@ export default function AdminUsersPage() {
       await updatePlanMutation.mutateAsync({ userId: planChangeTarget.id, plan: newPlan });
       toast(t('planUpdated', { plan: newPlan }), 'success');
       setPlanChangeTarget(null);
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -181,8 +181,8 @@ export default function AdminUsersPage() {
     try {
       await updateStatusMutation.mutateAsync({ userId: user.id, status: 'active' });
       toast(t('userActivated'), 'success');
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -197,8 +197,8 @@ export default function AdminUsersPage() {
       toast(t('userBanned'), 'success');
       setBanTarget(null);
       setBanReason('');
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     }
   };
 
@@ -262,8 +262,8 @@ export default function AdminUsersPage() {
       }
       clearSelection();
       setBulkAction(null);
-    } catch {
-      toast(tc('error'), 'error');
+    } catch (e) {
+      toast(getErrorMessage(e, tc('unknownError')), 'error');
     } finally {
       setBulkProcessing(false);
     }
