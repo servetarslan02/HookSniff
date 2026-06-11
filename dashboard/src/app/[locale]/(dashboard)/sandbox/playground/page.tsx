@@ -165,7 +165,7 @@ ${Object.entries(headers)
       <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('subtitle')}</p>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
         {/* Request */}
         <div className="space-y-4">
           <div className="glass-card p-6">
@@ -236,7 +236,7 @@ ${Object.entries(headers)
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 {t('headersAuto')}
               </label>
-              <pre className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-slate-400 overflow-x-auto">
+              <pre className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-slate-400 overflow-x-auto break-all whitespace-pre-wrap">
                 {JSON.stringify(headers, null, 2)}
               </pre>
             </div>
@@ -282,7 +282,7 @@ ${Object.entries(headers)
                 <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {tc('copy') || 'Copy'}
               </button>
             </div>
-            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto">
+            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto break-all whitespace-pre-wrap">
               {curlCommand}
             </pre>
           </div>

@@ -72,12 +72,12 @@ export function ResponseInspector({
 
       {/* Content */}
       <Activity mode={activeTab === 'body' ? 'visible' : 'hidden'}>
-        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px]">
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px] break-all whitespace-pre-wrap">
           {JSON.stringify(response, null, 2)}
         </pre>
       </Activity>
       <Activity mode={activeTab === 'headers' ? 'visible' : 'hidden'}>
-        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px]">
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px] break-all whitespace-pre-wrap">
           {Object.entries(headers).map(([k, v]) => `${k}: ${v}`).join('\n') || t('noHeaders')}
         </pre>
       </Activity>
