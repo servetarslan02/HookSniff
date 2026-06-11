@@ -237,69 +237,22 @@ pub async fn login(
     //     return Err(AppError::coded(ErrorCode::EmailNotVerified));
     // }
 
-    // SSO enforcement check
-    // 1. Check by customer_id (direct SSO config)
-    let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
-        "SELECT enabled, admin_bypass FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+    // SSO enforcement check — only for users who have SSO attributes
+    let has_sso_attributes = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM sso_user_attributes WHERE customer_id = $1)"
     )
     .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?;
+    .fetch_one(&pool)
+    .await
+    .unwrap_or(false);
 
-    // 2. Check by team membership
-    let sso_config = if sso_config.is_none() {
-        sqlx::query_as::<_, (bool, Option<bool>)>(
-            "SELECT s.enabled, s.admin_bypass FROM sso_configs s
-             INNER JOIN team_members tm ON tm.team_id = s.team_id
-             WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
-             LIMIT 1"
-        )
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-    } else {
-        sso_config
-    };
-
-    // 3. Check by email domain (verified_domain)
-    let sso_config = if sso_config.is_none() {
-        let email_domain = customer.email.split('@').nth(1).unwrap_or("");
-        sqlx::query_as::<_, (bool, Option<bool>)>(
-            "SELECT enabled, admin_bypass FROM sso_configs
-             WHERE enabled = true AND verified_domain = $1 LIMIT 1"
-        )
-        .bind(email_domain)
-        .fetch_optional(&pool)
-        .await?
-    } else {
-        sso_config
-    };
-
-    if let Some((sso_enabled, admin_bypass)) = sso_config {
-        if sso_enabled {
-            let bypass = admin_bypass.unwrap_or(true);
-            let admin_count: (i64,) = sqlx::query_as(
-                "SELECT COUNT(*) FROM customers WHERE is_admin = true AND is_active = true"
-            )
-            .fetch_one(&pool)
-            .await
-            .unwrap_or((1,));
-
-            let is_last_admin = customer.is_admin && admin_count.0 <= 1;
-
-            if is_last_admin {
-                tracing::info!("🔓 SSO bypass for last admin: {}", req.email);
-            } else if bypass && customer.is_admin {
-                tracing::info!("🔓 SSO admin bypass for: {}", req.email);
-            } else {
-                tracing::info!("🔒 SSO required for {} — redirecting", req.email);
-                return Ok((HeaderMap::new(), Json(serde_json::json!({
-                    "requires_sso": true,
-                    "email": req.email,
-                    "message": "SSO required for this account."
-                }))));
-            }
-        }
+    if has_sso_attributes {
+        tracing::info!("🔒 SSO user {} — redirecting to SSO login", req.email);
+        return Ok((HeaderMap::new(), Json(serde_json::json!({
+            "requires_sso": true,
+            "email": req.email,
+            "message": "SSO required for this account."
+        }))));
     }
 
     // 2FA check
