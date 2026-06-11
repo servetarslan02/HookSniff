@@ -152,6 +152,12 @@ function LoginForm() {
         setTwoFaStep(true);
         setError('');
       } else {
+        // SSO required — redirect to SSO login
+        const ssoErr = err as Error & { requiresSso?: boolean; ssoEmail?: string };
+        if (ssoErr.requiresSso && ssoErr.ssoEmail) {
+          window.location.href = `/api/v1/sso/login?email=${encodeURIComponent(ssoErr.ssoEmail)}`;
+          return;
+        }
         const msg = getErrorMessage(err, tc('unknownError')) || tc('error');
         setError(msg);
         // Show resend verification link if email not verified
