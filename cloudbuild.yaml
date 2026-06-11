@@ -16,19 +16,7 @@ steps:
         cargo check --workspace
     waitFor: ['-']
 
-  # Step 2: Run database migrations
-  - name: 'node:22-slim'
-    id: 'run-migrations'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        npm install --no-audit --no-fund pg
-        node run-migrations.js || echo "⚠️ Migration skipped (DB quota or connection issue)"
-    secretEnv: ['DATABASE_URL']
-    waitFor: ['-']
-
-  # Step 3: Build API image
+  # Step 2: Build API image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-api'
     args:
@@ -95,7 +83,7 @@ steps:
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest,POLAR_PRODUCT_PRO=hooksniff-polar-product-pro:latest,POLAR_PRODUCT_BUSINESS=hooksniff-polar-product-business:latest,QSTASH_TOKEN=hooksniff-qstash-token:latest,QSTASH_CURRENT_SIGNING_KEY=hooksniff-qstash-current-key:latest,QSTASH_NEXT_SIGNING_KEY=hooksniff-qstash-next-key:latest,GITHUB_CLIENT_SECRET=hooksniff-github-secret:latest,GOOGLE_CLIENT_SECRET=hooksniff-google-secret:latest,GMAIL_ADDRESS=hooksniff-gmail-address:latest,GMAIL_APP_PASSWORD=hooksniff-gmail-app-password:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
-    waitFor: ['push-api', 'run-migrations']
+    waitFor: ['push-api']
 
   # Step 10: Deploy Worker to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -118,7 +106,7 @@ steps:
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
-    waitFor: ['push-worker', 'run-migrations']
+    waitFor: ['push-worker']
 
 images:
   - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
