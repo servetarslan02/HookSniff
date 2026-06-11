@@ -144,8 +144,8 @@ pub async fn resolve_team_tracking(
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Plan {
-    /// Formerly "Free" — renamed to Developer but stored as "free" in DB
-    #[serde(rename = "free", alias = "developer")]
+    /// Developer plan — free tier
+    #[serde(rename = "developer", alias = "free")]
     Developer,
     /// New plan — $29/mo
     Startup,
@@ -170,7 +170,7 @@ impl Plan {
 
     pub fn as_str(&self) -> &'static str {
         match self {
-            Plan::Developer => "free",
+            Plan::Developer => "developer",
             Plan::Startup => "startup",
             Plan::Pro => "pro",
             Plan::Enterprise => "enterprise",
