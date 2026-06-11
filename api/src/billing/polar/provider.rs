@@ -94,10 +94,40 @@ impl PaymentProviderImpl for PolarProvider {
             let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
             tracing::error!("Polar checkout creation failed ({}): {}", status, body);
+
+            // Polar returns structured validation errors — extract the most relevant message
+            let user_message = if let Ok(polar_err) = serde_json::from_str::<serde_json::Value>(&body) {
+                // Polar validation error: {"error": "RequestValidationError", "detail": [...]}
+                if let Some(details) = polar_err.get("detail").and_then(|v| v.as_array()) {
+                    // Collect all validation error messages
+                    let messages: Vec<String> = details.iter().filter_map(|d| {
+                        d.get("msg").and_then(|v| v.as_str()).map(|s| s.to_string())
+                    }).collect();
+                    if !messages.is_empty() {
+                        messages.join("; ")
+                    } else {
+                        format!("{:?}", polar_err)
+                    }
+                } else if let Some(detail) = polar_err.get("detail").and_then(|v| v.as_str()) {
+                    detail.to_string()
+                } else if let Some(err) = polar_err.get("error").and_then(|v| v.as_str()) {
+                    err.to_string()
+                } else {
+                    format!("{:?}", polar_err)
+                }
+            } else {
+                body.chars().take(200).collect()
+            };
+
+            // 4xx = client error (e.g. invalid email domain) → return as BadRequest
+            // 5xx = Polar server error → return as Internal
+            if status.as_u16() >= 400 && status.as_u16() < 500 {
+                return Err(AppError::BadRequest(user_message));
+            }
+
             return Err(AppError::Internal(anyhow::anyhow!(
                 "Polar checkout failed ({}): {}",
-                status,
-                if body.len() > 200 { &body[..200] } else { &body }
+                status, user_message
             )));
         }
 
