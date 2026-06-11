@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { playgroundLpush, playgroundLrange, getRedis, checkRateLimit } from '@/lib/redis';
+import { checkRateLimit } from '@/lib/redis';
+import { insertPlaygroundRequest } from '@/lib/neon';
 
 const MAX_HISTORY = 100;
 
@@ -21,7 +22,7 @@ function getClientIp(request: Request): string {
 async function handleRequest(request: Request, id: string) {
   const ip = getClientIp(request);
 
-  // Rate limit: 120 istek/dakika per IP (plan limitlerinden yemez)
+  // Rate limit: 120 requests/minute per IP
   const { allowed, remaining, retryAfter } = await checkRateLimit(ip, 'request');
 
   if (!allowed) {
@@ -32,7 +33,7 @@ async function handleRequest(request: Request, id: string) {
         headers: {
           ...corsHeaders,
           'Retry-After': String(retryAfter),
-          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Limit': '120',
           'X-RateLimit-Remaining': '0',
         },
       },
@@ -56,46 +57,29 @@ async function handleRequest(request: Request, id: string) {
       // Body might be empty for GET/DELETE
     }
 
-    // Parse body as JSON if possible
-    let bodyJson: unknown = null;
-    if (body) {
-      try {
-        bodyJson = JSON.parse(body);
-      } catch {
-        bodyJson = null;
-      }
-    }
-
     // Build request record
     const record = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      token: id,
       method,
       path: url.pathname,
       query: Object.fromEntries(url.searchParams.entries()),
       headers,
       body: body || null,
-      body_json: bodyJson,
-      content_type: headers['content-type'] || null,
       content_length: body ? body.length : 0,
       ip,
-      user_agent: headers['user-agent'] || null,
       timestamp: new Date().toISOString(),
     };
 
-    // Store in history (keep last MAX_HISTORY)
-    const key = `play:history:${id}`;
-    const existing = (await playgroundLrange(key, 0, MAX_HISTORY - 1)) as unknown[];
-    if (existing.length >= MAX_HISTORY) {
-      await playgroundLpush(key, record, 86400);
-      const r = getRedis();
-      if (r) {
-        await r.ltrim(key, 0, MAX_HISTORY - 1);
-      }
-    } else {
-      await playgroundLpush(key, record, 86400);
+    // Store in Neon (non-blocking — if it fails, still return the record in response)
+    try {
+      await insertPlaygroundRequest(record);
+    } catch (err) {
+      console.warn('Neon write failed, returning record in response:', err);
     }
 
-    // Return success — mimic real webhook endpoint behavior
+    // Return success with captured request in response
+    // This ensures the frontend always gets the data even if DB write fails
     const forceStatus = url.searchParams.get('force_status_code');
     const echoBody = url.searchParams.get('echo_body');
 
@@ -108,7 +92,7 @@ async function handleRequest(request: Request, id: string) {
             status: statusCode,
             headers: {
               'Content-Type': 'application/json',
-              'X-RateLimit-Limit': '60',
+              'X-RateLimit-Limit': '120',
               'X-RateLimit-Remaining': String(remaining),
               ...corsHeaders,
             },
@@ -118,14 +102,28 @@ async function handleRequest(request: Request, id: string) {
     }
 
     return new NextResponse(
-      echoBody === 'true' ? body : JSON.stringify({ received: true, id: record.id }),
+      echoBody === 'true' ? body : JSON.stringify({
+        received: true,
+        id: record.id,
+        request: {
+          id: record.id,
+          method: record.method,
+          path: record.path,
+          query: record.query,
+          headers: record.headers,
+          body: record.body,
+          content_length: record.content_length,
+          ip: record.ip,
+          timestamp: record.timestamp,
+        },
+      }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
           'X-HookSniff-Playground': 'true',
           'X-HookSniff-Delivery-Id': record.id,
-          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Limit': '120',
           'X-RateLimit-Remaining': String(remaining),
           ...corsHeaders,
         },
