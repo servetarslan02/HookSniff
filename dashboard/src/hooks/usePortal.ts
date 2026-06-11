@@ -16,6 +16,7 @@ import {
   PortalProfileSchema,
   PortalUsageSchema,
 } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Portal ──
 export function usePortalConfig() {
@@ -41,9 +42,11 @@ export function usePortalEmbedCode() {
 export function useUpdatePortalConfig() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (config: Partial<PortalConfigResponse>) => api.updatePortalConfig(token!, config),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['portal-config'] }),
+    onError: (err) => showError(err),
   });
 }
 

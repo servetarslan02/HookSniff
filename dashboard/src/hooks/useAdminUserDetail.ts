@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi, webhooksApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
+import { useFriendlyToast } from './useFriendlyToast';
 import {
   AdminUserDetailSchema,
   UserEndpointsResponseSchema,
@@ -261,6 +262,7 @@ export function useDeliveryAttempts(deliveryId: string | null) {
 export function useUpdateUserPlan() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, plan }: { userId: string; plan: string }) =>
       adminApi.updateUserPlan(token!, userId, plan),
@@ -268,12 +270,14 @@ export function useUpdateUserPlan() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useUpdateUserStatus() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({
       userId,
@@ -287,31 +291,37 @@ export function useUpdateUserStatus() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminSendEmail() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, subject, body }: { userId: string; subject: string; body: string }) =>
       adminApi.sendUserEmail(token!, userId, subject, body),
     onSettled: (_data, _err, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'communications'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminImpersonate() {
   const { token } = useAuth();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (userId: string) => adminApi.impersonateUser(token!, userId),
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminRefundUser() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, amountCents, reason, currency }: {
       userId: string; amountCents: number; reason: string; currency?: string;
@@ -320,77 +330,91 @@ export function useAdminRefundUser() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'refunds'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'invoices'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminGdprExport() {
   const { token } = useAuth();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (userId: string) => adminApi.exportUserData(token!, userId),
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminGdprDelete() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
       adminApi.deleteUserData(token!, userId, reason),
     onSettled: (_data, _err, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminUserTestWebhook() {
   const { token } = useAuth();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, data }: {
       userId: string;
       data: { endpoint_url: string; event_type?: string; payload: Record<string, unknown> };
     }) => adminApi.adminUserTestWebhook(token!, userId, data),
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminAddNote() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, content }: { userId: string; content: string }) =>
       adminApi.addNote(token!, userId, content),
     onSettled: (_data, _err, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'notes'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminAddTag() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, tag }: { userId: string; tag: string }) =>
       adminApi.addTag(token!, userId, tag),
     onSettled: (_data, _err, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'tags'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminRemoveTag() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, tag }: { userId: string; tag: string }) =>
       adminApi.removeTag(token!, userId, tag),
     onSettled: (_data, _err, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'tags'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useAdminReplayDelivery() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: ({ userId, deliveryId }: { userId: string; deliveryId: string }) =>
       adminApi.adminUserReplayDelivery(token!, userId, deliveryId),
@@ -398,5 +422,6 @@ export function useAdminReplayDelivery() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'webhooks'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId] });
     },
+    onError: (err) => showError(err),
   });
 }

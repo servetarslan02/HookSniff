@@ -8,6 +8,7 @@ import {
   FeatureFlagsResponseSchema,
   PlatformSettingsSchema,
 } from '@/schemas/api';
+import { useFriendlyToast } from './useFriendlyToast';
 
 // ── Admin Feature Flags ──
 export function useAdminFeatureFlags(enabled = true) {
@@ -26,6 +27,7 @@ export function useAdminFeatureFlags(enabled = true) {
 export function useCreateFeatureFlag() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (data: {
@@ -39,12 +41,14 @@ export function useCreateFeatureFlag() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useUpdateFeatureFlag() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: ({
@@ -64,12 +68,14 @@ export function useUpdateFeatureFlag() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 export function useDeleteFeatureFlag() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (id: string) => adminApi.deleteFeatureFlag(token!, id),
@@ -77,6 +83,7 @@ export function useDeleteFeatureFlag() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
       queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
@@ -115,21 +122,25 @@ export function useAdminSettings() {
 export function useUpdateSettings() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { showError } = useFriendlyToast();
 
   return useMutation({
     mutationFn: (data: Partial<PlatformSettings>) => adminApi.updateSettings(token!, data as PlatformSettings),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
     },
+    onError: (err) => showError(err),
   });
 }
 
 // ── Test Webhook Mutation ──
 export function useTestWebhook() {
   const { token } = useAuth();
+  const { showError } = useFriendlyToast();
   return useMutation({
     mutationFn: (data: { endpoint_url: string; event_type: string; payload: Record<string, unknown> }) =>
       adminApi.testWebhook(token!, data),
+    onError: (err) => showError(err),
   });
 }
 
