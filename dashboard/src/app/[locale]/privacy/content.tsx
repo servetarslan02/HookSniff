@@ -28,8 +28,8 @@ export function PrivacyPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t('nav')} />
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+        <h1 className="text-2xl sm:text-3xl md:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mb-12">{t('lastUpdated')}</p>
 
         <div className="prose dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-slate-300 leading-relaxed">

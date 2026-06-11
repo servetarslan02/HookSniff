@@ -93,7 +93,7 @@ export function ContactPageContent() {
         </section>
 
         {/* ── Form Section ── */}
-        <section className="max-w-5xl mx-auto px-6 py-16 sm:py-20">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16 sm:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
             {/* Left: Form */}
             <div className="lg:col-span-3">

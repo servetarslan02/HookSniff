@@ -82,7 +82,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
       </div>
 
       {insights.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="glass-card p-4 text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{insights.length}</p>
             <p className="text-xs text-gray-500 dark:text-slate-400">{t('stats.activeAlerts')}</p>

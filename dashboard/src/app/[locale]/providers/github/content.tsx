@@ -21,13 +21,13 @@ export function GitHubWebhooksPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t("github")} />
 
-      <main className="max-w-5xl mx-auto px-6 py-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full border border-gray-200 dark:border-slate-700 mb-4">
             <span className="text-lg"><GithubIcon size={20} strokeWidth={1.75} /></span>
             <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("githubIntegration")}</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("githubWebhooksGuide")}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("githubWebhooksGuide")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
             Set up GitHub webhooks for push, pull request, issue, and deployment events. Automate your CI/CD and project management.
           </p>

@@ -27,7 +27,7 @@ export function BlogPostContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={post.title} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Header */}
         <header className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -36,7 +36,7 @@ export function BlogPostContent() {
             </span>
             <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          <h1 className="text-4xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             {post.title}
           </h1>
           <div className="flex items-center gap-4">

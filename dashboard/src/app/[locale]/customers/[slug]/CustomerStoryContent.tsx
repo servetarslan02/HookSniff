@@ -22,7 +22,7 @@ export function CustomerStoryContent() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
         <PublicNavbar />
-        <main className="max-w-4xl mx-auto px-6 py-16 text-center">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16 text-center">
           <p className="text-gray-600 dark:text-slate-400">{t('storyNotFound') || 'Story not found.'}</p>
           <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline mt-4 inline-block">← {t('backToList')}</Link>
         </main>
@@ -34,12 +34,12 @@ export function CustomerStoryContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={story.company} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="mb-10">
           <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white text-2xl font-bold mb-6">
             {story.logo}
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{story.company}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">{story.company}</h1>
           <p className="text-lg text-gray-500 dark:text-slate-500">{story.industry}</p>
         </div>
 

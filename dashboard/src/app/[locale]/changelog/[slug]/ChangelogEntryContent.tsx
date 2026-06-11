@@ -19,7 +19,7 @@ export async function ChangelogEntryContent({ slug }: { slug: string }) {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={release.version} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-sm font-mono font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2.5 py-1 rounded-md">{release.version}</span>

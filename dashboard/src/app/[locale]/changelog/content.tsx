@@ -84,10 +84,10 @@ export function ChangelogPageContent() {
   <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
    <PublicNavbar pageTitle={t("title")} />
 
-   <main className="max-w-6xl mx-auto px-6 py-16">
+   <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
     {/* Hero */}
     <div className="text-center mb-12">
-     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
      <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
       {t('desc')}
      </p>

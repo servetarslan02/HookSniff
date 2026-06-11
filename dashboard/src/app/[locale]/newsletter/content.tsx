@@ -108,11 +108,11 @@ export function NewsletterPageContent() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
         <div className="text-center mb-12">
           <span className="text-5xl mb-4 block"><Mailbox size={56} strokeWidth={1.5} /></span>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("theWebhookDigest")}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("theWebhookDigest")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">
             Webhook tips, product updates, and engineering insights. Delivered to your inbox. No spam. Unsubscribe anytime.
           </p>

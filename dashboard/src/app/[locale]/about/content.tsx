@@ -14,14 +14,14 @@ export function AboutPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t('about.title')} />
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-100 dark:border-brand-500/20">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             {t('about.liveOperational')}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t('about.title')}</h1>
+          <h1 className="text-4xl md:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t('about.title')}</h1>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
             {t('about.heroSubtitle')}
           </p>
