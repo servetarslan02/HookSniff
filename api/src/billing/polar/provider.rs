@@ -445,7 +445,7 @@ impl PaymentProviderImpl for PolarProvider {
                     let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
                     let _ = sqlx::query(
                         "UPDATE customers SET \
-                         plan = 'free', webhook_limit = $1, \
+                         plan = 'developer', webhook_limit = $1, \
                          cancel_at_period_end = false, \
                          polar_subscription_id = NULL, \
                          polar_customer_id = NULL, \

@@ -439,11 +439,22 @@ impl PaymentProviderImpl for IyzicoProvider {
 
         match notification.event_type.as_str() {
             "BKM_POS_PAYMENT_SUCCESS" | "CARD_PAYMENT_SUCCESS" => {
+                // iyzico webhook doesn't include amount — resolve from customer's plan
+                let customer_id = notification.conversation_id.as_deref().and_then(|s| Uuid::parse_str(s).ok());
+                let amount_cents = if let Some(cid) = customer_id {
+                    // Look up customer plan and use iyzico price config
+                    if let Ok(Some((plan_str,))) = sqlx::query_as::<_, (String,)>(
+                        "SELECT plan FROM customers WHERE id = $1"
+                    ).bind(cid).fetch_optional(_pool).await.ok() {
+                        let plan = Plan::parse_str(&plan_str);
+                        self.config.price_for_plan(&plan).unwrap_or(0) as u64
+                    } else { 0 }
+                } else { 0 };
                 Ok(WebhookResult::PaymentSucceeded {
                     provider_tx_id: notification.payment_id,
-                    amount_cents: 0, // Amount needs to be looked up from the payment
+                    amount_cents,
                     currency: "TRY".to_string(),
-                    customer_id: notification.conversation_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()),
+                    customer_id,
                     invoice_number: None,
                 })
             }
@@ -472,9 +483,9 @@ impl PaymentProviderImpl for IyzicoProvider {
     }
 
     async fn cancel_subscription(&self, _iyzico_subscription_id: &str) -> Result<(), AppError> {
-        // iyzico doesn't have native subscriptions.
-        // We handle cancellation on our side by marking the subscription as canceled.
-        tracing::info!("iyzico subscription canceled (handled server-side)");
+        // iyzico doesn't have native subscriptions — handled server-side.
+        // The caller (BillingService) is responsible for updating the DB.
+        tracing::info!("iyzico subscription cancel requested (handled server-side by caller)");
         Ok(())
     }
 }

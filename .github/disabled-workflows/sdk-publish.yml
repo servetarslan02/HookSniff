@@ -40,13 +40,15 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          LANGUAGE: ${{ github.event.inputs.language }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            LANG="${{ github.event.inputs.language }}"
-            if [ "$LANG" = "all" ]; then
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ "$LANGUAGE" = "all" ]; then
               echo 'matrix={"sdk":["node","python","go","rust","ruby","java","kotlin","php","csharp","elixir","swift"]}' >> $GITHUB_OUTPUT
             else
-              echo "matrix={\"sdk\":[\"$LANG\"]}" >> $GITHUB_OUTPUT
+              echo "matrix={\"sdk\":[\"$LANGUAGE\"]}" >> $GITHUB_OUTPUT
             fi
           else
             echo 'matrix={"sdk":["node","python","go","rust","ruby","java","kotlin","php","csharp","elixir","swift"]}' >> $GITHUB_OUTPUT

@@ -202,12 +202,12 @@ HookSniff/
 
 ## Pricing
 
-| Plan | Price | Webhooks/mo | Endpoints | Payload | Retention | Rate/min |
+| Plan | Price | Webhooks/day | Endpoints | Payload | Retention | Rate/min |
 |------|-------|-------------|-----------|---------|-----------|----------|
-| Free | $0 | 300 | 5 | 256 KB | 7 days | 100 |
-| Pro | $49/mo | 30,000 | 50 | 1 MB | 30 days | 1,000 |
-| Business | $149/mo | 100,000 | 500 | 5 MB | 90 days | 10,000 |
-| Enterprise | Custom | Unlimited | Unlimited | 10 MB | 365 days | Unlimited |
+| Developer | $0 | 300 | Unlimited | 256 KB | 14 days | 100 |
+| Startup | $29/mo | 30,000 | Unlimited | 1 MB | 30 days | 500 |
+| Pro | $49/mo | 100,000 | Unlimited | 5 MB | 180 days | 1,000 |
+| Enterprise | Custom | Unlimited | Unlimited | 10 MB | 365 days | 5,000 |
 
 **Hosting cost:** $0/month on free-tier services.
 

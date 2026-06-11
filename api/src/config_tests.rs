@@ -66,7 +66,7 @@ fn test_validate_secret_placeholder_xxx() {
 
 #[test]
 fn test_validate_secret_good_secret() {
-    let secret = "abcdef1234567890abcdef1234567890ab";
+    let secret = "abcdef1234567890abcdef1234567890ab"; // nosemgrep
     assert!(validate_secret(secret, "TEST_SECRET").is_ok());
 }
 

@@ -6,9 +6,14 @@ set -euo pipefail
 
 API_URL="https://hooksniff-api-e6ztf3x2ma-ew.a.run.app"
 OTLP_URL="https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/metrics"
-DB_URL="postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+
+# Load secrets from environment — NEVER hardcode credentials in source
+: "${DB_URL:?Set DB_URL env var (Neon connection string)}"
+: "${OTLP_GRAFANA_TOKEN:?Set OTLP_GRAFANA_TOKEN env var (Grafana OTLP auth token)}"
+: "${METRICS_SECRET:?Set METRICS_SECRET env var (API metrics auth token)}"
+
 export DB_URL
-OTLP_AUTH="Authorization: Basic $(echo -n '1625476:glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0=' | base64 -w0)"
+OTLP_AUTH="Authorization: Basic ${OTLP_GRAFANA_TOKEN}"
 NOW_NS=$(date +%s%N)
 
 # 1. API Health
@@ -52,7 +57,6 @@ if [ "$D1H" -gt 0 ] 2>/dev/null; then SR1H=$(python3 -c "print(round($OK1H/$D1H*
 if [ "$D24H" -gt 0 ] 2>/dev/null; then SR24H=$(python3 -c "print(round($OK24H/$D24H*100,1))"); else SR24H="100.0"; fi
 
 # 3b. Fetch Prometheus /metrics from API for cache + detailed metrics
-METRICS_SECRET="${METRICS_SECRET:-1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d}"
 PROM_METRICS=$(curl -sf --max-time 10 \
   -H "Authorization: Bearer ${METRICS_SECRET}" \
   "$API_URL/metrics" 2>/dev/null || echo "")
@@ -77,7 +81,7 @@ build_gauge() {
   echo "{\"name\":\"$name\",\"gauge\":{\"dataPoints\":[{\"timeUnixNano\":\"$NOW_NS\",\"asDouble\":$value}]}}"
 }
 
-METRICS=$(IFS=,; echo "
+METRICS=$(IFS=,; echo " # nosemgrep: bash.lang.security.ifs-tampering — IFS scoped to subshell
 $(build_gauge hooksniff_api_healthy $API_OK),
 $(build_gauge hooksniff_db_latency_ms $DB_LATENCY),
 $(build_gauge hooksniff_queue_pending $QP),

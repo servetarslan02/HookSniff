@@ -604,7 +604,7 @@ ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fifo_max_wait_secs INT DEFAULT 30
 
 -- Teslimat tablosuna FIFO alanları (eğer yoksa)
 ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS sequence_num BIGINT;
-ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS fifo_group_id STRING;
+ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS fifo_group_id TEXT;
 
 -- İndeksler
 CREATE INDEX IF NOT EXISTS idx_fifo_queue_endpoint_seq
