@@ -6,6 +6,7 @@ import { VirtualList } from '@/components/VirtualList';
 
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { getErrorMessage } from '@/lib/errors';
 import { api } from '@/lib/api';
 import { Check, ClipboardList, X } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
@@ -47,8 +48,8 @@ export default function SchemasPage() {
     try {
       const data = await api.getSchemas(token);
       setSchemas(data.schemas ?? []);
-    } catch {
-      // ignore
+    } catch (e) {
+      toast(getErrorMessage(e, tc('failedToLoad')), 'error');
     } finally {
       setIsLoading(false);
     }

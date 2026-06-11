@@ -130,18 +130,23 @@ export function EndpointsContent() {
     if (!token || selected.size === 0) return;
     setBulkDeleting(true);
     let deleted = 0;
+    let failed = 0;
     for (const id of selected) {
       try {
         await endpointsApi.delete(token, id);
         deleted++;
       } catch {
-        // Continue with remaining
+        failed++;
       }
     }
     queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     setSelected(new Set());
     setBulkDeleting(false);
-    toast(t('bulkDeleted', { count: deleted }), 'success');
+    if (failed > 0) {
+      toast(t('bulkDeletedPartial', { deleted, failed }) || `${deleted} deleted, ${failed} failed`, 'error');
+    } else {
+      toast(t('bulkDeleted', { count: deleted }), 'success');
+    }
   };
 
   if (isLoading) {
