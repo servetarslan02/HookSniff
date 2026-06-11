@@ -2565,7 +2565,8 @@
         "Inbound webhook proxy",
         "Embeddable portal",
         "Cortex AI anomaly detection",
-        "Priority support"
+        "Priority support",
+        "$0.000001/event overage"
       ],
       "enterpriseFeatures": [
         "Unlimited events/day",
@@ -2583,7 +2584,8 @@
         "Dedicated account manager",
         "99.9% SLA guarantee",
         "GDPR compliance",
-        "Priority + dedicated support"
+        "Priority + dedicated support",
+        "Custom overage pricing"
       ],
       "developerFeatures": [
         "300 events/day",
@@ -2595,7 +2597,8 @@
         "SSRF protection",
         "2FA authentication",
         "Webhook playground",
-        "Community support"
+        "Community support",
+        "Blocked at limit"
       ],
       "startupFeatures": [
         "30,000 events/day",
@@ -2609,7 +2612,8 @@
         "Circuit breaker",
         "Smart routing",
         "500 req/min API rate",
-        "Email support"
+        "Email support",
+        "$0.00003/event overage"
       ],
       "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
       "startupDesc": "Enhance your webhook experience with new features and grow your startup!",

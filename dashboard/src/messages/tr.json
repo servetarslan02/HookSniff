@@ -2570,7 +2570,8 @@
         "Gelen webhook proxy",
         "Gömülebilir portal",
         "Cortex AI anomalı tespiti",
-        "Öncelikli destek"
+        "Öncelikli destek",
+        "Aşım ücreti: event başına $0.000001"
       ],
       "enterpriseFeatures": [
         "Sınırsız günlük event",
@@ -2588,7 +2589,8 @@
         "Özel hesap yöneticisi",
         "%99.9 SLA garantisi",
         "GDPR uyumluluğu",
-        "Öncelikli + özel destek"
+        "Öncelikli + özel destek",
+        "Özel aşım ücretlendirmesi"
       ],
       "developerFeatures": [
         "Günlük 300 event",
@@ -2600,7 +2602,8 @@
         "SSRF koruması",
         "2FA kimlik doğrulama",
         "Webhook playground",
-        "Topluluk desteği"
+        "Topluluk desteği",
+        "Limitte engellenir"
       ],
       "startupFeatures": [
         "Günlük 30.000 event",
@@ -2614,7 +2617,8 @@
         "Circuit breaker",
         "Akıllı yönlendirme",
         "Dakikada 500 API isteği",
-        "E-posta desteği"
+        "E-posta desteği",
+        "Aşım ücreti: event başına $0.00003"
       ],
       "developerDesc": "HookSniff'ı denemek için mükemmel bir yol. Kurulum gerektirmez, yan projeler için sonsuza dek ücretsiz.",
       "startupDesc": "Yeni özelliklerimizle webhook deneyiminizi geliştirin ve girişiminizi büyütün!",
