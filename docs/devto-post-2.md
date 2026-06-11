@@ -145,7 +145,7 @@ For indie developers and small teams, $490/month for a webhook platform is a non
 
 **How HookSniff fixes it:**
 
-HookSniff is **open-source (MIT licensed)** and **self-hostable**. You can run it yourself with Docker in 5 minutes. If you want the hosted version, it starts at **$49/month** — 10x cheaper than Svix with comparable features.
+HookSniff is **open-source (MIT licensed)** and **self-hostable**. You can run it yourself with Docker in 5 minutes. If you want the hosted version, it starts at **$29/month** — 17x cheaper than Svix with comparable features.
 
 And unlike abandoned open-source projects, HookSniff is actively developed with 30 route modules and 22,000+ lines of Rust.
 

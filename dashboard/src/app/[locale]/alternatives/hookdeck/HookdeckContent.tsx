@@ -10,7 +10,7 @@ export function HookdeckContent() {
 
   const rows = [
     { featureKey: 'pricePro', hooksniff: '$49/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
-    { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, hookdeck: `10,000 ${t('events')}`, bestFor: 'tie' },
+    { featureKey: 'freeTier', hooksniff: `300 ${t('eventsPerDay')}`, hookdeck: `10,000 ${t('eventsPerMonth')}`, bestFor: 'hookdeck' },
     { featureKey: 'sdkCount', hooksniff: '11', hookdeck: '8', bestFor: 'hooksniff' },
     { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, hookdeck: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
     { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, hookdeck: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },

@@ -389,5 +389,5 @@ These examples show how webhooks connect modern software. The pattern is always 
 
 HookSniff handles the hard parts — retries, signatures, monitoring, dead letter queues. You focus on your business logic.
 
-Try it free at [hooksniff.com](https://hooksniff.com). 10,000 events per month, no credit card required.`,
+Try it free at [hooksniff.com](https://hooksniff.com). 300 events per day, no credit card required.`,
 };

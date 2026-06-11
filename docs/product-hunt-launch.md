@@ -43,7 +43,7 @@ I built this because every webhook platform out there is either too expensive ($
 🔐 HMAC-SHA256 signatures (Standard Webhooks compliant)
 🔀 Smart routing — round-robin, failover, weighted
 ⚡ Built in Rust for speed — 45ms avg latency
-💰 Starting at $49/mo (Svix charges $490 for similar features)
+💰 Starting at $29/mo (Svix charges $490 for similar features)
 
 **Tech stack:** Rust (Axum), Next.js 16, PostgreSQL, Redis
 **Deploy:** Google Cloud Run, 4 regions

@@ -31,7 +31,7 @@ Here's what makes it different from other webhook platforms:
 
 **Tech stack:** Rust (Axum 0.8) for the API, Tokio for the worker, PostgreSQL (Neon) for storage, Redis (Upstash) for queue/cache, Next.js 16 for the dashboard. Deployed on Google Cloud Run across 4 regions.
 
-**Pricing:** Free tier with 10K webhooks/month and 5 endpoints. Paid plans start at $29/mo.
+**Pricing:** Free tier with 300 webhooks/day and unlimited endpoints. Paid plans start at $29/mo.
 
 https://hooksniff.vercel.app
 

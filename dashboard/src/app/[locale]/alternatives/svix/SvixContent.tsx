@@ -10,7 +10,7 @@ export function SvixContent() {
 
   const rows = [
     { featureKey: 'pricePro', hooksniff: '$49/mo', svix: '$490/mo', bestFor: 'hooksniff' },
-    { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, svix: `Unlimited ${t('events')}`, bestFor: 'svix' },
+    { featureKey: 'freeTier', hooksniff: `300 ${t('eventsPerDay')}`, svix: `50,000 ${t('eventsPerMonth')}`, bestFor: 'svix' },
     { featureKey: 'sdkCount', hooksniff: '11', svix: '6', bestFor: 'hooksniff' },
     { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
     { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
@@ -53,7 +53,7 @@ export function SvixContent() {
           <div className="p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('pricePro')}:</strong> $24/mo vs Svix at $490/mo — {t('savedPerYear', { amount: '$5,592' })}</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('pricePro')}:</strong> $49/mo vs Svix at $490/mo — {t('savedPerYear', { amount: '$5,292' })}</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('hook0FifoDesc')}</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('svixI18nDesc')}</li>
             </ul>

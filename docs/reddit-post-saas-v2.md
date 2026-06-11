@@ -33,7 +33,7 @@ Security-wise: HMAC-SHA256 signatures on every delivery, SSRF protection that bl
 
 There's also smart routing (round-robin, failover, weighted), per-endpoint rate limiting, a playground for testing webhooks from the dashboard, a signature verifier, and a schema registry.
 
-Free tier: 10K webhooks/month, 5 endpoints. Paid plans start at $29/mo.
+Free tier: 300 webhooks/day, unlimited endpoints. Paid plans start at $29/mo.
 
 Built with Rust (Axum) + Next.js 16 + PostgreSQL + Redis. Running on Google Cloud Run across 4 regions.
 

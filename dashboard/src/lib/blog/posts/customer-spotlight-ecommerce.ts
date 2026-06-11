@@ -124,5 +124,5 @@ After HookSniff, webhooks became invisible infrastructure. Events are delivered,
 3. **Observability is non-negotiable.** If you cannot see every delivery, you cannot trust your system.
 4. **Start with a managed service.** You can always self-host later. Getting the architecture right first saves months of debugging.
 
-If you are running an e-commerce platform, marketplace, or any system with complex event lifecycles, we would love to help. Sign up at hooksniff.vercel.app — your first 10,000 webhooks per month are free.`,
+If you are running an e-commerce platform, marketplace, or any system with complex event lifecycles, we would love to help. Sign up at hooksniff.vercel.app — your first 300 webhooks per day are free.`,
 };

@@ -115,5 +115,5 @@ Webhooks are the foundation of modern event-driven architecture. They enable rea
 
 Whether you are building a payment integration, a CI/CD pipeline, or an AI agent system, understanding webhooks is essential.
 
-Ready to start using webhooks? [Get started with HookSniff for free](https://hooksniff.vercel.app/register) — 10,000 webhooks per month, no credit card required.`,
+Ready to start using webhooks? [Get started with HookSniff for free](https://hooksniff.vercel.app/register) — 300 webhooks per day, no credit card required.`,
 };

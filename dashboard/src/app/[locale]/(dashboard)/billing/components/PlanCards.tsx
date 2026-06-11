@@ -8,16 +8,24 @@ import { Check } from '@/components/icons';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
-    '10eventsDay', '5endpoints', '7dayLog', 'hmac', 'communitySupport',
+    'dev1', 'dev2', 'dev3', 'dev4', 'dev5',
+    'dev6', 'dev7', 'dev8', 'dev9', 'dev10',
   ],
   startup: [
-    '30kEventsDay', '20endpoints', '14dayLog', 'neverBlocked', 'deadLetter', 'emailSupport',
+    'su1', 'su2', 'su3', 'su4', 'su5',
+    'su6', 'su7', 'su8', 'su9', 'su10',
+    'su11', 'su12',
   ],
   pro: [
-    '100kEventsDay', '500endpoints', '30dayLog', 'fifo', 'analytics', 'prioritySupport',
+    'pro1', 'pro2', 'pro3', 'pro4', 'pro5',
+    'pro6', 'pro7', 'pro8', 'pro9', 'pro10',
+    'pro11', 'pro12', 'pro13', 'pro14',
   ],
   enterprise: [
-    'unlimitedEvents', '200endpoints', 'customLog', 'ssoSaml', 'accountManager', 'sla99',
+    'ent1', 'ent2', 'ent3', 'ent4', 'ent5',
+    'ent6', 'ent7', 'ent8', 'ent9', 'ent10',
+    'ent11', 'ent12', 'ent13', 'ent14', 'ent15',
+    'ent16',
   ],
 };
 

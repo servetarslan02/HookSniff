@@ -23,7 +23,7 @@ HookSniff is a webhook delivery service that handles the hard parts so you can f
 
 ### Free Forever
 
-HookSniff runs entirely on free-tier services. 10,000 webhooks per month, no credit card required.
+HookSniff runs entirely on free-tier services. 300 webhooks per day, no credit card required.
 
 ### Getting Started
 

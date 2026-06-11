@@ -15,8 +15,8 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 | Feature | HookSniff | Svix | Hookdeck | Hook0 |
 |---------|-----------|------|----------|-------|
-| **Price (free tier)** | 10,000 events/mo | Unlimited events* | 10,000 events/mo | Free (self-hosted) |
-| **Paid plans** | $49–149/mo | Custom pricing | $39/mo+ | N/A |
+| **Price (free tier)** | 300 events/day | 50,000 events/mo | 10,000 events/mo | Free (self-hosted) |
+| **Paid plans** | $29–149/mo | $490/mo+ | $39/mo+ | N/A |
 | **SDKs** | 11 | 6 | 8 | 3 |
 | **FIFO delivery** | Yes | No | No | No |
 | **Schema registry** | Yes | No | No | No |
@@ -28,7 +28,7 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 ### Pricing Deep-Dive
 
-**HookSniff** offers a generous free tier with 10,000 webhooks per month at $0. For higher volumes, Pro ($49/mo) and Business ($149/mo) plans are available. For startups and indie developers, the free tier is a great starting point.
+**HookSniff** offers a generous free tier with 300 webhooks per day at $0. For higher volumes, Startup ($29/mo), Pro ($49/mo), and Enterprise ($149/mo) plans are available. For startups and indie developers, the free tier is a great starting point.
 
 **Svix** offers a managed cloud with pricing that scales based on usage. Their Professional plan starts around $490/month for higher volumes. They also offer an open-source self-hosted version, but you need to manage your own infrastructure.
 

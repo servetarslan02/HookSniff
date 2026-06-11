@@ -361,5 +361,5 @@ In production, webhook services like HookSniff automatically retry failed delive
 - **Add monitoring** to track delivery success rates
 - **Use a webhook service** like HookSniff for production — automatic retries, signature verification, dead letter queue, and real-time monitoring
 
-Try HookSniff free at [hooksniff.com](https://hooksniff.com). 10,000 events per month, no credit card required.`,
+Try HookSniff free at [hooksniff.com](https://hooksniff.com). 300 events per day, no credit card required.`,
 };
