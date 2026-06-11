@@ -10,8 +10,22 @@ use crate::models::customer::{Customer, CustomerResponse, UpdateProfileRequest};
 
 // ── Profile ─────────────────────────────────────────────────
 
-pub async fn get_me(Extension(customer): Extension<Customer>) -> Result<Json<CustomerResponse>, AppError> {
-    Ok(Json(customer.to_response(None)))
+pub async fn get_me(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<CustomerResponse>, AppError> {
+    let is_sso = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM sso_user_attributes WHERE customer_id = $1)"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await
+    .unwrap_or(false);
+
+    let mut resp = customer.to_response(None);
+    resp.is_sso = is_sso;
+
+    Ok(Json(resp))
 }
 
 pub async fn update_profile(

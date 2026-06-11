@@ -12,6 +12,7 @@ interface User {
   is_admin?: boolean;
   avatar_url?: string;
   email_verified?: boolean;
+  is_sso?: boolean;
 }
 
 interface AuthContextType {
@@ -141,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             is_admin: raw.is_admin ?? false,
             avatar_url: raw.avatar_url,
             email_verified: raw.email_verified ?? true,
+            is_sso: raw.is_sso ?? false,
           };
           setUser(u);
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));

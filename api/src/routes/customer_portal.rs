@@ -45,9 +45,23 @@ struct ProfileResponse {
     webhook_limit: i64,
     webhook_count: i64,
     created_at: String,
+    #[serde(default)]
+    is_sso: bool,
 }
 
-async fn get_profile(Extension(customer): Extension<Customer>) -> Json<ProfileResponse> {
+async fn get_profile(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Json<ProfileResponse> {
+    // Check if user has SSO attributes (determines SSO vs standard registration)
+    let is_sso = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM sso_user_attributes WHERE customer_id = $1)"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await
+    .unwrap_or(false);
+
     Json(ProfileResponse {
         id: customer.id,
         email: customer.email.clone(),
@@ -56,6 +70,7 @@ async fn get_profile(Extension(customer): Extension<Customer>) -> Json<ProfileRe
         webhook_limit: customer.webhook_limit,
         webhook_count: customer.webhook_count,
         created_at: customer.created_at.to_rfc3339(),
+        is_sso,
     })
 }
 
