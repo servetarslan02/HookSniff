@@ -20,7 +20,7 @@ export function ResponseInspector({
 
   if (!response && !status) {
     return (
-      <div className="text-center text-gray-500 dark:text-slate-500 py-16">
+      <div className="text-center text-gray-500 dark:text-slate-500 py-8 sm:py-12 md:py-16">
         <div className="text-4xl mb-3"><FlaskConical size={18} strokeWidth={1.75} /></div>
         <p>{t('sendToInspect')}</p>
       </div>

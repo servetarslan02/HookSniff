@@ -258,7 +258,7 @@ export default function ApplicationsPage() {
       {/* ── Card Grid ── */}
       <LazySection fallback={Skeletons.card} rootMargin={300}>
       {filteredApps.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-16 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-4 sm:px-5 py-8 sm:py-12 md:py-16 text-center">
           <Smartphone size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
           <p className="text-gray-900 dark:text-white font-medium">
             {search ? (tc('noResults') || 'No results found') : (t('empty') || 'No applications')}
