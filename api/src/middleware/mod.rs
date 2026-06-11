@@ -272,14 +272,14 @@ pub async fn auth_middleware(
                 let candidates =
                     sqlx::query_as::<_, Customer>(&format!("{} WHERE api_key_prefix = $1", CUSTOMER_SELECT))
                         .bind(&prefix)
-                        .fetch_all(&pool)
+                        .fetch_all(&pool.0)
                         .await?;
 
                 let api_key_candidates: Vec<(String,)> = sqlx::query_as(
                     "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
                 )
                 .bind(&prefix)
-                .fetch_all(&pool)
+                .fetch_all(&pool.0)
                 .await?;
 
                 let mut found: Option<Customer> = None;
@@ -298,7 +298,7 @@ pub async fn auth_middleware(
                             )
                             .bind(&prefix)
                             .bind(hash)
-                            .fetch_optional(&pool)
+                            .fetch_optional(&pool.0)
                             .await?;
                             if let Some(c) = owner {
                                 found = Some(c);
@@ -313,7 +313,7 @@ pub async fn auth_middleware(
                         "SELECT token_hash FROM service_tokens WHERE token_prefix = $1 AND is_active = true",
                     )
                     .bind(&prefix)
-                    .fetch_all(&pool)
+                    .fetch_all(&pool.0)
                     .await?;
 
                     for (hash,) in &st_candidates {
@@ -325,7 +325,7 @@ pub async fn auth_middleware(
                             )
                             .bind(&prefix)
                             .bind(hash)
-                            .fetch_optional(&pool)
+                            .fetch_optional(&pool.0)
                             .await?;
 
                             if let Some(team_id) = team_id_opt {
@@ -333,7 +333,7 @@ pub async fn auth_middleware(
                                     &format!("{} c INNER JOIN teams t ON t.owner_id = c.id WHERE t.id = $1", CUSTOMER_SELECT)
                                 )
                                 .bind(team_id)
-                                .fetch_optional(&pool)
+                                .fetch_optional(&pool.0)
                                 .await?;
 
                                 if let Some(c) = customer {
@@ -344,7 +344,7 @@ pub async fn auth_middleware(
                                     )
                                     .bind(&prefix)
                                     .bind(hash)
-                                    .execute(&pool)
+                                    .execute(&pool.0)
                                     .await;
                                 }
                             }
@@ -398,7 +398,7 @@ pub async fn auth_middleware(
 
                 let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
                     .bind(claims.sub)
-                    .fetch_optional(&pool)
+                    .fetch_optional(&pool.0)
                     .await?
                     .ok_or(AppError::Unauthorized)?;
 
@@ -470,7 +470,7 @@ pub async fn jwt_auth_middleware(
 
             let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
                 .bind(claims.sub)
-                .fetch_optional(&pool)
+                .fetch_optional(&pool.0)
                 .await?
                 .ok_or(AppError::Unauthorized)?;
 
