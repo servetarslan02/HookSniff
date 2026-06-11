@@ -34,7 +34,22 @@ export function useTeamRole(teamId?: string | null) {
 
   const isLoading = teamsLoading || membersLoading;
 
-  if (!effectiveTeamId || !user) {
+  if (!user) {
+    return { role: null as TeamRole | null, teamId: null, isLoading };
+  }
+
+  // Personal account (not SSO): user has no teams → full access (matches backend behavior)
+  // SSO user without team: misconfigured SSO → no automatic elevation
+  // Only treat as personal account after teams have finished loading
+  if (!teamsLoading && (!teams || teams.length === 0)) {
+    if (!user?.is_sso) {
+      return { role: 'owner' as TeamRole, teamId: null, isLoading };
+    }
+    // SSO user without team — don't elevate, let them see limited access
+    return { role: null as TeamRole | null, teamId: null, isLoading };
+  }
+
+  if (!effectiveTeamId) {
     return { role: null as TeamRole | null, teamId: null, isLoading };
   }
 

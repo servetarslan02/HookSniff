@@ -234,6 +234,9 @@ pub struct CustomerResponse {
     pub is_admin: bool,
     pub created_at: DateTime<Utc>,
     pub avatar_url: Option<String>,
+    /// Whether this user authenticated via SSO (populated by /auth/me)
+    #[serde(default)]
+    pub is_sso: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -265,6 +268,7 @@ impl Customer {
             is_admin: self.is_admin,
             created_at: self.created_at,
             avatar_url: self.avatar_url,
+            is_sso: false, // Populated by /auth/me endpoint
         }
     }
 }
