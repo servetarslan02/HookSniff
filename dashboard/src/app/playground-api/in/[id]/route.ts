@@ -82,17 +82,21 @@ async function handleRequest(request: Request, id: string) {
       timestamp: new Date().toISOString(),
     };
 
-    // Store in history (keep last MAX_HISTORY)
+    // Store in history (non-blocking — Redis çalışmasa bile devam et)
     const key = `play:history:${id}`;
-    const existing = (await playgroundLrange(key, 0, MAX_HISTORY - 1)) as unknown[];
-    if (existing.length >= MAX_HISTORY) {
-      await playgroundLpush(key, record, 86400);
-      const r = getRedis();
-      if (r) {
-        await r.ltrim(key, 0, MAX_HISTORY - 1);
+    try {
+      const existing = (await playgroundLrange(key, 0, MAX_HISTORY - 1)) as unknown[];
+      if (existing.length >= MAX_HISTORY) {
+        await playgroundLpush(key, record, 86400);
+        const r = getRedis();
+        if (r) {
+          await r.ltrim(key, 0, MAX_HISTORY - 1);
+        }
+      } else {
+        await playgroundLpush(key, record, 86400);
       }
-    } else {
-      await playgroundLpush(key, record, 86400);
+    } catch {
+      // Redis unavailable — frontend will use record from response
     }
 
     // Return success — mimic real webhook endpoint behavior
@@ -118,7 +122,21 @@ async function handleRequest(request: Request, id: string) {
     }
 
     return new NextResponse(
-      echoBody === 'true' ? body : JSON.stringify({ received: true, id: record.id }),
+      echoBody === 'true' ? body : JSON.stringify({
+        received: true,
+        id: record.id,
+        request: {
+          id: record.id,
+          method: record.method,
+          path: record.path,
+          query: record.query,
+          headers: record.headers,
+          body: record.body,
+          content_length: record.content_length,
+          ip: record.ip,
+          timestamp: record.timestamp,
+        },
+      }),
       {
         status: 200,
         headers: {

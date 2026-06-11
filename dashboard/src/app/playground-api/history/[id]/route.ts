@@ -24,11 +24,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const records = (await playgroundLrange(key, 0, limit - 1)) as unknown[];
 
     // Filter by timestamp if 'since' param provided
+    // Frontend sends Date.now() (Unix ms), records store ISO timestamps
     let filtered = records;
     if (since) {
+      const sinceMs = Number(since);
       filtered = records.filter((r: unknown) => {
-        const rec = r as { timestamp: string };
-        return rec.timestamp > since;
+        const rec = r as { timestamp: string | number };
+        const recMs = typeof rec.timestamp === 'string'
+          ? new Date(rec.timestamp).getTime()
+          : Number(rec.timestamp);
+        return recMs > sinceMs;
       });
     }
 
@@ -36,7 +41,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       success: true,
       count: filtered.length,
       total: records.length,
-      data: filtered,
+      requests: filtered,
     }, {
       headers: {
         'Cache-Control': 'no-store',
