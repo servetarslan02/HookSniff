@@ -243,7 +243,7 @@ pub fn generate_totp_secret() -> String {
     let mut bytes = [0u8; 20];
     rand::rngs::SysRng
         .try_fill_bytes(&mut bytes)
-        .expect("SysRng fill failed");
+        .unwrap_or_else(|e| panic!("SysRng fill failed: {e}"));
     base32::encode(base32::Alphabet::Rfc4648 { padding: false }, &bytes)
 }
 
@@ -255,7 +255,7 @@ pub fn generate_backup_codes(count: usize) -> Vec<String> {
         let mut bytes = [0u8; 8];
         rand::rngs::SysRng
             .try_fill_bytes(&mut bytes)
-            .expect("SysRng fill failed");
+            .unwrap_or_else(|e| panic!("SysRng fill failed: {e}"));
         let code: String = bytes
             .iter()
             .map(|&b| CHARSET[(b as usize) % CHARSET.len()] as char)

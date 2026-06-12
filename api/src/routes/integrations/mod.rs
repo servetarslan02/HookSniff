@@ -241,6 +241,5 @@ const INTEGRATION_JOIN_SQL: &str =
 // ──────────────────────────────────────────────────────────────
 
 /// List all integrations for the authenticated customer.
-
 pub mod integration_handlers;
 pub use integration_handlers::*;

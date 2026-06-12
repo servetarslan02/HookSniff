@@ -23,7 +23,6 @@ pub async fn handle_stripe_webhook(
 /// POST /v1/billing/webhook/polar — Polar.sh webhook handler
 /// IMPORTANT: Always returns 200 to prevent Polar from auto-disabling the webhook.
 /// Errors are logged but never returned to Polar.
-
 pub async fn handle_polar_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
@@ -75,7 +74,6 @@ pub async fn handle_polar_webhook(
 }
 
 /// POST /v1/billing/webhook/iyzico — iyzico webhook handler
-
 pub async fn handle_iyzico_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
@@ -98,7 +96,6 @@ pub async fn handle_iyzico_webhook(
 }
 
 /// Shared rate limit check for billing webhooks.
-
 async fn check_billing_webhook_rate_limit(
     rate_limiter: &crate::rate_limit::RateLimiter,
     headers: &axum::http::HeaderMap,
@@ -111,7 +108,6 @@ async fn check_billing_webhook_rate_limit(
 }
 
 /// HS-021: Idempotency check — skip if event already processed.
-
 async fn check_webhook_idempotency(pool: &PgPool, body: &str, provider: &str) -> Result<(), AppError> {
     if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body) {
         if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
@@ -129,7 +125,6 @@ async fn check_webhook_idempotency(pool: &PgPool, body: &str, provider: &str) ->
 }
 
 /// Get the provider-specific column names for customer table updates.
-
 fn provider_columns(provider: &str) -> Option<(&'static str, &'static str)> {
     match provider {
         "polar" => Some(("polar_customer_id", "polar_subscription_id")),
@@ -139,7 +134,6 @@ fn provider_columns(provider: &str) -> Option<(&'static str, &'static str)> {
 }
 
 /// Get the provider-specific subscription ID column name.
-
 fn provider_sub_col(provider: &str) -> Option<&'static str> {
     match provider {
         "polar" => Some("polar_subscription_id"),
@@ -149,7 +143,6 @@ fn provider_sub_col(provider: &str) -> Option<&'static str> {
 }
 
 /// Process a webhook result from any provider and update the database.
-
 async fn process_webhook_result(
     pool: &sqlx::PgPool,
     result: &crate::billing::provider::WebhookResult,

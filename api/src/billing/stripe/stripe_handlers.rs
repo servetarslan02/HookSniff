@@ -287,8 +287,7 @@ async fn handle_invoice_paid(
                 .and_then(|p| p.get("end"))
                 .and_then(|v| v.as_i64())
                 .or_else(|| data.get("period_end").and_then(|v| v.as_i64()))
-                .map(|ts| chrono::DateTime::from_timestamp(ts, 0).map(|dt| dt.to_rfc3339()))
-                .flatten();
+                .and_then(|ts| chrono::DateTime::from_timestamp(ts, 0).map(|dt| dt.to_rfc3339()));
 
             // Clear payment_failed_at on successful payment
             sqlx::query(
@@ -400,8 +399,7 @@ async fn handle_chargeback_created(
         .get("metadata")
         .and_then(|m| m.get("customer_id"))
         .and_then(|v| v.as_str())
-        .map(|s| Uuid::parse_str(s).ok())
-        .flatten();
+        .and_then(|s| Uuid::parse_str(s).ok());
 
     if let Some(cid) = customer_id {
         // Downgrade to free, clear payment info

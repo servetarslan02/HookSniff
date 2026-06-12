@@ -233,7 +233,7 @@ pub async fn cancel_subscription(
 
     let client = crate::http_client::get_client().clone();
     let resp = client
-        .delete(&format!(
+        .delete(format!(
             "https://api.stripe.com/v1/subscriptions/{}",
             stripe_subscription_id
         ))

@@ -243,7 +243,6 @@ pub(crate) struct OverageSettingsResponse {
 }
 
 /// GET /v1/billing/settings — Get current overage settings
-
 pub async fn get_overage_settings(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -269,7 +268,6 @@ pub(crate) struct UpdateOverageSettingsRequest {
 }
 
 /// PUT /v1/billing/settings — Update overage settings
-
 pub async fn update_overage_settings(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,

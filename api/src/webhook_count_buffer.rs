@@ -13,11 +13,6 @@ use std::sync::Arc;
 use std::time::Duration;
 use uuid::Uuid;
 
-/// Buffer entry: accumulated count since last flush.
-struct CounterEntry {
-    count: i64,
-}
-
 /// Thread-safe buffered counter for webhook_count increments.
 #[derive(Clone)]
 pub struct WebhookCountBuffer {
