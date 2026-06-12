@@ -18,8 +18,6 @@ pub async fn run_predictions(pool: &sqlx::PgPool, config: &CortexConfig) -> Resu
 
     if endpoints.is_empty() { return Ok(0); }
 
-    let endpoint_ids: Vec<uuid::Uuid> = endpoints.iter().map(|(eid, _)| *eid).collect();
-
     // 2. BATCH: All hourly stats in ONE query
     let stats_rows: Vec<(uuid::Uuid, i32, i32, i32)> = sqlx::query_as(
         "SELECT endpoint_id, total_deliveries, successful, failed \

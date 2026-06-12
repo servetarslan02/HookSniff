@@ -226,8 +226,7 @@ pub async fn train_all(pool: &PgPool) -> Result<u64, sqlx::Error> {
             "INSERT INTO ml_models (endpoint_id, model_type, parameters, training_samples, last_trained, updated_at) VALUES "
         );
         let mut binds: Vec<String> = Vec::new();
-        for (i, (eid, mtype, params, samples)) in save_queue.iter().enumerate() {
-            let base = i * 4;
+        for (eid, mtype, params, samples) in save_queue.iter() {
             binds.push(format!("('${}'::uuid, '{}', '{}', {}, NOW(), NOW())",
                 eid, mtype, params.to_string().replace('\'', "''"), samples));
         }
