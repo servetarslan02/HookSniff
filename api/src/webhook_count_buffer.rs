@@ -30,6 +30,7 @@ impl WebhookCountBuffer {
     pub fn new(pool: PgPool, flush_interval: Duration) -> Self {
         let pending = Arc::new(DashMap::new());
         let flush_pool = pool.clone();
+        let flush_pending = pending.clone();
 
         let buffer = Self {
             pending,
@@ -39,7 +40,7 @@ impl WebhookCountBuffer {
             let mut interval = tokio::time::interval(flush_interval);
             loop {
                 interval.tick().await;
-                Self::flush(&pending, &flush_pool).await;
+                Self::flush(&flush_pending, &flush_pool).await;
             }
         });
 
