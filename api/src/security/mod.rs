@@ -17,6 +17,7 @@ pub mod ip_reputation;
 pub mod threat_detector;
 pub mod waf;
 pub mod zero_trust;
+pub mod alerting;
 
 use sqlx::PgPool;
 use uuid::Uuid;

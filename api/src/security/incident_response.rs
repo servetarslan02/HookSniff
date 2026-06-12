@@ -5,6 +5,8 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use super::alerting::{self, SecurityAlert, AlertLevel};
+
 /// Incident severity levels
 #[derive(Debug, Clone, PartialEq)]
 pub enum IncidentSeverity {
@@ -69,12 +71,39 @@ pub async fn create_incident(
         IncidentSeverity::Critical => {
             // Auto-block IP for critical incidents
             auto_block_ip(pool, ip, "Critical incident auto-block").await.ok();
-            // Alert admin
-            alert_admin(pool, &incident_type, &severity, ip, &details).await.ok();
+            // Send real-time alert via all channels
+            alerting::send_alert(pool, &SecurityAlert {
+                level: AlertLevel::Critical,
+                title: format!("Critical: {:?}", incident_type),
+                body: format!("IP {} triggered critical incident. Auto-blocked.", ip),
+                ip: Some(ip.to_string()),
+                customer_id,
+                event_type: format!("incident_{:?}", incident_type).to_lowercase(),
+                details: details.clone(),
+            }).await;
         }
         IncidentSeverity::High => {
-            // Rate limit the IP
-            alert_admin(pool, &incident_type, &severity, ip, &details).await.ok();
+            // Send alert via Slack + dashboard
+            alerting::send_alert(pool, &SecurityAlert {
+                level: AlertLevel::High,
+                title: format!("High: {:?}", incident_type),
+                body: format!("IP {} triggered high-severity incident.", ip),
+                ip: Some(ip.to_string()),
+                customer_id,
+                event_type: format!("incident_{:?}", incident_type).to_lowercase(),
+                details: details.clone(),
+            }).await;
+        }
+        IncidentSeverity::Medium => {
+            alerting::send_alert(pool, &SecurityAlert {
+                level: AlertLevel::Medium,
+                title: format!("Medium: {:?}", incident_type),
+                body: format!("IP {} triggered medium-severity event.", ip),
+                ip: Some(ip.to_string()),
+                customer_id,
+                event_type: format!("incident_{:?}", incident_type).to_lowercase(),
+                details: details.clone(),
+            }).await;
         }
         _ => {}
     }
@@ -104,25 +133,6 @@ async fn auto_block_ip(pool: &PgPool, ip: &str, reason: &str) -> Result<(), sqlx
     .await?;
 
     tracing::info!(ip = %ip, reason = %reason, "🚫 IP auto-blocked");
-    Ok(())
-}
-
-/// Send alert to admin (via security events table)
-async fn alert_admin(
-    _pool: &PgPool,
-    incident_type: &IncidentType,
-    severity: &IncidentSeverity,
-    ip: &str,
-    _details: &serde_json::Value,
-) -> Result<(), sqlx::Error> {
-    // The admin notification system reads from security_events
-    // This is picked up by the AdminNotificationCenter in the dashboard
-    tracing::warn!(
-        severity = %severity.as_str(),
-        ip = %ip,
-        incident_type = ?incident_type,
-        "🔔 Admin alert triggered"
-    );
     Ok(())
 }
 
