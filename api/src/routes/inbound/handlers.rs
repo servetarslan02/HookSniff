@@ -126,34 +126,6 @@ pub async fn process_inbound(
             AppError::Unauthorized
         })?;
 
-    // WAF: Scan inbound payload for injection attacks
-    let body_str = String::from_utf8_lossy(body);
-    if let Some(detection) = crate::security::waf::analyze_request(&body_str) {
-        if detection.is_attack && detection.confidence >= 0.7 {
-            tracing::warn!(
-                "🛡️ WAF blocked inbound webhook from {}: {} (confidence {:.0}%)",
-                provider, detection.attack_type, detection.confidence * 100.0
-            );
-            let _ = sqlx::query(
-                "INSERT INTO security_events (event_type, severity, ip_address, customer_id, details) \
-                 VALUES ('inbound_webhook_injection', $1, $2, $3, $4)"
-            )
-            .bind(if detection.confidence >= 0.9 { "critical" } else { "high" })
-            .bind(headers.get("x-forwarded-for").and_then(|v| v.to_str().ok()).unwrap_or("unknown"))
-            .bind(customer.id)
-            .bind(serde_json::json!({
-                "provider": provider.to_string(),
-                "attack_type": detection.attack_type,
-                "confidence": detection.confidence,
-                "payload_snippet": detection.payload_snippet,
-            }))
-            .execute(pool)
-            .await;
-
-            return Err(AppError::BadRequest("Payload rejected by security policy".to_string()));
-        }
-    }
-
     // Create delivery
     let event_type = provider
         .extract_event_type(body)
