@@ -49,15 +49,15 @@ const HTTP_CONNECT_TIMEOUT_SECS: u64 = 2;
 /// Maximum idle connections per host in HTTP pool (increased to 100 for HTTP/2 multiplexing)
 const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 100;
 /// Maximum concurrent HTTP deliveries (global) — base value
-const DELIVERY_CONCURRENCY_LIMIT: usize = 50;
+const DELIVERY_CONCURRENCY_LIMIT: usize = 200;
 /// Dynamic concurrency: minimum limit
-const DYNAMIC_CONCURRENCY_MIN: usize = 10;
+const DYNAMIC_CONCURRENCY_MIN: usize = 50;
 /// Dynamic concurrency: maximum limit
-const DYNAMIC_CONCURRENCY_MAX: usize = 200;
+const DYNAMIC_CONCURRENCY_MAX: usize = 500;
 /// Dynamic concurrency: adjustment interval
 const DYNAMIC_CONCURRENCY_INTERVAL_SECS: u64 = 30;
 /// Maximum concurrent deliveries per endpoint — prevents one slow endpoint from blocking all others
-const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 10;
+const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 25;
 /// Circuit breaker: failures before opening
 const CIRCUIT_BREAKER_FAILURE_THRESHOLD: u32 = 5;
 /// Circuit breaker: cooldown period in seconds
@@ -80,6 +80,7 @@ use sqlx::postgres::{PgListener, PgPoolOptions};
 use sqlx::PgPool;
 
 mod circuit_breaker;
+mod idempotency_cache;
 mod config;
 mod batch;
 pub mod cortex_integration;
@@ -178,7 +179,6 @@ async fn main() -> Result<()> {
         // HTTP/2 multiplexing — same endpoint, single connection, parallel streams
         // (http2_prior_knowledge not set → uses ALPN negotiation for H1/H2)
         .http2_adaptive_window(true)
-        .http2_adaptive_window(true)
         .http2_keep_alive_interval(std::time::Duration::from_secs(30))
         .http2_keep_alive_timeout(std::time::Duration::from_secs(10))
         .build()?;
@@ -191,7 +191,7 @@ async fn main() -> Result<()> {
     let success_count = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
     let failure_count = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
 
-    // Dynamic concurrency adjuster — runs every 30s
+    // Success rate monitoring — runs every 30s
     {
         let sem = delivery_semaphore.clone();
         let successes = success_count.clone();
@@ -206,26 +206,18 @@ async fn main() -> Result<()> {
                 if total == 0 { continue; }
 
                 let success_rate = s as f64 / total as f64;
-                let current = sem.available_permits();
 
-                // Adjust: high success → increase, low success → decrease
-                let new_limit = if success_rate > 0.95 {
-                    (current + 10).min(DYNAMIC_CONCURRENCY_MAX)
-                } else if success_rate > 0.8 {
-                    (current + 5).min(DYNAMIC_CONCURRENCY_MAX)
-                } else if success_rate < 0.5 {
-                    (current.saturating_sub(10)).max(DYNAMIC_CONCURRENCY_MIN)
-                } else if success_rate < 0.3 {
-                    (current.saturating_sub(20)).max(DYNAMIC_CONCURRENCY_MIN)
-                } else {
-                    current
-                };
+                tracing::info!(
+                    "📊 Delivery metrics: {} total, {:.1}% success rate, {} permits available",
+                    total, success_rate * 100, sem.available_permits()
+                );
 
-                if new_limit != current {
-                    tracing::info!("🔄 Dynamic concurrency: {} → {} (success rate: {:.1}%)", current, new_limit, success_rate * 100.0);
-                    // Note: Tokio Semaphore doesn't support dynamic resize,
-                    // so we log the adjustment for monitoring. The actual limit
-                    // is enforced by the adaptive logic in process_pending.
+                if success_rate < 0.3 && total > 10 {
+                    tracing::error!(
+                        "🚨 CRITICAL: Success rate {:.1}% ({}/{}), {} permits in use",
+                        success_rate * 100, s, total,
+                        DELIVERY_CONCURRENCY_LIMIT - sem.available_permits()
+                    );
                 }
             }
         });
@@ -289,6 +281,7 @@ async fn main() -> Result<()> {
         Some(tokio::spawn(async move {
             // Signing secret in-memory cache (5 min TTL) — avoids DB query per message
             let mut signing_cache = secret_cache::SecretCache::new(std::time::Duration::from_secs(300));
+            let idempotency_cache = idempotency_cache::IdempotencyCache::new(std::time::Duration::from_secs(300));
 
             // Connect to Redis
             let redis_client = match redis::Client::open(redis_url) {
@@ -417,20 +410,12 @@ async fn main() -> Result<()> {
                     };
 
                     // ── Idempotency guard: skip already-delivered webhooks ──
-                    if let Ok(Some((status,))) = sqlx::query_as::<_, (String,)>(
-                        "SELECT status::text FROM deliveries WHERE id = $1"
-                    )
-                    .bind(delivery_uuid)
-                    .fetch_optional(&pool)
-                    .await
-                    {
-                        if status == "delivered" {
-                            tracing::debug!("⏭️ {} already delivered, ACKing and skipping", delivery_id);
-                            let _: Result<(), _> = redis::cmd("XACK")
-                                .arg(stream_key).arg(group_name).arg(stream_entry_id)
-                                .query_async(&mut redis_conn).await;
-                            continue;
-                        }
+                    if idempotency_cache.is_delivered(&delivery_id).await {
+                        tracing::debug!("⏭️ {} already delivered (cached), ACKing", delivery_id);
+                        let _: Result<(), _> = redis::cmd("XACK")
+                            .arg(stream_key).arg(group_name).arg(stream_entry_id)
+                            .query_async(&mut redis_conn).await;
+                        continue;
                     }
 
                     // Circuit breaker check — skip delivery if endpoint is open
@@ -504,6 +489,7 @@ async fn main() -> Result<()> {
                         match &result {
                             Ok(results) if results.iter().any(|r| r.success) => {
                                 circuit_breaker.record_success(endpoint_uuid).await;
+                                idempotency_cache.mark_delivered(delivery_id.clone()).await;
                                 throttle_manager.record_success(endpoint_uuid).await;
                             }
                             Ok(_) | Err(_) => {
