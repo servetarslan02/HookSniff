@@ -13,7 +13,7 @@ pub static SLOW_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
 pub static TOTAL_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
 
 /// Global Redis queue — initialized at startup, shared across all handlers
-pub static REDIS_QUEUE: std::sync::Mutex<Option<crate::queue::RedisQueue>> = std::sync::Mutex::new(None);
+pub static REDIS_QUEUE: tokio::sync::Mutex<Option<crate::queue::RedisQueue>> = tokio::sync::Mutex::new(None);
 
 /// Execute a database query with timing. Logs a warning if the query
 /// exceeds `SLOW_QUERY_THRESHOLD_MS`. Always records the duration

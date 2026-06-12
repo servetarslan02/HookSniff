@@ -176,10 +176,10 @@ gcloud run deploy "$API_SERVICE" \
     --platform=managed \
     --allow-unauthenticated \
     --port=3000 \
-    --memory=512Mi \
+    --memory=1Gi \
     --cpu=1 \
-    --min-instances=0 \
-    --max-instances=3 \
+    --min-instances=1 \
+    --max-instances=5 \
     --timeout=300 \
     --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=${OTEL_ENABLED:-false}" \
     --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest" \
@@ -196,10 +196,10 @@ gcloud run deploy "$WORKER_SERVICE" \
     --region="$REGION" \
     --platform=managed \
     --no-allow-unauthenticated \
-    --memory=512Mi \
+    --memory=1Gi \
     --cpu=1 \
-    --min-instances=0 \
-    --max-instances=4 \
+    --min-instances=2 \
+    --max-instances=10 \
     --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json" \
     --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest" \
     --project="$PROJECT_ID" \

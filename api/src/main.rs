@@ -128,7 +128,7 @@ async fn main() -> Result<()> {
 
     // Initialize global REDIS_QUEUE for handler access
     if let Some(q) = redis_queue.take() {
-        let mut global = crate::db::REDIS_QUEUE.lock().expect("REDIS_QUEUE lock");
+        let mut global = crate::db::REDIS_QUEUE.lock().await;
         *global = Some(q);
         tracing::info!("✅ Global REDIS_QUEUE initialized");
     }
