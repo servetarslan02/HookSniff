@@ -120,6 +120,35 @@ pub async fn create_webhook(
     // Validate JSON payload depth
     validation::validate_json_depth(&req.data).map_err(AppError::BadRequest)?;
 
+    // WAF: Scan payload for injection attacks (SQL, XSS, path traversal)
+    let payload_str = serde_json::to_string(&req.data).unwrap_or_default();
+    if let Some(detection) = crate::security::waf::analyze_request(&payload_str) {
+        if detection.is_attack && detection.confidence >= 0.7 {
+            tracing::warn!(
+                "🛡️ WAF blocked webhook: {} (confidence {:.0}%, endpoint {})",
+                detection.attack_type, detection.confidence * 100.0, req.endpoint_id
+            );
+            // Log security event
+            let _ = sqlx::query(
+                "INSERT INTO security_events (event_type, severity, ip_address, customer_id, details) \
+                 VALUES ('webhook_injection_attempt', $1, $2, $3, $4)"
+            )
+            .bind(if detection.confidence >= 0.9 { "critical" } else { "high" })
+            .bind(headers.get("x-forwarded-for").and_then(|v| v.to_str().ok()).unwrap_or("unknown"))
+            .bind(customer.id)
+            .bind(serde_json::json!({
+                "attack_type": detection.attack_type,
+                "confidence": detection.confidence,
+                "endpoint_id": req.endpoint_id,
+                "payload_snippet": detection.payload_snippet,
+            }))
+            .execute(&pool)
+            .await;
+
+            return Err(AppError::BadRequest("Payload rejected by security policy".to_string()));
+        }
+    }
+
     // Check payload size
     let payload_size = serde_json::to_string(&req.data)
         .map(|s| s.len())

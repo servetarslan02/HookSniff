@@ -234,6 +234,25 @@ pub async fn analyze_request(
         )
         .await
         .ok();
+
+        // Real-time alert for high-confidence threats
+        if score > 0.8 {
+            super::alerting::send_alert(pool, &super::alerting::SecurityAlert {
+                level: super::alerting::AlertLevel::Critical,
+                title: format!("Threat detected: {:?}", threat_type),
+                body: format!("IP {} — {} (score {:.0}%)", ip, reasons.join("; "), score * 100.0),
+                ip: Some(ip.to_string()),
+                customer_id,
+                event_type: "threat_detected".to_string(),
+                details: serde_json::json!({
+                    "threat_type": format!("{:?}", threat_type),
+                    "score": score,
+                    "reasons": reasons,
+                    "path": path,
+                    "method": method,
+                }),
+            }).await;
+        }
     }
 
     ThreatResult {
