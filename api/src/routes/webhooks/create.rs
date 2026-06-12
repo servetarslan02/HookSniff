@@ -257,7 +257,7 @@ pub async fn create_webhook(
     // std::sync::MutexGuard is !Send, which would make this async fn's Future !Send
     // and break axum's Handler trait.
     {
-        let mut rq_clone = crate::db::REDIS_QUEUE.lock().await.clone();
+        let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
         db::publish_to_queue_fast(
             &pool,
             &mut rq_clone,
@@ -421,7 +421,7 @@ pub async fn batch_webhooks(
                 // ── Publish to queue: Redis-first, PG fallback ──
                 // Clone queue from mutex — MutexGuard is !Send and must not cross .await
                 let queue_result = {
-                    let mut rq_clone = crate::db::REDIS_QUEUE.lock().await.clone();
+                    let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
                     db::publish_to_queue_fast(
                         &pool,
                         &mut rq_clone,

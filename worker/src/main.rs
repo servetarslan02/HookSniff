@@ -209,13 +209,13 @@ async fn main() -> Result<()> {
 
                 tracing::info!(
                     "📊 Delivery metrics: {} total, {:.1}% success rate, {} permits available",
-                    total, success_rate * 100, sem.available_permits()
+                    total, success_rate * 100.0, sem.available_permits()
                 );
 
                 if success_rate < 0.3 && total > 10 {
                     tracing::error!(
                         "🚨 CRITICAL: Success rate {:.1}% ({}/{}), {} permits in use",
-                        success_rate * 100, s, total,
+                        success_rate * 100.0, s, total,
                         DELIVERY_CONCURRENCY_LIMIT - sem.available_permits()
                     );
                 }
