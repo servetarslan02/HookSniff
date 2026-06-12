@@ -18,6 +18,7 @@ use hooksniff_api::notifications;
 use hooksniff_api::rate_limit;
 use hooksniff_api::routes;
 use hooksniff_api::telemetry;
+use hooksniff_api::webhook_count_buffer;
 use hooksniff_api::throttle;
 
 #[tokio::main]
