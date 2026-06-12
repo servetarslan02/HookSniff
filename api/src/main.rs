@@ -151,6 +151,12 @@ async fn main() -> Result<()> {
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
     let throttle_manager = throttle::ThrottleManager::new();
 
+    // ── Buffered webhook counter (flushes every 5s) ──
+    let webhook_count_buffer = webhook_count_buffer::WebhookCountBuffer::new(
+        pool.clone(),
+        std::time::Duration::from_secs(5),
+    );
+
     let feature_flag_service = feature_flags::FeatureFlagService::new(pool.clone()).await;
     let ffs_clone = feature_flag_service.clone();
     tokio::spawn(async move {
@@ -324,6 +330,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(event_publisher))
         .layer(axum::Extension(feature_flag_service))
         .layer(axum::Extension(cache_layer))
+        .layer(axum::Extension(webhook_count_buffer))
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(cfg.clone()))

@@ -642,7 +642,7 @@ pub async fn request_metrics_middleware(
 /// Request timeout middleware — aborts requests that take too long.
 pub async fn request_timeout_middleware(request: Request, next: Next) -> Response {
     let timeout_secs = std::env::var("REQUEST_TIMEOUT_SECS")
-        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(25);
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(5);
 
     match tokio::time::timeout(std::time::Duration::from_secs(timeout_secs), next.run(request)).await {
         Ok(response) => response,

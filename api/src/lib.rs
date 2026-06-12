@@ -48,6 +48,7 @@ pub mod telemetry;
 pub mod templates;
 pub mod throttle;
 pub mod transform;
+pub mod webhook_count_buffer;
 pub mod validation;
 pub mod ws;
 
