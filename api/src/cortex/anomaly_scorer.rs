@@ -163,6 +163,7 @@ pub async fn score_endpoint_from_stats(
     total: i32,
     successful: i32,
     failed: i32,
+    p95_latency: f64,
     sr_1h: f64,
     avg_per_hour: f64,
     config: &CortexConfig,
@@ -172,11 +173,17 @@ pub async fn score_endpoint_from_stats(
     let current_sr = (successful as f64 / total as f64) * 100.0;
     let delivery_rate = total as f64;
 
-    // Formula-based scoring (ML would need per-endpoint model fetch — skip in batch mode)
     let mut weighted_score = 0.0f64;
     let mut factors_map = serde_json::Map::new();
 
-    let latency_score = 0.0; // Not available in batch context without extra query
+    // Latency scoring: compare p95 to configured default
+    let default_p95 = config.anomaly_default_p95_ms as f64;
+    let latency_ratio = if default_p95 > 0.0 {
+        p95_latency / default_p95
+    } else {
+        1.0
+    };
+    let latency_score = ((latency_ratio - 1.0) * 100.0_f64).max(0.0).min(100.0);
     factors_map.insert("latency_spike".into(), serde_json::json!(latency_score));
     weighted_score += latency_score * config.anomaly_weights.latency_spike;
 
@@ -221,6 +228,62 @@ pub async fn score_endpoint_from_stats(
             "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
         ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
         .execute(pool).await?;
+    }
+
+    Ok(Some(AnomalyResult { score, factors: factors_json, category }))
+}
+
+/// Event-driven anomaly check: lightweight check triggered by delivery failures.
+/// Called from worker when consecutive failures detected. Uses profile data (no extra stats query).
+pub async fn check_after_failure(
+    pool: &sqlx::PgPool,
+    endpoint_id: uuid::Uuid,
+    consecutive_failures: i32,
+    config: &CortexConfig,
+) -> Result<Option<AnomalyResult>, sqlx::Error> {
+    let profile: Option<(f64, f64, f64)> = sqlx::query_as(
+        "SELECT success_rate_1h, avg_deliveries_per_hour, latency_p95 \
+         FROM endpoint_profiles WHERE endpoint_id = $1"
+    ).bind(endpoint_id).fetch_optional(pool).await?;
+
+    let (sr_1h, _avg_per_hour, _p95) = profile.unwrap_or((100.0, 0.0, 0.0));
+
+    let mut weighted_score = 0.0f64;
+    let mut factors_map = serde_json::Map::new();
+
+    let consec_score = (consecutive_failures as f64 * 20.0).min(100.0);
+    factors_map.insert("consecutive_failures".into(), serde_json::json!(consec_score));
+    weighted_score += consec_score * config.anomaly_weights.consecutive_failures;
+
+    let sr_score = (100.0 - sr_1h).max(0.0);
+    factors_map.insert("success_drop".into(), serde_json::json!(sr_score));
+    weighted_score += sr_score * config.anomaly_weights.success_drop;
+
+    let score = weighted_score.round() as i32;
+    if score < 40 { return Ok(None); }
+
+    factors_map.insert("method".into(), serde_json::json!("event_driven"));
+    let factors_json = serde_json::Value::Object(factors_map);
+
+    let category = if score >= 80 { "critical" }
+        else if score >= config.anomaly_high_threshold { "high" }
+        else { "medium" }.to_string();
+
+    let customer_id: Option<(uuid::Uuid,)> = sqlx::query_as(
+        "SELECT customer_id FROM endpoints WHERE id = $1"
+    ).bind(endpoint_id).fetch_optional(pool).await?;
+    let cid = customer_id.map(|(c,)| c).unwrap_or(uuid::Uuid::nil());
+
+    sqlx::query(
+        "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+    ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
+    .execute(pool).await?;
+
+    if score >= config.anomaly_high_threshold as i32 {
+        tracing::warn!(
+            "🚨 Event-driven anomaly: endpoint {} score {} ({}) after {} consecutive failures",
+            endpoint_id, score, category, consecutive_failures
+        );
     }
 
     Ok(Some(AnomalyResult { score, factors: factors_json, category }))

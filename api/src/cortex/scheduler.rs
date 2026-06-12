@@ -324,10 +324,10 @@ async fn execute_stage(
             .fetch_all(pool).await?;
 
             let mut scored = 0u64;
-            for (eid, total, successful, failed, _p95, _p99, sr_1h, avg_per_hour, _errors) in &rows {
+            for (eid, total, successful, failed, p95, _p99, sr_1h, avg_per_hour, _errors) in &rows {
                 if *total == 0 { continue; }
                 let result = super::anomaly_scorer::score_endpoint_from_stats(
-                    pool, *eid, *total, *successful, *failed, *sr_1h, *avg_per_hour, config,
+                    pool, *eid, *total, *successful, *failed, *p95, *sr_1h, *avg_per_hour, config,
                 ).await;
                 if let Ok(Some(r)) = result {
                     if r.score > config.anomaly_high_threshold {
@@ -413,17 +413,8 @@ async fn execute_stage(
             Ok(reset_count)
         }
         CortexStage::SmartRouting => {
-            let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
-                "SELECT id FROM endpoints WHERE is_active = true AND routing_config IS NOT NULL"
-            ).fetch_all(pool).await?;
-            let mut decisions = 0u64;
-            for (eid,) in &endpoints {
-                if let Ok(Some(_)) = super::smart_routing::decide_routing(pool, *eid).await {
-                    decisions += 1;
-                }
-            }
-            super::CORTEX_METRICS.routing_decisions.fetch_add(decisions, std::sync::atomic::Ordering::Relaxed);
-            Ok(decisions)
+            let n = super::smart_routing::run_smart_routing_batch(pool).await?;
+            Ok(n)
         }
         CortexStage::DriftDetection => {
             // BATCH: Fetch ALL endpoint stats in ONE query instead of N queries
@@ -576,43 +567,85 @@ async fn execute_stage(
         CortexStage::CleanupJob => {
             let mut cleaned = 0u64;
 
-            // 1. Prune old model versions (keep last 10 per model)
+            // 1. HOT/COLD SEPARATION: Aggregate hourly stats > 7 days into daily summaries
+            let _ = sqlx::query(
+                r#"
+                INSERT INTO endpoint_daily_stats
+                    (endpoint_id, day_start, total_deliveries, successful, failed,
+                     avg_latency_ms, p50_latency_ms, p95_latency_ms, p99_latency_ms)
+                SELECT
+                    endpoint_id,
+                    date_trunc('day', hour_start) as day_start,
+                    SUM(total_deliveries),
+                    SUM(successful),
+                    SUM(failed),
+                    COALESCE(AVG(avg_latency_ms), 0)::INT,
+                    COALESCE(AVG(p50_latency_ms), 0)::INT,
+                    COALESCE(MAX(p95_latency_ms), 0)::INT,
+                    COALESCE(MAX(p99_latency_ms), 0)::INT
+                FROM endpoint_hourly_stats
+                WHERE hour_start < NOW() - INTERVAL '7 days'
+                  AND hour_start >= NOW() - INTERVAL '30 days'
+                GROUP BY endpoint_id, date_trunc('day', hour_start)
+                ON CONFLICT (endpoint_id, day_start) DO UPDATE SET
+                    total_deliveries = EXCLUDED.total_deliveries,
+                    successful = EXCLUDED.successful,
+                    failed = EXCLUDED.failed,
+                    avg_latency_ms = EXCLUDED.avg_latency_ms,
+                    p50_latency_ms = EXCLUDED.p50_latency_ms,
+                    p95_latency_ms = EXCLUDED.p95_latency_ms,
+                    p99_latency_ms = EXCLUDED.p99_latency_ms
+                "#
+            ).execute(pool).await.ok();
+
+            // Delete aggregated hourly records (older than 7 days, now in daily stats)
+            if let Ok(r) = sqlx::query(
+                "DELETE FROM endpoint_hourly_stats WHERE hour_start < NOW() - INTERVAL '7 days'"
+            ).execute(pool).await {
+                let deleted = r.rows_affected();
+                if deleted > 0 {
+                    tracing::info!("🧹 Hot/cold: archived {} hourly records to daily stats", deleted);
+                    cleaned += deleted;
+                }
+            }
+
+            // 2. Prune old model versions (keep last 10 per model)
             if let Ok(n) = super::ml::versioning::prune_old_versions(pool, 10).await {
                 cleaned += n;
                 if n > 0 { tracing::info!("🧹 Cleanup: pruned {} old model versions", n); }
             }
 
-            // 2. Clean old cortex traces (90 days)
+            // 3. Clean old cortex traces (90 days)
             if let Ok(r) = sqlx::query("DELETE FROM cortex_traces WHERE completed_at < NOW() - INTERVAL '90 days'")
                 .execute(pool).await {
                 cleaned += r.rows_affected();
             }
 
-            // 3. Clean old drift events (180 days)
+            // 4. Clean old drift events (180 days)
             if let Ok(r) = sqlx::query("DELETE FROM ml_drift_events WHERE created_at < NOW() - INTERVAL '180 days'")
                 .execute(pool).await {
                 cleaned += r.rows_affected();
             }
 
-            // 4. Clean old chaos tests (90 days)
+            // 5. Clean old chaos tests (90 days)
             if let Ok(r) = sqlx::query("DELETE FROM chaos_tests WHERE started_at < NOW() - INTERVAL '90 days'")
                 .execute(pool).await {
                 cleaned += r.rows_affected();
             }
 
-            // 5. Clean old AutoML trials (90 days)
+            // 6. Clean old AutoML trials (90 days)
             if let Ok(r) = sqlx::query("DELETE FROM automl_trials WHERE created_at < NOW() - INTERVAL '90 days'")
                 .execute(pool).await {
                 cleaned += r.rows_affected();
             }
 
-            // 6. Clean old A/B test decisions (90 days)
+            // 7. Clean old A/B test decisions (90 days)
             if let Ok(r) = sqlx::query("DELETE FROM ab_test_decisions WHERE created_at < NOW() - INTERVAL '90 days'")
                 .execute(pool).await {
                 cleaned += r.rows_affected();
             }
 
-            // 7. Expire feature store cache
+            // 8. Expire feature store cache
             super::ml::feature_store::FEATURE_STORE.evict_expired();
 
             if cleaned > 0 {

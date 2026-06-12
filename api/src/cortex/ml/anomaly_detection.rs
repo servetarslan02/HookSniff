@@ -224,7 +224,7 @@ pub struct AnomalyResult {
 }
 
 /// Calculate median of a slice
-fn median(data: &[f64]) -> f64 {
+pub fn median(data: &[f64]) -> f64 {
     if data.is_empty() { return 0.0; }
     let mut sorted = data.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -233,7 +233,7 @@ fn median(data: &[f64]) -> f64 {
 }
 
 /// Calculate Median Absolute Deviation (MAD)
-fn mad(data: &[f64], med: f64) -> f64 {
+pub fn mad(data: &[f64], med: f64) -> f64 {
     if data.is_empty() { return 0.0; }
     let mut abs_devs: Vec<f64> = data.iter().map(|x| (x - med).abs()).collect();
     abs_devs.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -242,7 +242,7 @@ fn mad(data: &[f64], med: f64) -> f64 {
 }
 
 /// Calculate Pearson correlation coefficient
-fn pearson_correlation(x: &[f64], y: &[f64]) -> f64 {
+pub fn pearson_correlation(x: &[f64], y: &[f64]) -> f64 {
     let n = x.len().min(y.len()) as f64;
     if n < 3.0 { return 0.0; }
 
