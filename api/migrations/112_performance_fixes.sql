@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS delivery_idempotency_cache (
 
 -- Auto-expire after 5 minutes
 CREATE INDEX IF NOT EXISTS idx_idempotency_cache_expiry
-    ON delivery_idempotency_cache(cached_at)
-    WHERE cached_at < now() - INTERVAL '5 minutes';
+    ON delivery_idempotency_cache(cached_at);
 
 -- 2. Auth lookup optimization — composite index for prefix-based lookups
 CREATE INDEX IF NOT EXISTS idx_customers_api_key_prefix_active
