@@ -28,14 +28,13 @@ pub struct WebhookCountBuffer {
 
 impl WebhookCountBuffer {
     pub fn new(pool: PgPool, flush_interval: Duration) -> Self {
+        let pending = Arc::new(DashMap::new());
+        let flush_pool = pool.clone();
+
         let buffer = Self {
-            pending: Arc::new(DashMap::new()),
+            pending,
             pool,
         };
-
-        // Spawn background flush task
-        let pending = buffer.pending.clone();
-        let flush_pool = pool.clone();
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(flush_interval);
             loop {
