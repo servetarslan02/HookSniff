@@ -670,6 +670,53 @@ enum StageOutcome {
     Timeout,
 }
 
+/// Circuit breaker state for DB protection
+struct CircuitBreaker {
+    consecutive_failures: u32,
+    last_failure: Option<Instant>,
+    open_until: Option<Instant>,
+}
+
+impl CircuitBreaker {
+    fn new() -> Self {
+        Self {
+            consecutive_failures: 0,
+            last_failure: None,
+            open_until: None,
+        }
+    }
+
+    /// Is the circuit open (DB unavailable)?
+    fn is_open(&self) -> bool {
+        if let Some(until) = self.open_until {
+            if Instant::now() < until {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Record a successful DB operation
+    fn record_success(&mut self) {
+        self.consecutive_failures = 0;
+        self.open_until = None;
+    }
+
+    /// Record a failed DB operation. Opens circuit after 3 consecutive failures.
+    fn record_failure(&mut self) {
+        self.consecutive_failures += 1;
+        self.last_failure = Some(Instant::now());
+        if self.consecutive_failures >= 3 {
+            // Open circuit for 30 seconds
+            self.open_until = Some(Instant::now() + Duration::from_secs(30));
+            tracing::warn!(
+                "🔴 Cortex circuit breaker OPEN — {} consecutive DB failures, pausing 30s",
+                self.consecutive_failures
+            );
+        }
+    }
+}
+
 /// Start the central Cortex scheduler.
 /// Call this ONCE from main.rs — replaces all individual tokio::spawn stage tasks.
 pub fn start_cortex_scheduler(pool: PgPool) {
@@ -677,22 +724,59 @@ pub fn start_cortex_scheduler(pool: PgPool) {
         tracing::info!("🧠 Cortex Scheduler started — tick every 30s, {} stages", ALL_STAGES.len());
 
         let mut last_runs: Vec<Option<Instant>> = vec![None; ALL_STAGES.len()];
+        let mut last_durations: Vec<u64> = vec![0; ALL_STAGES.len()];
         let mut ticker = tokio::time::interval(Duration::from_secs(30));
         let mut tick_count: u64 = 0;
+        let mut circuit_breaker = CircuitBreaker::new();
 
         loop {
             ticker.tick().await;
             tick_count += 1;
 
+            // Circuit breaker: skip all stages if DB is failing
+            if circuit_breaker.is_open() {
+                if tick_count % 10 == 0 {
+                    tracing::warn!("🧠 Cortex tick #{} — circuit breaker open, skipping all stages", tick_count);
+                }
+                continue;
+            }
+
             let config = super::CortexConfig::load(&pool).await;
+            circuit_breaker.record_success();
 
             for (i, &stage) in ALL_STAGES.iter().enumerate() {
                 if !should_run_stage(stage, last_runs[i]) {
                     continue;
                 }
 
+                // Backpressure: if previous stage took >2x its timeout, skip non-critical stages
+                if i > 0 && last_durations[i - 1] > ALL_STAGES[i - 1].timeout().as_millis() as u64 * 2 {
+                    if stage.timeout().as_secs() <= 120 {
+                        tracing::debug!(
+                            "⏭️ Cortex [{}] — backpressure skip (prev stage took {}ms)",
+                            stage.name(), last_durations[i - 1]
+                        );
+                        last_runs[i] = Some(Instant::now());
+                        continue;
+                    }
+                }
+
                 let result = run_stage_with_timeout(&pool, stage, &config).await;
                 last_runs[i] = Some(Instant::now());
+                last_durations[i] = result.duration_ms;
+
+                // Track DB failures for circuit breaker
+                match &result.outcome {
+                    StageOutcome::Error(e) if e.contains("connection") || e.contains("timeout") || e.contains("pool") => {
+                        circuit_breaker.record_failure();
+                    }
+                    StageOutcome::Timeout => {
+                        circuit_breaker.record_failure();
+                    }
+                    _ => {
+                        circuit_breaker.record_success();
+                    }
+                }
 
                 // Periodic summary log (every 10 ticks ≈ 5 min)
                 if tick_count % 10 == 0 {

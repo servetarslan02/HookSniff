@@ -146,10 +146,24 @@ pub async fn score_endpoint(
 
     // Only store medium+ anomalies (score >= 40) — low scores are noise
     if score >= 40 {
-        sqlx::query(
-            "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+        // Dedup: update existing score for same endpoint+category in last 5 min
+        let updated = sqlx::query(
+            "UPDATE anomaly_scores SET score = $3, factors = $4 \
+             WHERE endpoint_id = $1 AND category = $5 \
+             AND created_at > NOW() - INTERVAL '5 minutes' \
+             AND id = (SELECT id FROM anomaly_scores \
+                       WHERE endpoint_id = $1 AND category = $5 \
+                       AND created_at > NOW() - INTERVAL '5 minutes' \
+                       ORDER BY created_at DESC LIMIT 1)"
         ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
         .execute(pool).await?;
+
+        if updated.rows_affected() == 0 {
+            sqlx::query(
+                "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+            ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
+            .execute(pool).await?;
+        }
     }
 
     Ok(Some(AnomalyResult { score, factors: factors_json, category }))
@@ -224,10 +238,24 @@ pub async fn score_endpoint_from_stats(
         ).bind(endpoint_id).fetch_optional(pool).await?;
         let cid = customer_id.map(|(c,)| c).unwrap_or(uuid::Uuid::nil());
 
-        sqlx::query(
-            "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+        // Dedup: update existing score for same endpoint+category in last 5 min
+        let updated = sqlx::query(
+            "UPDATE anomaly_scores SET score = $3, factors = $4 \
+             WHERE endpoint_id = $1 AND category = $5 \
+             AND created_at > NOW() - INTERVAL '5 minutes' \
+             AND id = (SELECT id FROM anomaly_scores \
+                       WHERE endpoint_id = $1 AND category = $5 \
+                       AND created_at > NOW() - INTERVAL '5 minutes' \
+                       ORDER BY created_at DESC LIMIT 1)"
         ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
         .execute(pool).await?;
+
+        if updated.rows_affected() == 0 {
+            sqlx::query(
+                "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+            ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
+            .execute(pool).await?;
+        }
     }
 
     Ok(Some(AnomalyResult { score, factors: factors_json, category }))
@@ -274,10 +302,24 @@ pub async fn check_after_failure(
     ).bind(endpoint_id).fetch_optional(pool).await?;
     let cid = customer_id.map(|(c,)| c).unwrap_or(uuid::Uuid::nil());
 
-    sqlx::query(
-        "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+    // Dedup: update existing score for same endpoint+category in last 5 min
+    let updated = sqlx::query(
+        "UPDATE anomaly_scores SET score = GREATEST(score, $3), factors = $4 \
+         WHERE endpoint_id = $1 AND category = $5 \
+         AND created_at > NOW() - INTERVAL '5 minutes' \
+         AND id = (SELECT id FROM anomaly_scores \
+                   WHERE endpoint_id = $1 AND category = $5 \
+                   AND created_at > NOW() - INTERVAL '5 minutes' \
+                   ORDER BY created_at DESC LIMIT 1)"
     ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
     .execute(pool).await?;
+
+    if updated.rows_affected() == 0 {
+        sqlx::query(
+            "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+        ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
+        .execute(pool).await?;
+    }
 
     if score >= config.anomaly_high_threshold as i32 {
         tracing::warn!(
