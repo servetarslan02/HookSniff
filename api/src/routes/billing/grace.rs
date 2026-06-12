@@ -52,7 +52,6 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
 
 /// Disable endpoints that exceed the new plan's limit.
 /// Keeps the oldest (by created_at) endpoints active, disables the rest.
-
 pub async fn cleanup_excess_endpoints(
     pool: &sqlx::PgPool,
     customer_id: uuid::Uuid,

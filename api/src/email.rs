@@ -385,7 +385,7 @@ impl GCloudEmailClient {
 
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .expect("system time after UNIX epoch")
+            .unwrap_or_else(|e| panic!("system time before UNIX epoch: {e}"))
             .as_secs();
 
         let claims = JwtClaims {

@@ -271,7 +271,10 @@ pub async fn create_webhook(
 
     tokio::spawn(async move {
         // Publish to queue (Redis-first, PG fallback)
-        let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+        let mut rq_clone = match crate::db::REDIS_QUEUE.lock() {
+            Ok(guard) => guard.clone(),
+            Err(poisoned) => poisoned.into_inner().clone(),
+        };
         if let Err(e) = db::publish_to_queue_fast(
             &pool_bg,
             &mut rq_clone,
@@ -408,7 +411,6 @@ pub async fn batch_webhooks(
         payload_json: serde_json::Value,
         payload_str: String,
         retry_policy: RetryPolicy,
-        original_index: usize,
     }
     let mut valid_webhooks: Vec<ValidWebhook> = Vec::new();
     let mut deliveries = Vec::new();
@@ -460,7 +462,6 @@ pub async fn batch_webhooks(
             payload_json: payload,
             payload_str,
             retry_policy,
-            original_index: i,
         });
     }
 
@@ -497,7 +498,10 @@ pub async fn batch_webhooks(
             let vw = &valid_webhooks[row_idx];
 
             let queue_result = {
-                let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+                let mut rq_clone = match crate::db::REDIS_QUEUE.lock() {
+                    Ok(guard) => guard.clone(),
+                    Err(poisoned) => poisoned.into_inner().clone(),
+                };
                 db::publish_to_queue_fast(
                     &pool,
                     &mut rq_clone,

@@ -81,13 +81,13 @@ pub async fn train(
         // Blend: 70% recent data + 30% golden (enough to anchor the model)
         let mut sr = success_rates.to_vec();
         let golden_count = (sr.len() as f64 * 0.3).ceil() as usize;
-        sr.extend(std::iter::repeat(golden_sr).take(golden_count));
+        sr.extend(std::iter::repeat_n(golden_sr, golden_count));
 
         let mut lat = latencies.to_vec();
-        lat.extend(std::iter::repeat(golden_lat).take(golden_count));
+        lat.extend(std::iter::repeat_n(golden_lat, golden_count));
 
         let mut del = delivery_rates.to_vec();
-        del.extend(std::iter::repeat(golden_del).take(golden_count));
+        del.extend(std::iter::repeat_n(golden_del, golden_count));
 
         tracing::info!(
             "🛡️ Golden dataset: endpoint {} degraded (median SR {:.1}%) — blended {}% baseline",

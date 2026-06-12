@@ -1174,7 +1174,7 @@ async fn process_pending(
             let _adjusted_timeout_ms: Option<u64> = None;
             if let Ok(Some(action)) = cortex_integration::get_active_healing_action(&pool, endpoint_id).await {
                 if let Some(factor) = action.get_timeout_adjustment() {
-                    let _ = (30_000u64 as f64 * factor) as u64; // reserved for future use
+                    let _ = (30_000_f64 * factor) as u64; // reserved for future use
                 }
             }
 

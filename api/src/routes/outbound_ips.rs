@@ -74,9 +74,10 @@ pub fn router() -> Router {
 /// Returns the list of static IP addresses that HookSniff uses to deliver webhooks.
 /// Enterprise customers use this endpoint to configure firewall/WAF allowlists.
 async fn get_outbound_ips() -> Json<OutboundIpsResponse> {
-    let mut cached = CACHED_RESPONSE
-        .write()
-        .expect("outbound_ips cache lock poisoned");
+    let mut cached = match CACHED_RESPONSE.write() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
     Json(cached.get())
 }
 
