@@ -22,7 +22,7 @@ use crate::validation;
 #[allow(dead_code)]
 type RedisQueueExt = Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>;
 
-use super::helpers::{reserve_webhook_slot, resolve_team_tracking};
+use super::helpers::resolve_team_tracking;
 
 pub async fn create_webhook(
     Extension(pool): Extension<PgPool>,
@@ -31,6 +31,7 @@ pub async fn create_webhook(
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    Extension(count_buffer): Extension<crate::webhook_count_buffer::WebhookCountBuffer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
@@ -71,8 +72,8 @@ pub async fn create_webhook(
         }
     }
 
-    // Content-based deduplication (when feature flag is enabled)
-    if feature_flags.is_enabled("deduplication").await {
+    // Content-based deduplication (skip if idempotency key is present — already handles dupes)
+    if idempotency_key.is_none() && feature_flags.is_enabled("deduplication").await {
         let content_hash = idempotency::compute_body_hash(&req.data);
         let dedup_window = chrono::Duration::seconds(60); // 60s dedup window
         let cutoff = Utc::now() - dedup_window;
@@ -201,101 +202,135 @@ pub async fn create_webhook(
     // Get retry policy from endpoint, or use defaults
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
-    // Atomic check-and-increment: reserve webhook slot before creating delivery
-    reserve_webhook_slot(&pool, &cache, &customer, 1, team_id).await?;
+    // ── Combined limit check + INSERT in a single CTE (1 round-trip instead of 2) ──
+    // This atomically checks the customer's webhook limit and inserts the delivery.
+    let tracking_info = resolve_team_tracking(&pool, &cache, &customer, team_id).await;
+    let tracking_id = tracking_info.tracking_id;
 
-    // Track daily event usage for overage notifications (best-effort)
-    let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
+    let delivery: Delivery = if tracking_info.allow_overage {
+        // Overage allowed: just INSERT (no limit check needed)
+        db::timed_query("webhook_create_delivery", async {
+            sqlx::query_as::<_, Delivery>(
+                "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) \
+                 VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *"
+            )
+            .bind(endpoint.id)
+            .bind(customer.id)
+            .bind(&payload)
+            .bind(&req.event)
+            .bind(retry_policy.max_attempts)
+            .bind(is_test.0)
+            .fetch_one(&pool)
+            .await
+        }).await?
+    } else {
+        // No overage: CTE checks limit AND inserts in one round-trip
+        db::timed_query("webhook_create_with_limit", async {
+            sqlx::query_as::<_, Delivery>(
+                "WITH limit_check AS ( \
+                    SELECT id, webhook_count, webhook_limit FROM customers \
+                    WHERE id = $1 AND webhook_count < webhook_limit \
+                ), \
+                insert_delivery AS ( \
+                    INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) \
+                    SELECT $2, $1, $3, $4, 'pending', $5, $6 \
+                    FROM limit_check \
+                    RETURNING * \
+                ) \
+                SELECT * FROM insert_delivery"
+            )
+            .bind(tracking_id)                // $1
+            .bind(endpoint.id)                // $2
+            .bind(&payload)                   // $3
+            .bind(&req.event)                 // $4
+            .bind(retry_policy.max_attempts)  // $5
+            .bind(is_test.0)                  // $6
+            .fetch_one(&pool)
+            .await
+        }).await.map_err(|e| {
+            let err_str = e.to_string();
+            if err_str.contains("no rows") || err_str.contains("RowNotFound") {
+                AppError::RateLimitExceeded
+            } else {
+                AppError::Internal(e)
+            }
+        })?
+    };
 
-    let delivery = db::timed_query("webhook_create_delivery", async {
-        sqlx::query_as::<_, Delivery>(
-            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
-        )
-        .bind(endpoint.id)
-        .bind(customer.id)
-        .bind(&payload)
-        .bind(&req.event)
-        .bind(retry_policy.max_attempts)
-        .bind(is_test.0)
-        .fetch_one(&pool)
-        .await
-    })
-    .await?;
+    // Buffer the increment (non-blocking, flushed every 5s)
+    count_buffer.increment(tracking_id, 1);
 
-    // Publish DeliveryCreated event (best-effort)
-    if let Some(ref publisher) = event_publisher {
-        publisher.publish(crate::events::AppEvent::DeliveryCreated {
-            delivery_id: delivery.id,
-            endpoint_id: endpoint.id,
-            customer_id: customer.id,
-            event_type: req.event.clone(),
-        }).await.ok();
+    // ── Fire-and-forget: queue publish + idempotency + event (don't block response) ──
+    let delivery_id = delivery.id;
+    let delivery_resp = delivery.to_response();
+    let endpoint_clone = endpoint.clone();
+    let customer_id = customer.id;
+    let event_type = req.event.clone();
+    let pool_bg = pool.clone();
+    let event_publisher_bg = event_publisher.clone();
+
+    tokio::spawn(async move {
+        // Publish to queue (Redis-first, PG fallback)
+        let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+        if let Err(e) = db::publish_to_queue_fast(
+            &pool_bg,
+            &mut rq_clone,
+            delivery_id,
+            endpoint_clone.id,
+            &endpoint_clone.url,
+            &payload_str,
+            endpoint_clone.custom_headers.as_ref(),
+            &endpoint_clone.signing_secret,
+            retry_policy.max_attempts,
+            endpoint_clone.fifo_enabled.unwrap_or(false),
+        ).await {
+            tracing::error!("Background queue publish failed for {}: {:?}", delivery_id, e);
+            let _ = sqlx::query("UPDATE deliveries SET status = 'failed', error_message = 'Queue publish failed' WHERE id = $1")
+                .bind(delivery_id).execute(&pool_bg).await;
+        }
+
+        // Publish event (best-effort)
+        if let Some(ref publisher) = event_publisher_bg {
+            publisher.publish(crate::events::AppEvent::DeliveryCreated {
+                delivery_id,
+                endpoint_id: endpoint_clone.id,
+                customer_id,
+                event_type,
+            }).await.ok();
+        }
+    });
+
+    // Store idempotency key in background (don't block response)
+    if let Some(key) = idempotency_key {
+        let pool_idem = pool.clone();
+        let resp_value = serde_json::to_value(&delivery_resp).unwrap_or(serde_json::Value::Null);
+        let key_owned = key.to_string();
+        tokio::spawn(async move {
+            if let Err(e) = idempotency::store_idempotency(
+                &pool_idem, &key_owned, customer_id, resp_value, 200, body_hash.as_deref(),
+            ).await {
+                tracing::warn!("Background idempotency store failed: {:?}", e);
+            }
+        });
     }
 
-    // Test mode: mark as delivered immediately, skip real delivery
+    // Test mode: mark as delivered immediately
     if is_test.0 {
         sqlx::query(
             "UPDATE deliveries SET status = 'delivered', attempt_count = 0, response_status = 200, response_body = '{\"test\": true}' WHERE id = $1",
         )
-        .bind(delivery.id)
+        .bind(delivery_id)
         .execute(&pool)
         .await?;
 
-        tracing::info!(
-            "🧪 Test delivery {} created with hr_test_ key — marked as delivered (no real HTTP)",
-            delivery.id
-        );
-
-        let mut resp = delivery.to_response();
+        tracing::info!("🧪 Test delivery {} marked as delivered", delivery_id);
+        let mut resp = delivery_resp;
         resp.status = "delivered".to_string();
         resp.response_status = Some(200);
         return Ok(Json(resp));
     }
 
-    // ── Publish to queue: Redis-first, PG fallback ──
-    // Clone the queue out of the mutex so the MutexGuard is NOT held across .await.
-    // std::sync::MutexGuard is !Send, which would make this async fn's Future !Send
-    // and break axum's Handler trait.
-    {
-        let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
-        db::publish_to_queue_fast(
-            &pool,
-            &mut rq_clone,
-            delivery.id,
-            endpoint.id,
-            &endpoint.url,
-            &payload_str,
-            endpoint.custom_headers.as_ref(),
-            &endpoint.signing_secret,
-            5, // default max_attempts
-            endpoint.fifo_enabled.unwrap_or(false), // FIFO endpoints → PG queue
-        )
-        .await
-        .map_err(|e| {
-            tracing::error!("Failed to publish to queue: {:?}", e);
-            AppError::Internal(e)
-        })?;
-    }
-
-    // Store idempotency key if provided
-    if let Some(key) = idempotency_key {
-        let response_body =
-            serde_json::to_value(delivery.to_response()).unwrap_or(serde_json::Value::Null);
-        if let Err(e) = idempotency::store_idempotency(
-            &pool,
-            key,
-            customer.id,
-            response_body,
-            200,
-            body_hash.as_deref(),
-        )
-        .await
-        {
-            tracing::warn!("Failed to store idempotency key: {:?}", e);
-        }
-    }
-
-    Ok(Json(delivery.to_response()))
+    Ok(Json(delivery_resp))
 }
 
 pub async fn batch_webhooks(
@@ -303,6 +338,7 @@ pub async fn batch_webhooks(
     Extension(customer): Extension<Customer>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(count_buffer): Extension<crate::webhook_count_buffer::WebhookCountBuffer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
@@ -319,11 +355,27 @@ pub async fn batch_webhooks(
         return Err(AppError::coded(ErrorCode::BatchTooLarge));
     }
 
-    // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
-    reserve_webhook_slot(&pool, &cache, &customer, batch_count, team_id).await?;
 
-    // Track daily event usage for overage notifications (best-effort, once per batch)
+    // Fast limit check with buffer
+    {
+        let info = resolve_team_tracking(&pool, &cache, &customer, team_id).await;
+        if !info.allow_overage {
+            let current: (i64,) = sqlx::query_as(
+                "SELECT webhook_count FROM customers WHERE id = $1"
+            )
+            .bind(info.tracking_id)
+            .fetch_one(&pool)
+            .await?;
+            let buffered = count_buffer.pending_count(&info.tracking_id);
+            if current.0 + buffered + batch_count > info.webhook_limit {
+                return Err(AppError::RateLimitExceeded);
+            }
+        }
+        count_buffer.increment(info.tracking_id, batch_count);
+    }
+
+    // Track daily event usage (best-effort, once per batch)
     let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
 
     // Collect unique endpoint IDs and fetch all in one query (eliminates N+1)
@@ -349,6 +401,16 @@ pub async fn batch_webhooks(
     let endpoint_map: std::collections::HashMap<Uuid, Endpoint> =
         endpoints.into_iter().map(|e| (e.id, e)).collect();
 
+    // ── Pre-validate and prepare all webhooks before bulk insert ──
+    struct ValidWebhook {
+        endpoint: Endpoint,
+        event: Option<String>,
+        payload_json: serde_json::Value,
+        payload_str: String,
+        retry_policy: RetryPolicy,
+        original_index: usize,
+    }
+    let mut valid_webhooks: Vec<ValidWebhook> = Vec::new();
     let mut deliveries = Vec::new();
     let mut errors = Vec::new();
     let mut created_count: i64 = 0;
@@ -357,29 +419,22 @@ pub async fn batch_webhooks(
         let payload_size = serde_json::to_string(&webhook_req.data)
             .map(|s| s.len())
             .unwrap_or(0);
-        if payload_size > 1_048_576 { // 1MB default payload limit
-            errors.push(BatchError {
-                index: i,
-                error: "Payload too large".to_string(),
-            });
+        if payload_size > 1_048_576 {
+            errors.push(BatchError { index: i, error: "Payload too large".to_string() });
             continue;
         }
 
         let endpoint = match endpoint_map.get(&webhook_req.endpoint_id) {
             Some(ep) => ep.clone(),
             None => {
-                errors.push(BatchError {
-                    index: i,
-                    error: "Endpoint not found or inactive".to_string(),
-                });
+                errors.push(BatchError { index: i, error: "Endpoint not found or inactive".to_string() });
                 continue;
             }
         };
 
-        // Check event filter
         if let Some(ref event) = webhook_req.event {
             if !endpoint.matches_event_filter(event) {
-                continue; // Silently skip filtered events in batch
+                continue;
             }
         }
 
@@ -392,100 +447,106 @@ pub async fn batch_webhooks(
         let payload_str = match serde_json::to_string(&payload) {
             Ok(s) => s,
             Err(e) => {
-                tracing::warn!("Batch webhook serialization error at index {}: {:?}", i, e);
-                errors.push(BatchError {
-                    index: i,
-                    error: "Invalid payload format".to_string(),
-                });
+                errors.push(BatchError { index: i, error: "Invalid payload format".to_string() });
                 continue;
             }
         };
 
         let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
-        match db::timed_query("webhook_batch_create_delivery", async {
-            sqlx::query_as::<_, Delivery>(
-                "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
-            )
-            .bind(endpoint.id)
-            .bind(customer.id)
-            .bind(&payload)
-            .bind(&webhook_req.event)
-            .bind(retry_policy.max_attempts)
-            .fetch_one(&pool)
-            .await
-        })
-        .await
-        {
-            Ok(delivery) => {
-                // ── Publish to queue: Redis-first, PG fallback ──
-                // Clone queue from mutex — MutexGuard is !Send and must not cross .await
-                let queue_result = {
-                    let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
-                    db::publish_to_queue_fast(
-                        &pool,
-                        &mut rq_clone,
-                        delivery.id,
-                        endpoint.id,
-                        &endpoint.url,
-                        &payload_str,
-                        endpoint.custom_headers.as_ref(),
-                        &endpoint.signing_secret,
-                        retry_policy.max_attempts,
-                        endpoint.fifo_enabled.unwrap_or(false), // FIFO endpoints → PG queue
-                    ).await
-                };
+        valid_webhooks.push(ValidWebhook {
+            endpoint,
+            event: webhook_req.event.clone(),
+            payload_json: payload,
+            payload_str,
+            retry_policy,
+            original_index: i,
+        });
+    }
 
-                if let Err(e) = queue_result {
-                    tracing::error!(
-                        "Failed to publish batch delivery {} to queue: {:?} — marking as failed",
-                        delivery.id,
-                        e
-                    );
-                    let _ = sqlx::query(
-                        "UPDATE deliveries SET status = 'failed', error_message = 'Queue publish failed' WHERE id = $1"
-                    )
-                    .bind(delivery.id)
-                    .execute(&pool)
-                    .await;
+    // ── Bulk INSERT all valid deliveries in one query (eliminates N round-trips) ──
+    if !valid_webhooks.is_empty() {
+        // Build multi-row INSERT
+        let mut query = String::from(
+            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES "
+        );
+        let mut params: Vec<String> = Vec::new();
+        for (i, _) in valid_webhooks.iter().enumerate() {
+            let base = i * 6;
+            params.push(format!("(${}, ${}, ${}, ${}, 'pending', ${})", 
+                base + 1, base + 2, base + 3, base + 4, base + 5));
+        }
+        query.push_str(&params.join(", "));
+        query.push_str(" RETURNING id, endpoint_id, event_type, status, created_at");
 
-                    errors.push(BatchError {
-                        index: i,
-                        error: "Failed to queue delivery".to_string(),
-                    });
-                } else {
-                    if let Some(ref publisher) = event_publisher {
-                        publisher.publish(crate::events::AppEvent::DeliveryCreated {
-                            delivery_id: delivery.id,
-                            endpoint_id: endpoint.id,
-                            customer_id: customer.id,
-                            event_type: webhook_req.event.clone(),
-                        }).await.ok();
-                    }
-                    created_count += 1;
-                    deliveries.push(delivery.to_response());
+        let mut q = sqlx::query_as::<_, (Uuid, Uuid, Option<String>, String, chrono::DateTime<Utc>)>(&query);
+        for vw in &valid_webhooks {
+            q = q.bind(vw.endpoint.id)
+                .bind(customer.id)
+                .bind(&vw.payload_json)
+                .bind(&vw.event)
+                .bind(vw.retry_policy.max_attempts);
+        }
+
+        let rows = db::timed_query("webhook_batch_bulk_insert", async {
+            q.fetch_all(&pool).await
+        }).await?;
+
+        // Map rows back to deliveries and publish to queue
+        for (row_idx, (delivery_id, endpoint_id, event_type, status, created_at)) in rows.into_iter().enumerate() {
+            let vw = &valid_webhooks[row_idx];
+
+            let queue_result = {
+                let mut rq_clone = crate::db::REDIS_QUEUE.lock().expect("redis_queue lock").clone();
+                db::publish_to_queue_fast(
+                    &pool,
+                    &mut rq_clone,
+                    delivery_id,
+                    vw.endpoint.id,
+                    &vw.endpoint.url,
+                    &vw.payload_str,
+                    vw.endpoint.custom_headers.as_ref(),
+                    &vw.endpoint.signing_secret,
+                    vw.retry_policy.max_attempts,
+                    vw.endpoint.fifo_enabled.unwrap_or(false),
+                ).await
+            };
+
+            if let Err(e) = queue_result {
+                tracing::error!("Failed to publish batch delivery {} to queue: {:?}", delivery_id, e);
+                let _ = sqlx::query("UPDATE deliveries SET status = 'failed', error_message = 'Queue publish failed' WHERE id = $1")
+                    .bind(delivery_id).execute(&pool).await;
+                errors.push(BatchError { index: row_idx, error: "Failed to queue delivery".to_string() });
+            } else {
+                if let Some(ref publisher) = event_publisher {
+                    publisher.publish(crate::events::AppEvent::DeliveryCreated {
+                        delivery_id,
+                        endpoint_id: vw.endpoint.id,
+                        customer_id: customer.id,
+                        event_type: vw.event.clone(),
+                    }).await.ok();
                 }
-            }
-            Err(e) => {
-                errors.push(BatchError {
-                    index: i,
-                    error: format!("Failed to create delivery: {}", e),
+                created_count += 1;
+                deliveries.push(DeliveryResponse {
+                    id: delivery_id,
+                    endpoint_id: vw.endpoint.id,
+                    event: vw.event.clone(),
+                    status,
+                    attempt_count: 0,
+                    response_status: None,
+                    replay_count: Some(0),
+                    created_at,
+                    is_test: None,
                 });
             }
         }
     }
 
-    // Rollback excess webhook_count for failed/filtered items
+    // Rollback excess webhook_count for failed/filtered items via buffer
     let excess = batch_count - created_count;
     if excess > 0 {
         let info = resolve_team_tracking(&pool, &cache, &customer, team_id).await;
-        let _ = sqlx::query(
-            "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2",
-        )
-        .bind(excess)
-        .bind(info.tracking_id)
-        .execute(&pool)
-        .await;
+        count_buffer.increment(info.tracking_id, -excess);
     }
 
     Ok(Json(BatchResponse { deliveries, errors }))
