@@ -446,7 +446,7 @@ pub async fn batch_webhooks(
 
         let payload_str = match serde_json::to_string(&payload) {
             Ok(s) => s,
-            Err(e) => {
+            Err(_e) => {
                 errors.push(BatchError { index: i, error: "Invalid payload format".to_string() });
                 continue;
             }
@@ -493,7 +493,7 @@ pub async fn batch_webhooks(
         }).await?;
 
         // Map rows back to deliveries and publish to queue
-        for (row_idx, (delivery_id, endpoint_id, event_type, status, created_at)) in rows.into_iter().enumerate() {
+        for (row_idx, (delivery_id, _endpoint_id, _event_type, status, created_at)) in rows.into_iter().enumerate() {
             let vw = &valid_webhooks[row_idx];
 
             let queue_result = {
