@@ -132,8 +132,15 @@ pub async fn check_and_reset_degraded_models(
         .execute(pool)
         .await?;
 
+        // Trigger immediate retraining for this endpoint
+        if let Err(e) = super::train_endpoint_for_drift(pool, *eid).await {
+            tracing::error!("Failed to retrain after quality reset for {}: {:?}", eid, e);
+        } else {
+            tracing::info!("🔄 Retrained models for endpoint {} after quality reset", eid);
+        }
+
         tracing::warn!(
-            "🔄 ML model reset: endpoint {} model '{}' quality below {}%",
+            "🔄 ML model reset + retrain: endpoint {} model '{}' quality below {}%",
             eid, model_type, min_quality_score
         );
         reset_count += 1;
