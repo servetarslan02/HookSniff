@@ -213,11 +213,9 @@ HookSniff/
 
 ## SDKs
 
-| Language | Package | Status |
-|----------|---------|--------|
 | Language | Package | Repository | Status |
 |----------|---------|------------|--------|
-| Node.js | `hooksniff-sdk` | [hooksniff-node](https://github.com/servetarslan02/hooksniff-node) | ✅ Available |
+| Node.js | [`hooksniff-sdk`](https://www.npmjs.com/package/hooksniff-sdk) | [hooksniff-node](https://github.com/servetarslan02/hooksniff-node) | ✅ Available |
 | Python | `hooksniff` | [hooksniff-python](https://github.com/servetarslan02/hooksniff-python) | ✅ Available |
 | Go | `hooksniff-go` | [hooksniff-go](https://github.com/servetarslan02/hooksniff-go) | ✅ Available |
 | Rust | `hooksniff` | [hooksniff-rust](https://github.com/servetarslan02/hooksniff-rust) | ✅ Available |
@@ -251,17 +249,21 @@ k6 run tests/load/k6_load_test.js
 ```typescript
 import { HookSniff } from 'hooksniff-sdk';
 
-const client = new HookSniff({ apiKey: 'hr_live_YOUR_KEY' });
+const hs = new HookSniff('hr_live_YOUR_KEY');
+
+// Create application
+const app = await hs.application.create({ name: 'My App' });
 
 // Create endpoint
-const endpoint = await client.endpoints.create({
+const ep = await hs.endpoint.create({
   url: 'https://your-app.com/webhook',
+  application_id: app.id,
   description: 'Order notifications',
 });
 
 // Send webhook
-await client.webhooks.send({
-  endpointId: endpoint.id,
+await hs.webhook.send({
+  endpoint_id: ep.id,
   event: 'order.created',
   data: { order_id: '12345', amount: 99.99 },
 });
@@ -272,38 +274,48 @@ await client.webhooks.send({
 ```python
 from hooksniff import HookSniff
 
-client = HookSniff(api_key="hr_live_YOUR_KEY")
+hs = HookSniff('hr_live_YOUR_KEY')
+
+# Create application
+app = hs.application.create(name='My App')
 
 # Create endpoint
-endpoint = client.endpoints.create(
-    url="https://your-app.com/webhook",
-    description="Order notifications"
+ep = hs.endpoint.create(
+    url='https://your-app.com/webhook',
+    application_id=app['id'],
+    description='Order notifications'
 )
 
 # Send webhook
-client.webhooks.send(
-    endpoint_id=endpoint.id,
-    event="order.created",
-    data={"order_id": "12345", "amount": 99.99}
+hs.webhook.send(
+    endpoint_id=ep['id'],
+    event='order.created',
+    data={'order_id': '12345', 'amount': 99.99}
 )
 ```
 
 ### Go
 
 ```go
-import "github.com/servetarslan02/hooksniff-go"
+import hooksniff "github.com/servetarslan02/hooksniff-go"
 
-client := hooksniff.NewClient("hr_live_YOUR_KEY")
+hs := hooksniff.NewClient("hr_live_YOUR_KEY")
+
+// Create application
+app, _ := hs.Application.Create(&hooksniff.ApplicationCreate{
+    Name: "My App",
+})
 
 // Create endpoint
-endpoint, _ := client.Endpoints.Create(&hooksniff.EndpointCreate{
-    URL:         "https://your-app.com/webhook",
-    Description: "Order notifications",
+ep, _ := hs.Endpoint.Create(&hooksniff.EndpointCreate{
+    URL:           "https://your-app.com/webhook",
+    ApplicationID: app.ID,
+    Description:   hooksniff.String("Order notifications"),
 })
 
 // Send webhook
-client.Webhooks.Send(&hooksniff.WebhookSend{
-    EndpointID: endpoint.ID,
+hs.Webhook.Send(&hooksniff.WebhookSend{
+    EndpointID: ep.ID,
     Event:      "order.created",
     Data:       map[string]interface{}{"order_id": "12345", "amount": 99.99},
 })
@@ -323,7 +335,7 @@ client.Webhooks.Send(&hooksniff.WebhookSend{
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment on Google Cloud Run |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Deploy on Google Cloud Run |
 | [Self-Host Guide](docs/SELF-HOST.md) | Run HookSniff on your own infrastructure |
-| [SDK Examples](docs/SDK_EXAMPLES.md) | Code examples for SDKs (Node.js available, others planned) |
+| [SDK Examples](docs/SDK_EXAMPLES.md) | Code examples for all SDKs |
 | [Developer Guide](docs/DEVELOPMENT.md) | Local development setup and workflows |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues and solutions |
 | [Runbook](docs/RUNBOOK.md) | Operational procedures and incident response |
