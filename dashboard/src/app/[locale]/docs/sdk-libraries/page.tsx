@@ -26,30 +26,32 @@ const sdks = [
 
 const hs = new HookSniff(process.env.HOOKSNIFF_API_KEY!);
 
-// 1. Create an endpoint
-const endpoint = await hs.endpoint.create({
- url: 'https://myapp.com/webhook',
- description: 'Production webhook',
- event_types: ['order.created', 'order.updated'],
-});
-console.log('Endpoint:', endpoint.id);
-console.log('Signing secret:', endpoint.secret); // → whsec_...
+// 1. Create an application
+const app = await hs.application.create({ name: 'My App' });
 
-// 2. Send a webhook
+// 2. Create an endpoint
+const ep = await hs.endpoint.create({
+ url: 'https://myapp.com/webhook',
+ application_id: app.id,
+ description: 'Production webhook',
+});
+console.log('Endpoint:', ep.id);
+
+// 3. Rotate secret to get signing key
+const secret = await hs.endpoint.rotateSecret(ep.id);
+console.log('Signing secret:', secret.signing_secret); // → whsec_...
+
+// 4. Send a webhook
 const delivery = await hs.webhook.send({
- endpoint_id: endpoint.id,
+ endpoint_id: ep.id,
  event: 'order.created',
  data: {order_id: 'ORD-123', amount: 99.99, currency: 'USD'},
 });
 console.log('Delivery:', delivery.id, delivery.status);
 
-// 3. List deliveries with pagination
-const deliveries = await hs.webhook.list({
- endpoint_id: endpoint.id,
- limit: 20,
-});
-for (const attempt of deliveries.data) {
- console.log(\`\${attempt.id}: \${attempt.response_status_code}\`);
+// 5. List deliveries with auto-pagination
+for await (const d of hs.webhook.list()) {
+ console.log(\`\${d.id}: \${d.status}\`);
 }`,
   verify: `import {Webhook, WebhookVerificationError} from 'hooksniff-sdk';
 
@@ -58,17 +60,14 @@ const wh = new Webhook('whsec_your_signing_secret');
 // Express/Fastify handler
 app.post('/webhook', (req, res) => {
  try {
-  // Standard Webheaders headers
-  const payload = wh.verify(req.body, {
-   'webhook-id': req.headers['webhook-id']!,
-   'webhook-timestamp': req.headers['webhook-timestamp']!,
-   'webhook-signature': req.headers['webhook-signature']!,
-});
-  console.log('Event:', payload.event);
-  console.log('Data:', payload.data);
+  const payload = wh.verify(req.body, req.headers);
+  console.log('Event:', payload);
   res.status(200).send('OK');
 } catch (err) {
-  res.status(401).send('Invalid signature');
+  if (err instanceof WebhookVerificationError) {
+   res.status(401).send('Invalid signature');
+  }
+  throw err;
 }
 });`,
   resources: 35,
