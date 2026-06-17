@@ -497,14 +497,15 @@ pub async fn batch_webhooks(
     // ── Bulk INSERT all valid deliveries in one query (eliminates N round-trips) ──
     if !valid_webhooks.is_empty() {
         // Build multi-row INSERT
+        let is_test = service_token.as_ref().map(|s| s.is_test).unwrap_or(false);
         let mut query = String::from(
-            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES "
+            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES "
         );
         let mut params: Vec<String> = Vec::new();
         for (i, _) in valid_webhooks.iter().enumerate() {
-            let base = i * 6;
-            params.push(format!("(${}, ${}, ${}, ${}, 'pending', ${})", 
-                base + 1, base + 2, base + 3, base + 4, base + 5));
+            let base = i * 7;
+            params.push(format!("(${}, ${}, ${}, ${}, 'pending', ${}, ${})", 
+                base + 1, base + 2, base + 3, base + 4, base + 5, base + 6));
         }
         query.push_str(&params.join(", "));
         query.push_str(" RETURNING id, endpoint_id, event_type, status, created_at");
@@ -515,7 +516,8 @@ pub async fn batch_webhooks(
                 .bind(customer.id)
                 .bind(&vw.payload_json)
                 .bind(&vw.event)
-                .bind(vw.retry_policy.max_attempts);
+                .bind(vw.retry_policy.max_attempts)
+                .bind(is_test);
         }
 
         let rows = db::timed_query("webhook_batch_bulk_insert", async {
