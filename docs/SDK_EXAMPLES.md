@@ -28,7 +28,7 @@ All SDKs follow the same pattern: initialize client → use resources (applicati
 ### Installation
 
 ```bash
-npm install hooksniff-sdk
+npm install hooksniff-node
 ```
 
 ### Quick Start
@@ -219,13 +219,13 @@ const hs = new HookSniff("hr_live_...", {
 ### Installation
 
 ```bash
-pip install hooksniff
+pip install hooksniff-python
 ```
 
 ### Quick Start
 
 ```python
-from hooksniff import HookSniff
+from hooksniff_python import HookSniff
 
 hs = HookSniff("hr_live_...")
 
@@ -263,7 +263,7 @@ all_endpoints = hs.endpoint.list().all()
 ### Webhook Verification
 
 ```python
-from hooksniff import Webhook, WebhookVerificationError
+from hooksniff_python import Webhook, WebhookVerificationError
 
 wh = Webhook("whsec_...")
 
@@ -280,7 +280,7 @@ def handle_webhook(request):
 ### Error Handling
 
 ```python
-from hooksniff import AuthenticationError, NotFoundError, RateLimitError
+from hooksniff_python import AuthenticationError, NotFoundError, RateLimitError
 
 try:
     hs.endpoint.get("invalid_id")
