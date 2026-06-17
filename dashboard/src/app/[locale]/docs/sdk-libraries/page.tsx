@@ -76,7 +76,7 @@ app.post('/webhook', (req, res) => {
   icon: <Code2 size={16} strokeWidth={1.75} className="text-yellow-600" />,
   nameKey: 'pythonSdk',
   lang: 'Python',
-  pkg: 'hooksniff-sdk',
+  pkg: 'hooksniff',
   registry: 'PyPI',
   version: '1.1.0',
   install: 'pip install hooksniff',
@@ -84,35 +84,36 @@ app.post('/webhook', (req, res) => {
   statusColor: 'green',
   features: ['Type hints', 'Auto-retry', 'Pagination', 'Async support', 'Idempotency keys'],
   quickStart: `from hooksniff import HookSniff
-import os
 
-hs = HookSniff(api_key=os.environ["HOOKSNIFF_API_KEY"])
+hs = HookSniff("hr_live_...")
 
-# 1. Create an endpoint
-endpoint = hs.endpoint.create(
+# 1. Create an application
+app = hs.application.create(name="My App")
+
+# 2. Create an endpoint
+ep = hs.endpoint.create(
   url="https://myapp.com/webhook",
+  application_id=app["id"],
   description="Production webhook",
-  event_types=["order.created", "order.updated"],
 )
-print(f"Endpoint: {endpoint.id}")
-print(f"Secret: {endpoint.secret}") # → whsec_...
+print(f"Endpoint: {ep['id']}")
 
-# 2. Send a webhook
-delivery = hs.message.create(
-  endpoint_id=endpoint.id,
+# 3. Rotate secret to get signing key
+secret = hs.endpoint.rotate_secret(ep["id"])
+print(f"Signing secret: {secret['signing_secret']}") # → whsec_...
+
+# 4. Send a webhook
+delivery = hs.webhook.send(
+  endpoint_id=ep["id"],
   event="order.created",
   data={"order_id": "ORD-123", "amount": 99.99, "currency": "USD"},
 )
-print(f"Delivery: {delivery.id} ({delivery.status})")
+print(f"Delivery: {delivery['id']} ({delivery['status']})")
 
-# 3. List deliveries with pagination
-deliveries = hs.message_attempt.list_by_endpoint(
-  endpoint_id=endpoint.id,
-  limit=20,
-)
-for attempt in deliveries.data:
-  print(f"{attempt.id}: {attempt.response_status_code}")`,
-  verify: `from hooksniff import Webhook
+# 5. List deliveries with auto-pagination
+for d in hs.webhook.list(per_page=20):
+  print(f"{d['id']}: {d['status']}")`,
+  verify: `from hooksniff import Webhook, WebhookVerificationError
 
 wh = Webhook("whsec_your_signing_secret")
 
@@ -120,17 +121,10 @@ wh = Webhook("whsec_your_signing_secret")
 @app.route("/webhook", methods=["POST"])
 def handle_webhook():
   try:
-    payload = wh.verify(
-      request.data,
-      {
-        "webhook-id": request.headers["webhook-id"],
-        "webhook-timestamp": request.headers["webhook-timestamp"],
-        "webhook-signature": request.headers["webhook-signature"],
-},
-    )
-    print(f"Event: {payload['event']}")
+    payload = wh.verify(request.data, request.headers)
+    print(f"Event: {payload}")
     return "", 200
-  except Exception:
+  except WebhookVerificationError:
     return "Invalid signature", 401`,
   resources: 30,
 },
