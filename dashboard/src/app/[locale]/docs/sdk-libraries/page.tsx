@@ -15,14 +15,14 @@ const sdks = [
   icon: <Package size={16} strokeWidth={1.75} />,
   nameKey: 'nodeSdk',
   lang: 'Node.js',
-  pkg: 'hooksniff-sdk',
+  pkg: 'hooksniff-node',
   registry: 'npm',
   version: '0.4.2',
   install: 'npm install hooksniff-sdk',
   status: 'Stable',
   statusColor: 'green',
   features: ['TypeScript types', 'Auto-retry', 'Pagination', 'SSE Streaming', 'Idempotency keys', 'Rate limit parsing'],
-  quickStart: `import {HookSniff} from 'hooksniff-sdk';
+  quickStart: `import {HookSniff} from 'hooksniff-node';
 
 const hs = new HookSniff(process.env.HOOKSNIFF_API_KEY!);
 
@@ -53,7 +53,7 @@ console.log('Delivery:', delivery.id, delivery.status);
 for await (const d of hs.webhook.list()) {
  console.log(\`\${d.id}: \${d.status}\`);
 }`,
-  verify: `import {Webhook, WebhookVerificationError} from 'hooksniff-sdk';
+  verify: `import {Webhook, WebhookVerificationError} from 'hooksniff-node';
 
 const wh = new Webhook('whsec_your_signing_secret');
 
@@ -76,14 +76,14 @@ app.post('/webhook', (req, res) => {
   icon: <Code2 size={16} strokeWidth={1.75} className="text-yellow-600" />,
   nameKey: 'pythonSdk',
   lang: 'Python',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-python',
   registry: 'PyPI',
   version: '1.1.0',
   install: 'pip install hooksniff',
   status: 'Stable',
   statusColor: 'green',
   features: ['Type hints', 'Auto-retry', 'Pagination', 'Async support', 'Idempotency keys'],
-  quickStart: `from hooksniff import HookSniff
+  quickStart: `from hooksniff_python import HookSniff
 
 hs = HookSniff("hr_live_...")
 
@@ -113,7 +113,7 @@ print(f"Delivery: {delivery['id']} ({delivery['status']})")
 # 5. List deliveries with auto-pagination
 for d in hs.webhook.list(per_page=20):
   print(f"{d['id']}: {d['status']}")`,
-  verify: `from hooksniff import Webhook, WebhookVerificationError
+  verify: `from hooksniff_python import Webhook, WebhookVerificationError
 
 wh = Webhook("whsec_your_signing_secret")
 
