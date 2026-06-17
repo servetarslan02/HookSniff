@@ -1,11 +1,9 @@
 # HookSniff — SDK Usage Examples
 
-> Last updated: 2026-06-03
-> API Base URL: `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`
+> Last updated: 2026-06-17
+> API Base URL: `https://hooksniff-api-e6ztf3x2ma-ew.a.run.app`
 
-All SDKs follow the same pattern: initialize client → use resources (endpoints, webhooks) → handle responses.
-
-> **Note:** Only the Node.js SDK example below reflects the planned API. Other SDK examples show the target API design — actual SDK packages are in development. See [sdk-coverage.md](sdk-coverage.md) for current status.
+All SDKs follow the same pattern: initialize client → use resources (applications, endpoints, webhooks) → handle responses.
 
 ---
 
@@ -33,78 +31,184 @@ All SDKs follow the same pattern: initialize client → use resources (endpoints
 npm install hooksniff-sdk
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```typescript
 import { HookSniff } from "hooksniff-sdk";
 
-const hs = new HookSniff({ apiKey: "hr_live_your_api_key" });
+const hs = new HookSniff("hr_live_...");
 
-const endpoint = await hs.endpoints.create({
-  url: "https://your-app.com/webhooks",
+// Create an application
+const app = await hs.application.create({ name: "My App" });
+
+// Create an endpoint
+const ep = await hs.endpoint.create({
+  url: "https://app.com/webhook",
+  application_id: app.id,
   description: "Order notifications",
-  event_types: ["order.created", "order.updated"],
 });
 
-console.log(endpoint.id);          // "ep_abc123"
-console.log(endpoint.secret);      // "whsec_xyz..." (save this!)
-```
-
-### 2. Send a Webhook
-
-```typescript
-const delivery = await hs.webhooks.send({
-  endpoint_id: "ep_abc123",
+// Send a webhook
+const delivery = await hs.webhook.send({
+  endpoint_id: ep.id,
   event: "order.created",
-  data: {
-    order_id: "ORD-001",
-    amount: 99.99,
-    currency: "USD",
-  },
+  data: { order_id: "12345", amount: 99.99 },
 });
 
-console.log(delivery.id);          // "dlv_..."
-console.log(delivery.status);      // "pending"
+console.log(delivery.id); // "msg_..."
 ```
 
-### 3. List Deliveries
+### Auto-Pagination
 
 ```typescript
-// Paginated listing
-const deliveries = await hs.webhooks.list({
-  endpoint_id: "ep_abc123",
-  limit: 20,
-});
-
-for (const dlv of deliveries.data) {
-  console.log(`${dlv.id}: ${dlv.status} — ${dlv.event_type}`);
+// Iterate through all endpoints automatically
+for await (const ep of hs.endpoint.list()) {
+  console.log(ep.url);
 }
 
-// Auto-paginate all
-import { paginate } from "hooksniff-sdk/pagination";
-
-for await (const dlv of paginate(hs.webhooks, { endpoint_id: "ep_abc123" })) {
-  console.log(dlv.id, dlv.status);
-}
+// Or collect all at once
+const allEndpoints = await hs.endpoint.list().all();
 ```
 
-### 4. Verify Incoming Webhook
+### Webhook Verification
 
 ```typescript
-import { Webhook } from "hooksniff-sdk";
+import { Webhook, WebhookVerificationError } from "hooksniff-sdk";
 
-const wh = new Webhook("whsec_your_endpoint_secret");
+const wh = new Webhook("whsec_...");
 
-// In your Express/Fastify handler:
-app.post("/webhooks", (req, res) => {
+app.post("/webhook", (req, res) => {
   try {
-    const payload = wh.verify(req.body, req.headers);
-    console.log("Verified event:", payload.event_type);
-    console.log("Data:", payload.data);
-    res.status(200).send("ok");
+    const event = wh.verify(req.body, req.headers);
+    console.log("Verified event:", event);
+    res.status(200).send("OK");
   } catch (err) {
-    res.status(400).send("invalid signature");
+    if (err instanceof WebhookVerificationError) {
+      res.status(401).send("Invalid signature");
+    }
+    throw err;
   }
+});
+```
+
+### Error Handling
+
+```typescript
+import {
+  AuthenticationError,
+  NotFoundError,
+  RateLimitError,
+} from "hooksniff-sdk";
+
+try {
+  await hs.endpoint.get("invalid_id");
+} catch (err) {
+  if (err instanceof NotFoundError) {
+    console.log("Endpoint not found");
+  } else if (err instanceof AuthenticationError) {
+    console.log("Invalid API key");
+  } else if (err instanceof RateLimitError) {
+    console.log(`Rate limited, retry after ${err.retryAfter}s`);
+  }
+}
+```
+
+### Idempotency
+
+```typescript
+const delivery = await hs.webhook.send(
+  { endpoint_id: ep.id, event: "order.created", data: {} },
+  { idempotencyKey: "unique-key-123" },
+);
+```
+
+### All Resources
+
+```typescript
+// Applications
+await hs.application.create({ name: "My App" });
+await hs.application.list();  // auto-pagination
+await hs.application.get("app_123");
+await hs.application.update("app_123", { name: "New Name" });
+await hs.application.delete("app_123");
+
+// Endpoints
+await hs.endpoint.create({ url: "...", application_id: "app_123" });
+await hs.endpoint.list();
+await hs.endpoint.get("ep_123");
+await hs.endpoint.update("ep_123", { url: "..." });
+await hs.endpoint.delete("ep_123");
+await hs.endpoint.rotateSecret("ep_123");
+
+// Webhooks
+await hs.webhook.send({ endpoint_id: "ep_123", event: "...", data: {} });
+await hs.webhook.sendBatch([{ endpoint_id: "ep_123", event: "...", data: {} }]);
+await hs.webhook.list();
+await hs.webhook.get("msg_123");
+await hs.webhook.replay("msg_123");
+
+// API Keys
+await hs.apiKey.list();
+await hs.apiKey.create({ name: "Production Key" });
+await hs.apiKey.delete("key_123");
+
+// Analytics
+await hs.analytics.deliveries({ range: "24h" });
+await hs.analytics.successRate({ range: "7d" });
+
+// Billing
+await hs.billing.subscription();
+await hs.billing.upgrade({ plan: "pro" });
+await hs.billing.portal();
+
+// Teams
+await hs.team.list();
+await hs.team.create({ name: "Engineering" });
+
+// Cortex AI
+await hs.cortex.insights();
+await hs.cortex.anomalies({ endpoint_id: "ep_123" });
+await hs.cortex.predict("ep_123");
+await hs.cortex.autoHeal("ep_123");
+
+// Notifications
+await hs.notification.list();
+await hs.notification.getUnreadCount();
+await hs.notification.markRead("notif_123");
+await hs.notification.markAllRead();
+
+// Templates
+await hs.template.list();
+await hs.template.get("tmpl_123");
+
+// Schemas
+await hs.schema.list();
+await hs.schema.create({ name: "Order Schema", schema: { ... } });
+await hs.schema.validate("schema_123", { order_id: "123" });
+
+// Alerts
+await hs.alert.list();
+await hs.alert.create({ name: "...", condition: "failure_rate", threshold: 10, channels: ["email"] });
+
+// Search
+await hs.search.deliveries("order.created");
+
+// Health
+await hs.health.check();
+await hs.health.outboundIps();
+
+// User
+await hs.me();
+```
+
+### Configuration
+
+```typescript
+const hs = new HookSniff("hr_live_...", {
+  baseUrl: "https://your-instance.com",  // Custom API URL
+  timeout: 30000,                         // Request timeout (ms)
+  retries: 3,                             // Max retries on 5xx/429
+  headers: { "X-Custom": "value" },       // Custom headers
 });
 ```
 
@@ -118,78 +222,165 @@ app.post("/webhooks", (req, res) => {
 pip install hooksniff
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```python
 from hooksniff import HookSniff
 
-hs = HookSniff(api_key="hr_live_your_api_key")
+hs = HookSniff("hr_live_...")
 
-endpoint = hs.endpoints.create(
-    url="https://your-app.com/webhooks",
+# Create an application
+app = hs.application.create(name="My App")
+
+# Create an endpoint
+ep = hs.endpoint.create(
+    url="https://app.com/webhook",
+    application_id=app["id"],
     description="Order notifications",
-    event_types=["order.created", "order.updated"],
 )
 
-print(endpoint.id)       # "ep_abc123"
-print(endpoint.secret)   # "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```python
-delivery = hs.webhooks.send(
-    endpoint_id="ep_abc123",
+# Send a webhook
+delivery = hs.webhook.send(
+    endpoint_id=ep["id"],
     event="order.created",
-    data={
-        "order_id": "ORD-001",
-        "amount": 99.99,
-        "currency": "USD",
-    },
+    data={"order_id": "12345", "amount": 99.99},
 )
 
-print(delivery.id)       # "dlv_..."
-print(delivery.status)   # "pending"
+print(delivery["id"])  # "msg_..."
 ```
 
-### 3. List Deliveries with Pagination
+### Auto-Pagination
 
 ```python
-# Single page
-deliveries = hs.webhooks.list(endpoint_id="ep_abc123", limit=20)
-for dlv in deliveries.data:
-    print(f"{dlv.id}: {dlv.status}")
+# Iterate through all endpoints
+for ep in hs.endpoint.list():
+    print(ep["url"])
 
-# Auto-paginate
-from hooksniff.pagination import paginate
-
-for dlv in paginate(hs.webhooks, endpoint_id="ep_abc123"):
-    print(dlv.id, dlv.status)
-
-# Collect all at once
-from hooksniff.pagination import collect_all
-
-all_deliveries = collect_all(hs.webhooks, endpoint_id="ep_abc123")
-print(f"Total: {len(all_deliveries)}")
+# Or collect all
+all_endpoints = hs.endpoint.list().all()
 ```
 
-### 4. Verify Incoming Webhook
+### Webhook Verification
 
 ```python
-from hooksniff import Webhook
+from hooksniff import Webhook, WebhookVerificationError
 
-wh = Webhook("whsec_your_endpoint_secret")
+wh = Webhook("whsec_...")
 
 # In your Flask/FastAPI handler:
-@app.route("/webhooks", methods=["POST"])
-def handle_webhook():
+def handle_webhook(request):
     try:
-        payload = wh.verify(request.data, request.headers)
-        print(f"Event: {payload['event_type']}")
-        print(f"Data: {payload['data']}")
-        return "ok", 200
-    except Exception:
-        return "invalid signature", 400
+        event = wh.verify(request.body, request.headers)
+        print(f"Verified event: {event}")
+        return "OK", 200
+    except WebhookVerificationError:
+        return "Invalid signature", 401
+```
+
+### Error Handling
+
+```python
+from hooksniff import AuthenticationError, NotFoundError, RateLimitError
+
+try:
+    hs.endpoint.get("invalid_id")
+except NotFoundError:
+    print("Endpoint not found")
+except AuthenticationError:
+    print("Invalid API key")
+except RateLimitError as e:
+    print(f"Rate limited, retry after {e.retry_after}s")
+```
+
+### All Resources
+
+```python
+# Applications
+hs.application.create(name="My App")
+hs.application.list()  # auto-pagination
+hs.application.get("app_123")
+hs.application.update("app_123", name="New Name")
+hs.application.delete("app_123")
+
+# Endpoints
+hs.endpoint.create(url="...", application_id="app_123")
+hs.endpoint.list()
+hs.endpoint.get("ep_123")
+hs.endpoint.update("ep_123", url="...")
+hs.endpoint.delete("ep_123")
+hs.endpoint.rotate_secret("ep_123")
+
+# Webhooks
+hs.webhook.send(endpoint_id="ep_123", event="...", data={})
+hs.webhook.send_batch([{...}])
+hs.webhook.list()
+hs.webhook.get("msg_123")
+hs.webhook.replay("msg_123")
+
+# API Keys
+hs.api_key.list()
+hs.api_key.create(name="Production Key")
+hs.api_key.delete("key_123")
+
+# Analytics
+hs.analytics.deliveries(range="24h")
+hs.analytics.success_rate(range="7d")
+
+# Billing
+hs.billing.subscription()
+hs.billing.upgrade(plan="pro")
+hs.billing.portal()
+
+# Teams
+hs.team.list()
+hs.team.create(name="Engineering")
+
+# Cortex AI
+hs.cortex.insights()
+hs.cortex.anomalies(endpoint_id="ep_123")
+hs.cortex.predict("ep_123")
+hs.cortex.auto_heal("ep_123")
+
+# Notifications
+hs.notification.list()
+hs.notification.get_unread_count()
+hs.notification.mark_read("notif_123")
+hs.notification.mark_all_read()
+
+# Templates
+hs.template.list()
+hs.template.get("tmpl_123")
+
+# Schemas
+hs.schema.list()
+hs.schema.create(name="Order Schema", schema={...})
+hs.schema.validate("schema_123", {"order_id": "123"})
+
+# Alerts
+hs.alert.list()
+hs.alert.create(name="...", condition="failure_rate", threshold=10, channels=["email"])
+
+# Search
+hs.search.deliveries("order.created")
+
+# Health
+hs.health.check()
+hs.health.outbound_ips()
+
+# User
+hs.me()
+```
+
+### Configuration
+
+```python
+hs = HookSniff(
+    "hr_live_...",
+    base_url="https://your-instance.com",  # Custom API URL
+    timeout=30,                             # Request timeout (seconds)
+    retries=3,                              # Max retries on 5xx/429
+    headers={"X-Custom": "value"},          # Custom headers
+)
 ```
 
 ---
@@ -199,88 +390,59 @@ def handle_webhook():
 ### Installation
 
 ```bash
-go get github.com/servetarslan02/hooksniff-sdk-go
+go get github.com/servetarslan02/hooksniff-go
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```go
 package main
 
 import (
     "fmt"
-    hooksniff "github.com/servetarslan02/hooksniff-sdk-go"
+    hooksniff "github.com/servetarslan02/hooksniff-go"
 )
 
 func main() {
-    hs := hooksniff.NewClient("hr_live_your_api_key")
+    hs := hooksniff.NewClient("hr_live_...")
 
-    endpoint, err := hs.Endpoints.Create(&hooksniff.CreateEndpointRequest{
-        URL:         "https://your-app.com/webhooks",
-        Description: hooksniff.String("Order notifications"),
-        EventTypes:  []string{"order.created", "order.updated"},
+    // Create an application
+    app, err := hs.Application.Create(&hooksniff.ApplicationCreate{
+        Name: "My App",
     })
-    if err != nil {
-        panic(err)
-    }
 
-    fmt.Println(endpoint.ID)       // "ep_abc123"
-    fmt.Println(endpoint.Secret)   // "whsec_xyz..."
+    // Create an endpoint
+    ep, err := hs.Endpoint.Create(&hooksniff.EndpointCreate{
+        URL:           "https://app.com/webhook",
+        ApplicationID: app.ID,
+        Description:   hooksniff.String("Order notifications"),
+    })
+
+    // Send a webhook
+    delivery, err := hs.Webhook.Send(&hooksniff.WebhookSend{
+        EndpointID: ep.ID,
+        Event:      "order.created",
+        Data:       map[string]interface{}{"order_id": "12345", "amount": 99.99},
+    })
+
+    fmt.Println(delivery.ID)
 }
 ```
 
-### 2. Send a Webhook
+### Webhook Verification
 
 ```go
-delivery, err := hs.Webhooks.Send(&hooksniff.SendWebhookRequest{
-    EndpointID: "ep_abc123",
-    Event:      "order.created",
-    Data: map[string]interface{}{
-        "order_id": "ORD-001",
-        "amount":   99.99,
-        "currency": "USD",
-    },
-})
-if err != nil {
-    panic(err)
-}
+wh := hooksniff.NewWebhook("whsec_...")
 
-fmt.Println(delivery.ID)       // "dlv_..."
-fmt.Println(delivery.Status)   // "pending"
-```
-
-### 3. List Deliveries
-
-```go
-deliveries, err := hs.Webhooks.List(&hooksniff.ListWebhooksRequest{
-    EndpointID: "ep_abc123",
-    Limit:      20,
-})
-if err != nil {
-    panic(err)
-}
-
-for _, dlv := range deliveries.Data {
-    fmt.Printf("%s: %s\n", dlv.ID, dlv.Status)
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```go
-wh := hooksniff.NewWebhook("whsec_your_endpoint_secret")
-
-// In your HTTP handler:
 func handleWebhook(w http.ResponseWriter, r *http.Request) {
     payload, err := wh.Verify(r.Body, r.Header)
     if err != nil {
-        w.WriteHeader(400)
-        w.Write([]byte("invalid signature"))
+        w.WriteHeader(401)
+        w.Write([]byte("Invalid signature"))
         return
     }
 
-    fmt.Printf("Event: %s\n", payload.EventType)
-    fmt.Printf("Data: %v\n", payload.Data)
+    fmt.Printf("Event: %s\n", payload.Event)
     w.WriteHeader(200)
 }
 ```
@@ -293,86 +455,60 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 
 ```xml
 <dependency>
-    <groupId>dev.hooksniff</groupId>
+    <groupId>com.hooksniff</groupId>
     <artifactId>hooksniff-java</artifactId>
-    <version>1.0.0</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```java
-import dev.hooksniff.HookSniff;
-import dev.hooksniff.models.Endpoint;
+import com.hooksniff.HookSniff;
 
-HookSniff hs = new HookSniff("hr_live_your_api_key");
+HookSniff hs = new HookSniff("hr_live_...");
 
-Endpoint endpoint = hs.endpoints().create(
-    CreateEndpointRequest.builder()
-        .url("https://your-app.com/webhooks")
+// Create an application
+Application app = hs.application().create(
+    ApplicationCreate.builder().name("My App").build()
+);
+
+// Create an endpoint
+Endpoint ep = hs.endpoint().create(
+    EndpointCreate.builder()
+        .url("https://app.com/webhook")
+        .applicationId(app.getId())
         .description("Order notifications")
-        .eventTypes(List.of("order.created", "order.updated"))
         .build()
 );
 
-System.out.println(endpoint.getId());       // "ep_abc123"
-System.out.println(endpoint.getSecret());   // "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```java
-import dev.hooksniff.models.Delivery;
-
-Delivery delivery = hs.webhooks().send(
-    SendWebhookRequest.builder()
-        .endpointId("ep_abc123")
+// Send a webhook
+WebhookDelivery delivery = hs.webhook().send(
+    WebhookSend.builder()
+        .endpointId(ep.getId())
         .event("order.created")
-        .data(Map.of(
-            "order_id", "ORD-001",
-            "amount", 99.99,
-            "currency", "USD"
-        ))
+        .data(Map.of("order_id", "12345", "amount", 99.99))
         .build()
 );
 
-System.out.println(delivery.getId());       // "dlv_..."
-System.out.println(delivery.getStatus());   // "pending"
+System.out.println(delivery.getId());
 ```
 
-### 3. List Deliveries
+### Webhook Verification
 
 ```java
-DeliveryListResponse deliveries = hs.webhooks().list(
-    ListWebhooksRequest.builder()
-        .endpointId("ep_abc123")
-        .limit(20)
-        .build()
-);
+Webhook wh = new Webhook("whsec_...");
 
-for (Delivery dlv : deliveries.getData()) {
-    System.out.printf("%s: %s%n", dlv.getId(), dlv.getStatus());
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```java
-import dev.hooksniff.Webhook;
-
-Webhook wh = new Webhook("whsec_your_endpoint_secret");
-
-// In your Spring handler:
-@PostMapping("/webhooks")
+@PostMapping("/webhook")
 public ResponseEntity<String> handleWebhook(
         @RequestBody String body,
         @RequestHeader Map<String, String> headers) {
     try {
-        WebhookPayload payload = wh.verify(body, headers);
-        System.out.println("Event: " + payload.getEventType());
-        return ResponseEntity.ok("ok");
+        WebhookEvent event = wh.verify(body, headers);
+        System.out.println("Event: " + event.getEvent());
+        return ResponseEntity.ok("OK");
     } catch (WebhookVerificationException e) {
-        return ResponseEntity.status(400).body("invalid signature");
+        return ResponseEntity.status(401).body("Invalid signature");
     }
 }
 ```
@@ -385,85 +521,41 @@ public ResponseEntity<String> handleWebhook(
 
 ```toml
 [dependencies]
-hooksniff = "1.0"
+hooksniff = "0.4"
 tokio = { version = "1", features = ["full"] }
-serde_json = "1"
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```rust
 use hooksniff::HookSniff;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let hs = HookSniff::new("hr_live_your_api_key");
+    let hs = HookSniff::new("hr_live_...");
 
-    let endpoint = hs.endpoints().create(
-        CreateEndpointRequest {
-            url: "https://your-app.com/webhooks".to_string(),
-            description: Some("Order notifications".to_string()),
-            event_types: Some(vec![
-                "order.created".to_string(),
-                "order.updated".to_string(),
-            ]),
-        },
+    let app = hs.application().create(
+        ApplicationCreate { name: "My App".into() }
     ).await?;
 
-    println!("ID: {}", endpoint.id);
-    println!("Secret: {}", endpoint.secret);
+    let ep = hs.endpoint().create(
+        EndpointCreate {
+            url: "https://app.com/webhook".into(),
+            application_id: app.id,
+            description: Some("Order notifications".into()),
+        }
+    ).await?;
+
+    let delivery = hs.webhook().send(
+        WebhookSend {
+            endpoint_id: ep.id,
+            event: "order.created".into(),
+            data: serde_json::json!({"order_id": "12345", "amount": 99.99}),
+        }
+    ).await?;
+
+    println!("{}", delivery.id);
     Ok(())
-}
-```
-
-### 2. Send a Webhook
-
-```rust
-let delivery = hs.webhooks().send(SendWebhookRequest {
-    endpoint_id: "ep_abc123".to_string(),
-    event: "order.created".to_string(),
-    data: serde_json::json!({
-        "order_id": "ORD-001",
-        "amount": 99.99,
-        "currency": "USD"
-    }),
-}).await?;
-
-println!("Status: {}", delivery.status);
-```
-
-### 3. List Deliveries
-
-```rust
-let deliveries = hs.webhooks().list(ListWebhooksRequest {
-    endpoint_id: Some("ep_abc123".to_string()),
-    limit: Some(20),
-    ..Default::default()
-}).await?;
-
-for dlv in &deliveries.data {
-    println!("{}: {}", dlv.id, dlv.status);
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```rust
-use hooksniff::Webhook;
-
-let wh = Webhook::new("whsec_your_endpoint_secret");
-
-// In your Axum handler:
-async fn handle_webhook(
-    headers: HeaderMap,
-    body: String,
-) -> Result<String, StatusCode> {
-    wh.verify(&body, &headers)
-        .map(|payload| {
-            println!("Event: {}", payload.event_type);
-            "ok".to_string()
-        })
-        .map_err(|_| StatusCode::BAD_REQUEST)
 }
 ```
 
@@ -477,63 +569,27 @@ async fn handle_webhook(
 gem install hooksniff
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```ruby
 require "hooksniff"
 
-hs = HookSniff::Client.new(api_key: "hr_live_your_api_key")
+hs = HookSniff::Client.new("hr_live_...")
 
-endpoint = hs.endpoints.create(
-  url: "https://your-app.com/webhooks",
+app = hs.application.create(name: "My App")
+ep = hs.endpoint.create(
+  url: "https://app.com/webhook",
+  application_id: app.id,
   description: "Order notifications",
-  event_types: ["order.created", "order.updated"],
 )
 
-puts endpoint.id       # "ep_abc123"
-puts endpoint.secret   # "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```ruby
-delivery = hs.webhooks.send(
-  endpoint_id: "ep_abc123",
+delivery = hs.webhook.send(
+  endpoint_id: ep.id,
   event: "order.created",
-  data: {
-    order_id: "ORD-001",
-    amount: 99.99,
-    currency: "USD",
-  },
+  data: { order_id: "12345", amount: 99.99 },
 )
 
-puts delivery.id       # "dlv_..."
-puts delivery.status   # "pending"
-```
-
-### 3. List Deliveries
-
-```ruby
-deliveries = hs.webhooks.list(endpoint_id: "ep_abc123", limit: 20)
-
-deliveries.data.each do |dlv|
-  puts "#{dlv.id}: #{dlv.status}"
-end
-```
-
-### 4. Verify Incoming Webhook
-
-```ruby
-wh = HookSniff::Webhook.new("whsec_your_endpoint_secret")
-
-# In your Sinatra/Rails handler:
-post "/webhooks" do
-  payload = wh.verify(request.body.read, request.headers)
-  puts "Event: #{payload["event_type"]}"
-  status 200
-rescue HookSniff::SignatureError
-  status 400
-end
+puts delivery.id
 ```
 
 ---
@@ -546,69 +602,28 @@ end
 composer require hooksniff/hooksniff-php
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```php
 <?php
 require 'vendor/autoload.php';
 
-$hs = new HookSniff\Client('hr_live_your_api_key');
+$hs = new HookSniff\Client("hr_live_...");
 
-$endpoint = $hs->endpoints->create([
-    'url' => 'https://your-app.com/webhooks',
-    'description' => 'Order notifications',
-    'event_types' => ['order.created', 'order.updated'],
+$app = $hs->application->create(["name" => "My App"]);
+$ep = $hs->endpoint->create([
+    "url" => "https://app.com/webhook",
+    "application_id" => $app->id,
+    "description" => "Order notifications",
 ]);
 
-echo $endpoint->id;       // "ep_abc123"
-echo $endpoint->secret;   // "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```php
-$delivery = $hs->webhooks->send([
-    'endpoint_id' => 'ep_abc123',
-    'event' => 'order.created',
-    'data' => [
-        'order_id' => 'ORD-001',
-        'amount' => 99.99,
-        'currency' => 'USD',
-    ],
+$delivery = $hs->webhook->send([
+    "endpoint_id" => $ep->id,
+    "event" => "order.created",
+    "data" => ["order_id" => "12345", "amount" => 99.99],
 ]);
 
-echo $delivery->id;       // "dlv_..."
-echo $delivery->status;   // "pending"
-```
-
-### 3. List Deliveries
-
-```php
-$deliveries = $hs->webhooks->list([
-    'endpoint_id' => 'ep_abc123',
-    'limit' => 20,
-]);
-
-foreach ($deliveries->data as $dlv) {
-    echo "{$dlv->id}: {$dlv->status}\n";
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```php
-$wh = new HookSniff\Webhook('whsec_your_endpoint_secret');
-
-// In your Laravel/Symfony controller:
-public function handleWebhook(Request $request) {
-    try {
-        $payload = $wh->verify($request->getContent(), $request->headers->all());
-        echo "Event: " . $payload['event_type'];
-        return response('ok', 200);
-    } catch (HookSniff\SignatureVerificationException $e) {
-        return response('invalid signature', 400);
-    }
-}
+echo $delivery->id;
 ```
 
 ---
@@ -621,80 +636,27 @@ public function handleWebhook(Request $request) {
 dotnet add package HookSniff.Sdk
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```csharp
 using HookSniff;
 
-var hs = new HookSniffClient("hr_live_your_api_key");
+var hs = new HookSniffClient("hr_live_...");
 
-var endpoint = await hs.Endpoints.CreateAsync(new CreateEndpointRequest
-{
-    Url = "https://your-app.com/webhooks",
+var app = await hs.Application.CreateAsync(new ApplicationCreate { Name = "My App" });
+var ep = await hs.Endpoint.CreateAsync(new EndpointCreate {
+    Url = "https://app.com/webhook",
+    ApplicationId = app.Id,
     Description = "Order notifications",
-    EventTypes = new[] { "order.created", "order.updated" }
 });
 
-Console.WriteLine(endpoint.Id);       // "ep_abc123"
-Console.WriteLine(endpoint.Secret);   // "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```csharp
-var delivery = await hs.Webhooks.SendAsync(new SendWebhookRequest
-{
-    EndpointId = "ep_abc123",
+var delivery = await hs.Webhook.SendAsync(new WebhookSend {
+    EndpointId = ep.Id,
     Event = "order.created",
-    Data = new Dictionary<string, object>
-    {
-        { "order_id", "ORD-001" },
-        { "amount", 99.99 },
-        { "currency", "USD" }
-    }
+    Data = new Dictionary<string, object> { { "order_id", "12345" }, { "amount", 99.99 } },
 });
 
-Console.WriteLine(delivery.Id);       // "dlv_..."
-Console.WriteLine(delivery.Status);   // "pending"
-```
-
-### 3. List Deliveries
-
-```csharp
-var deliveries = await hs.Webhooks.ListAsync(new ListWebhooksRequest
-{
-    EndpointId = "ep_abc123",
-    Limit = 20
-});
-
-foreach (var dlv in deliveries.Data)
-{
-    Console.WriteLine($"{dlv.Id}: {dlv.Status}");
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```csharp
-var wh = new WebhookVerifier("whsec_your_endpoint_secret");
-
-// In your ASP.NET controller:
-[HttpPost("webhooks")]
-public IActionResult HandleWebhook()
-{
-    try
-    {
-        using var reader = new StreamReader(Request.Body);
-        var body = await reader.ReadToEndAsync();
-        var payload = wh.Verify(body, Request.Headers);
-        Console.WriteLine($"Event: {payload.EventType}");
-        return Ok();
-    }
-    catch (SignatureVerificationException)
-    {
-        return BadRequest("invalid signature");
-    }
-}
+Console.WriteLine(delivery.Id);
 ```
 
 ---
@@ -704,73 +666,30 @@ public IActionResult HandleWebhook()
 ### Installation (Gradle)
 
 ```kotlin
-implementation("dev.hooksniff:hooksniff-kotlin:1.0.0")
+implementation("com.hooksniff:hooksniff-kotlin:0.4.0")
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```kotlin
-import dev.hooksniff.HookSniff
+import com.hooksniff.HookSniff
 
-val hs = HookSniff(apiKey = "hr_live_your_api_key")
+val hs = HookSniff("hr_live_...")
 
-val endpoint = hs.endpoints.create(
-    url = "https://your-app.com/webhooks",
+val app = hs.application.create(name = "My App")
+val ep = hs.endpoint.create(
+    url = "https://app.com/webhook",
+    applicationId = app.id,
     description = "Order notifications",
-    eventTypes = listOf("order.created", "order.updated"),
 )
 
-println(endpoint.id)       // "ep_abc123"
-println(endpoint.secret)   // "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```kotlin
-val delivery = hs.webhooks.send(
-    endpointId = "ep_abc123",
+val delivery = hs.webhook.send(
+    endpointId = ep.id,
     event = "order.created",
-    data = mapOf(
-        "order_id" to "ORD-001",
-        "amount" to 99.99,
-        "currency" to "USD",
-    ),
+    data = mapOf("order_id" to "12345", "amount" to 99.99),
 )
 
-println(delivery.id)       // "dlv_..."
-println(delivery.status)   // "pending"
-```
-
-### 3. List Deliveries
-
-```kotlin
-val deliveries = hs.webhooks.list(
-    endpointId = "ep_abc123",
-    limit = 20,
-)
-
-deliveries.data.forEach { dlv ->
-    println("${dlv.id}: ${dlv.status}")
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```kotlin
-import dev.hooksniff.Webhook
-
-val wh = Webhook("whsec_your_endpoint_secret")
-
-// In your Ktor handler:
-post("/webhooks") {
-    try {
-        val payload = wh.verify(call.receiveText(), call.request.headers)
-        println("Event: ${payload.eventType}")
-        call.respondText("ok")
-    } catch (e: SignatureVerificationException) {
-        call.respondText("invalid signature", status = HttpStatusCode.BadRequest)
-    }
-}
+println(delivery.id)
 ```
 
 ---
@@ -780,72 +699,28 @@ post("/webhooks") {
 ### Installation (mix.exs)
 
 ```elixir
-{:hooksniff, "~> 1.0"}
+{:hooksniff, "~> 0.4"}
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```elixir
-{:ok, hs} = HookSniff.client(api_key: "hr_live_your_api_key")
+{:ok, hs} = HookSniff.client("hr_live_...")
 
-{:ok, endpoint} = HookSniff.Endpoints.create(hs, %{
-  url: "https://your-app.com/webhooks",
-  description: "Order notifications",
-  event_types: ["order.created", "order.updated"]
+{:ok, app} = HookSniff.Application.create(hs, %{name: "My App"})
+{:ok, ep} = HookSniff.Endpoint.create(hs, %{
+  url: "https://app.com/webhook",
+  application_id: app.id,
+  description: "Order notifications"
 })
 
-IO.puts(endpoint.id)       # "ep_abc123"
-IO.puts(endpoint.secret)   # "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```elixir
-{:ok, delivery} = HookSniff.Webhooks.send(hs, %{
-  endpoint_id: "ep_abc123",
+{:ok, delivery} = HookSniff.Webhook.send(hs, %{
+  endpoint_id: ep.id,
   event: "order.created",
-  data: %{
-    order_id: "ORD-001",
-    amount: 99.99,
-    currency: "USD"
-  }
+  data: %{order_id: "12345", amount: 99.99}
 })
 
-IO.puts(delivery.id)       # "dlv_..."
-IO.puts(delivery.status)   # "pending"
-```
-
-### 3. List Deliveries
-
-```elixir
-{:ok, deliveries} = HookSniff.Webhooks.list(hs, %{
-  endpoint_id: "ep_abc123",
-  limit: 20
-})
-
-Enum.each(deliveries.data, fn dlv ->
-  IO.puts("#{dlv.id}: #{dlv.status}")
-end)
-```
-
-### 4. Verify Incoming Webhook
-
-```elixir
-{:ok, wh} = HookSniff.Webhook.new("whsec_your_endpoint_secret")
-
-# In your Phoenix controller:
-def handle_webhook(conn, _params) do
-  {:ok, body, conn} = Plug.Conn.read_body(conn)
-
-  case HookSniff.Webhook.verify(wh, body, conn.req_headers) do
-    {:ok, payload} ->
-      IO.puts("Event: #{payload["event_type"]}")
-      send_resp(conn, 200, "ok")
-
-    {:error, _reason} ->
-      send_resp(conn, 400, "invalid signature")
-  end
-end
+IO.puts(delivery.id)
 ```
 
 ---
@@ -855,78 +730,32 @@ end
 ### Installation (Swift Package Manager)
 
 ```swift
-// Package.swift
 dependencies: [
-    .package(url: "https://github.com/servetarslan02/hooksniff-sdk-swift", from: "1.0.0"),
+    .package(url: "https://github.com/servetarslan02/hooksniff-swift", from: "0.4.0"),
 ]
 ```
 
-### 1. Create an Endpoint
+### Quick Start
 
 ```swift
 import HookSniff
 
-let hs = HookSniff(apiKey: "hr_live_your_api_key")
+let hs = HookSniff("hr_live_...")
 
-let endpoint = try await hs.endpoints.create(
-    url: "https://your-app.com/webhooks",
-    description: "Order notifications",
-    eventTypes: ["order.created", "order.updated"]
+let app = try await hs.application.create(name: "My App")
+let ep = try await hs.endpoint.create(
+    url: "https://app.com/webhook",
+    applicationId: app.id,
+    description: "Order notifications"
 )
 
-print(endpoint.id)       // "ep_abc123"
-print(endpoint.secret)   // "whsec_xyz..."
-```
-
-### 2. Send a Webhook
-
-```swift
-let delivery = try await hs.webhooks.send(
-    endpointId: "ep_abc123",
+let delivery = try await hs.webhook.send(
+    endpointId: ep.id,
     event: "order.created",
-    data: [
-        "order_id": "ORD-001",
-        "amount": 99.99,
-        "currency": "USD"
-    ]
+    data: ["order_id": "12345", "amount": 99.99]
 )
 
-print(delivery.id)       // "dlv_..."
-print(delivery.status)   // "pending"
-```
-
-### 3. List Deliveries
-
-```swift
-let deliveries = try await hs.webhooks.list(
-    endpointId: "ep_abc123",
-    limit: 20
-)
-
-for dlv in deliveries.data {
-    print("\(dlv.id): \(dlv.status)")
-}
-```
-
-### 4. Verify Incoming Webhook
-
-```swift
-import HookSniff
-
-let wh = try Webhook(secret: "whsec_your_endpoint_secret")
-
-// In your Vapor handler:
-app.post("webhooks") { req async throws -> Response in
-    let body = req.body.string ?? ""
-
-    do {
-        let payload = try wh.verify(body: body, headers: req.headers)
-        print("Event: \(payload.eventType)")
-        return Response(status: .ok)
-    } catch {
-        return Response(status: .badRequest, body: "invalid signature")
-    }
-}
+print(delivery.id)
 ```
 
 ---
@@ -936,10 +765,11 @@ app.post("webhooks") { req async throws -> Response in
 ### Error Handling
 
 All SDKs throw/return errors for:
-- `401` — Invalid API key
-- `404` — Resource not found
-- `429` — Rate limit exceeded (auto-retry with backoff)
-- `500` — Server error (auto-retry up to 2 times)
+- `401` — Invalid API key (`AuthenticationError`)
+- `404` — Resource not found (`NotFoundError`)
+- `429` — Rate limit exceeded (`RateLimitError`, auto-retry with backoff)
+- `400` — Validation error (`ValidationError`)
+- `500` — Server error (`ServerError`, auto-retry)
 
 ### Webhook Signature Verification
 
@@ -952,15 +782,30 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))
 
 **Important:** Reject webhooks with timestamps older than 5 minutes (replay protection).
 
-### Pagination
+### Auto-Pagination
 
-All SDKs support cursor-based pagination. Use `limit` and `cursor` parameters, or use the built-in pagination helpers for auto-pagination.
+All SDKs support auto-pagination for list endpoints:
+
+```typescript
+// Node.js
+for await (const ep of hs.endpoint.list()) {
+  console.log(ep.url);
+}
+```
+
+```python
+# Python
+for ep in hs.endpoint.list():
+    print(ep["url"])
+```
 
 ### Rate Limits
 
-- **Developer:** 300 webhooks/day, 100 requests/min
-- **Startup:** 30,000 webhooks/day, 500 requests/min
-- **Pro:** 100,000 webhooks/day, 1,000 requests/min
-- **Enterprise:** Unlimited webhooks/day, 5,000 requests/min
+| Plan | Webhooks/day | Requests/min |
+|------|-------------|--------------|
+| Developer | 300 | 100 |
+| Startup | 30,000 | 500 |
+| Pro | 100,000 | 1,000 |
+| Enterprise | Unlimited | 5,000 |
 
 SDKs automatically retry on `429` with exponential backoff.
