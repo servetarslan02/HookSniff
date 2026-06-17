@@ -15,16 +15,16 @@ const sdks = [
   icon: <Package size={16} strokeWidth={1.75} />,
   nameKey: 'nodeSdk',
   lang: 'Node.js',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-sdk',
   registry: 'npm',
-  version: '1.3.0',
-  install: 'npm install hooksniff',
+  version: '0.4.2',
+  install: 'npm install hooksniff-sdk',
   status: 'Stable',
   statusColor: 'green',
   features: ['TypeScript types', 'Auto-retry', 'Pagination', 'SSE Streaming', 'Idempotency keys', 'Rate limit parsing'],
-  quickStart: `import {HookSniff} from 'hooksniff';
+  quickStart: `import {HookSniff} from 'hooksniff-sdk';
 
-const hs = new HookSniff({apiKey: process.env.HOOKSNIFF_API_KEY!});
+const hs = new HookSniff(process.env.HOOKSNIFF_API_KEY!);
 
 // 1. Create an endpoint
 const endpoint = await hs.endpoint.create({
@@ -36,7 +36,7 @@ console.log('Endpoint:', endpoint.id);
 console.log('Signing secret:', endpoint.secret); // → whsec_...
 
 // 2. Send a webhook
-const delivery = await hs.message.create({
+const delivery = await hs.webhook.send({
  endpoint_id: endpoint.id,
  event: 'order.created',
  data: {order_id: 'ORD-123', amount: 99.99, currency: 'USD'},
@@ -44,14 +44,14 @@ const delivery = await hs.message.create({
 console.log('Delivery:', delivery.id, delivery.status);
 
 // 3. List deliveries with pagination
-const deliveries = await hs.message_attempt.list_by_endpoint({
+const deliveries = await hs.webhook.list({
  endpoint_id: endpoint.id,
  limit: 20,
 });
 for (const attempt of deliveries.data) {
  console.log(\`\${attempt.id}: \${attempt.response_status_code}\`);
 }`,
-  verify: `import {Webhook} from 'hooksniff';
+  verify: `import {Webhook, WebhookVerificationError} from 'hooksniff-sdk';
 
 const wh = new Webhook('whsec_your_signing_secret');
 
@@ -77,7 +77,7 @@ app.post('/webhook', (req, res) => {
   icon: <Code2 size={16} strokeWidth={1.75} className="text-yellow-600" />,
   nameKey: 'pythonSdk',
   lang: 'Python',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-sdk',
   registry: 'PyPI',
   version: '1.1.0',
   install: 'pip install hooksniff',
@@ -211,7 +211,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
   icon: <Gem size={16} strokeWidth={1.75} className="text-orange-600" />,
   nameKey: 'rustSdk',
   lang: 'Rust',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-sdk',
   registry: 'crates.io',
   version: '1.5.0',
   install: 'cargo add hooksniff',
@@ -283,7 +283,7 @@ async fn handle_webhook(
   icon: <Gem size={16} strokeWidth={1.75} />,
   nameKey: 'rubySdk',
   lang: 'Ruby',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-sdk',
   registry: 'RubyGems',
   version: '1.2.0',
   install: 'gem install hooksniff',
@@ -579,7 +579,7 @@ public async Task<IActionResult> HandleWebhook()
   icon: <FlaskConical size={16} strokeWidth={1.75} />,
   nameKey: 'elixirSdk',
   lang: 'Elixir',
-  pkg: 'hooksniff',
+  pkg: 'hooksniff-sdk',
   registry: 'Hex.pm',
   version: '1.1.0',
   install: `# mix.exs
