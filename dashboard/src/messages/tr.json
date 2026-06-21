@@ -2681,6 +2681,42 @@
       "featureReliabilityDesc": "Üretim kullanımı için yerleşik devre kesici ve hata sınıflandırması.",
       "featureSpeedTitle": "Hızlı",
       "featureSpeedDesc": "Rust backend ve Redis kuyruğu ile düşük gecikmeli teslimat."
+    },
+    "cortex": {
+      "title": "Cortex AI",
+      "subtitle": "Webhook altyapınız kendisi düşünür.",
+      "desc": "Trafik patternlerinizi öğrenen, sorunları olmadan tespit eden ve bozulan endpoint'leri otomatik onaran yerleşik ML motoru.",
+      "anomalyDetection": "Anomali Tespiti",
+      "anomalyDetectionDesc": "Adaptif EWMA eşikleri, Modified Z-Score, IQR aykırı değer tespiti ve çok değişkenli korelasyon her endpoint'in normal davranışını öğrenir.",
+      "predictiveEngine": "Tahmin Motoru",
+      "predictiveEngineDesc": "Doğrusal regresyon ve momentum analizi arızaları gerçekleşmeden önce tahmin eder. Başarı oranı eşik geçmeden saatlerce önce uyarı alırsınız.",
+      "selfHealing": "Kendiliğinden İyileşme",
+      "selfHealingDesc": "Devre kesici sıkılaştırma, yavaş yeniden deneme, hız limiti azaltma, yedek URL geçişi gibi kurtarma stratejilerini otomatik uygular.",
+      "smartRouting": "Akıllı Yönlendirme",
+      "smartRoutingDesc": "Endpoint sağlık durumunu izler ve performans düştüğünde trafiği en iyi yedek URL'e yönlendirir.",
+      "driftDetection": "Drift Tespiti",
+      "driftDetectionDesc": "Page-Hinkley, ADWIN ve Kolmogorov-Smirnov testleri endpoint davranışının önemli ölçüde değiştiğini tespit eder.",
+      "mlQuality": "ML Kalite Takibi",
+      "mlQualityDesc": "Her tahmin takip edilir ve puanlanır. Yetersiz performans gösteren modeller otomatik olarak sıfırlanır ve yeniden eğitilir.",
+      "readDocs": "Cortex Dokümanlarını Oku"
+    },
+    "securitySection": {
+      "title": "Güvenlik",
+      "subtitle": "Kurumsal düzeyde güvenlik. Sıfır taviz.",
+      "desc": "Güvenlik odaklı inşa edildi. SSRF koruması, WAF, davranışsal analiz ve zero-trust mimarisi.",
+      "ssrf": "SSRF Koruması",
+      "ssrfDesc": "Özel IP'lere, metadata endpoint'lere ve dahili ağlara istekleri engeller. DNS doğrulama yeniden bağlama saldırılarını önler.",
+      "hmac": "HMAC-SHA256 İmzaları",
+      "hmacDesc": "Her webhook Standard Webhooks uyumlu HMAC-SHA256 ile imzalanır. Kesinti olmadan gizli anahtar döndürme.",
+      "apiKeys": "API Anahtar Güvenliği",
+      "apiKeysDesc": "Anahtarlar Argon2id hash olarak saklanır. Kesintisiz otomatik anahtar döndürme.",
+      "threatDetection": "Tehdit Tespiti",
+      "threatDetectionDesc": "Davranışsal analiz kimlik bilgisi doldurma, kaba kuvvet ve kötüye kullanımı gerçek zamanlı tespit eder. Otomatik IP engelleme.",
+      "compliance": "Uyumluluk",
+      "complianceDesc": "GDPR, SOC 2, CCPA, KVKK uyumlu. IP takibi ile tam denetim günlüğü.",
+      "zeroTrust": "Sıfır Güven",
+      "zeroTrustDesc": "TOTP 2FA ile JWT, kurumsal için SSO/SAML. Her istek doğrulanır ve yetkilendirilir.",
+      "readDocs": "Güvenlik Dokümanlarını Oku"
     }
   },
   "apiKeys": {

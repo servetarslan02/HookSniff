@@ -334,6 +334,8 @@ export function HomeContent() {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4">
             <a href="#features" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('features')}</a>
+            <a href="#cortex" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">Cortex AI</a>
+            <a href="#security" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('security')}</a>
             <a href="#pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</a>
             <Link href="/get-started" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('getStarted')}</Link>
             <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
@@ -496,6 +498,44 @@ curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
               <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{tFeatures(`${key}Desc`)}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Cortex AI */}
+      <div id="cortex" className="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-24">
+        <div className="text-center mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('cortex.title')}</h2>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-2xl mx-auto px-2">{t('cortex.desc')}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          {['anomalyDetection', 'predictiveEngine', 'selfHealing', 'smartRouting', 'driftDetection', 'mlQuality'].map((key) => (
+            <div key={key} className="glass-card p-5 sm:p-6 md:p-8 hover-lift group">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t(`cortex.${key}`)}</h3>
+              <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{t(`cortex.${key}Desc`)}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <a href="/docs/cortex" className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:underline">{t('cortex.readDocs')} →</a>
+        </div>
+      </div>
+
+      {/* Security */}
+      <div id="security" className="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-24 py-12 sm:py-16 bg-gray-50 dark:bg-slate-900/50 rounded-3xl">
+        <div className="text-center mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('securitySection.title')}</h2>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-2xl mx-auto px-2">{t('securitySection.desc')}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          {['ssrf', 'hmac', 'apiKeys', 'threatDetection', 'compliance', 'zeroTrust'].map((key) => (
+            <div key={key} className="glass-card p-5 sm:p-6 md:p-8 hover-lift group">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t(`securitySection.${key}`)}</h3>
+              <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{t(`securitySection.${key}Desc`)}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <a href="/docs/security-architecture" className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold hover:underline">{t('securitySection.readDocs')} →</a>
         </div>
       </div>
 

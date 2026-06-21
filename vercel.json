@@ -3,7 +3,6 @@
   "outputDirectory": "dashboard/.next",
   "framework": "nextjs",
   "installCommand": "cd dashboard && npm ci",
-  "ignoreCommand": "git diff --quiet HEAD~1 HEAD -- dashboard/ vercel.json || exit 1",
   "rewrites": [
     { "source": "/api/health", "destination": "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/health" },
     { "source": "/api/v1/:path*", "destination": "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/:path*" }
