@@ -243,7 +243,7 @@ This document tracks the implementation status of all HookSniff features. For a 
 |----------|---------|-------------|--------|
 | Node.js (TypeScript) | `hooksniff-sdk` | `npm install hooksniff-sdk` | 🔄 In development |
 | Python | `hooksniff` | `pip install hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go` | ⏳ Planned (OpenAPI codegen) |
+| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go@v0.5.0` | ✅ Available |
 | Rust | `hooksniff` | `cargo add hooksniff` | ⏳ Planned (OpenAPI codegen) |
 | Ruby | `hooksniff` | `gem install hooksniff` | 🔄 Models in `.cleanup/` |
 | Java | `com.hooksniff` | Maven Central | ⏳ Planned (OpenAPI codegen) |
