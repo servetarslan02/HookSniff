@@ -243,7 +243,7 @@ This document tracks the implementation status of all HookSniff features. For a 
 |----------|---------|-------------|--------|
 | Node.js (TypeScript) | `hooksniff-node` | `npm install hooksniff-node` | ✅ v0.4.10 |
 | Python | `hooksniff-python` | `pip install hooksniff-python` | ✅ v0.4.4 |
-| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go@v1.4.0` | ✅ v1.4.0 |
+| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go@v1.4.1` | ✅ v1.4.0 |
 | Kotlin | `com.hooksniff:hooksniff-kotlin` | `implementation("com.hooksniff:hooksniff-kotlin:0.5.0")` | ✅ v0.5.0 |
 | Rust | `hooksniff` | `cargo add hooksniff` | 🔄 Planned |
 | Ruby | `hooksniff` | `gem install hooksniff` | 🔄 Planned |
