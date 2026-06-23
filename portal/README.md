@@ -18,7 +18,7 @@ Bu kadar. Sayfanıza bir webhook portalı eklenecek.
 | Parametre | Zorunlu | Varsayılan | Açıklama |
 |-----------|---------|------------|----------|
 | `data-api-key` | ✅ | — | Müşteri API anahtarı |
-| `data-api-url` | ❌ | `https://hooksniff-api-1046140057667.europe-west1.run.app` | API base URL |
+| `data-api-url` | ❌ | `https://hooksniff-api-499907444852.europe-west1.run.app` | API base URL |
 | `data-theme` | ❌ | `dark` | Tema: `dark` veya `light` |
 | `data-height` | ❌ | `600px` | Widget yüksekliği |
 | `data-width` | ❌ | `100%` | Widget genişliği |

@@ -1,7 +1,7 @@
 # HookSniff — SDK Usage Examples
 
 > Last updated: 2026-06-17
-> API Base URL: `https://hooksniff-api-e6ztf3x2ma-ew.a.run.app`
+> API Base URL: `https://hooksniff-api-499907444852.europe-west1.run.app`
 
 All SDKs follow the same pattern: initialize client → use resources (applications, endpoints, webhooks) → handle responses.
 

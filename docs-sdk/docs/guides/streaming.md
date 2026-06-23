@@ -28,7 +28,7 @@ stream.on('error', (err) => {
 ### curl
 
 ```bash
-curl -N https://hooksniff-api-1046140057667.europe-west1.run.app/v1/stream/deliveries \
+curl -N https://hooksniff-api-499907444852.europe-west1.run.app/v1/stream/deliveries \
   -H "Authorization: Bearer hr_live_YOUR_KEY" \
   -H "Accept: text/event-stream"
 ```

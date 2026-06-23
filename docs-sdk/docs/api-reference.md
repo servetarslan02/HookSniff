@@ -9,7 +9,7 @@ Complete REST API documentation for HookSniff. All endpoints are under `/v1`.
 ## Base URL
 
 ```
-https://hooksniff-api-1046140057667.europe-west1.run.app
+https://hooksniff-api-499907444852.europe-west1.run.app
 ```
 
 ## Authentication

@@ -497,7 +497,7 @@ pub async fn batch_webhooks(
     // ── Bulk INSERT all valid deliveries in one query (eliminates N round-trips) ──
     if !valid_webhooks.is_empty() {
         // Build multi-row INSERT
-        let is_test = service_token.as_ref().map(|s| s.is_test).unwrap_or(false);
+        let is_test = is_test.0;
         let mut query = String::from(
             "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES "
         );

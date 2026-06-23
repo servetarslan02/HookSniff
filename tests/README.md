@@ -118,7 +118,7 @@ schemathesis run http://localhost:3000/openapi.json \
   --hypothesis-max-examples=100
 
 # Run against production (read-only tests)
-schemathesis run https://hooksniff-api-1046140057667.europe-west1.run.app/openapi.json \
+schemathesis run https://hooksniff-api-499907444852.europe-west1.run.app/openapi.json \
   --checks all \
   --dry-run
 

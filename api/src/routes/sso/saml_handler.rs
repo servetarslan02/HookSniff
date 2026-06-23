@@ -30,7 +30,7 @@ pub async fn initiate_saml_login(
     let sp_entity_id = entity_id.as_deref().unwrap_or("urn:hooksniff:sp");
     let acs_url = format!(
         "{}/v1/sso/saml/callback",
-        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string())
+        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-499907444852.europe-west1.run.app".to_string())
     );
 
     // Build SAML AuthnRequest (XML)

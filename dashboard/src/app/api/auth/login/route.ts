@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app/v1';
 
 export async function POST(request: NextRequest) {
   try {

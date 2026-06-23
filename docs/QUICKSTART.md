@@ -25,7 +25,7 @@ hr_live_abc123def456...
 Tell HookSniff where to deliver your webhooks.
 
 ```bash
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
+curl -X POST https://hooksniff-api-499907444852.europe-west1.run.app/v1/endpoints \
   -H "Authorization: Bearer hr_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-app.com/webhook"}'
@@ -43,7 +43,7 @@ Response:
 ## 4. Send a Webhook (1 minute)
 
 ```bash
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
+curl -X POST https://hooksniff-api-499907444852.europe-west1.run.app/v1/webhooks \
   -H "Authorization: Bearer hr_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{

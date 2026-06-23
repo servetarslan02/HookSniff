@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/v1/:path*", "destination": "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/:path*" }
+    { "source": "/api/v1/:path*", "destination": "https://hooksniff-api-499907444852.europe-west1.run.app/v1/:path*" }
   ],
   "headers": [
     {

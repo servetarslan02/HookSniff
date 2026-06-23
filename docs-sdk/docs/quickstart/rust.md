@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // With custom base URL
     let hs = HookSniff::new(
         std::env::var("HOOKSNIFF_API_KEY")?,
-        Some("https://hooksniff-api-1046140057667.europe-west1.run.app".to_string()),
+        Some("https://hooksniff-api-499907444852.europe-west1.run.app".to_string()),
     );
 
     Ok(())

@@ -170,15 +170,15 @@ Set via Vercel Dashboard → Settings → Environment Variables:
 
 ```bash
 # 1. Health check
-curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/health
+curl -s https://hooksniff-api-499907444852.europe-west1.run.app/health
 # Expected: {"status":"ok","version":"...","uptime":"..."}
 
 # 2. API responds
-curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/v1/docs
+curl -s https://hooksniff-api-499907444852.europe-west1.run.app/v1/docs
 # Expected: Swagger UI HTML
 
 # 3. Database connectivity
-curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/register \
+curl -s https://hooksniff-api-499907444852.europe-west1.run.app/v1/auth/register \
   -X POST -H "Content-Type: application/json" \
   -d '{"email":"test-deploy@example.com","password":"Test1234!"}'
 # Expected: 201 Created or 409 Conflict (if user exists)
@@ -195,15 +195,15 @@ gcloud run services logs read hooksniff-api --region europe-west1 --limit 20
 
 ```bash
 # 6. Create endpoint and send webhook (full flow)
-TOKEN=$(curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/login \
+TOKEN=$(curl -s https://hooksniff-api-499907444852.europe-west1.run.app/v1/auth/login \
   -X POST -H "Content-Type: application/json" \
   -d '{"email":"demo@hooksniff.com","password":"Demo1234!"}' | jq -r .token)
 
-curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
+curl -s https://hooksniff-api-499907444852.europe-west1.run.app/v1/endpoints \
   -H "Authorization: Bearer $TOKEN" | jq .
 
 # 7. Check metrics endpoint
-curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/metrics
+curl -s https://hooksniff-api-499907444852.europe-west1.run.app/metrics
 # Expected: Prometheus metrics
 
 # 8. Check Grafana dashboards
@@ -216,7 +216,7 @@ curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/metrics
 #!/bin/bash
 # scripts/verify-deploy.sh
 
-API_URL="https://hooksniff-api-1046140057667.europe-west1.run.app"
+API_URL="https://hooksniff-api-499907444852.europe-west1.run.app"
 DASHBOARD_URL="https://hooksniff.vercel.app"
 ERRORS=0
 
@@ -367,7 +367,7 @@ sqlx migrate info
 
 ```bash
 # 1. Check application health
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
+curl https://hooksniff-api-499907444852.europe-west1.run.app/health
 
 # 2. Check for errors in logs
 gcloud run services logs read hooksniff-api --region europe-west1 --limit 50
@@ -427,7 +427,7 @@ ALTER TABLE users RENAME COLUMN name TO full_name;
 
 ```bash
 # Check service status
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
+curl https://hooksniff-api-499907444852.europe-west1.run.app/health
 
 # Check recent logs
 gcloud run services logs read hooksniff-api --region europe-west1 --limit 50

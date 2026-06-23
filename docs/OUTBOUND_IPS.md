@@ -15,7 +15,7 @@ HookSniff workers send webhook deliveries from **static IP addresses**. If your 
 You can programmatically fetch the current outbound IPs:
 
 ```bash
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips
+curl https://hooksniff-api-499907444852.europe-west1.run.app/v1/outbound-ips
 ```
 
 Response:

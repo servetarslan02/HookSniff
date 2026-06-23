@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Use same base URL logic as api.ts — always include /v1
-const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app';
 const API_BASE = RAW_API_URL.endsWith('/v1') ? RAW_API_URL : `${RAW_API_URL}/v1`;
 
 export async function GET(request: NextRequest) {
