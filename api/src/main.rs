@@ -53,21 +53,34 @@ async fn main() -> Result<()> {
     let db_url = cfg.database_url.clone();
     let redis_url = config::resolve_redis_url();
 
-    // Retry DB connection with exponential backoff — Neon cold start can take 30-60s
+    // Retry DB connection with exponential backoff
     let pool = {
         let mut attempts = 0;
-        let max_attempts = 8;
+        let max_attempts = 12;
         loop {
-            match db::create_pool(&db_url).await {
-                Ok(p) => break p,
-                Err(e) => {
+            match tokio::time::timeout(
+                std::time::Duration::from_secs(45),
+                db::create_pool(&db_url),
+            ).await {
+                Ok(Ok(p)) => break p,
+                Ok(Err(e)) => {
                     attempts += 1;
                     if attempts >= max_attempts {
                         tracing::error!("❌ Database connection failed after {} attempts: {:?}", attempts, e);
                         return Err(e);
                     }
-                    let wait = std::time::Duration::from_secs(2_u64.pow(attempts));
-                    tracing::warn!("⚠️ Database connection attempt {} failed: {:?}, retrying in {:?}...", attempts, e, wait);
+                    let wait = std::time::Duration::from_secs(5 * attempts as u64);
+                    tracing::warn!("⚠️ DB attempt {}/{} failed: {:?}, retrying in {:?}...", attempts, max_attempts, e, wait);
+                    tokio::time::sleep(wait).await;
+                }
+                Err(_) => {
+                    attempts += 1;
+                    if attempts >= max_attempts {
+                        tracing::error!("❌ Database connection timed out after {} attempts", attempts);
+                        return Err(anyhow::anyhow!("Database connection timed out"));
+                    }
+                    let wait = std::time::Duration::from_secs(5 * attempts as u64);
+                    tracing::warn!("⚠️ DB attempt {}/{} timed out, retrying in {:?}...", attempts, max_attempts, wait);
                     tokio::time::sleep(wait).await;
                 }
             }
