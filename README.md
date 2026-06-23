@@ -213,19 +213,19 @@ HookSniff/
 
 ## SDKs
 
-| Language | Package | Repository | Status |
-|----------|---------|------------|--------|
-| Node.js | [`hooksniff-sdk`](https://www.npmjs.com/package/hooksniff-sdk) | [hooksniff-node](https://github.com/servetarslan02/hooksniff-node) | ✅ Available |
-| Python | `hooksniff` | [hooksniff-python](https://github.com/servetarslan02/hooksniff-python) | ✅ Available |
-| Go | `hooksniff-go` | [hooksniff-go](https://github.com/servetarslan02/hooksniff-go) | ✅ Available |
-| Rust | `hooksniff` | [hooksniff-rust](https://github.com/servetarslan02/hooksniff-rust) | ✅ Available |
-| Java | `com.hooksniff` | [hooksniff-java](https://github.com/servetarslan02/hooksniff-java) | ✅ Available |
-| Kotlin | `com.hooksniff` | [hooksniff-kotlin](https://github.com/servetarslan02/hooksniff-kotlin) | ✅ Available |
-| Ruby | `hooksniff` | [hooksniff-ruby](https://github.com/servetarslan02/hooksniff-ruby) | ✅ Available |
-| PHP | `hooksniff/hooksniff` | [hooksniff-php](https://github.com/servetarslan02/hooksniff-php) | ✅ Available |
-| C# | `HookSniff` | [hooksniff-csharp](https://github.com/servetarslan02/hooksniff-csharp) | ✅ Available |
-| Elixir | `hooksniff` | [hooksniff-elixir](https://github.com/servetarslan02/hooksniff-elixir) | ✅ Available |
-| Swift | `HookSniff` | [hooksniff-swift](https://github.com/servetarslan02/hooksniff-swift) | ✅ Available |
+| Language | Package | Version | Repository | Status |
+|----------|---------|---------|------------|--------|
+| Node.js | [`hooksniff-node`](https://www.npmjs.com/package/hooksniff-node) | v0.4.10 | [hooksniff-node](https://github.com/servetarslan02/hooksniff-node) | ✅ Available |
+| Python | [`hooksniff-python`](https://pypi.org/project/hooksniff-python/) | v0.4.4 | [hooksniff-python](https://github.com/servetarslan02/hooksniff-python) | ✅ Available |
+| Go | [`hooksniff-go`](https://pkg.go.dev/github.com/servetarslan02/hooksniff-go) | v1.4.0 | [hooksniff-go](https://github.com/servetarslan02/hooksniff-go) | ✅ Available |
+| Kotlin | [`hooksniff-kotlin`](https://central.sonatype.com/artifact/com.hooksniff/hooksniff-kotlin) | v0.5.0 | [hooksniff-kotlin](https://github.com/servetarslan02/hooksniff-kotlin) | ✅ Available |
+| Rust | `hooksniff` | — | [hooksniff-rust](https://github.com/servetarslan02/hooksniff-rust) | 🔄 Planned |
+| Java | `com.hooksniff` | — | [hooksniff-java](https://github.com/servetarslan02/hooksniff-java) | 🔄 Planned |
+| Ruby | `hooksniff` | — | [hooksniff-ruby](https://github.com/servetarslan02/hooksniff-ruby) | 🔄 Planned |
+| PHP | `hooksniff/hooksniff` | — | [hooksniff-php](https://github.com/servetarslan02/hooksniff-php) | 🔄 Planned |
+| C# | `HookSniff` | — | [hooksniff-csharp](https://github.com/servetarslan02/hooksniff-csharp) | 🔄 Planned |
+| Elixir | `hooksniff` | — | [hooksniff-elixir](https://github.com/servetarslan02/hooksniff-elixir) | 🔄 Planned |
+| Swift | `HookSniff` | — | [hooksniff-swift](https://github.com/servetarslan02/hooksniff-swift) | 🔄 Planned |
 
 > All SDKs are MIT licensed. See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 

@@ -241,17 +241,17 @@ This document tracks the implementation status of all HookSniff features. For a 
 
 | Language | Package | Installation | Status |
 |----------|---------|-------------|--------|
-| Node.js (TypeScript) | `hooksniff-sdk` | `npm install hooksniff-sdk` | 🔄 In development |
-| Python | `hooksniff` | `pip install hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go@v0.5.0` | ✅ Available |
-| Rust | `hooksniff` | `cargo add hooksniff` | ⏳ Planned (OpenAPI codegen) |
-| Ruby | `hooksniff` | `gem install hooksniff` | 🔄 Models in `.cleanup/` |
-| Java | `com.hooksniff` | Maven Central | ⏳ Planned (OpenAPI codegen) |
-| Kotlin | `com.hooksniff` | `implementation("com.hooksniff:hooksniff-kotlin:0.5.0")` | ✅ Available |
-| PHP | `hooksniff/hooksniff` | `composer require hooksniff/hooksniff` | 🔄 Tests in `.cleanup/` |
-| C# | `HookSniff` | `dotnet add package HookSniff` | 🔄 Models+API in `.cleanup/` |
-| Elixir | `hooksniff` | `{:hooksniff, "~> 1.0"}` | ⏳ Planned (OpenAPI codegen) |
-| Swift | `HookSniff` | Swift Package Manager | ⏳ Planned |
+| Node.js (TypeScript) | `hooksniff-node` | `npm install hooksniff-node` | ✅ v0.4.10 |
+| Python | `hooksniff-python` | `pip install hooksniff-python` | ✅ v0.4.4 |
+| Go | `hooksniff-go` | `go get github.com/servetarslan02/hooksniff-go@v1.4.0` | ✅ v1.4.0 |
+| Kotlin | `com.hooksniff:hooksniff-kotlin` | `implementation("com.hooksniff:hooksniff-kotlin:0.5.0")` | ✅ v0.5.0 |
+| Rust | `hooksniff` | `cargo add hooksniff` | 🔄 Planned |
+| Ruby | `hooksniff` | `gem install hooksniff` | 🔄 Planned |
+| Java | `com.hooksniff` | Maven Central | 🔄 Planned |
+| PHP | `hooksniff/hooksniff` | `composer require hooksniff/hooksniff` | 🔄 Planned |
+| C# | `HookSniff` | `dotnet add package HookSniff` | 🔄 Planned |
+| Elixir | `hooksniff` | `{:hooksniff, "~> 1.0"}` | 🔄 Planned |
+| Swift | `HookSniff` | Swift Package Manager | 🔄 Planned |
 
 > **Note:** SDK source code is being reorganized from `.cleanup/` to `sdks/`. See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 

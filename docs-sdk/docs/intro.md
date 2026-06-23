@@ -11,17 +11,17 @@ Official SDKs for the [HookSniff](https://hooksniff.vercel.app) webhook delivery
 
 | Language | Package | Version | Registry |
 |----------|---------|---------|----------|
-| **Node.js** | `hooksniff` | 1.3.0 | npm |
-| **Python** | `hooksniff` | 1.1.0 | PyPI |
-| **Go** | `hooksniff-go` | v0.5.0 | [pkg.go.dev](https://pkg.go.dev/github.com/servetarslan02/hooksniff-go@v0.5.0) |
-| **Rust** | `hooksniff` | 1.5.0 | crates.io |
-| **Ruby** | `hooksniff` | 1.2.0 | RubyGems |
-| **Java** | `hooksniff-sdk` | 1.1.0 | Maven Central |
-| **Kotlin** | `hooksniff-kotlin` | v0.5.0 | [GitHub](https://github.com/servetarslan02/hooksniff-kotlin) |
-| **PHP** | `hooksniff/hooksniff` | 1.1.0 | Packagist |
-| **C#** | `HookSniff` | 1.2.0 | NuGet |
-| **Elixir** | `hooksniff` | 1.1.0 | Hex.pm |
-| **Swift** | `HookSniff` | 1.2.0 | SPM |
+| **Node.js** | `hooksniff-node` | v0.4.10 | [npm](https://www.npmjs.com/package/hooksniff-node) |
+| **Python** | `hooksniff-python` | v0.4.4 | [PyPI](https://pypi.org/project/hooksniff-python/) |
+| **Go** | `hooksniff-go` | v1.4.0 | [pkg.go.dev](https://pkg.go.dev/github.com/servetarslan02/hooksniff-go@v1.4.0) |
+| **Kotlin** | `com.hooksniff:hooksniff-kotlin` | v0.5.0 | [Maven Central](https://central.sonatype.com/artifact/com.hooksniff/hooksniff-kotlin/0.5.0) |
+| **Rust** | `hooksniff` | — | 🔄 Planned |
+| **Ruby** | `hooksniff` | — | 🔄 Planned |
+| **Java** | `com.hooksniff` | — | 🔄 Planned |
+| **PHP** | `hooksniff/hooksniff` | — | 🔄 Planned |
+| **C#** | `HookSniff` | — | 🔄 Planned |
+| **Elixir** | `hooksniff` | — | 🔄 Planned |
+| **Swift** | `HookSniff` | — | 🔄 Planned |
 
 ## Quick Example
 
