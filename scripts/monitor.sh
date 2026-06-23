@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-API_URL="https://hooksniff-api-e6ztf3x2ma-ew.a.run.app"
+API_URL="https://hooksniff-api-499907444852.europe-west1.run.app"
 OTLP_URL="https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/metrics"
 
 # Load secrets from environment — NEVER hardcode credentials in source

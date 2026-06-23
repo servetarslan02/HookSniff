@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app/v1';
 const TIMEOUT = 5000;
 
 async function checkEndpoint(url: string, timeout = TIMEOUT): Promise<{ ok: boolean; latency: number }> {

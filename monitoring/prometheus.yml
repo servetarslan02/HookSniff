@@ -25,7 +25,7 @@ scrape_configs:
       type: Bearer
       credentials: "1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d"
     static_configs:
-      - targets: ["hooksniff-api-e6ztf3x2ma-ew.a.run.app"]
+      - targets: ["hooksniff-api-499907444852.europe-west1.run.app"]
         labels:
           service: "hooksniff-api"
           environment: "production"

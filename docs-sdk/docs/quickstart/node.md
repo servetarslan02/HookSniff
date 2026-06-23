@@ -21,7 +21,7 @@ const hs = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 // With custom options
 const hs = new HookSniff({
   apiKey: process.env.HOOKSNIFF_API_KEY!,
-  baseUrl: 'https://hooksniff-api-1046140057667.europe-west1.run.app',
+  baseUrl: 'https://hooksniff-api-499907444852.europe-west1.run.app',
   timeout: 30000,
 });
 ```

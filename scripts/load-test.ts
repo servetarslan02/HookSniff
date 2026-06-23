@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 // Load Test Script — HookSniff API Performance Test
 // Usage: node scripts/load-test.js [concurrent] [duration_sec]
 
-const API_BASE = process.env.API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
+const API_BASE = process.env.API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app';
 const EMAIL = 'servetarslan02@gmail.com';
 const PASSWORD = 'Alayci_165';
 

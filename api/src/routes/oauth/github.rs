@@ -24,7 +24,7 @@ pub async fn github_login() -> Result<impl axum::response::IntoResponse, AppErro
         .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
-        .unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string());
+        .unwrap_or_else(|_| "https://hooksniff-api-499907444852.europe-west1.run.app".to_string());
     let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
     let state = uuid::Uuid::new_v4().to_string();
 
@@ -78,7 +78,7 @@ pub async fn github_callback(
         .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
-        .unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string());
+        .unwrap_or_else(|_| "https://hooksniff-api-499907444852.europe-west1.run.app".to_string());
     let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
 
     let access_token = exchange_github_code(&code, &client_id, &client_secret, &redirect_uri, None).await?;

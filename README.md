@@ -127,18 +127,18 @@ See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for a complete guide to deployi
 
 ```bash
 # Register
-curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/auth/register \
+curl -X POST https://hooksniff-api-499907444852.europe-west1.run.app/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email": "you@example.com", "password": "your-password"}'
 
 # Create endpoint
-curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/endpoints \
+curl -X POST https://hooksniff-api-499907444852.europe-west1.run.app/v1/endpoints \
   -H "Authorization: Bearer hr_live_YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-app.com/webhook"}'
 
 # Send webhook
-curl -X POST https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/webhooks \
+curl -X POST https://hooksniff-api-499907444852.europe-west1.run.app/v1/webhooks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"endpoint_id": "YOUR_ENDPOINT_ID", "event": "order.created", "data": {"order_id": "12345"}}'
@@ -345,7 +345,7 @@ hs.Webhook.Send(&hooksniff.WebhookSend{
 Enterprise customers can whitelist HookSniff's static outbound IPs in their firewall/WAF. See **[docs/OUTBOUND_IPS.md](docs/OUTBOUND_IPS.md)** for the full list.
 
 ```bash
-curl https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/outbound-ips
+curl https://hooksniff-api-499907444852.europe-west1.run.app/v1/outbound-ips
 # → { "ips": ["..."], "updated_at": "..." }
 ```
 

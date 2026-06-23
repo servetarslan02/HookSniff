@@ -5,7 +5,7 @@
 # ═══════════════════════════════════════════════════════════════
 
 set -e
-API="https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1"
+API="https://hooksniff-api-499907444852.europe-west1.run.app/v1"
 EMAIL="servetarslan02@gmail.com"
 PASSWORD="Alayci_165"
 
