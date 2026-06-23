@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 4
 ---
 
 # Kotlin Quick Start
@@ -7,52 +7,67 @@ sidebar_position: 7
 ## Installation
 
 ### Gradle Kotlin DSL
-
 ```kotlin
-dependencies {
-    implementation("io.github.servetarslan02:hooksniff-sdk-kotlin:1.2.0")
-}
+implementation("com.hooksniff:hooksniff-kotlin:0.5.0")
 ```
 
-### Gradle Groovy
-
+### Gradle Groovy DSL
 ```groovy
-implementation 'io.github.servetarslan02:hooksniff-sdk-kotlin:1.2.0'
+implementation 'com.hooksniff:hooksniff-kotlin:0.5.0'
+```
+
+### Maven
+```xml
+<dependency>
+    <groupId>com.hooksniff</groupId>
+    <artifactId>hooksniff-kotlin</artifactId>
+    <version>0.5.0</version>
+</dependency>
 ```
 
 ## Setup
 
 ```kotlin
-import dev.hooksniff.HookSniff
+import com.hooksniff.*
 
-val hs = HookSniff(apiKey = System.getenv("HOOKSNIFF_API_KEY"))
+fun main() {
+    val hs = HookSniff(System.getenv("HOOKSNIFF_API_KEY"))
+}
+```
+
+## Create an Application
+
+```kotlin
+val app = hs.application.create(ApplicationCreate(
+    name = "My App"
+))
+
+println("Application ID: ${app.id}")
 ```
 
 ## Create an Endpoint
 
 ```kotlin
-val endpoint = hs.endpoint.create(
+val ep = hs.endpoint.create(EndpointCreate(
     url = "https://myapp.com/webhook",
-    description = "Order notifications",
-    eventTypes = listOf("order.created", "order.updated"),
-)
+    application_id = app.id,
+    description = "Order notifications"
+))
 
-println("Endpoint ID: ${endpoint.id}")
-println("Signing secret: ${endpoint.secret}")
+println("Endpoint ID: ${ep.id}")
 ```
 
 ## Send a Webhook
 
 ```kotlin
-val delivery = hs.message.create(
-    endpointId = endpoint.id,
+val delivery = hs.webhook.send(WebhookSend(
+    endpoint_id = ep.id,
     event = "order.created",
-    data = mapOf(
-        "order_id" to "ORD-12345",
-        "amount" to 99.99,
-        "currency" to "USD",
-    ),
-)
+    data = buildJsonObject {
+        put("order_id", "ORD-12345")
+        put("amount", 99.99)
+    }
+))
 
 println("Delivery ID: ${delivery.id}")
 println("Status: ${delivery.status}")
@@ -61,37 +76,15 @@ println("Status: ${delivery.status}")
 ## Verify Incoming Webhooks
 
 ```kotlin
-import dev.hooksniff.Webhook
-
 val wh = Webhook("whsec_your_signing_secret")
 
-// Ktor handler
-post("/webhook") {
+fun handleWebhook(payload: String, headers: Map<String, String>) {
     try {
-        val payload = wh.verify(
-            call.receiveText(),
-            call.request.headers,
-        )
-
-        println("Event: ${payload.event}")
-        println("Data: ${payload.data}")
-        call.respondText("OK")
-    } catch (e: SignatureVerificationException) {
-        call.respondText("Invalid signature", status = HttpStatusCode.Unauthorized)
+        val event = wh.verify(payload, headers)
+        println("Event: $event")
+    } catch (e: WebhookVerificationError) {
+        println("Invalid signature: ${e.message}")
     }
-}
-```
-
-## List Deliveries
-
-```kotlin
-val deliveries = hs.message.list(
-    endpointId = endpoint.id,
-    limit = 20,
-)
-
-deliveries.data.forEach { dlv ->
-    println("${dlv.id}: ${dlv.status}")
 }
 ```
 
@@ -99,14 +92,14 @@ deliveries.data.forEach { dlv ->
 
 ```kotlin
 try {
-    hs.endpoint.get("nonexistent")
-} catch (e: HttpError) {
-    println("HTTP ${e.statusCode}: ${e.message}")
-    if (e.statusCode == 429) {
-        val retryAfter = e.headers["retry-after"]
-        println("Retry after $retryAfter seconds")
-    }
+    hs.endpoint.get("invalid_id")
+} catch (e: AuthenticationError) {
+    println("Invalid API key")
+} catch (e: NotFoundError) {
+    println("Endpoint not found")
+} catch (e: RateLimitError) {
+    println("Rate limited, retry after ${e.retryAfter}s")
 } catch (e: ValidationError) {
-    println("Validation failed: ${e.errors}")
+    println("Validation error: ${e.detail}")
 }
 ```

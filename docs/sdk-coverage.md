@@ -11,7 +11,7 @@
 | Go | Go | 📋 Planned | Generate from OpenAPI spec |
 | Rust | Rust | 📋 Planned | Generate from OpenAPI spec |
 | Java | Java | 📋 Planned | Generate from OpenAPI spec |
-| Kotlin | Kotlin | 📋 Planned | Generate from OpenAPI spec |
+| Kotlin | Kotlin | ✅ Available | v0.5.0 — hooksniff-kotlin |
 | Ruby | Ruby | 📋 Planned | Generate from OpenAPI spec |
 | PHP | PHP | 📋 Planned | Generate from OpenAPI spec |
 | C# | C# | 📋 Planned | Generate from OpenAPI spec |

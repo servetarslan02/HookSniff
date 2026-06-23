@@ -247,7 +247,7 @@ This document tracks the implementation status of all HookSniff features. For a 
 | Rust | `hooksniff` | `cargo add hooksniff` | ⏳ Planned (OpenAPI codegen) |
 | Ruby | `hooksniff` | `gem install hooksniff` | 🔄 Models in `.cleanup/` |
 | Java | `com.hooksniff` | Maven Central | ⏳ Planned (OpenAPI codegen) |
-| Kotlin | `com.hooksniff` | Maven Central | 🔄 Models in `.cleanup/` |
+| Kotlin | `com.hooksniff` | `implementation("com.hooksniff:hooksniff-kotlin:0.5.0")` | ✅ Available |
 | PHP | `hooksniff/hooksniff` | `composer require hooksniff/hooksniff` | 🔄 Tests in `.cleanup/` |
 | C# | `HookSniff` | `dotnet add package HookSniff` | 🔄 Models+API in `.cleanup/` |
 | Elixir | `hooksniff` | `{:hooksniff, "~> 1.0"}` | ⏳ Planned (OpenAPI codegen) |
