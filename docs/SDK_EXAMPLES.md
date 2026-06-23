@@ -666,7 +666,7 @@ Console.WriteLine(delivery.Id);
 ### Installation (Gradle)
 
 ```kotlin
-implementation("com.hooksniff:hooksniff-kotlin:0.4.0")
+implementation("com.hooksniff:hooksniff-kotlin:0.5.0")
 ```
 
 ### Quick Start

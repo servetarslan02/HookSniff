@@ -17,7 +17,7 @@ Official SDKs for the [HookSniff](https://hooksniff.vercel.app) webhook delivery
 | **Rust** | `hooksniff` | 1.5.0 | crates.io |
 | **Ruby** | `hooksniff` | 1.2.0 | RubyGems |
 | **Java** | `hooksniff-sdk` | 1.1.0 | Maven Central |
-| **Kotlin** | `hooksniff-sdk-kotlin` | 1.2.0 | Maven Central |
+| **Kotlin** | `hooksniff-kotlin` | v0.5.0 | [GitHub](https://github.com/servetarslan02/hooksniff-kotlin) |
 | **PHP** | `hooksniff/hooksniff` | 1.1.0 | Packagist |
 | **C#** | `HookSniff` | 1.2.0 | NuGet |
 | **Elixir** | `hooksniff` | 1.1.0 | Hex.pm |
