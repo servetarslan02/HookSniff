@@ -56,10 +56,10 @@ async fn main() -> Result<()> {
     // Retry DB connection with exponential backoff
     let pool = {
         let mut attempts = 0;
-        let max_attempts = 12;
+        let max_attempts = 5;
         loop {
             match tokio::time::timeout(
-                std::time::Duration::from_secs(45),
+                std::time::Duration::from_secs(15),
                 db::create_pool(&db_url),
             ).await {
                 Ok(Ok(p)) => break p,
@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
                         tracing::error!("❌ Database connection failed after {} attempts: {:?}", attempts, e);
                         return Err(e);
                     }
-                    let wait = std::time::Duration::from_secs(5 * attempts as u64);
+                    let wait = std::time::Duration::from_secs(5);
                     tracing::warn!("⚠️ DB attempt {}/{} failed: {:?}, retrying in {:?}...", attempts, max_attempts, e, wait);
                     tokio::time::sleep(wait).await;
                 }
@@ -79,7 +79,7 @@ async fn main() -> Result<()> {
                         tracing::error!("❌ Database connection timed out after {} attempts", attempts);
                         return Err(anyhow::anyhow!("Database connection timed out"));
                     }
-                    let wait = std::time::Duration::from_secs(5 * attempts as u64);
+                    let wait = std::time::Duration::from_secs(5);
                     tracing::warn!("⚠️ DB attempt {}/{} timed out, retrying in {:?}...", attempts, max_attempts, wait);
                     tokio::time::sleep(wait).await;
                 }
