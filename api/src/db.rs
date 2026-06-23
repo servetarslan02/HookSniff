@@ -86,16 +86,16 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
         format!("{}?options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
     };
     let pool = PgPoolOptions::new()
-        .max_connections(10)                              // Neon free tier: 10 bağlantı yeterli
-        .min_connections(0)                               // Neon auto-suspend çalışsın diye 0
-        .acquire_timeout(std::time::Duration::from_secs(30)) // 30sn: Neon cold start (suspend→wake) için
-        .idle_timeout(std::time::Duration::from_secs(60))    // 1dk kullanılmayan bağlantıyı kapat
+        .max_connections(15)                              // Neon free tier: makul miktar
+        .min_connections(1)                               // 1 bağlantı sıcak tut (cold start azaltır)
+        .acquire_timeout(std::time::Duration::from_secs(30)) // 30sn: Neon cold start için
+        .idle_timeout(std::time::Duration::from_secs(120))   // 2dk kullanılmayan bağlantıyı kapat
         .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile
         .connect(&url_with_encoding)
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
-        "✅ Database pool created (min=0, max=10, acquire_timeout=30s, idle_timeout=1m, Neon-optimized)"
+        "✅ Database pool created (min=1, max=15, acquire_timeout=30s, idle_timeout=2m, Neon-optimized)"
     );
     Ok(pool)
 }

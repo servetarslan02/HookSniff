@@ -75,7 +75,7 @@ steps:
       - '--port=3000'
       - '--memory=1Gi'
       - '--cpu=1'
-      - '--min-instances=0'
+      - '--min-instances=1'
       - '--max-instances=3'
       - '--timeout=300'
       - '--startup-probe=httpGet.port=3000,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
