@@ -19,10 +19,33 @@ CREATE INDEX IF NOT EXISTS idx_deliveries_failed_created
 
 -- login_attempts: brute force detection (email + success + created_at)
 -- Used by: security_monitor login tracking
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    user_agent TEXT,
+    success BOOLEAN NOT NULL,
+    failure_reason VARCHAR(100),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 CREATE INDEX IF NOT EXISTS idx_login_attempts_email_success
     ON login_attempts(email, success, created_at DESC);
 
 -- security_events: admin dashboard filtering (customer + severity + created_at)
+CREATE TABLE IF NOT EXISTS security_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_type VARCHAR(100) NOT NULL,
+    severity VARCHAR(20) NOT NULL DEFAULT 'medium',
+    customer_id UUID,
+    email VARCHAR(255),
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    details JSONB,
+    resolved BOOLEAN NOT NULL DEFAULT false,
+    resolved_by UUID,
+    resolved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 CREATE INDEX IF NOT EXISTS idx_security_events_customer_severity
     ON security_events(customer_id, severity, created_at DESC)
     WHERE customer_id IS NOT NULL;
