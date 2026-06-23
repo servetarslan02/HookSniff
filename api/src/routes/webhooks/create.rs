@@ -369,6 +369,7 @@ pub async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
+    Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(count_buffer): Extension<crate::webhook_count_buffer::WebhookCountBuffer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
