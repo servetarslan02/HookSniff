@@ -86,16 +86,16 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
         format!("{}?options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
     };
     let pool = PgPoolOptions::new()
-        .max_connections(50)                              // Neon free tier: 100 max, 50 bizim için yeterli
-        .min_connections(2)                               // Minimum 2 bağlantı hazır tut
-        .acquire_timeout(std::time::Duration::from_secs(15)) // 15sn: Neon cold start için yeterli
-        .idle_timeout(std::time::Duration::from_secs(300))   // 5dk kullanılmayan bağlantıyı kapat
-        .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile (memory leak önleme)
+        .max_connections(10)                              // Neon free tier: 10 bağlantı yeterli
+        .min_connections(0)                               // Neon auto-suspend çalışsın diye 0
+        .acquire_timeout(std::time::Duration::from_secs(30)) // 30sn: Neon cold start (suspend→wake) için
+        .idle_timeout(std::time::Duration::from_secs(60))    // 1dk kullanılmayan bağlantıyı kapat
+        .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile
         .connect(&url_with_encoding)
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
-        "✅ Database pool created (min=2, max=50, acquire_timeout=15s, idle_timeout=5m, prepared_statements=true)"
+        "✅ Database pool created (min=0, max=10, acquire_timeout=30s, idle_timeout=1m, Neon-optimized)"
     );
     Ok(pool)
 }
@@ -109,8 +109,10 @@ pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
         format!("{}?options=-c%20client_encoding%3DUTF8", clean_url)
     };
     let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .acquire_timeout(std::time::Duration::from_secs(10))
+        .max_connections(2)
+        .min_connections(0)
+        .acquire_timeout(std::time::Duration::from_secs(30)) // Neon cold start
+        .idle_timeout(std::time::Duration::from_secs(60))
         .connect(&url_with_encoding)
         .await?;
     Ok(pool)
@@ -128,13 +130,13 @@ pub async fn create_readonly_pool(database_url: &str) -> Result<PgPool> {
         format!("{}?options=-c%20client_encoding%3DUTF8%20-c%20default_transaction_read_only%3Don", clean_url)
     };
     let pool = PgPoolOptions::new()
-        .max_connections(10)
-        .min_connections(1)
-        .acquire_timeout(std::time::Duration::from_secs(10))
-        .idle_timeout(std::time::Duration::from_secs(300))
+        .max_connections(5)
+        .min_connections(0)                               // Neon auto-suspend çalışsın
+        .acquire_timeout(std::time::Duration::from_secs(30))
+        .idle_timeout(std::time::Duration::from_secs(60))
         .connect(&url_with_readonly)
         .await?;
-    tracing::info!("✅ Read-only pool created for analytics/health queries");
+    tracing::info!("✅ Read-only pool created (min=0, max=5, Neon-optimized)");
     Ok(pool)
 }
 
