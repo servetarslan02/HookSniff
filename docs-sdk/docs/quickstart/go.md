@@ -7,7 +7,7 @@ sidebar_position: 3
 ## Installation
 
 ```bash
-go get github.com/servetarslan02/hooksniff-go@v0.5.0
+go get github.com/servetarslan02/hooksniff-go@v1.4.0
 ```
 
 ## Setup
