@@ -79,39 +79,37 @@ pub fn clean_database_url(database_url: &str) -> String {
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
-    // Force UTF-8 client encoding to prevent double-encoding of non-ASCII characters
-    let url_with_encoding = if clean_url.contains('?') {
-        format!("{}&options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
-    } else {
-        format!("{}?options=-c%20client_encoding%3DUTF8&statement_cache_size=100", clean_url)
-    };
+    // Force UTF-8 client encoding and set connect_timeout
+    let separator = if clean_url.contains('?') { '&' } else { '?' };
+    let url_with_encoding = format!(
+        "{}{}options=-c%20client_encoding%3DUTF8&statement_cache_size=100&connect_timeout=10",
+        clean_url, separator
+    );
     let pool = PgPoolOptions::new()
-        .max_connections(15)                              // Neon free tier: makul miktar
-        .min_connections(1)                               // 1 bağlantı sıcak tut (cold start azaltır)
-        .acquire_timeout(std::time::Duration::from_secs(30)) // 30sn: Neon cold start için
-        .idle_timeout(std::time::Duration::from_secs(120))   // 2dk kullanılmayan bağlantıyı kapat
-        .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile
+        .max_connections(15)
+        .min_connections(1)
+        .acquire_timeout(std::time::Duration::from_secs(45))
+        .idle_timeout(std::time::Duration::from_secs(120))
+        .max_lifetime(std::time::Duration::from_secs(1800))
         .connect(&url_with_encoding)
         .await?;
     run_migrations(&pool).await?;
-    tracing::info!(
-        "✅ Database pool created (min=1, max=15, acquire_timeout=30s, idle_timeout=2m, Neon-optimized)"
-    );
+    tracing::info!("✅ Database pool created (max=15, connect_timeout=10s)");
     Ok(pool)
 }
 
 /// Create a small dedicated pool for health checks (5 connections).
 pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
-    let url_with_encoding = if clean_url.contains('?') {
-        format!("{}&options=-c%20client_encoding%3DUTF8", clean_url)
-    } else {
-        format!("{}?options=-c%20client_encoding%3DUTF8", clean_url)
-    };
+    let separator = if clean_url.contains('?') { '&' } else { '?' };
+    let url_with_encoding = format!(
+        "{}{}options=-c%20client_encoding%3DUTF8&connect_timeout=10",
+        clean_url, separator
+    );
     let pool = PgPoolOptions::new()
         .max_connections(2)
         .min_connections(0)
-        .acquire_timeout(std::time::Duration::from_secs(30)) // Neon cold start
+        .acquire_timeout(std::time::Duration::from_secs(30))
         .idle_timeout(std::time::Duration::from_secs(60))
         .connect(&url_with_encoding)
         .await?;
