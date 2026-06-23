@@ -7,7 +7,7 @@ sidebar_position: 3
 ## Installation
 
 ```bash
-go get github.com/servetarslan02/hooksniff-go@v1.3.0
+go get github.com/servetarslan02/hooksniff-go@v0.5.0
 ```
 
 ## Setup
@@ -16,7 +16,6 @@ go get github.com/servetarslan02/hooksniff-go@v1.3.0
 package main
 
 import (
-    "context"
     "fmt"
     "os"
 
@@ -24,44 +23,54 @@ import (
 )
 
 func main() {
-    hs := hooksniff.NewClient(os.Getenv("HOOKSNIFF_API_KEY"))
-    ctx := context.Background()
+    hs := hooksniff.New(os.Getenv("HOOKSNIFF_API_KEY"), nil)
 }
 ```
 
-## Create an Endpoint
+## Create an Application
 
 ```go
-endpoint, err := hs.Endpoint.Create(ctx, &hooksniff.EndpointIn{
-    Url:         "https://myapp.com/webhook",
-    Description: hooksniff.String("Order notifications"),
-    EventTypes:  []string{"order.created", "order.updated"},
+app, err := hs.Application.Create(&hooksniff.ApplicationCreate{
+    Name: "My App",
 })
 if err != nil {
     panic(err)
 }
 
-fmt.Printf("Endpoint ID: %s\n", endpoint.Id)
-fmt.Printf("Signing secret: %s\n", endpoint.Secret)
+fmt.Printf("Application ID: %s\n", app.ID)
+```
+
+## Create an Endpoint
+
+```go
+ep, err := hs.Endpoint.Create(&hooksniff.EndpointCreate{
+    URL:           "https://myapp.com/webhook",
+    ApplicationID: app.ID,
+    Description:   hooksniff.String("Order notifications"),
+})
+if err != nil {
+    panic(err)
+}
+
+fmt.Printf("Endpoint ID: %s\n", ep.ID)
 ```
 
 ## Send a Webhook
 
 ```go
-delivery, err := hs.Message.Create(ctx, &hooksniff.MessageIn{
-    EndpointId: endpoint.Id,
+delivery, err := hs.Webhook.Send(&hooksniff.WebhookSend{
+    EndpointID: ep.ID,
     Event:      "order.created",
     Data: map[string]interface{}{
         "order_id": "ORD-12345",
         "amount":   99.99,
-        "currency": "USD",
     },
 })
 if err != nil {
     panic(err)
 }
 
-fmt.Printf("Delivery ID: %s\n", delivery.Id)
+fmt.Printf("Delivery ID: %s\n", delivery.ID)
 fmt.Printf("Status: %s\n", delivery.Status)
 ```
 
@@ -81,39 +90,41 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    fmt.Printf("Event: %s\n", payload.Event)
-    fmt.Printf("Data: %v\n", payload.Data)
+    fmt.Printf("Payload: %s\n", string(payload))
     w.WriteHeader(200)
 }
 ```
 
-## List Deliveries
+## List Deliveries (Auto-Pagination)
 
 ```go
-deliveries, err := hs.MessageAttempt.ListByEndpoint(ctx, endpoint.Id, &hooksniff.MessageAttemptListOptions{
-    Limit: hooksniff.Int32(20),
-})
-if err != nil {
-    panic(err)
-}
-
-for _, attempt := range deliveries.Data {
-    fmt.Printf("%s: %d\n", attempt.Id, attempt.ResponseStatusCode)
+paginator := hs.Webhook.List()
+for {
+    item, ok := paginator.Next()
+    if !ok {
+        break
+    }
+    // item is json.RawMessage — unmarshal as needed
+    fmt.Printf("Delivery: %s\n", string(item))
 }
 ```
 
 ## Error Handling
 
 ```go
-endpoint, err := hs.Endpoint.Create(ctx, &hooksniff.EndpointIn{Url: "invalid"})
+_, err := hs.Endpoint.Get("invalid_id")
 if err != nil {
-    var httpErr *hooksniff.HttpError
-    if errors.As(err, &httpErr) {
-        fmt.Printf("HTTP %d: %s\n", httpErr.StatusCode, httpErr.Message)
-        if httpErr.StatusCode == 429 {
-            retryAfter := httpErr.Headers.Get("Retry-After")
-            fmt.Printf("Retry after %s seconds\n", retryAfter)
-        }
+    switch e := err.(type) {
+    case *hooksniff.AuthenticationError:
+        fmt.Println("Invalid API key")
+    case *hooksniff.NotFoundError:
+        fmt.Println("Endpoint not found")
+    case *hooksniff.RateLimitError:
+        fmt.Printf("Rate limited, retry after %ds\n", e.RetryAfter)
+    case *hooksniff.ValidationError:
+        fmt.Println("Validation error:", e.Detail)
+    default:
+        fmt.Println("Error:", err)
     }
 }
 ```

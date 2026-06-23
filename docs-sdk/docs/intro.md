@@ -13,7 +13,7 @@ Official SDKs for the [HookSniff](https://hooksniff.vercel.app) webhook delivery
 |----------|---------|---------|----------|
 | **Node.js** | `hooksniff` | 1.3.0 | npm |
 | **Python** | `hooksniff` | 1.1.0 | PyPI |
-| **Go** | `hooksniff-go` | v1.3.0 | pkg.go.dev |
+| **Go** | `hooksniff-go` | v0.5.0 | [pkg.go.dev](https://pkg.go.dev/github.com/servetarslan02/hooksniff-go@v0.5.0) |
 | **Rust** | `hooksniff` | 1.5.0 | crates.io |
 | **Ruby** | `hooksniff` | 1.2.0 | RubyGems |
 | **Java** | `hooksniff-sdk` | 1.1.0 | Maven Central |
