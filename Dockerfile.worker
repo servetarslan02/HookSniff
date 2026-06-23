@@ -1,7 +1,6 @@
 # ── Stage 1: Builder ──
 FROM rust:1.96-bookworm AS builder
 
-# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends pkg-config cmake && \
     rm -rf /var/lib/apt/lists/*
@@ -14,30 +13,16 @@ COPY vendor/ vendor/
 COPY api/ api/
 COPY worker/ worker/
 
-# Dependency cache — stubs for api/worker only, common keeps real source
-RUN mkdir -p api/src worker/src && \
-    echo "fn main() {}" > api/src/main.rs && \
-    echo "fn main() {}" > worker/src/main.rs && \
-    cargo build --release -p hooksniff-worker && \
-    rm -rf api/src worker/src
-
-# Restore real source
-COPY api/src/ api/src/
-COPY worker/src/ worker/src/
-
-# Build release binary with optimizations
 RUN cargo build --release -p hooksniff-worker && \
     strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
 
-# Install only runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user with no shell
 RUN groupadd -r hooksniff && \
     useradd -r -g hooksniff -d /app -s /sbin/nologin -u 10001 hooksniff && \
     mkdir -p /app && \
