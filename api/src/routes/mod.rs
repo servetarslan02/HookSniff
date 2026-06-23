@@ -149,6 +149,8 @@ pub fn api_router() -> Router {
             "/plans",
             axum::routing::get(admin::public_plans),
         )
+        .route("/docs", axum::routing::get(docs::swagger_ui))
+        .route("/openapi.yaml", axum::routing::get(docs::openapi_spec))
         .merge(protected)
         .merge(inbound_config_routes)
         .merge(inbound_public_routes)

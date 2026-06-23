@@ -93,6 +93,8 @@ pub fn router() -> Router {
             "/subscription",
             get(get_subscription).delete(cancel_subscription),
         )
+        // Alias: POST /billing/cancel → cancel subscription
+        .route("/cancel", post(cancel_subscription))
         .route("/upgrade", post(upgrade_plan))
         .route("/pause", post(pause_subscription))
         .route("/resume", post(resume_subscription))

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
+// Use same base URL logic as api.ts — always include /v1
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
+const API_BASE = RAW_API_URL.endsWith('/v1') ? RAW_API_URL : `${RAW_API_URL}/v1`;
 
 export async function GET(request: NextRequest) {
   const domain = request.nextUrl.searchParams.get('domain');
@@ -9,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${API_URL}/v1/sso/providers?domain=${encodeURIComponent(domain)}`, {
+    const res = await fetch(`${API_BASE}/sso/providers?domain=${encodeURIComponent(domain)}`, {
       signal: AbortSignal.timeout(3000),
     });
     const data = await res.json();
