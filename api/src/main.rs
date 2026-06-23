@@ -45,7 +45,26 @@ async fn main() -> Result<()> {
     let db_url = cfg.database_url.clone();
     let redis_url = config::resolve_redis_url();
 
-    let pool = db::create_pool(&db_url).await?;
+    // Retry DB connection with exponential backoff — Neon cold start can take 30-60s
+    let pool = {
+        let mut attempts = 0;
+        let max_attempts = 5;
+        loop {
+            match db::create_pool(&db_url).await {
+                Ok(p) => break p,
+                Err(e) => {
+                    attempts += 1;
+                    if attempts >= max_attempts {
+                        tracing::error!("❌ Database connection failed after {} attempts: {:?}", attempts, e);
+                        return Err(e);
+                    }
+                    let wait = std::time::Duration::from_secs(2_u64.pow(attempts));
+                    tracing::warn!("⚠️ Database connection attempt {} failed: {:?}, retrying in {:?}...", attempts, e, wait);
+                    tokio::time::sleep(wait).await;
+                }
+            }
+        }
+    };
 
     let (health_pool, rate_limiter, cache_layer) = tokio::join!(
         async {
