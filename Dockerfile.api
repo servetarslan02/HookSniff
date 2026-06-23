@@ -8,18 +8,19 @@ RUN apt-get update && \
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
-COPY api/ api/
-COPY worker/ worker/
 COPY common/ common/
 COPY vendor/ vendor/
+COPY api/ api/
+COPY worker/ worker/
 
-# Dependency cache (faster rebuilds)
+# Dependency cache — stubs for api/worker only, common keeps real source
 RUN mkdir -p api/src worker/src && \
     echo "fn main() {}" > api/src/main.rs && \
     echo "fn main() {}" > worker/src/main.rs && \
-    cargo build --release -p hooksniff-api 2>/dev/null || true && \
+    cargo build --release -p hooksniff-api && \
     rm -rf api/src worker/src
 
+# Restore real source
 COPY api/src/ api/src/
 COPY worker/src/ worker/src/
 COPY docs/ docs/
@@ -53,5 +54,3 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=3 \
     CMD sh -c 'curl -sf "http://127.0.0.1:${PORT:-10000}/health" || exit 1'
 
 CMD ["/usr/local/bin/hooksniff-api"]
-
-# Force rebuild 2026-06-04 01:53:20

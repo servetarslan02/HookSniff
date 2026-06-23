@@ -6,24 +6,24 @@
 # ═══════════════════════════════════════════════════════════════════
 
 # ── Stage 1: Builder ──
-# Item 346: Pin to digest for reproducible builds. Example:
-#   FROM rust:1.96-bookworm@sha256:<digest> AS builder
 FROM rust:1.96-bookworm AS builder
 
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
+COPY common/ common/
+COPY vendor/ vendor/
 COPY api/ api/
 COPY worker/ worker/
 
-# Dependency cache
-RUN mkdir -p api/src && \
+# Dependency cache — stubs for api/worker only, common keeps real source
+RUN mkdir -p api/src worker/src && \
     echo "fn main() {}" > api/src/main.rs && \
-    mkdir -p worker/src && \
     echo "fn main() {}" > worker/src/main.rs && \
-    cargo build --release -p hooksniff-worker 2>/dev/null || true && \
+    cargo build --release -p hooksniff-worker && \
     rm -rf api/src worker/src
 
+# Restore real source for api and worker
 COPY api/src/ api/src/
 COPY worker/src/ worker/src/
 
@@ -31,10 +31,8 @@ RUN cargo build --release -p hooksniff-worker && \
     strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
-# Item 346: Pin to digest for reproducible builds
 FROM debian:bookworm-slim
 
-# Runtime deps — no libssl3 needed (rustls is pure Rust)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*

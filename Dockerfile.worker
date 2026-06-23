@@ -7,11 +7,23 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
 COPY Cargo.toml Cargo.lock ./
-COPY api/ api/
-COPY worker/ worker/
 COPY common/ common/
 COPY vendor/ vendor/
+COPY api/ api/
+COPY worker/ worker/
+
+# Dependency cache — stubs for api/worker only, common keeps real source
+RUN mkdir -p api/src worker/src && \
+    echo "fn main() {}" > api/src/main.rs && \
+    echo "fn main() {}" > worker/src/main.rs && \
+    cargo build --release -p hooksniff-worker && \
+    rm -rf api/src worker/src
+
+# Restore real source
+COPY api/src/ api/src/
+COPY worker/src/ worker/src/
 
 # Build release binary with optimizations
 RUN cargo build --release -p hooksniff-worker && \
