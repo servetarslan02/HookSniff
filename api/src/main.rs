@@ -41,6 +41,14 @@ async fn main() -> Result<()> {
     let startup_start = std::time::Instant::now();
     let redis_startup = config::redis_startup_timeout();
 
+    // ── CRITICAL: Bind TCP listener FIRST ───────────────────────
+    // Cloud Run startup probe needs to connect to the port immediately.
+    // Health check returns 200 during startup (HEALTH_CHECKS_READY=false).
+    // DB setup happens AFTER port is open, so startup probe always passes.
+    let addr = format!("0.0.0.0:{}", cfg.port);
+    let early_listener = tokio::net::TcpListener::bind(&addr).await?;
+    tracing::info!("🔌 TCP listener bound on port {} (startup probe can connect now)", cfg.port);
+
     // ── Database & core services (parallel) ─────────────────────
     let db_url = cfg.database_url.clone();
     let redis_url = config::resolve_redis_url();
@@ -48,7 +56,7 @@ async fn main() -> Result<()> {
     // Retry DB connection with exponential backoff — Neon cold start can take 30-60s
     let pool = {
         let mut attempts = 0;
-        let max_attempts = 5;
+        let max_attempts = 8;
         loop {
             match db::create_pool(&db_url).await {
                 Ok(p) => break p,
@@ -358,17 +366,13 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(pool.clone()))
         .layer(axum::Extension(readonly_pool));
 
-    // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
-    let addr = format!("0.0.0.0:{}", cfg.port);
-    tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
+    // ── Start server — use the listener bound at startup ──
+    tracing::info!("🚀 HookSniff API ready to serve on port {}", cfg.port);
 
-    // Bind the TCP listener immediately — Render needs to see the port open within seconds
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
+    // Use the listener that was bound at the very beginning of startup
+    let listener = early_listener;
     
     // Mark health checks as ready AFTER full initialization but BEFORE serving
-    // The health_check function returns 200 during startup when HEALTH_CHECKS_READY is false,
-    // so Render's startup probe will pass immediately. Once we set this to true,
-    // health_check will do full DB/Redis checks.
     routes::health::set_health_checks_ready();
     
     // Serve — all middleware layers, extensions, and routes are fully initialized here
